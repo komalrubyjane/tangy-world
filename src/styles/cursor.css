@@ -1,0 +1,65 @@
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999 !important;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cursor {
+    display: block;
+  }
+
+  body.cursor-ready {
+    cursor: none;
+  }
+}
+
+.cursor-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-tangy-cream);
+  transition: width .25s ease, height .25s ease, background .25s ease;
+}
+
+.cursor.is-active .cursor-dot {
+  width: 64px;
+  height: 64px;
+  background: transparent;
+  border: 1px solid var(--color-tangy-cream);
+  box-sizing: border-box;
+}
+
+.cursor-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--color-tangy-cream);
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.cursor.is-active .cursor-label {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------- */
+/* MODAL & FORM FIELD CURSOR ACCESSIBILITY FALLBACKS             */
+/* ------------------------------------------------------------- */
+input, textarea, select {
+  cursor: text !important;
+}
+
+button, a, [role="button"], .btn-ticket {
+  cursor: pointer !important;
+}
