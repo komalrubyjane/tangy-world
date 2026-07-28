@@ -1,15 +1,18 @@
+import { useRef, useState, useEffect } from 'react';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
+import { gallery, artists } from '../../data/mockData';
 
 export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
   const { playSFX } = useAudio();
+  const [activeTab, setActiveTab] = useState(null);
 
   const sectionRef = useGSAPContext((ctx) => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 75%'
+        start: 'top 70%'
       }
     });
 
@@ -19,26 +22,52 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }
     )
 
-    // 2. Posters Enter Asymmetrically
-    .fromTo('.poster-volunteer',
-      { x: -80, opacity: 0, rotation: -6 },
-      { x: 0, opacity: 1, rotation: -1, duration: 0.8, ease: 'back.out(1.2)' }, 0.2
+    // 2. Dossier Folders Slide In Asymmetrically
+    .fromTo('.dossier-volunteer',
+      { x: -90, opacity: 0, rotation: -5 },
+      { x: 0, opacity: 1, rotation: -1.5, duration: 0.8, ease: 'back.out(1.2)' }, 0.2
     )
-    .fromTo('.poster-artist',
-      { x: 80, opacity: 0, rotation: 6 },
-      { x: 0, opacity: 1, rotation: 1, duration: 0.8, ease: 'back.out(1.2)' }, 0.3
+    .fromTo('.dossier-artist',
+      { x: 90, opacity: 0, rotation: 5 },
+      { x: 0, opacity: 1, rotation: 1.5, duration: 0.8, ease: 'back.out(1.2)' }, 0.3
     )
 
-    // 3. Stamps Slap Down Last
+    // 3. Polaroids & Tape Stick
+    .fromTo('.dossier-polaroid-1',
+      { scale: 0.8, opacity: 0, rotation: -10 },
+      { scale: 1, opacity: 1, rotation: -4, duration: 0.5, ease: 'power3.out' }, 0.6
+    )
+    .fromTo('.dossier-polaroid-2',
+      { scale: 0.8, opacity: 0, rotation: 10 },
+      { scale: 1, opacity: 1, rotation: 4, duration: 0.5, ease: 'power3.out' }, 0.7
+    )
+
+    // 4. Archive Stamps Slap Down with Impact
     .fromTo('.crew-stamp-1',
       { scale: 1.8, opacity: 0, rotation: -25 },
-      { scale: 1, opacity: 0.9, rotation: -8, duration: 0.4, ease: 'bounce.out' }, 0.8
+      { scale: 1, opacity: 0.95, rotation: -8, duration: 0.4, ease: 'bounce.out' }, 0.9
     )
     .fromTo('.crew-stamp-2',
       { scale: 1.8, opacity: 0, rotation: 25 },
-      { scale: 1, opacity: 0.9, rotation: 6, duration: 0.4, ease: 'bounce.out', onStart: () => playSFX('ticketClick') }, 0.9
+      { scale: 1, opacity: 0.95, rotation: 6, duration: 0.4, ease: 'bounce.out', onStart: () => playSFX('ticketClick') }, 1.0
     );
 
+  }, []);
+
+  // Desktop Mouse Parallax (Subtle Dossier Tilt & Shadow Shift)
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (window.innerWidth < 768) return;
+      const { clientX, clientY } = e;
+      const moveX = (clientX / window.innerWidth - 0.5) * 12;
+      const moveY = (clientY / window.innerHeight - 0.5) * 12;
+
+      gsap.to('.dossier-volunteer', { x: moveX * 0.15, y: moveY * 0.15, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.dossier-artist', { x: -moveX * 0.18, y: -moveY * 0.18, duration: 1.2, ease: 'power2.out' });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   const handleVolunteerClick = () => {
@@ -55,31 +84,32 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
     <section 
       ref={sectionRef} 
       id="volunteer" 
-      className="relative w-full py-28 md:py-36 bg-[#315B66] text-[#E7D7AC] overflow-hidden border-t-8 border-[#E7D7AC]"
+      className="relative w-full py-28 md:py-36 bg-[#315B66] text-[#E7D5A4] overflow-hidden border-t-8 border-[#E7D5A4]"
     >
       
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+      {/* INK GRAIN OVERLAY */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-10" />
 
       {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-10">
-        <span className="display text-[26vw] leading-none text-[#5F7D80] uppercase">WE WANT YOU</span>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-10 z-5">
+        <span className="display text-[24vw] leading-none text-[#5F7D80] uppercase">CLASSIFIED 1974</span>
       </div>
 
       {/* ARCHIVAL CORNER METADATA */}
       <div className="absolute top-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#C69A32] font-bold pointer-events-none uppercase hidden md:block">
-        TANGY SESSIONS // RECRUITMENT
+        TANGY SESSIONS // RECRUITMENT ARCHIVE
       </div>
 
-      <div className="absolute top-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D7AC]/70 pointer-events-none uppercase hidden md:block">
+      <div className="absolute top-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D5A4]/70 pointer-events-none uppercase hidden md:block">
         HYDERABAD / EST. 2016
       </div>
 
-      <div className="absolute bottom-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D7AC]/70 pointer-events-none uppercase hidden md:block">
+      <div className="absolute bottom-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D5A4]/70 pointer-events-none uppercase hidden md:block">
         PEOPLE MAKE THE SESSION.
       </div>
 
       <div className="absolute bottom-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#C69A32] font-bold pointer-events-none uppercase hidden md:block">
-        VOL. 001 / FADED BLUE INK
+        DOSSIER NO. 07-V & 08-A
       </div>
 
       {/* ------------------------------------------------------------- */}
@@ -87,103 +117,167 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       {/* ------------------------------------------------------------- */}
       <div className="crew-header max-w-4xl mx-auto text-center px-6 relative z-20 mb-16 md:mb-24">
         <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
-          RECRUITMENT POSTER // 1970s BLUE SCREEN PRINT
+          1970s CLASSIFIED RECRUITMENT DESK // TANGY MUSIC LABEL
         </span>
-        <h2 className="display text-6xl md:text-9xl text-[#E7D7AC] leading-none ink-bleed mb-4">
+        <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] leading-none ink-bleed mb-4">
           JOIN THE CREW
         </h2>
-        <p className="font-mono text-xs md:text-sm text-[#E7D7AC]/90 tracking-[0.3em] uppercase border-y-2 border-[#17120D] py-2 inline-block px-6 bg-[#172E33]/80 backdrop-blur-xs">
+        <p className="font-mono text-xs md:text-sm text-[#E7D7AC]/90 tracking-[0.3em] uppercase border-y-2 border-[#17120D] py-2 inline-block px-6 bg-[#172E33]/90 backdrop-blur-xs shadow-md">
           BEHIND THE SOUND · ON THE STAGE
         </p>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* TWO SIDE-BY-SIDE RECRUITMENT POSTERS                          */}
+      {/* INTERACTIVE CLASSIFIED DOSSIER ARCHIVE GRID                    */}
       {/* ------------------------------------------------------------- */}
       <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 relative z-20 items-stretch">
 
         {/* ----------------------------------------------------------- */}
-        {/* POSTER 1: VOLUNTEER (MUSTARD STAMP & BUTTON)                 */}
+        {/* DOSSIER 1: VOLUNTEER (AGED CREAM MANILA FOLDER ARCHIVE)       */}
         {/* ----------------------------------------------------------- */}
-        <div className="poster-volunteer group bg-[#E7D7AC] text-[#17120D] p-8 md:p-14 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[-2deg] transition-all duration-300 relative flex flex-col justify-between">
+        <div 
+          className="dossier-volunteer group bg-[#E7D7AC] text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[-2deg] transition-all duration-300 relative flex flex-col justify-between"
+          onClick={() => setActiveTab(activeTab === 'vol' ? null : 'vol')}
+        >
           
-          {/* Stamp */}
-          <div className="crew-stamp-1 absolute -top-4 right-6 border-4 border-[#17120D] bg-[#C69A32] text-[#17120D] font-mono text-[10px] font-bold px-3 py-1 uppercase rotate-[-8deg] shadow-md z-30">
-            CREW WANTED ✦
+          {/* MANILA FOLDER TAB AT TOP */}
+          <div className="absolute -top-6 left-6 bg-[#E7D7AC] border-t-4 border-x-4 border-[#17120D] px-4 py-1 font-mono text-[9px] font-bold text-[#315B66] uppercase tracking-widest">
+            DOSSIER NO. 07-V // BEHIND THE SCENES
+          </div>
+
+          {/* PAPER CLIP DECORATION */}
+          <div className="absolute -top-3 left-44 w-3 h-10 border-2 border-slate-700 rounded-full z-30 pointer-events-none rotate-[-6deg]" />
+
+          {/* MASKING TAPE OVERLAY */}
+          <div className="absolute -top-3 right-28 w-20 h-5 bg-[rgba(231,215,172,0.85)] rotate-[-3deg] border border-black/30 z-30 pointer-events-none" />
+
+          {/* CLASSIFIED RED STAMP */}
+          <div className="crew-stamp-1 absolute -top-5 right-4 border-4 border-[#17120D] bg-[#5A120D] text-[#E7D7AC] font-mono text-[10px] font-bold px-3.5 py-1 uppercase rotate-[-8deg] shadow-lg z-30 pointer-events-none">
+            CLASSIFIED // HYD 1974 ✦
           </div>
 
           <div>
             <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#315B66] border-b-2 border-[#17120D] pb-3 mb-6 uppercase">
-              <span>RECRUITMENT // PATH 01</span>
-              <span>BEHIND THE SCENES</span>
+              <span>PATH 01 // PRODUCTION DESK</span>
+              <span>CONFIDENTIAL FILE</span>
             </div>
 
-            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-4 ink-bleed">
+            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-3 ink-bleed">
               VOLUNTEER
             </h3>
 
-            <p className="font-body text-base md:text-lg text-[#17120D]/90 leading-relaxed italic border-l-4 border-[#C69A32] pl-4 mb-8">
-              Help build the nights, the stories and everything that happens between them.
+            {/* HANDWRITTEN ARCHIVAL NOTE */}
+            <p className="font-mono text-xs md:text-sm text-[#17120D]/90 leading-relaxed border-l-4 border-[#C69A32] pl-3.5 my-4">
+              ✎ "Help build the nights, the stories and everything that happens between them."
             </p>
 
-            <div className="flex flex-wrap gap-2 mb-10 font-mono text-[9px] font-bold text-[#17120D]">
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">EVENTS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">PRODUCTION</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">CREATIVE</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">HOSPITALITY</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">COMMUNITY</span>
+            {/* ATTACHED POLAROID PHOTO */}
+            <div className="dossier-polaroid-1 relative w-[160px] md:w-[210px] bg-[#F5E9C9] p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[-4deg] my-6 transition-transform group-hover:scale-105">
+              <img src={gallery[4]?.src || "/media/gallery/tangy5.jpg"} alt="Stagehands Sound Check" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125 border border-[#17120D]" />
+              <p className="font-mono text-[7.5px] text-[#17120D] font-bold tracking-wider mt-1.5">✎ STAGE & PRODUCTION</p>
             </div>
+
+            {/* CLASSIFIED DEPARTMENT TAGS */}
+            <div className="flex flex-wrap gap-2 mb-8 font-mono text-[9px] font-bold text-[#17120D]">
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">EVENTS</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">PRODUCTION</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">CREATIVE</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">HOSPITALITY</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">COMMUNITY</span>
+            </div>
+
+            {/* MOBILE TAP DETAILS TOGGLE */}
+            {activeTab === 'vol' && (
+              <div className="font-mono text-[10px] text-[#17120D] bg-[#F5E9C9] p-3 border border-[#17120D] mb-4 animate-in fade-in">
+                <p className="font-bold mb-1">RECRUITMENT DETAILS:</p>
+                <p>• Access to all 2025-2026 Tangy Sessions behind-the-scenes.</p>
+                <p>• Hands-on experience with analogue sound rigs & monument lighting.</p>
+              </div>
+            )}
           </div>
 
-          {/* Volunteer Action Button (Mustard + Black Text) */}
+          {/* Volunteer Action Button */}
           <button 
             onClick={handleVolunteerClick}
-            className="btn-ticket w-full text-center !bg-[#C69A32] !text-[#17120D]"
+            className="btn-ticket w-full text-center !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
-            APPLY AS VOLUNTEER →
+            [ APPLY AS VOLUNTEER → ]
           </button>
 
         </div>
 
         {/* ----------------------------------------------------------- */}
-        {/* POSTER 2: ARTIST (BURNT ORANGE STAMP & BUTTON)               */}
+        {/* DOSSIER 2: ARTIST (VINTAGE VINYL SLEEVE AUDITION PORTFOLIO)    */}
         {/* ----------------------------------------------------------- */}
-        <div className="poster-artist group bg-[#E7D7AC] text-[#17120D] p-8 md:p-14 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[2deg] transition-all duration-300 relative flex flex-col justify-between">
+        <div 
+          className="dossier-artist group bg-[#E7D7AC] text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[2deg] transition-all duration-300 relative flex flex-col justify-between"
+          onClick={() => setActiveTab(activeTab === 'art' ? null : 'art')}
+        >
           
-          {/* Stamp */}
-          <div className="crew-stamp-2 absolute -top-4 right-6 border-4 border-[#17120D] bg-[#B84718] text-[#E7D7AC] font-mono text-[10px] font-bold px-3 py-1 uppercase rotate-[6deg] shadow-md z-30">
-            ARTISTS WANTED ✦
+          {/* MANILA FOLDER TAB AT TOP */}
+          <div className="absolute -top-6 left-6 bg-[#B84718] border-t-4 border-x-4 border-[#17120D] px-4 py-1 font-mono text-[9px] font-bold text-[#E7D7AC] uppercase tracking-widest">
+            DOSSIER NO. 08-A // ON THE STAGE
+          </div>
+
+          {/* CASSETTE TAPE / GUITAR PICK ACCENT */}
+          <div className="absolute -top-4 right-32 w-7 h-9 bg-[#C69A32] rounded-t-xl rounded-b-sm border-2 border-[#17120D] rotate-[12deg] z-30 pointer-events-none flex items-center justify-center font-mono text-[6px] font-black text-[#17120D]">
+            PICK
+          </div>
+
+          {/* MASKING TAPE OVERLAY */}
+          <div className="absolute -top-3 left-32 w-18 h-5 bg-[rgba(231,215,172,0.85)] rotate-[4deg] border border-black/30 z-30 pointer-events-none" />
+
+          {/* GOLD FOIL AUDITION STAMP */}
+          <div className="crew-stamp-2 absolute -top-5 right-4 border-4 border-[#17120D] bg-[#B84718] text-[#E7D7AC] font-mono text-[10px] font-bold px-3.5 py-1 uppercase rotate-[6deg] shadow-lg z-30 pointer-events-none">
+            AUDITION // 33⅓ RPM ✦
           </div>
 
           <div>
             <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B84718] border-b-2 border-[#17120D] pb-3 mb-6 uppercase">
-              <span>RECRUITMENT // PATH 02</span>
-              <span>ON THE STAGE</span>
+              <span>PATH 02 // ARTIST PORTFOLIO</span>
+              <span>AUDITION FILE</span>
             </div>
 
-            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-4 ink-bleed">
+            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-3 ink-bleed">
               ARTIST
             </h3>
 
-            <p className="font-body text-base md:text-lg text-[#17120D]/90 leading-relaxed italic border-l-4 border-[#B84718] pl-4 mb-8">
-              Bring your sound, your story and your energy into the Tangy world.
+            {/* HANDWRITTEN ARCHIVAL NOTE */}
+            <p className="font-mono text-xs md:text-sm text-[#17120D]/90 leading-relaxed border-l-4 border-[#B84718] pl-3.5 my-4">
+              ✎ "Bring your sound, your story and your energy into the Tangy world."
             </p>
 
-            <div className="flex flex-wrap gap-2 mb-10 font-mono text-[9px] font-bold text-[#17120D]">
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">MUSICIANS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">DJs</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">BANDS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">PRODUCERS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase">PERFORMERS</span>
+            {/* ATTACHED POLAROID PHOTO */}
+            <div className="dossier-polaroid-2 relative w-[160px] md:w-[210px] bg-[#F5E9C9] p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[4deg] my-6 transition-transform group-hover:scale-105">
+              <img src={artists[6]?.image || "/media/artists/artist7.jpg"} alt="Live Vocalist Performing" className="w-full aspect-[4/3] object-cover filter grayscale contrast-130 border border-[#17120D]" />
+              <p className="font-mono text-[7.5px] text-[#17120D] font-bold tracking-wider mt-1.5">✎ LIVE AUDITION // STAGE A</p>
             </div>
+
+            {/* CLASSIFIED GENRE TAGS */}
+            <div className="flex flex-wrap gap-2 mb-8 font-mono text-[9px] font-bold text-[#17120D]">
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">MUSICIANS</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">DJs</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">BANDS</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">PRODUCERS</span>
+              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1 uppercase shadow-xs">PERFORMERS</span>
+            </div>
+
+            {/* MOBILE TAP DETAILS TOGGLE */}
+            {activeTab === 'art' && (
+              <div className="font-mono text-[10px] text-[#17120D] bg-[#F5E9C9] p-3 border border-[#17120D] mb-4 animate-in fade-in">
+                <p className="font-bold mb-1">AUDITION CRITERIA:</p>
+                <p>• Performers of all analog, live electronic & acoustic genres welcome.</p>
+                <p>• Submit demo recordings for season curation.</p>
+              </div>
+            )}
           </div>
 
-          {/* Artist Action Button (Burnt Orange + Cream Text) */}
+          {/* Artist Action Button */}
           <button 
             onClick={handleArtistClick}
-            className="btn-ticket w-full text-center !bg-[#B84718] !text-[#E7D7AC]"
+            className="btn-ticket w-full text-center !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
-            APPLY AS ARTIST →
+            [ APPLY AS ARTIST → ]
           </button>
 
         </div>
