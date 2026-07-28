@@ -183,7 +183,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION — REFINED DENSE 1970S CONCERT POSTER */}
+      {/* 2. MOBILE HERO SECTION — GROUNDED REFINED 1970S CONCERT POSTER */}
       <section 
         id="m-hero" 
         className="relative w-full h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate pt-14"
@@ -235,7 +235,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </g>
           </svg>
 
-          {/* HEADLINE "TANGY SESSIONS" (z-15) — POSITIONED BEHIND CENTERED PERFORMER */}
+          {/* HEADLINE "TANGY SESSIONS" (z-15) — HELD AT TOP-[18%] (~70% VISIBLE) */}
           <div className="headline absolute z-15 top-[18%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
             <span className="word block font-poster text-[clamp(58px,18vw,84px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1.2px_#191410] relative drop-shadow-[5px_5px_0px_#191410]">
               TANGY
@@ -245,8 +245,8 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </span>
           </div>
 
-          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) — CENTERED & SCALED UP 20% */}
-          <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[20%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
+          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) — MOVED DOWN TO TOP-[32%] (GROUNDED) */}
+          <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[32%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
             <img 
               src="/media/hero-performer.png" 
               alt="Tangy 1970s Performer Cutout" 
@@ -254,10 +254,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             />
           </div>
 
-          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 66%, CENTERED BELOW PERFORMER WITH -3° ROTATION */}
+          {/* ADMISSION TICKET (z-60) — MOVED DOWN TO TOP-[76%], ATTACHED TO PERFORMER WITH -3° ROTATION */}
           <div 
             ref={ticketRef}
-            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[66%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
+            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[76%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
           >
             {/* Masking Tape Overlay (z-61) */}
             <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.45)] border border-[rgba(255,255,255,0.5)] z-[61] pointer-events-none" />

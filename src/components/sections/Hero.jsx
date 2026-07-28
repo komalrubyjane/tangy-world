@@ -224,9 +224,9 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20, NO BLOB)    */}
+        {/* 1970S PERFORMER CUTOUT IMAGE (z-20) — MOVED DOWN TO TOP-[34%] */}
         {/* ------------------------------------------------------------- */}
-        <div className="portrait-wrap absolute z-20 left-[50%] top-[24%] w-[22cqw] max-w-[420px] h-[44cqw] max-h-[640px] pointer-events-none">
+        <div className="portrait-wrap absolute z-20 left-[50%] top-[34%] -translate-x-1/2 w-[22cqw] max-w-[420px] h-[44cqw] max-h-[640px] pointer-events-none">
           <img 
             src="/media/hero-performer.png" 
             alt="Tangy 1970s Performer Cutout" 
@@ -235,11 +235,11 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* ADMISSION TICKET (z-60) AT TOP: 62% OVERLAPPING TYPOGRAPHY     */}
+        {/* ADMISSION TICKET (z-60) — MOVED DOWN TO TOP-[75%]              */}
         {/* ------------------------------------------------------------- */}
         <div 
           ref={ticketRef} 
-          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[85vw] sm:w-[42cqw] md:w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
+          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[75%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[85vw] sm:w-[42cqw] md:w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
         >
           {/* Masking Tape Overlay (z-61) */}
           <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] h-[1.8cqw] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
