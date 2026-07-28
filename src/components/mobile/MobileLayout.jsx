@@ -134,7 +134,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION */}
+      {/* 2. MOBILE HERO SECTION (100DVH CONCERT POSTER COMPOSITION) */}
       <section 
         id="m-hero" 
         className="w-full min-h-[100dvh] bg-[#B9471B] text-[#EAD9A6] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
@@ -147,44 +147,52 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       >
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
 
+        {/* TOP METADATA BAR */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-1.5 z-20 transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <span className="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-[#EAD9A6] tracking-[0.25em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
             TANGY SESSIONS // HYDERABAD // EST. 2016
           </span>
           <span className="font-mono text-[8px] font-bold text-[#D19A24] tracking-[0.2em] uppercase">
-            ○ LIVE ARCHIVE
+            ○ LIVE CONCERT POSTER
           </span>
         </div>
 
-        <div className="w-full max-w-[340px] flex flex-col items-center gap-3 my-auto z-20 py-2">
+        {/* MIDDLE SECTION: STATIC SWING MIC + TITLE + CUTOUT PHOTO */}
+        <div className="w-full max-w-[340px] flex flex-col items-center gap-2.5 my-auto z-20 py-2">
+          
+          {/* STATIC HANGING MICROPHONE */}
           <div className={`w-full flex flex-col items-center pointer-events-none mb-1 transition-all duration-800 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
-            <div className="w-[1.5px] h-[75px] sm:h-[90px] bg-[#15120D]" />
-            <div className="w-12 h-16 sm:w-14 sm:h-18 border border-black/40 rounded-b-xl shadow-xl flex items-center justify-center bg-[linear-gradient(135deg,#999_0%,#222_40%,#666_70%,#111_100%)] p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
+            <div className="w-[1.5px] h-[65px] sm:h-[80px] bg-[#15120D]" />
+            <div className="w-11 h-15 sm:w-13 sm:h-17 border border-black/40 rounded-b-xl shadow-xl flex items-center justify-center bg-[linear-gradient(135deg,#999_0%,#222_40%,#666_70%,#111_100%)] p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
               <img src="/media/vintage-mic.png" alt="Microphone" className="w-full h-full object-contain filter drop-shadow-md" />
             </div>
           </div>
 
-          <div className={`w-[72%] max-w-[280px] sm:max-w-[320px] bg-[#EAD9A6] p-2 sm:p-2.5 pb-6 sm:pb-7 border-2 border-[#15120D] shadow-[8px_8px_0px_#15120D] rotate-[-1.5deg] transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          {/* CLAMPED TITLE */}
+          <div className={`flex flex-col items-center transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <h1 className="font-display text-[clamp(52px,14.5vw,76px)] text-[#EAD9A6] leading-[0.82] tracking-tighter drop-shadow-[5px_5px_0px_#15120D]">
+              TANGY
+            </h1>
+            <h1 className="font-display text-[clamp(44px,12.5vw,64px)] italic text-[#D19A24] font-normal leading-[0.82] tracking-tight drop-shadow-[5px_5px_0px_#15120D] -mt-1">
+              WORLD
+            </h1>
+          </div>
+
+          {/* HERO PERFORMER CUT-OUT PHOTO */}
+          <div className={`w-[75%] max-w-[280px] sm:max-w-[320px] bg-[#EAD9A6] p-2 sm:p-2.5 pb-6 sm:pb-7 border-3 border-[#15120D] shadow-[10px_10px_0px_#15120D] rotate-[-1.5deg] transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             <div className="absolute -top-2.5 left-1/3 w-16 h-4 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30" />
             <img 
               src={gallery[2]?.src || "/media/gallery/tangy3.jpg"} 
-              alt="Tangy Concert Crowd" 
-              className="w-full aspect-[3/4] object-cover filter grayscale contrast-130 sepia-[0.2] border border-[#15120D] block"
+              alt="Tangy Concert Performer" 
+              className="w-full aspect-[4/3] object-cover filter grayscale contrast-130 border border-[#15120D] block"
             />
             <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-1.5 text-left">✎ BANSILALPET // 11:42 PM</p>
           </div>
 
-          <div className={`flex flex-col items-center mt-2 transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <h1 className="font-display text-[clamp(50px,13.5vw,72px)] text-[#EAD9A6] leading-[0.82] tracking-tighter drop-shadow-[4px_4px_0px_#15120D]">
-              TANGY
-            </h1>
-            <h1 className="font-display text-[clamp(42px,11.5vw,60px)] italic text-[#D19A24] font-normal leading-[0.82] tracking-tight drop-shadow-[4px_4px_0px_#15120D] -mt-1">
-              WORLD
-            </h1>
-          </div>
         </div>
 
-        <div className={`w-full max-w-[340px] flex flex-col items-center gap-3 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* BOTTOM SECTION: CONCERT TICKET CTA */}
+        <div className={`w-full max-w-[340px] flex flex-col items-center gap-2.5 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <p className="font-mono text-[9px] sm:text-[10px] font-bold text-[#EAD9A6] tracking-[0.2em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
             MUSIC • PEOPLE • PLACES • STORIES
           </p>
@@ -193,7 +201,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             onClick={() => handleNavClick('#m-manifesto')}
             className="w-full h-[56px] bg-[#EAD9A6] text-[#15120D] border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] font-mono text-xs sm:text-sm font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-150 cursor-pointer"
           >
-            <span>[ EXPLORE THE WORLD ↓ ]</span>
+            <span>[ ENTER TANGY WORLD → ]</span>
             <span className="text-[#B9471B] font-black">✦</span>
           </button>
         </div>
@@ -384,7 +392,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 10. MOBILE CREW (HANDCRAFTED VINTAGE RECRUITMENT POSTERS) */}
+      {/* 10. MOBILE CREW */}
       <section 
         ref={crewRef}
         id="m-crew" 
@@ -395,17 +403,12 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             08 JOIN THE CREW // RECRUITMENT DESK
           </span>
 
-          {/* POSTER 01: VOLUNTEER (CREAM ARCHIVAL FLYER) */}
+          {/* POSTER 01: VOLUNTEER */}
           <div 
             className={`w-full bg-[#EAD9A6] text-[#15120D] p-5 sm:p-6 border-4 border-[#15120D] shadow-[10px_10px_0px_#15120D] rotate-[2deg] relative flex flex-col gap-4 transition-all duration-500 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            {/* FOLDED PAPER CORNER */}
             <div className="absolute top-0 right-0 w-6 h-6 bg-[#D19A24] border-b-2 border-l-2 border-[#15120D] shadow-sm pointer-events-none" />
-
-            {/* MASKING TAPE */}
             <div className="absolute -top-3 left-6 w-20 h-5 bg-[rgba(234,217,166,0.9)] rotate-[-3deg] border border-black/30 pointer-events-none" />
-
-            {/* RED ARCHIVE STAMP */}
             <div className="absolute -top-4 right-8 border-2 border-[#15120D] bg-[#5A120D] text-[#EAD9A6] font-mono text-[8.5px] font-bold px-2.5 py-0.5 uppercase rotate-[-6deg] shadow-md pointer-events-none">
               REC • LIVE // ARCHIVE 08 ✦
             </div>
@@ -422,7 +425,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               </h3>
             </div>
 
-            {/* ICONS STRIP */}
             <div className="flex items-center gap-2 font-mono text-[9px] font-bold bg-[#F5E9C9] p-2 border border-[#15120D]">
               <span>🎧 HEADPHONES</span>
               <span>·</span>
@@ -431,7 +433,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <span>⚡ SPOTLIGHT</span>
             </div>
 
-            {/* HANDWRITTEN NOTE */}
             <p className="font-mono text-xs text-[#15120D]/90 border-l-4 border-[#D19A24] pl-3 py-0.5 italic">
               ✎ "Help build the nights, the stories and everything that happens between them."
             </p>
@@ -444,14 +445,11 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </button>
           </div>
 
-          {/* POSTER 02: ARTIST (1970s CONCERT GIG FLYER / VINYL SLEEVE) */}
+          {/* POSTER 02: ARTIST */}
           <div 
             className={`w-full bg-[#15120D] text-[#EAD9A6] p-5 sm:p-6 border-4 border-[#D19A24] shadow-[10px_10px_0px_#15120D] rotate-[-2deg] relative flex flex-col gap-4 transition-all duration-500 delay-200 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            {/* MASKING TAPE */}
             <div className="absolute -top-3 right-6 w-20 h-5 bg-[rgba(209,154,36,0.85)] rotate-[4deg] border border-black/30 pointer-events-none" />
-
-            {/* BACKSTAGE PASS TAG */}
             <div className="absolute -top-4 left-6 border-2 border-[#15120D] bg-[#B9471B] text-[#EAD9A6] font-mono text-[8.5px] font-bold px-2 py-0.5 uppercase rotate-[4deg] shadow-md pointer-events-none">
               PROPERTY OF TANGY // BACKSTAGE ✦
             </div>
@@ -468,7 +466,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               </h3>
             </div>
 
-            {/* VISUAL COMPONENTS: SPINNING VINYL ICON + GUITAR PICK */}
             <div className="flex items-center justify-between bg-[#1C140E] p-2.5 border border-[#D19A24]/40 font-mono text-[9px]">
               <div className="flex items-center gap-2">
                 <img src="/media/vinyl.png" alt="Vinyl" className="w-6 h-6 object-contain animate-[spin_6s_linear_infinite]" />
@@ -477,7 +474,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <span className="bg-[#B9471B] text-[#EAD9A6] px-1.5 py-0.5 text-[7.5px] font-bold uppercase">GUITAR PICK ✦</span>
             </div>
 
-            {/* HANDWRITTEN NOTE */}
             <p className="font-mono text-xs text-[#EAD9A6]/90 border-l-4 border-[#B9471B] pl-3 py-0.5 italic">
               ✎ "Bring your sound, your story and your energy into the Tangy world."
             </p>
