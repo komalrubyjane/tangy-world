@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { events, gallery, diaryEntries, archive } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { MobileMicrophoneJourney } from './MobileMicrophoneJourney';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
 const useMobileInView = (options = { threshold: 0.12 }) => {
@@ -113,6 +114,9 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
   return (
     <div className="w-full min-h-[100dvh] bg-[#191410] text-[#ecdcaf] font-sans antialiased overflow-x-hidden selection:bg-[#c2272a] selection:text-[#ecdcaf]">
       
+      {/* GLOBAL CONTINUOUS HANGING MICROPHONE STORYTELLING JOURNEY (<1024px) */}
+      <MobileMicrophoneJourney />
+
       {/* 1. TOUCH-NATIVE MOBILE NAVIGATION BAR & SLIDE-IN MENU OVERLAY */}
       <header className="fixed top-0 left-0 right-0 h-14 bg-[#191410]/95 backdrop-blur-md border-b border-[#ecdcaf]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
         <button
@@ -281,27 +285,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <path d="M215 335 Q255 300 270 250 Q276 230 260 220 Q258 250 235 285 Q220 310 200 335 Z" fill="#5a1414"/>
               <ellipse cx="262" cy="228" rx="19" ry="15" fill="#e9d6ab" transform="rotate(30 262 228)"/>
               <rect x="248" y="205" width="20" height="8" rx="3" fill="#8a6a2a" transform="rotate(30 258 209)"/>
-            </svg>
-          </div>
-
-          {/* HANGING VINTAGE CHROME MICROPHONE (z-35) */}
-          <div className="mic absolute z-35 top-14 left-1/2 -translate-x-[4%] w-14 h-36 origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
-            <svg viewBox="0 0 100 260" preserveAspectRatio="xMidYMin meet">
-              <line x1="50" y1="0" x2="50" y2="90" stroke="#141110" strokeWidth="2.5"/>
-              <g transform="translate(50,90)">
-                <rect x="-16" y="0" width="32" height="90" rx="16" fill="#cfd2d4" stroke="#141110" strokeWidth="2"/>
-                <rect x="-16" y="0" width="14" height="90" rx="7" fill="#9aa0a3" opacity=".6"/>
-                <g stroke="#141110" strokeWidth="1.6" opacity=".8">
-                  <line x1="-11" y1="12" x2="11" y2="12"/>
-                  <line x1="-11" y1="20" x2="11" y2="20"/>
-                  <line x1="-11" y1="28" x2="11" y2="28"/>
-                  <line x1="-11" y1="36" x2="11" y2="36"/>
-                  <line x1="-11" y1="44" x2="11" y2="44"/>
-                  <line x1="-11" y1="52" x2="11" y2="52"/>
-                </g>
-                <rect x="-19" y="88" width="38" height="14" rx="4" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
-                <rect x="-6" y="100" width="12" height="26" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
-              </g>
             </svg>
           </div>
 
@@ -504,7 +487,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 8. MOBILE SPACES & ARCHITECTURE (NEW) */}
+      {/* 8. MOBILE SPACES & ARCHITECTURE */}
       <section 
         ref={spacesRef}
         id="m-spaces" 
@@ -546,7 +529,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 10. MOBILE FEATURED ARTISTS (NEW) */}
+      {/* 10. MOBILE FEATURED ARTISTS */}
       <section 
         ref={artistsRef}
         id="m-artists" 
@@ -697,7 +680,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 14. MOBILE NEWSLETTER DISPATCH (NEW) */}
+      {/* 14. MOBILE NEWSLETTER DISPATCH */}
       <section 
         ref={newsletterRef}
         id="m-newsletter" 
@@ -733,16 +716,13 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 15. MOBILE CLOSING SIGNATURE (NEW) */}
+      {/* 15. MOBILE CLOSING SIGNATURE */}
       <section 
         ref={closingRef}
         id="m-closing" 
         className={`w-full bg-[#191410] text-[#ecdcaf] py-16 px-5 flex flex-col items-center text-center transition-all duration-700 ${closingInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[420px] flex flex-col items-center gap-6">
-          <div className="w-16 h-16 border-2 border-[#d1a437] rounded-full flex items-center justify-center text-[#d1a437] text-2xl font-bold animate-[bounce_3s_ease-in-out_infinite]">
-            🎙
-          </div>
           <h2 className="font-poster text-3xl text-[#ecdcaf]">"THIS WORLD HAS A SOUND."</h2>
           <p className="font-mono text-xs text-[#ecdcaf]/70 uppercase tracking-widest">TANGY SESSIONS // HYDERABAD // EST. 2016</p>
         </div>
