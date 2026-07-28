@@ -27,7 +27,7 @@ const useMobileInView = (options = { threshold: 0.15 }) => {
 export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate }) => {
   const { playSFX } = useAudio();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [heroLoaded, setHeroLoaded] = useState(false);
+  const ticketRef = useRef(null);
 
   // Mobile InView Refs for Section Animations
   const [manifestoRef, manifestoInView] = useMobileInView();
@@ -39,11 +39,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
   const [foundersRef, foundersInView] = useMobileInView();
   const [crewRef, crewInView] = useMobileInView();
   const [privateRef, privateInView] = useMobileInView();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setHeroLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const navLinks = [
     { label: "01 COVER", target: "#m-hero" },
@@ -62,6 +57,21 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
     playSFX('ticketClick');
     setIsMenuOpen(false);
     document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleTicketClick = () => {
+    playSFX('ticketClick');
+    if (ticketRef.current) {
+      ticketRef.current.animate(
+        [
+          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(1)' },
+          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(0.97)' },
+          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(1)' }
+        ],
+        { duration: 220 }
+      );
+    }
+    document.querySelector('#m-manifesto')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const videoList = [
@@ -134,77 +144,199 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION (100DVH CONCERT POSTER) */}
+      {/* 2. MOBILE HERO SECTION — FULL 100DVH CONCERT POSTER */}
       <section 
         id="m-hero" 
-        className="w-full min-h-[100dvh] bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] text-[#ecdcaf] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
-        style={{
-          paddingTop: 'max(68px, calc(env(safe-area-inset-top) + 56px))',
-          paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
-          paddingLeft: 'max(20px, env(safe-area-inset-left))',
-          paddingRight: 'max(20px, env(safe-area-inset-right))',
-        }}
+        className="relative w-full h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate pt-14"
       >
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none z-10" />
+        {/* SVG ROUGHEN FILTER */}
+        <svg className="absolute width-0 height-0 overflow-hidden pointer-events-none z-0">
+          <filter id="m-roughen" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="7" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </svg>
 
-        {/* TOP METADATA BAR */}
-        <div className={`w-full max-w-[340px] flex justify-between items-center z-20 font-mono text-[8px] font-bold tracking-widest text-[#ecdcaf] uppercase transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-          <span>HYDERABAD, INDIA</span>
-          <span className="text-[#d1a437]">33⅓ RPM STEREO</span>
-        </div>
-
-        {/* MIDDLE SECTION: SWING MIC + HEADLINE + PORTRAIT */}
-        <div className="w-full max-w-[340px] flex flex-col items-center gap-2 my-auto z-20 py-2 relative">
+        {/* POSTER CANVAS */}
+        <div className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size">
           
-          {/* STATIC HANGING MICROPHONE */}
-          <div className={`w-full flex flex-col items-center pointer-events-none mb-1 transition-all duration-800 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
-            <div className="w-[1.5px] h-[55px] sm:h-[70px] bg-[#191410]" />
-            <div className="w-11 h-15 sm:w-13 sm:h-17 shadow-xl flex items-center justify-center p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
-              <img src="/media/vintage-mic.png" alt="Microphone" className="w-full h-full object-contain filter drop-shadow-md" />
-            </div>
+          {/* CORNER CROSSHAIRS */}
+          <div className="absolute z-30 w-7 h-7 opacity-85 top-16 left-3 pointer-events-none">
+            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
+          </div>
+          <div className="absolute z-30 w-7 h-7 opacity-85 top-16 right-3 pointer-events-none">
+            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
           </div>
 
-          {/* HEADLINE "TANGY SESSIONS" */}
-          <div className={`flex flex-col items-center transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <h1 className="font-poster text-[clamp(54px,15vw,78px)] text-[#ecdcaf] leading-[0.78] tracking-tighter drop-shadow-[6px_6px_0px_#191410] uppercase font-black">
+          {/* TOP METADATA BAR (z-40) */}
+          <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8px] font-bold tracking-widest text-[#ecdcaf] uppercase">
+            <span>HYDERABAD, INDIA</span>
+            <span className="text-[#d1a437]">33⅓ RPM STEREO</span>
+          </div>
+
+          {/* STEPWELL SILHOUETTE (z-2) */}
+          <svg className="absolute z-2 left-0 bottom-0 w-64 h-72 opacity-45 mix-blend-multiply pointer-events-none" viewBox="0 0 400 420" preserveAspectRatio="xMinYMax meet">
+            <g fill="#3c0f0e">
+              <rect x="0" y="360" width="400" height="60"/>
+              <rect x="0" y="300" width="360" height="60"/>
+              <rect x="0" y="245" width="310" height="55"/>
+              <rect x="0" y="195" width="260" height="50"/>
+              <rect x="0" y="150" width="210" height="45"/>
+              <rect x="0" y="110" width="165" height="40"/>
+              <rect x="0" y="75" width="120" height="35"/>
+              <g stroke="#5a1717" strokeWidth="4" fill="none" opacity=".8">
+                <path d="M20 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M80 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M140 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M200 300 v-55 a18 18 0 0 1 36 0 v55"/>
+                <path d="M255 300 v-55 a18 18 0 0 1 36 0 v55"/>
+                <path d="M40 245 v-50 a16 16 0 0 1 32 0 v50"/>
+                <path d="M95 245 v-50 a16 16 0 0 1 32 0 v50"/>
+              </g>
+            </g>
+          </svg>
+
+          {/* HEADLINE "TANGY SESSIONS" (z-15) */}
+          <div className="headline absolute z-15 top-[22%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
+            <span className="word block font-poster text-[clamp(52px,16vw,72px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1px_#191410] relative drop-shadow-[4px_4px_0px_#191410]">
               TANGY
-            </h1>
-            <h1 className="font-poster text-[clamp(44px,12.5vw,64px)] text-[#ecdcaf] font-black leading-[0.78] tracking-tight drop-shadow-[6px_6px_0px_#191410] -mt-2 uppercase">
+            </span>
+            <span className="word block font-poster text-[clamp(44px,13.5vw,62px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1px_#191410] relative -mt-1 drop-shadow-[4px_4px_0px_#191410]">
               SESSIONS
-            </h1>
+            </span>
           </div>
 
-          {/* PORTRAIT BLOB CONTAINER */}
-          <div className={`w-[80%] max-w-[280px] sm:max-w-[320px] p-2 bg-[#e9decb] text-[#241a12] rounded-xl shadow-[0_0_0_8px_#e9decb,0_0_0_10px_#191410,0_15px_30px_rgba(0,0,0,0.65)] rotate-[-1.5deg] -mt-6 z-25 transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-            <div className="w-full aspect-[4/3] bg-[#191410] rounded-lg overflow-hidden border border-[#191410]">
-              <img 
-                src={gallery[2]?.src || "/media/gallery/tangy3.jpg"} 
-                alt="Tangy Musician Portrait" 
-                className="w-full h-full object-cover filter grayscale contrast-130 block"
-              />
+          {/* VIOLIN PERFORMER ILLUSTRATION (z-20) */}
+          <div className="portrait-wrap absolute z-20 right-3 top-[28%] w-36 h-64 pointer-events-none opacity-90">
+            <div className="portrait-blob absolute -inset-x-2 -top-1 -bottom-1 bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-md" />
+            <svg className="relative w-full h-full block z-2" viewBox="0 0 320 520" preserveAspectRatio="xMidYMax meet">
+              <path d="M40 520 L40 430 Q40 360 100 335 L140 320 Q160 335 190 320 L225 335 Q285 360 285 430 L285 520 Z" fill="#5a1414"/>
+              <path d="M120 335 L160 380 L200 335 L190 320 Q160 335 140 320 Z" fill="#3c0d0d"/>
+              <rect x="140" y="270" width="42" height="60" rx="12" fill="#e9d6ab"/>
+              <ellipse cx="161" cy="205" rx="76" ry="82" fill="#ecdcaf"/>
+              <ellipse cx="86" cy="210" rx="10" ry="16" fill="#e2cd97"/>
+              <ellipse cx="236" cy="210" rx="10" ry="16" fill="#e2cd97"/>
+              <g fill="#1c140d">
+                <circle cx="95" cy="150" r="30"/>
+                <circle cx="120" cy="118" r="34"/>
+                <circle cx="160" cy="102" r="36"/>
+                <circle cx="200" cy="112" r="33"/>
+                <circle cx="232" cy="140" r="30"/>
+                <circle cx="245" cy="175" r="24"/>
+                <circle cx="80" cy="182" r="24"/>
+                <circle cx="70" cy="150" r="20"/>
+                <circle cx="252" cy="150" r="20"/>
+              </g>
+              <path d="M118 190 q16 -12 34 -2" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
+              <path d="M192 188 q16 -10 34 2" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
+              <path d="M122 210 q14 12 30 0" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
+              <path d="M196 210 q14 12 30 0" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
+              <path d="M158 210 q-6 22 0 30 q6 6 14 0" stroke="#c9b485" strokeWidth="4" fill="none" strokeLinecap="round"/>
+              <path d="M128 252 q34 20 70 0 q-6 14 -35 16 q-29 -2 -35 -16 Z" fill="#1c140d" opacity=".85"/>
+              <path d="M132 262 q34 34 66 0 q-30 26 -66 0 Z" fill="#3c1e10"/>
+              <path d="M140 264 q22 16 50 0" stroke="#ecdcaf" strokeWidth="5" fill="none" strokeLinecap="round"/>
+              <path d="M110 250 q50 46 104 0 q4 24 -10 40 q-42 26 -84 0 q-14 -16 -10 -40 Z" fill="#1c140d" opacity=".18"/>
+              <path d="M108 345 Q60 300 78 235 Q86 215 110 220 Q95 255 118 300 Q130 330 150 345 Z" fill="#5a1414"/>
+              <ellipse cx="92" cy="222" rx="20" ry="16" fill="#e9d6ab" transform="rotate(-25 92 222)"/>
+              <g transform="translate(150,225) rotate(-32)">
+                <path d="M0 -70 Q22 -66 22 -40 Q30 -20 20 0 Q30 20 20 45 Q22 66 0 70 Q-22 66 -20 45 Q-30 20 -20 0 Q-30 -20 -22 -40 Q-22 -66 0 -70 Z" fill="#7a3b1e" stroke="#3c1a0c" strokeWidth="3"/>
+                <line x1="0" y1="-70" x2="0" y2="-140" stroke="#3c1a0c" strokeWidth="6"/>
+                <ellipse cx="0" cy="-140" rx="9" ry="14" fill="#5a2a12" stroke="#3c1a0c" strokeWidth="2"/>
+                <line x1="-3" y1="-8" x2="-3" y2="30" stroke="#1c140d" strokeWidth="2"/>
+                <line x1="3" y1="-8" x2="3" y2="30" stroke="#1c140d" strokeWidth="2"/>
+                <path d="M-8 -10 q-6 12 0 24" stroke="#1c140d" strokeWidth="2" fill="none"/>
+                <path d="M8 -10 q6 12 0 24" stroke="#1c140d" strokeWidth="2" fill="none"/>
+              </g>
+              <line x1="255" y1="70" x2="95" y2="345" stroke="#2a1710" strokeWidth="4"/>
+              <line x1="248" y1="80" x2="102" y2="336" stroke="#ecdcaf" strokeWidth="2" opacity=".7"/>
+              <path d="M215 335 Q255 300 270 250 Q276 230 260 220 Q258 250 235 285 Q220 310 200 335 Z" fill="#5a1414"/>
+              <ellipse cx="262" cy="228" rx="19" ry="15" fill="#e9d6ab" transform="rotate(30 262 228)"/>
+              <rect x="248" y="205" width="20" height="8" rx="3" fill="#8a6a2a" transform="rotate(30 258 209)"/>
+            </svg>
+          </div>
+
+          {/* HANGING VINTAGE CHROME MICROPHONE (z-35) */}
+          <div className="mic absolute z-35 top-14 left-1/2 -translate-x-[4%] w-14 h-36 origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
+            <svg viewBox="0 0 100 260" preserveAspectRatio="xMidYMin meet">
+              <line x1="50" y1="0" x2="50" y2="90" stroke="#141110" strokeWidth="2.5"/>
+              <g transform="translate(50,90)">
+                <rect x="-16" y="0" width="32" height="90" rx="16" fill="#cfd2d4" stroke="#141110" strokeWidth="2"/>
+                <rect x="-16" y="0" width="14" height="90" rx="7" fill="#9aa0a3" opacity=".6"/>
+                <g stroke="#141110" strokeWidth="1.6" opacity=".8">
+                  <line x1="-11" y1="12" x2="11" y2="12"/>
+                  <line x1="-11" y1="20" x2="11" y2="20"/>
+                  <line x1="-11" y1="28" x2="11" y2="28"/>
+                  <line x1="-11" y1="36" x2="11" y2="36"/>
+                  <line x1="-11" y1="44" x2="11" y2="44"/>
+                  <line x1="-11" y1="52" x2="11" y2="52"/>
+                </g>
+                <rect x="-19" y="88" width="38" height="14" rx="4" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
+                <rect x="-6" y="100" width="12" height="26" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
+              </g>
+            </svg>
+          </div>
+
+          {/* ADMISSION TICKET (z-30) AT EXACTLY TOP: 62%, LEFT: 50%, TRANSFORM: TRANSLATE(-50%, -50%) ROTATE(-3DEG) */}
+          <div 
+            ref={ticketRef}
+            className="hero-ticket ticket absolute z-30 left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_8px_20px_rgba(0,0,0,0.65)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
+          >
+            {/* Masking Tape Overlay (z-31) */}
+            <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-31 pointer-events-none" />
+
+            <div className="w-7 flex items-center justify-center border-r border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[9px] tracking-wider text-[#241a12] opacity-75">
+              TS-2016-001
             </div>
-            <p className="font-mono text-[7.5px] text-[#241a12] font-bold tracking-wider mt-1 text-left">✎ BANSILALPET STEPWELL // 22h</p>
-          </div>
 
-        </div>
+            <div className="flex-1 p-2.5 flex flex-col justify-between">
+              <div className="flex justify-between items-center font-mono font-semibold text-[8.5px] tracking-wider uppercase opacity-80 border-b border-dashed border-[rgba(36,26,18,0.35)] pb-1">
+                <span>Admit One</span>
+                <span>Vol. 01</span>
+              </div>
 
-        {/* BOTTOM SECTION: TICKET STUB BUTTON */}
-        <div className={`w-full max-w-[340px] flex flex-col items-center gap-2 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          
-          <div className="w-full bg-[#e9decb] text-[#241a12] border-2 border-[#191410] p-3 shadow-[5px_5px_0px_#191410] flex flex-col gap-2 rounded-sm">
-            <div className="flex justify-between items-center font-mono text-[8px] font-bold text-[#315D73] border-b border-[#241a12]/30 pb-1 uppercase">
-              <span>ADMIT ONE // VOL. 01</span>
-              <span>ARCHIVE NO. 001</span>
+              <div className="flex items-center justify-between gap-2 my-1">
+                <button 
+                  type="button"
+                  onClick={handleTicketClick}
+                  className="enter font-poster text-xl tracking-tight flex items-center gap-1.5 cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
+                >
+                  Enter Tangy →
+                </button>
+              </div>
+
+              <div className="font-mono font-medium text-[7.5px] tracking-widest uppercase text-center opacity-75 border-t border-dashed border-[rgba(36,26,18,0.35)] pt-1">
+                Live Music · Heritage
+              </div>
             </div>
 
-            <button
-              onClick={() => handleNavClick('#m-manifesto')}
-              className="w-full h-[52px] bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer rounded-sm"
-            >
-              <span>ENTER TANGY →</span>
-              <span className="text-[#d1a437] font-black">✦</span>
-            </button>
+            <div className="w-7 flex items-center justify-center border-l border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[9.5px] tracking-widest text-[#c2272a]">
+              09100
+            </div>
           </div>
+
+          {/* BADGES & EPHEMERA (z-40) */}
+          <div className="badge absolute z-40 left-2 top-[38%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6">
+            <div className="font-poster text-xs leading-none">33⅓</div>
+            <div className="font-mono font-bold text-[7px] tracking-widest">RPM</div>
+          </div>
+
+          <div className="badge absolute z-40 right-2 top-[38%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-md">
+            <div className="text-center font-mono font-bold text-[7px] text-[#ecdcaf]">LIVE</div>
+          </div>
+
+          <div className="badge absolute z-40 left-3 bottom-[12%] bg-[#191410] text-[#ecdcaf] -rotate-4 px-2 py-1 shadow-md">
+            <div className="font-mono font-bold text-[8px] tracking-wider">STEPWELL ★</div>
+          </div>
+
+          <div className="badge absolute z-40 right-3 bottom-[12%] font-serif italic font-bold text-xl text-[#d1a437] -rotate-6">
+            Tangy
+          </div>
+
+          {/* TEXTURE OVERLAYS */}
+          <div className="spatter absolute inset-0 z-45 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px)]" />
+          <div className="scratches absolute inset-0 z-46 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px)]" />
+          <div className="grain absolute inset-0 z-47 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none" />
+          <div className="vignette absolute inset-0 z-48 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
 
         </div>
       </section>
