@@ -254,15 +254,14 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             />
           </div>
 
-          {/* VINTAGE CHROME STAGE MICROPHONE ABOVE FINGERTIPS (z-25) */}
+          {/* VINTAGE COMIC MICROPHONE WITH STAND ON STAGE FLOOR (z-25) */}
           <div 
-            className="vintage-mic absolute z-25 left-[6%] top-[24%] w-11 sm:w-12 h-28 sm:h-32 pointer-events-auto transition-all duration-300 hover:scale-[1.08] hover:-rotate-[31deg] group cursor-pointer"
-            style={{ animation: 'micFloat 3.5s ease-in-out infinite alternate' }}
+            className="vintage-mic absolute z-25 left-[6%] top-[44%] w-20 sm:w-24 h-52 sm:h-60 -rotate-[25deg] pointer-events-none"
           >
             <img 
               src="/media/vintage-mic.png" 
-              alt="Vintage Chrome Stage Microphone" 
-              className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.45)] drop-shadow-[0_0_10px_rgba(255,180,80,0.18)] group-hover:drop-shadow-[0_0_18px_rgba(255,180,80,0.4)] transition-all duration-300" 
+              alt="Vintage Comic Stage Microphone Stand" 
+              className="w-full h-full object-contain filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)]" 
             />
           </div>
 
