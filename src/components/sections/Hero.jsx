@@ -38,7 +38,7 @@ export const Hero = () => {
     // POSTER UNFOLDING INTRO ANIMATION TIMELINE
     // -------------------------------------------------------------
     gsap.set('.hero-bg-texture', { opacity: 0 });
-    gsap.set('.poster-[#FDF6E3]-tagline', { opacity: 0, y: -20 });
+    gsap.set('.poster-cream-tagline', { opacity: 0, y: -20 });
     gsap.set('.poster-title-tangy', { opacity: 0, scale: 1.05, y: 30 });
     gsap.set('.poster-title-sessions', { opacity: 0, scale: 1.05, y: 30 });
     gsap.set('.poster-performer-cutout', { opacity: 0, scale: 0.9, y: 60 });
@@ -49,7 +49,7 @@ export const Hero = () => {
 
     introTl
       .to('.hero-bg-texture', { opacity: 1, duration: 0.6, ease: 'power2.out' })
-      .to('.poster-[#FDF6E3]-tagline', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+      .to('.poster-cream-tagline', { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
       .to('.poster-title-tangy', { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.3')
       .to('.poster-title-sessions', { opacity: 1, scale: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
       .to('.poster-performer-cutout', { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: 'back.out(1.2)' }, '-=0.5')
@@ -120,7 +120,7 @@ export const Hero = () => {
         </div>
 
         {/* TOP CENTER TAGLINE */}
-        <div className="poster-[#FDF6E3]-tagline hidden sm:block bg-[#11100C]/40 px-5 py-1 border border-[#FDF6E3]/30 rounded-full backdrop-blur-xs">
+        <div className="poster-cream-tagline hidden sm:block bg-[#11100C]/40 px-5 py-1 border border-[#FDF6E3]/30 rounded-full backdrop-blur-xs">
           • FEITO POR ELAS, PARA ELAS •
         </div>
 
