@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Ultra&family=Righteous&family=Syne:wght@800;900&family=Outfit:wght@800;900&display=swap');
 @import "tailwindcss";
 @import "./animations.css";
 @import "./cursor.css";
@@ -11,6 +12,7 @@
   --color-tangy-paper: #E7D5A4;
   --color-tangy-cream: #F5E9C9;
   
+  --font-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
   --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
   --font-editorial: 'Libre Baskerville', Georgia, serif;
   --font-archive: 'Special Elite', 'Courier New', monospace;
@@ -26,6 +28,7 @@
     --paper: #E7D5A4;
     --cream: #F5E9C9;
 
+    --f-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
     --f-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
     --f-editorial: 'Libre Baskerville', Georgia, serif;
     --f-archive: 'Special Elite', 'Courier New', monospace;
@@ -38,61 +41,10 @@
     color: var(--paper);
     font-family: var(--f-editorial);
     overflow-x: hidden;
-    width: 100%;
-  }
-
-  ::selection {
-    background: var(--mustard);
-    color: var(--black);
   }
 }
 
-@layer utilities {
-  .eyebrow-mono {
-    font-family: var(--f-archive);
-    font-size: 11px;
-    letter-spacing: .25em;
-    text-transform: uppercase;
-    color: var(--mustard);
-  }
-
-  .display {
-    font-family: var(--f-display);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: .92;
-  }
-
-  /* 1970s Ink-Bleed Print Effect */
-  .ink-bleed {
-    text-shadow: 1px 1px 0px rgba(185, 71, 23, 0.35), -1px -1px 0px rgba(201, 154, 46, 0.35);
-  }
-
-  /* Master 1970s Ticket Stub Button System */
-  .btn-ticket {
-    font-family: var(--f-archive);
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    font-weight: 700;
-    background-color: var(--mustard);
-    color: var(--black);
-    border: 2px solid var(--black);
-    position: relative;
-    padding: 14px 28px;
-    box-shadow: 4px 4px 0px var(--black);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-    cursor: pointer;
-  }
-
-  .btn-ticket:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px var(--black);
-    background-color: var(--paper);
-  }
-
-  .btn-ticket:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--black);
-  }
+/* Custom 1970s Vintage Poster Typography Classes */
+.font-poster {
+  font-family: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
 }
