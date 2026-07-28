@@ -183,7 +183,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION — FULL 100DVH CONCERT POSTER */}
+      {/* 2. MOBILE HERO SECTION — REFINED DENSE 1970S CONCERT POSTER */}
       <section 
         id="m-hero" 
         className="relative w-full h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate pt-14"
@@ -208,7 +208,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           </div>
 
           {/* TOP METADATA BAR (z-40) */}
-          <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8px] font-bold tracking-widest text-[#ecdcaf] uppercase pointer-events-none">
+          <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8.5px] font-bold tracking-widest text-[#ecdcaf] uppercase pointer-events-none">
             <span>HYDERABAD, INDIA</span>
             <span className="text-[#d1a437]">33⅓ RPM STEREO</span>
           </div>
@@ -235,32 +235,32 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </g>
           </svg>
 
-          {/* HEADLINE "TANGY SESSIONS" (z-15) */}
-          <div className="headline absolute z-15 top-[22%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
-            <span className="word block font-poster text-[clamp(52px,16vw,72px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1px_#191410] relative drop-shadow-[4px_4px_0px_#191410]">
+          {/* HEADLINE "TANGY SESSIONS" (z-15) — POSITIONED BEHIND CENTERED PERFORMER */}
+          <div className="headline absolute z-15 top-[18%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
+            <span className="word block font-poster text-[clamp(58px,18vw,84px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1.2px_#191410] relative drop-shadow-[5px_5px_0px_#191410]">
               TANGY
             </span>
-            <span className="word block font-poster text-[clamp(44px,13.5vw,62px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1px_#191410] relative -mt-1 drop-shadow-[4px_4px_0px_#191410]">
+            <span className="word block font-poster text-[clamp(50px,15vw,74px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1.2px_#191410] relative -mt-1 drop-shadow-[5px_5px_0px_#191410]">
               SESSIONS
             </span>
           </div>
 
-          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20, NO BLOB) */}
-          <div className="portrait-wrap absolute z-20 right-3 top-[26%] w-44 h-72 pointer-events-none opacity-95">
+          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) — CENTERED & SCALED UP 20% */}
+          <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[20%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
             <img 
               src="/media/hero-performer.png" 
               alt="Tangy 1970s Performer Cutout" 
-              className="relative w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)] z-2" 
+              className="relative w-full h-full object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.7)] z-2" 
             />
           </div>
 
-          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 62%, LEFT: 50%, TRANSFORM: TRANSLATE(-50%, -50%) ROTATE(-3DEG) */}
+          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 66%, CENTERED BELOW PERFORMER WITH -3° ROTATION */}
           <div 
             ref={ticketRef}
-            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_8px_20px_rgba(0,0,0,0.65)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
+            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[66%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
           >
             {/* Masking Tape Overlay (z-61) */}
-            <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
+            <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.45)] border border-[rgba(255,255,255,0.5)] z-[61] pointer-events-none" />
 
             <div className="w-7 flex items-center justify-center border-r border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[9px] tracking-wider text-[#241a12] opacity-75">
               TS-2016-001
@@ -270,6 +270,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <div className="flex justify-between items-center font-mono font-semibold text-[8.5px] tracking-wider uppercase opacity-80 border-b border-dashed border-[rgba(36,26,18,0.35)] pb-1">
                 <span>Admit One</span>
                 <span>Vol. 01</span>
+                <span>Archive No. 001</span>
               </div>
 
               <div className="flex items-center justify-between gap-2 my-1">
@@ -284,7 +285,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               </div>
 
               <div className="font-mono font-medium text-[7.5px] tracking-widest uppercase text-center opacity-75 border-t border-dashed border-[rgba(36,26,18,0.35)] pt-1">
-                Live Music · Heritage
+                Live Music · Community · Heritage
               </div>
             </div>
 
@@ -293,22 +294,38 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </div>
           </div>
 
-          {/* BADGES & EPHEMERA (z-40) */}
-          <div className="badge absolute z-40 left-2 top-[38%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
+          {/* BALANCED BADGES & EPHEMERA (z-40) */}
+          
+          {/* LEFT SIDE BADGES */}
+          <div className="badge absolute z-40 left-2 top-[34%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
             <div className="font-poster text-xs leading-none">33⅓</div>
             <div className="font-mono font-bold text-[7px] tracking-widest">RPM</div>
+            <div className="font-mono text-[6px] tracking-widest">STEREO</div>
           </div>
 
-          <div className="badge absolute z-40 right-2 top-[38%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-md pointer-events-none">
-            <div className="text-center font-mono font-bold text-[7px] text-[#ecdcaf]">LIVE</div>
+          <div className="badge absolute z-40 left-2.5 bottom-[10%] bg-[#191410] text-[#ecdcaf] -rotate-4 px-2 py-1 shadow-md border border-[#ecdcaf]/30 pointer-events-none">
+            <div className="font-mono font-bold text-[8px] tracking-wider">BANSILALPET ★</div>
+            <div className="font-mono text-[7px] text-[#d1a437]">STEPWELL</div>
           </div>
 
-          <div className="badge absolute z-40 left-3 bottom-[12%] bg-[#191410] text-[#ecdcaf] -rotate-4 px-2 py-1 shadow-md pointer-events-none">
-            <div className="font-mono font-bold text-[8px] tracking-wider">STEPWELL ★</div>
+          {/* RIGHT SIDE BADGES */}
+          <div className="badge absolute z-40 right-2 top-[34%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.18),transparent_70%)] flex flex-col items-center justify-center rotate-8 shadow-md pointer-events-none">
+            <div className="font-mono font-semibold text-[6px] text-[#ecdcaf]">RECORDED</div>
+            <div className="font-poster text-xs text-[#c2272a] leading-none my-0.5">LIVE</div>
+            <div className="font-mono font-semibold text-[5.5px] text-[#ecdcaf]">AT STEPWELL</div>
           </div>
 
-          <div className="badge absolute z-40 right-3 bottom-[12%] font-serif italic font-bold text-xl text-[#d1a437] -rotate-6 pointer-events-none">
-            Tangy
+          <div className="badge absolute z-40 right-2.5 bottom-[18%] bg-[#e9decb] text-[#241a12] -rotate-3 px-2 py-0.5 shadow-md flex items-center gap-1 border border-[#191410]/20 pointer-events-none">
+            <span className="font-mono font-bold text-[8px] tracking-wider">REC</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#c2272a] animate-pulse" />
+          </div>
+
+          <div className="badge absolute z-40 right-2.5 bottom-[6%] text-right text-[#ecdcaf] pointer-events-none">
+            <div className="font-mono font-semibold text-[8px] leading-tight tracking-wider">KEEP THE CULTURE</div>
+            <div className="font-mono font-semibold text-[8px] leading-tight tracking-wider text-[#d1a437]">ALIVE ★</div>
+            <div className="font-serif italic font-bold text-lg text-[#d1a437] -rotate-6 mt-0.5">
+              Tangy
+            </div>
           </div>
 
           {/* TEXTURE OVERLAYS (z-10) */}
