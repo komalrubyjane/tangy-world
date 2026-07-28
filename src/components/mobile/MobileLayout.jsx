@@ -134,7 +134,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION (100DVH DEEP RED VINTAGE CONCERT POSTER) */}
+      {/* 2. MOBILE HERO SECTION (100DVH ASYMMETRIC CONCERT POSTER) */}
       <section 
         id="m-hero" 
         className="w-full min-h-[100dvh] bg-[#991B1B] text-[#EAD9A6] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
@@ -153,14 +153,14 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             HYDERABAD // LIVE ARCHIVE // EST. 2016
           </span>
           <span className="font-mono text-[8px] font-bold text-[#D19A24] tracking-[0.2em] uppercase">
-            ○ 1974 SCREEN-PRINTED POSTER
+            ○ 1974 ASYMMETRIC POSTER
           </span>
         </div>
 
-        {/* MIDDLE SECTION: HANGING MIC + MASSIVE TYPOGRAPHY */}
+        {/* MIDDLE SECTION: HANGING MIC + ASYMMETRIC STACKED TYPOGRAPHY */}
         <div className="w-full max-w-[340px] flex flex-col items-center gap-2.5 my-auto z-20 py-2">
           
-          {/* STATIC HANGING MICROPHONE (NO BLACK BOX) */}
+          {/* STATIC HANGING MICROPHONE */}
           <div className={`w-full flex flex-col items-center pointer-events-none mb-1 transition-all duration-800 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
             <div className="w-[1.5px] h-[75px] sm:h-[90px] bg-[#15120D]" />
             <div className="w-13 h-17 sm:w-15 sm:h-19 shadow-xl flex items-center justify-center p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
@@ -168,27 +168,30 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </div>
           </div>
 
-          {/* CLAMPED POSTER TITLE "TANGY SESSIONS" */}
-          <div className={`flex flex-col items-center transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <h1 className="font-display text-[clamp(56px,15.5vw,84px)] text-[#EAD9A6] leading-[0.78] tracking-tighter drop-shadow-[6px_6px_0px_#15120D] uppercase font-black">
+          {/* ASYMMETRIC POSTER TITLE STACK */}
+          <div className={`flex flex-col items-start w-full transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <h1 className="font-display text-[clamp(58px,16vw,86px)] text-[#EAD9A6] leading-[0.76] tracking-tighter drop-shadow-[6px_6px_0px_#15120D] uppercase font-black self-start">
               TANGY
             </h1>
-            <h1 className="font-display text-[clamp(44px,12.5vw,64px)] italic text-[#D19A24] font-normal leading-[0.78] tracking-tight drop-shadow-[6px_6px_0px_#15120D] -mt-1 uppercase">
+            <h1 className="font-display text-[clamp(44px,12.5vw,64px)] italic text-[#D19A24] font-normal leading-[0.76] tracking-tight drop-shadow-[6px_6px_0px_#15120D] -mt-2 uppercase self-end pr-2">
               SESSIONS
+            </h1>
+            <h1 className="font-display text-[clamp(24px,7vw,36px)] text-[#EAD9A6] font-bold leading-[0.8] tracking-widest drop-shadow-[4px_4px_0px_#15120D] -mt-1 uppercase self-end pr-4 opacity-90">
+              HYDERABAD
             </h1>
           </div>
 
         </div>
 
-        {/* BOTTOM SECTION: CONCERT TICKET CTA */}
+        {/* BOTTOM SECTION: ATTACHED CONCERT TICKET CTA */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-2.5 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <p className="font-mono text-[9px] sm:text-[10px] font-bold text-[#EAD9A6] tracking-[0.2em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
-            UNDERGROUND SERIES • STEPWELL EDITION
+            UNDERGROUND SERIES • VOL. 09
           </p>
 
           <button
             onClick={() => handleNavClick('#m-manifesto')}
-            className="w-full h-[56px] bg-[#EAD9A6] text-[#15120D] border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] font-mono text-xs sm:text-sm font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-150 cursor-pointer"
+            className="w-full h-[56px] bg-[#EAD9A6] text-[#15120D] border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] font-mono text-xs sm:text-sm font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all duration-150 cursor-pointer rotate-[-1deg]"
           >
             <span>[ ENTER TANGY → ]</span>
             <span className="text-[#991B1B] font-black">✦</span>
