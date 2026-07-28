@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Ultra&family=Righteous&family=Syne:wght@800;900&family=Outfit:wght@800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Titan+One&family=Shrikhand&family=Fredoka:wght@700&family=Ultra&family=Righteous&family=Syne:wght@800;900&display=swap');
 @import "tailwindcss";
 @import "./animations.css";
 @import "./cursor.css";
@@ -10,9 +10,9 @@
   --color-tangy-mustard: #C99A2E;
   --color-tangy-brown: #41261B;
   --color-tangy-paper: #E7D5A4;
-  --color-tangy-cream: #F5E9C9;
+  --color-tangy-cream: #FDF6E3;
   
-  --font-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+  --font-poster: 'Titan One', 'Shrikhand', 'Ultra', 'Syne', system-ui, sans-serif;
   --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
   --font-editorial: 'Libre Baskerville', Georgia, serif;
   --font-archive: 'Special Elite', 'Courier New', monospace;
@@ -26,9 +26,9 @@
     --mustard: #C99A2E;
     --brown: #41261B;
     --paper: #E7D5A4;
-    --cream: #F5E9C9;
+    --cream: #FDF6E3;
 
-    --f-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+    --f-poster: 'Titan One', 'Shrikhand', 'Ultra', 'Syne', system-ui, sans-serif;
     --f-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
     --f-editorial: 'Libre Baskerville', Georgia, serif;
     --f-archive: 'Special Elite', 'Courier New', monospace;
@@ -46,5 +46,13 @@
 
 /* Custom 1970s Vintage Poster Typography Classes */
 .font-poster {
-  font-family: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+  font-family: 'Titan One', 'Shrikhand', 'Ultra', 'Syne', system-ui, sans-serif;
+}
+
+/* White Paper Sticker Outline Effect for Cutouts */
+.sticker-outline {
+  box-shadow: 
+    0 0 0 10px #FDF6E3,
+    0 0 0 12px #11100C,
+    0 15px 30px rgba(0, 0, 0, 0.6);
 }
