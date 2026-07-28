@@ -59,33 +59,29 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       className="relative w-full py-28 md:py-36 bg-[#4A2638] text-[#E7D7AC] overflow-hidden border-t-8 border-[#E7D7AC]"
     >
       
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+      {/* SOFT NOISE & PAPER FIBER TEXTURE */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none" />
+
+      {/* CROP MARKS & ARCHIVE LABELS */}
+      <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        [ ✚ ] CROP MARK // INVITATION NO. 08-P
+      </div>
+      <div className="absolute top-4 right-4 font-mono text-[9px] text-[#E7D7AC]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        TANGY PRIVATE SESSIONS // HYDERABAD
+      </div>
+      <div className="absolute bottom-4 left-4 font-mono text-[9px] text-[#E7D7AC]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        REGISTRATION: PERFECT PRINT ALIGNMENT
+      </div>
+      <div className="absolute bottom-4 right-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        BY INVITATION ONLY ✦ 33⅓ RPM
+      </div>
 
       {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.08]">
         <span className="display text-[25vw] leading-none text-[#351B29] uppercase">BY INVITATION</span>
       </div>
 
-      {/* ARCHIVAL CORNER METADATA */}
-      <div className="absolute top-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#C69A32] font-bold pointer-events-none uppercase hidden md:block">
-        PRIVATE EXPERIENCES // BY TANGY
-      </div>
-
-      <div className="absolute top-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D7AC]/70 pointer-events-none uppercase hidden md:block">
-        HYDERABAD // BY INVITATION
-      </div>
-
-      <div className="absolute bottom-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#E7D7AC]/70 pointer-events-none uppercase hidden md:block">
-        YOUR SPACE · OUR SOUND
-      </div>
-
-      <div className="absolute bottom-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#C69A32] font-bold pointer-events-none uppercase hidden md:block">
-        ONE NIGHT THAT'S YOURS
-      </div>
-
-      {/* ------------------------------------------------------------- */}
-      {/* SECTION HEADER                                                 */}
-      {/* ------------------------------------------------------------- */}
+      {/* SECTION HEADER */}
       <div className="private-header max-w-4xl mx-auto text-center px-6 relative z-20 mb-16 md:mb-20">
         <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
           PRIVATE EXPERIENCES // BY TANGY
@@ -98,12 +94,10 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
         </p>
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* MAIN INVITATION CARD & SURROUNDING POLAROIDS                   */}
-      {/* ------------------------------------------------------------- */}
+      {/* MAIN INVITATION CARD & SURROUNDING POLAROIDS */}
       <div className="max-w-[1100px] mx-auto px-6 relative z-20 flex flex-col items-center">
         
-        {/* SURROUNDING ARCHIVAL PHOTO 1 (Left Edge) */}
+        {/* SURROUNDING ARCHIVAL PHOTO 1 */}
         <div className="private-photo-1 absolute -top-8 left-0 md:left-4 z-10 pointer-events-none hidden md:block">
           <div className="w-[180px] bg-[#E7D7AC] p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[-4deg]">
             <img src="/media/gallery/tangy9.jpg" alt="Your Place" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
@@ -111,7 +105,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
           </div>
         </div>
 
-        {/* SURROUNDING ARCHIVAL PHOTO 2 (Right Edge) */}
+        {/* SURROUNDING ARCHIVAL PHOTO 2 */}
         <div className="private-photo-2 absolute -bottom-8 right-0 md:right-4 z-10 pointer-events-none hidden md:block">
           <div className="w-[190px] bg-[#E7D7AC] p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[4deg]">
             <img src="/media/gallery/tangy3.jpg" alt="Our People" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
@@ -119,10 +113,10 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
           </div>
         </div>
 
-        {/* CENTRAL VINTAGE INVITATION CARD */}
-        <div className="private-invitation w-full max-w-[800px] bg-[#E7D7AC] text-[#17120D] p-8 md:p-16 border-4 border-[#17120D] shadow-[25px_25px_0px_#17120D] relative flex flex-col justify-between text-center">
+        {/* CENTRAL VINTAGE INVITATION CARD WITH LETTERPRESS DOUBLE-LINE BORDER */}
+        <div className="private-invitation w-full max-w-[800px] bg-[#E7D7AC] text-[#17120D] p-8 md:p-16 border-8 border-double border-[#17120D] shadow-[25px_25px_0px_#17120D] relative flex flex-col justify-between text-center">
           
-          {/* VINTAGE GRAPHIC WAX SEAL (Top-Right Corner) */}
+          {/* VINTAGE GRAPHIC WAX SEAL */}
           <div className="wax-seal absolute -top-6 -right-6 w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#651D2D] border-4 border-[#17120D] shadow-xl flex items-center justify-center z-40 rotate-[-6deg]">
             <div className="w-[82%] h-[82%] rounded-full border-2 border-[#C69A32] flex items-center justify-center">
               <span className="font-display text-2xl md:text-3xl text-[#E7D7AC] font-bold leading-none">T</span>
@@ -137,9 +131,14 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
 
           {/* Invitation Body */}
           <div className="my-auto">
-            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-6 ink-bleed">
+            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-4 ink-bleed">
               MAKE THE NIGHT<br/>YOUR OWN.
             </h3>
+
+            {/* GOLD FLOURISH RULE */}
+            <div className="font-mono text-xs font-bold text-[#C69A32] my-4 tracking-widest uppercase">
+              ─────── ✦ ───────
+            </div>
 
             <p className="font-body text-base md:text-xl text-[#17120D]/90 leading-relaxed italic max-w-xl mx-auto mb-8 border-y-2 border-[#17120D]/20 py-4">
               "Private gatherings deserve more than a playlist. Tangy brings the artists, sound, atmosphere and experience to spaces that mean something to you."
