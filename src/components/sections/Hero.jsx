@@ -224,54 +224,15 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* VIOLIN PERFORMER ILLUSTRATION (z-20)                           */}
+        {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20)            */}
         {/* ------------------------------------------------------------- */}
-        <div className="portrait-wrap absolute z-20 left-[52%] top-[34%] w-[17cqw] h-[34cqw] pointer-events-none">
-          <div className="portrait-blob absolute -inset-x-[6%] -top-[3%] -bottom-[1%] bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-[0_1cqw_1.8cqw_rgba(0,0,0,0.35)]" />
-          <svg className="relative w-full h-full block z-2" viewBox="0 0 320 520" preserveAspectRatio="xMidYMax meet">
-            <path d="M40 520 L40 430 Q40 360 100 335 L140 320 Q160 335 190 320 L225 335 Q285 360 285 430 L285 520 Z" fill="#5a1414"/>
-            <path d="M120 335 L160 380 L200 335 L190 320 Q160 335 140 320 Z" fill="#3c0d0d"/>
-            <rect x="140" y="270" width="42" height="60" rx="12" fill="#e9d6ab"/>
-            <ellipse cx="161" cy="205" rx="76" ry="82" fill="#ecdcaf"/>
-            <ellipse cx="86" cy="210" rx="10" ry="16" fill="#e2cd97"/>
-            <ellipse cx="236" cy="210" rx="10" ry="16" fill="#e2cd97"/>
-            <g fill="#1c140d">
-              <circle cx="95" cy="150" r="30"/>
-              <circle cx="120" cy="118" r="34"/>
-              <circle cx="160" cy="102" r="36"/>
-              <circle cx="200" cy="112" r="33"/>
-              <circle cx="232" cy="140" r="30"/>
-              <circle cx="245" cy="175" r="24"/>
-              <circle cx="80" cy="182" r="24"/>
-              <circle cx="70" cy="150" r="20"/>
-              <circle cx="252" cy="150" r="20"/>
-            </g>
-            <path d="M118 190 q16 -12 34 -2" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <path d="M192 188 q16 -10 34 2" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <path d="M122 210 q14 12 30 0" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <path d="M196 210 q14 12 30 0" stroke="#1c140d" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <path d="M158 210 q-6 22 0 30 q6 6 14 0" stroke="#c9b485" strokeWidth="4" fill="none" strokeLinecap="round"/>
-            <path d="M128 252 q34 20 70 0 q-6 14 -35 16 q-29 -2 -35 -16 Z" fill="#1c140d" opacity=".85"/>
-            <path d="M132 262 q34 34 66 0 q-30 26 -66 0 Z" fill="#3c1e10"/>
-            <path d="M140 264 q22 16 50 0" stroke="#ecdcaf" strokeWidth="5" fill="none" strokeLinecap="round"/>
-            <path d="M110 250 q50 46 104 0 q4 24 -10 40 q-42 26 -84 0 q-14 -16 -10 -40 Z" fill="#1c140d" opacity=".18"/>
-            <path d="M108 345 Q60 300 78 235 Q86 215 110 220 Q95 255 118 300 Q130 330 150 345 Z" fill="#5a1414"/>
-            <ellipse cx="92" cy="222" rx="20" ry="16" fill="#e9d6ab" transform="rotate(-25 92 222)"/>
-            <g transform="translate(150,225) rotate(-32)">
-              <path d="M0 -70 Q22 -66 22 -40 Q30 -20 20 0 Q30 20 20 45 Q22 66 0 70 Q-22 66 -20 45 Q-30 20 -20 0 Q-30 -20 -22 -40 Q-22 -66 0 -70 Z" fill="#7a3b1e" stroke="#3c1a0c" strokeWidth="3"/>
-              <line x1="0" y1="-70" x2="0" y2="-140" stroke="#3c1a0c" strokeWidth="6"/>
-              <ellipse cx="0" cy="-140" rx="9" ry="14" fill="#5a2a12" stroke="#3c1a0c" strokeWidth="2"/>
-              <line x1="-3" y1="-8" x2="-3" y2="30" stroke="#1c140d" strokeWidth="2"/>
-              <line x1="3" y1="-8" x2="3" y2="30" stroke="#1c140d" strokeWidth="2"/>
-              <path d="M-8 -10 q-6 12 0 24" stroke="#1c140d" strokeWidth="2" fill="none"/>
-              <path d="M8 -10 q6 12 0 24" stroke="#1c140d" strokeWidth="2" fill="none"/>
-            </g>
-            <line x1="255" y1="70" x2="95" y2="345" stroke="#2a1710" strokeWidth="4"/>
-            <line x1="248" y1="80" x2="102" y2="336" stroke="#ecdcaf" strokeWidth="2" opacity=".7"/>
-            <path d="M215 335 Q255 300 270 250 Q276 230 260 220 Q258 250 235 285 Q220 310 200 335 Z" fill="#5a1414"/>
-            <ellipse cx="262" cy="228" rx="19" ry="15" fill="#e9d6ab" transform="rotate(30 262 228)"/>
-            <rect x="248" y="205" width="20" height="8" rx="3" fill="#8a6a2a" transform="rotate(30 258 209)"/>
-          </svg>
+        <div className="portrait-wrap absolute z-20 left-[50%] top-[24%] w-[22cqw] max-w-[420px] h-[44cqw] max-h-[640px] pointer-events-none">
+          <div className="portrait-blob absolute -inset-x-[6%] -top-[3%] -bottom-[1%] bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-[0_1.2cqw_2.4cqw_rgba(0,0,0,0.4)]" />
+          <img 
+            src="/media/hero-performer.png" 
+            alt="Tangy 1970s Performer Cutout" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)] z-2" 
+          />
         </div>
 
         {/* ------------------------------------------------------------- */}
