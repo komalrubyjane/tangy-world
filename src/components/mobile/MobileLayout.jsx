@@ -150,10 +150,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         {/* TOP METADATA BAR */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-1.5 z-20 transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <span className="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-[#EAD9A6] tracking-[0.25em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
-            TANGY SESSIONS // HYDERABAD // EST. 2016
+            HYDERABAD // LIVE ARCHIVE // EST. 2016
           </span>
           <span className="font-mono text-[8px] font-bold text-[#D19A24] tracking-[0.2em] uppercase">
-            ○ LIVE CONCERT POSTER
+            ○ 1974 SCREEN-PRINTED POSTER
           </span>
         </div>
 
@@ -168,22 +168,22 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </div>
           </div>
 
-          {/* CLAMPED TITLE */}
+          {/* CLAMPED POSTER TITLE "TANGY SESSIONS" */}
           <div className={`flex flex-col items-center transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <h1 className="font-display text-[clamp(52px,14.5vw,76px)] text-[#EAD9A6] leading-[0.82] tracking-tighter drop-shadow-[5px_5px_0px_#15120D]">
               TANGY
             </h1>
-            <h1 className="font-display text-[clamp(44px,12.5vw,64px)] italic text-[#D19A24] font-normal leading-[0.82] tracking-tight drop-shadow-[5px_5px_0px_#15120D] -mt-1">
-              WORLD
+            <h1 className="font-display text-[clamp(40px,11.5vw,58px)] italic text-[#D19A24] font-normal leading-[0.82] tracking-tight drop-shadow-[5px_5px_0px_#15120D] -mt-1">
+              SESSIONS
             </h1>
           </div>
 
-          {/* HERO PERFORMER CUT-OUT PHOTO */}
+          {/* SINGLE DOMINANT MUSICIAN CUTOUT PHOTO */}
           <div className={`w-[75%] max-w-[280px] sm:max-w-[320px] bg-[#EAD9A6] p-2 sm:p-2.5 pb-6 sm:pb-7 border-3 border-[#15120D] shadow-[10px_10px_0px_#15120D] rotate-[-1.5deg] transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             <div className="absolute -top-2.5 left-1/3 w-16 h-4 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30" />
             <img 
               src={gallery[2]?.src || "/media/gallery/tangy3.jpg"} 
-              alt="Tangy Concert Performer" 
+              alt="Tangy Musician Performer" 
               className="w-full aspect-[4/3] object-cover filter grayscale contrast-130 border border-[#15120D] block"
             />
             <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-1.5 text-left">✎ BANSILALPET // 11:42 PM</p>
@@ -194,7 +194,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         {/* BOTTOM SECTION: CONCERT TICKET CTA */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-2.5 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <p className="font-mono text-[9px] sm:text-[10px] font-bold text-[#EAD9A6] tracking-[0.2em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
-            MUSIC • PEOPLE • PLACES • STORIES
+            UNDERGROUND SERIES • STEPWELL EDITION
           </p>
 
           <button
