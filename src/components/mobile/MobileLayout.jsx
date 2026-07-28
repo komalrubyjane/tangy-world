@@ -72,23 +72,23 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
   ];
 
   return (
-    <div className="w-full min-h-[100dvh] bg-[#11100C] text-[#FDF6E3] font-sans antialiased overflow-x-hidden selection:bg-[#991B1B] selection:text-[#FDF6E3]">
+    <div className="w-full min-h-[100dvh] bg-[#14110F] text-[#F4E8C3] font-sans antialiased overflow-x-hidden selection:bg-[#991B1B] selection:text-[#F4E8C3]">
       
       {/* 1. TOUCH-NATIVE MOBILE NAVIGATION BAR & SLIDE-IN MENU OVERLAY */}
-      <header className="fixed top-0 left-0 right-0 h-14 bg-[#15120D]/95 backdrop-blur-md border-b border-[#FDF6E3]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
+      <header className="fixed top-0 left-0 right-0 h-14 bg-[#14110F]/95 backdrop-blur-md border-b border-[#F4E8C3]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
         <button
           onClick={() => { playSFX('ticketClick'); setIsMenuOpen(true); }}
-          className="font-mono text-[10px] font-bold tracking-[0.2em] text-[#FDF6E3] flex items-center gap-1.5 border border-[#FDF6E3]/30 px-2.5 py-1 rounded-sm active:scale-95 transition-transform"
+          className="font-mono text-[10px] font-bold tracking-[0.2em] text-[#F4E8C3] flex items-center gap-1.5 border border-[#F4E8C3]/30 px-2.5 py-1 rounded-sm active:scale-95 transition-transform"
         >
           <span>☰</span>
           <span>MENU</span>
         </button>
 
-        <span className="font-poster text-sm font-bold tracking-widest text-[#FDF6E3] uppercase">
+        <span className="font-poster text-sm font-bold tracking-widest text-[#F4E8C3] uppercase">
           TANGY SESSIONS
         </span>
 
-        <span className="font-mono text-[9px] font-bold text-[#F2B533] tracking-widest border border-[#F2B533]/40 px-2 py-0.5">
+        <span className="font-mono text-[9px] font-bold text-[#D9A420] tracking-widest border border-[#D9A420]/40 px-2 py-0.5">
           HYD
         </span>
       </header>
@@ -103,13 +103,13 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         />
 
         <div 
-          className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-[360px] bg-[#15120D] text-[#FDF6E3] flex flex-col justify-between p-6 pt-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] shadow-2xl transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-[360px] bg-[#14110F] text-[#F4E8C3] flex flex-col justify-between p-6 pt-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] shadow-2xl transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
         >
-          <div className="flex justify-between items-center border-b border-[#FDF6E3]/20 pb-4">
-            <span className="font-mono text-xs text-[#F2B533] tracking-[0.3em] font-bold">PROGRAMME INDEX</span>
+          <div className="flex justify-between items-center border-b border-[#F4E8C3]/20 pb-4">
+            <span className="font-mono text-xs text-[#D9A420] tracking-[0.3em] font-bold">PROGRAMME INDEX</span>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="font-mono text-xs font-bold border-2 border-[#FDF6E3] px-3 py-1 text-[#FDF6E3] active:scale-95 transition-transform"
+              className="font-mono text-xs font-bold border-2 border-[#F4E8C3] px-3 py-1 text-[#F4E8C3] active:scale-95 transition-transform"
             >
               ✕ CLOSE
             </button>
@@ -121,23 +121,23 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
                 key={link.target}
                 onClick={() => handleNavClick(link.target)}
                 style={{ transitionDelay: `${idx * 40}ms` }}
-                className={`text-left font-poster text-2xl text-[#FDF6E3] active:text-[#991B1B] border-b border-[#FDF6E3]/10 pb-2 transition-all duration-300 ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
+                className={`text-left font-poster text-2xl text-[#F4E8C3] active:text-[#991B1B] border-b border-[#F4E8C3]/10 pb-2 transition-all duration-300 ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
               >
                 {link.label}
               </button>
             ))}
           </nav>
 
-          <div className="font-mono text-[10px] text-[#FDF6E3]/60 text-center tracking-widest uppercase pt-4 border-t border-[#FDF6E3]/20">
+          <div className="font-mono text-[10px] text-[#F4E8C3]/60 text-center tracking-widest uppercase pt-4 border-t border-[#F4E8C3]/20">
             TANGY SESSIONS // HYDERABAD // EST. 2016
           </div>
         </div>
       </div>
 
-      {/* 2. MOBILE HERO SECTION (100DVH POSTER ADAPTATION) */}
+      {/* 2. MOBILE HERO SECTION (100DVH 1974 CONCERT POSTER) */}
       <section 
         id="m-hero" 
-        className="w-full min-h-[100dvh] bg-[#991B1B] text-[#FDF6E3] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
+        className="w-full min-h-[100dvh] bg-[#991B1B] text-[#F4E8C3] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
         style={{
           paddingTop: 'max(68px, calc(env(safe-area-inset-top) + 56px))',
           paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
@@ -148,9 +148,9 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none z-10" />
 
         {/* TOP METADATA BAR */}
-        <div className={`w-full max-w-[340px] flex justify-between items-center z-20 font-mono text-[8px] font-bold tracking-widest text-[#FDF6E3] uppercase transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-          <span>LIVE ARCHIVE 𝌆</span>
-          <span className="text-[#F2B533]">33⅓ RPM STEREO</span>
+        <div className={`w-full max-w-[340px] flex justify-between items-center z-20 font-mono text-[8px] font-bold tracking-widest text-[#F4E8C3] uppercase transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+          <span>HYDERABAD, INDIA</span>
+          <span className="text-[#D9A420]">33⅓ RPM STEREO</span>
         </div>
 
         {/* MIDDLE SECTION: SWING MIC + 3D TITLE + STICKER PERFORMER CUTOUT */}
@@ -158,7 +158,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           
           {/* STATIC HANGING MICROPHONE */}
           <div className={`w-full flex flex-col items-center pointer-events-none mb-1 transition-all duration-800 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
-            <div className="w-[1.5px] h-[55px] sm:h-[70px] bg-[#11100C]" />
+            <div className="w-[1.5px] h-[55px] sm:h-[70px] bg-[#14110F]" />
             <div className="w-11 h-15 sm:w-13 sm:h-17 shadow-xl flex items-center justify-center p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
               <img src="/media/vintage-mic.png" alt="Microphone" className="w-full h-full object-contain filter drop-shadow-md" />
             </div>
@@ -166,43 +166,43 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
 
           {/* 3D TITLE "TANGY SESSIONS" */}
           <div className={`flex flex-col items-center transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <h1 className="font-poster text-[clamp(54px,15vw,78px)] text-[#FDF6E3] leading-[0.78] tracking-tighter drop-shadow-[6px_6px_0px_#11100C] uppercase font-black">
+            <h1 className="font-poster text-[clamp(54px,15vw,78px)] text-[#F4E8C3] leading-[0.78] tracking-tighter drop-shadow-[6px_6px_0px_#14110F] uppercase font-black">
               TANGY
             </h1>
-            <h1 className="font-poster text-[clamp(44px,12.5vw,64px)] text-[#FDF6E3] font-black leading-[0.78] tracking-tight drop-shadow-[6px_6px_0px_#11100C] -mt-2 uppercase">
+            <h1 className="font-poster text-[clamp(44px,12.5vw,64px)] text-[#F4E8C3] font-black leading-[0.78] tracking-tight drop-shadow-[6px_6px_0px_#14110F] -mt-2 uppercase">
               SESSIONS
             </h1>
           </div>
 
-          {/* PERFORMER CUTOUT WITH THICK WHITE PAPER STICKER BORDER */}
-          <div className={`w-[80%] max-w-[280px] sm:max-w-[320px] p-2 bg-[#FDF6E3] rounded-xl shadow-[0_0_0_8px_#FDF6E3,0_0_0_10px_#11100C,0_15px_30px_rgba(0,0,0,0.65)] rotate-[-1.5deg] -mt-6 z-25 transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-            <div className="w-full aspect-[4/3] bg-[#11100C] rounded-lg overflow-hidden border border-[#11100C]">
+          {/* VIOLIN PERFORMER CUTOUT WITH THICK WHITE PAPER STICKER BORDER */}
+          <div className={`w-[80%] max-w-[280px] sm:max-w-[320px] p-2 bg-[#F8F1D9] rounded-xl shadow-[0_0_0_8px_#F8F1D9,0_0_0_10px_#14110F,0_15px_30px_rgba(0,0,0,0.65)] rotate-[-1.5deg] -mt-6 z-25 transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+            <div className="w-full aspect-[4/3] bg-[#14110F] rounded-lg overflow-hidden border border-[#14110F]">
               <img 
                 src={gallery[2]?.src || "/media/gallery/tangy3.jpg"} 
-                alt="Tangy Performer Cutout" 
+                alt="Tangy Violin Performer Cutout" 
                 className="w-full h-full object-cover filter grayscale contrast-130 block"
               />
             </div>
-            <p className="font-mono text-[7.5px] text-[#11100C] font-bold tracking-wider mt-1 text-left">✎ BANSILALPET STEPWELL // 22h</p>
+            <p className="font-mono text-[7.5px] text-[#14110F] font-bold tracking-wider mt-1 text-left">✎ BANSILALPET STEPWELL // 22h</p>
           </div>
 
         </div>
 
-        {/* BOTTOM SECTION: TICKET STUB BUTTON */}
+        {/* BOTTOM SECTION: CONCERT TICKET STUB BUTTON */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-2 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           
-          <div className="w-full bg-[#FDF6E3] text-[#11100C] border-2 border-[#11100C] p-3 shadow-[5px_5px_0px_#11100C] flex flex-col gap-2 rounded-sm">
-            <div className="flex justify-between items-center font-mono text-[8px] font-bold text-[#315D73] border-b border-[#11100C]/30 pb-1 uppercase">
-              <span>ADMIT ONE // VOL. 09</span>
+          <div className="w-full bg-[#F8F1D9] text-[#14110F] border-2 border-[#14110F] p-3 shadow-[5px_5px_0px_#14110F] flex flex-col gap-2 rounded-sm">
+            <div className="flex justify-between items-center font-mono text-[8px] font-bold text-[#315D73] border-b border-[#14110F]/30 pb-1 uppercase">
+              <span>ADMIT ONE // VOL. 01</span>
               <span>ARCHIVE NO. 001</span>
             </div>
 
             <button
               onClick={() => handleNavClick('#m-manifesto')}
-              className="w-full h-[52px] bg-[#11100C] text-[#FDF6E3] font-mono text-xs font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer rounded-sm"
+              className="w-full h-[52px] bg-[#14110F] text-[#F4E8C3] font-mono text-xs font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer rounded-sm"
             >
               <span>ENTER TANGY →</span>
-              <span className="text-[#F2B533] font-black">✦</span>
+              <span className="text-[#D9A420] font-black">✦</span>
             </button>
           </div>
 
@@ -213,20 +213,20 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={manifestoRef}
         id="m-manifesto" 
-        className={`w-full bg-[#FDF6E3] text-[#11100C] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${manifestoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#F4E8C3] text-[#14110F] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${manifestoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
           <span className="font-mono text-[10px] font-bold text-[#991B1B] tracking-[0.3em] uppercase">01 MANIFESTO</span>
-          <div className="w-full bg-[#15120D] p-2 border-2 border-[#15120D] shadow-[6px_6px_0px_#991B1B] rotate-[1deg]">
+          <div className="w-full bg-[#14110F] p-2 border-2 border-[#14110F] shadow-[6px_6px_0px_#991B1B] rotate-[1deg]">
             <img src="/media/gallery/tangy1.jpg" alt="Stepwell" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
           </div>
-          <h2 className="font-poster text-2xl sm:text-3xl text-[#11100C] leading-tight">
+          <h2 className="font-poster text-2xl sm:text-3xl text-[#14110F] leading-tight">
             AN INTERACTIVE SCREEN-PRINTED MUSIC ARCHIVE.
           </h2>
-          <p className="font-sans text-sm sm:text-base text-[#11100C]/90 leading-relaxed">
+          <p className="font-sans text-sm sm:text-base text-[#14110F]/90 leading-relaxed">
             Tangy Sessions is a living archive of music, people, and historic spaces in Hyderabad.
           </p>
-          <blockquote className="w-full bg-[#991B1B] text-[#FDF6E3] p-5 border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] font-poster text-lg sm:text-xl italic my-2">
+          <blockquote className="w-full bg-[#991B1B] text-[#F4E8C3] p-5 border-2 border-[#14110F] shadow-[5px_5px_0px_#14110F] font-poster text-lg sm:text-xl italic my-2">
             "This world has a sound. Listen closely."
           </blockquote>
         </div>
@@ -236,10 +236,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={historyRef}
         id="m-history" 
-        className={`w-full bg-[#991B1B] text-[#FDF6E3] py-14 px-5 flex flex-col items-center transition-all duration-700 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#991B1B] text-[#F4E8C3] py-14 px-5 flex flex-col items-center transition-all duration-700 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase mb-6">02 CHRONOLOGY // 10 YEARS</span>
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase mb-6">02 CHRONOLOGY // 10 YEARS</span>
           <div className="w-full flex flex-col gap-6">
             {[
               { year: "2016", title: "THE FIRST SPARK", desc: "First acoustic sessions inside private living rooms & stepwells." },
@@ -251,14 +251,14 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <div 
                 key={idx} 
                 style={{ transitionDelay: `${idx * 120}ms` }}
-                className={`w-full bg-[#15120D] border-2 border-[#FDF6E3] p-5 shadow-[5px_5px_0px_#FDF6E3] flex flex-col items-start text-left gap-2 transition-all duration-500 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+                className={`w-full bg-[#14110F] border-2 border-[#F4E8C3] p-5 shadow-[5px_5px_0px_#F4E8C3] flex flex-col items-start text-left gap-2 transition-all duration-500 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-poster text-2xl sm:text-3xl text-[#FDF6E3]">{item.year}</span>
+                  <span className="font-poster text-2xl sm:text-3xl text-[#F4E8C3]">{item.year}</span>
                   <span className="text-[#991B1B] font-bold">○</span>
                 </div>
-                <h3 className="font-poster text-base sm:text-lg text-[#FDF6E3]">{item.title}</h3>
-                <p className="font-sans text-xs sm:text-sm text-[#FDF6E3]/80">{item.desc}</p>
+                <h3 className="font-poster text-base sm:text-lg text-[#F4E8C3]">{item.title}</h3>
+                <p className="font-sans text-xs sm:text-sm text-[#F4E8C3]/80">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -272,21 +272,21 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         className={`w-full bg-[#991B1B] py-14 px-5 flex flex-col items-center transition-all duration-700 ${sessionsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[420px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase">03 SESSIONS // TICKETS</span>
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase">03 SESSIONS // TICKETS</span>
 
           {events.map((evt) => (
-            <div key={evt.id} className="w-full bg-[#FDF6E3] text-[#11100C] border-2 border-[#15120D] p-4 sm:p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3">
-              <img src={evt.image} alt={evt.title} className="w-full aspect-[4/3] object-cover border border-[#15120D]" />
+            <div key={evt.id} className="w-full bg-[#F4E8C3] text-[#14110F] border-2 border-[#14110F] p-4 sm:p-5 shadow-[6px_6px_0px_#14110F] flex flex-col gap-3">
+              <img src={evt.image} alt={evt.title} className="w-full aspect-[4/3] object-cover border border-[#14110F]" />
               <div className="flex flex-col gap-1 text-left">
                 <span className="font-mono text-[9px] font-bold text-[#991B1B] tracking-widest">{evt.city} · {evt.status}</span>
-                <h3 className="font-poster text-xl sm:text-2xl text-[#11100C]">{evt.title}</h3>
+                <h3 className="font-poster text-xl sm:text-2xl text-[#14110F]">{evt.title}</h3>
                 <p className="font-mono text-xs opacity-80">{evt.venue} · {evt.date}</p>
                 <p className="font-sans text-xs sm:text-sm mt-1">{evt.description}</p>
               </div>
 
               <button
                 onClick={() => { playSFX('ticketClick'); onSelectBooking(evt); }}
-                className="w-full h-[56px] bg-[#15120D] text-[#FDF6E3] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#15120D] active:scale-95 active:bg-[#991B1B] transition-transform"
+                className="w-full h-[56px] bg-[#14110F] text-[#F4E8C3] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#14110F] active:scale-95 active:bg-[#991B1B] transition-transform"
               >
                 BOOK TICKET ({evt.price}) →
               </button>
@@ -299,17 +299,17 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={footageRef}
         id="m-footage" 
-        className={`w-full bg-[#0D0A07] text-[#FDF6E3] py-14 px-4 flex flex-col items-center transition-all duration-700 ${footageInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#0D0A07] text-[#F4E8C3] py-14 px-4 flex flex-col items-center transition-all duration-700 ${footageInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase">04 RAW FOOTAGE // 16MM REEL</span>
+          <span className="font-mono text-[10px] font-bold text-[#D9A420] tracking-[0.3em] uppercase">04 RAW FOOTAGE // 16MM REEL</span>
 
           <div className="grid grid-cols-2 gap-3 w-full">
             {videoList.map((vid) => (
-              <div key={vid.id} className="relative aspect-[3/4] bg-[#15120D] border border-[#FDF6E3]/20 rounded-md overflow-hidden flex flex-col justify-end p-2 group active:scale-95 transition-transform">
+              <div key={vid.id} className="relative aspect-[3/4] bg-[#14110F] border border-[#F4E8C3]/20 rounded-md overflow-hidden flex flex-col justify-end p-2 group active:scale-95 transition-transform">
                 <video src={vid.src} loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" />
-                <div className="relative z-10 bg-[#15120D]/90 p-1.5 rounded text-left">
-                  <p className="font-mono text-[8.5px] font-bold text-[#FDF6E3] truncate">{vid.title}</p>
+                <div className="relative z-10 bg-[#14110F]/90 p-1.5 rounded text-left">
+                  <p className="font-mono text-[8.5px] font-bold text-[#F4E8C3] truncate">{vid.title}</p>
                 </div>
               </div>
             ))}
@@ -321,20 +321,20 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={archiveRef}
         id="m-archive" 
-        className={`w-full bg-[#315D73] text-[#FDF6E3] py-14 px-5 flex flex-col items-center transition-all duration-700 ${archiveInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#315D73] text-[#F4E8C3] py-14 px-5 flex flex-col items-center transition-all duration-700 ${archiveInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase">05 ARCHIVE & SPACES</span>
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase">05 ARCHIVE & SPACES</span>
 
           {archive.map((item, idx) => (
-            <div key={idx} className="w-full bg-[#15120D] text-[#FDF6E3] border-2 border-[#FDF6E3]/30 p-4 sm:p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left">
-              <img src={item.image} alt={item.title} className="w-full aspect-[4/3] object-cover border border-[#FDF6E3]/20" />
-              <span className="font-mono text-[9px] font-bold text-[#FDF6E3]">{item.year} · {item.venue}</span>
-              <h3 className="font-poster text-lg sm:text-xl text-[#FDF6E3]">{item.title}</h3>
+            <div key={idx} className="w-full bg-[#14110F] text-[#F4E8C3] border-2 border-[#F4E8C3]/30 p-4 sm:p-5 shadow-[6px_6px_0px_#14110F] flex flex-col gap-3 text-left">
+              <img src={item.image} alt={item.title} className="w-full aspect-[4/3] object-cover border border-[#F4E8C3]/20" />
+              <span className="font-mono text-[9px] font-bold text-[#F4E8C3]">{item.year} · {item.venue}</span>
+              <h3 className="font-poster text-lg sm:text-xl text-[#F4E8C3]">{item.title}</h3>
               <p className="font-sans text-xs sm:text-sm opacity-90">{item.description}</p>
               <button
                 onClick={() => playSFX('ticketClick')}
-                className="w-full h-[48px] mt-1 border border-[#FDF6E3] text-[#FDF6E3] font-mono text-xs font-bold tracking-widest uppercase active:scale-95 active:bg-[#FDF6E3] active:text-[#11100C] transition-transform"
+                className="w-full h-[48px] mt-1 border border-[#F4E8C3] text-[#F4E8C3] font-mono text-xs font-bold tracking-widest uppercase active:scale-95 active:bg-[#F4E8C3] active:text-[#14110F] transition-transform"
               >
                 READ STORY →
               </button>
@@ -347,17 +347,17 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={diaryRef}
         id="m-diary" 
-        className={`w-full bg-[#FDF6E3] text-[#11100C] py-14 px-5 flex flex-col items-center transition-all duration-700 ${diaryInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#F4E8C3] text-[#14110F] py-14 px-5 flex flex-col items-center transition-all duration-700 ${diaryInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
           <span className="font-mono text-[10px] font-bold text-[#991B1B] tracking-[0.3em] uppercase">06 TANGY DIARY</span>
 
           {diaryEntries.map((entry) => (
-            <div key={entry.id} className="w-full bg-[#15120D] text-[#FDF6E3] border-2 border-[#15120D] p-4 sm:p-5 shadow-[6px_6px_0px_#991B1B] flex flex-col gap-3 text-left">
-              <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover border border-[#FDF6E3]/20" />
-              <span className="font-mono text-[9px] font-bold text-[#FDF6E3]">{entry.date} · {entry.location}</span>
-              <h3 className="font-poster text-lg sm:text-xl text-[#FDF6E3]">{entry.title}</h3>
-              <p className="font-sans text-xs sm:text-sm text-[#FDF6E3]/90">{entry.content}</p>
+            <div key={entry.id} className="w-full bg-[#14110F] text-[#F4E8C3] border-2 border-[#14110F] p-4 sm:p-5 shadow-[6px_6px_0px_#991B1B] flex flex-col gap-3 text-left">
+              <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover border border-[#F4E8C3]/20" />
+              <span className="font-mono text-[9px] font-bold text-[#F4E8C3]">{entry.date} · {entry.location}</span>
+              <h3 className="font-poster text-lg sm:text-xl text-[#F4E8C3]">{entry.title}</h3>
+              <p className="font-sans text-xs sm:text-sm text-[#F4E8C3]/90">{entry.content}</p>
             </div>
           ))}
         </div>
@@ -367,27 +367,27 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={foundersRef}
         id="m-founders" 
-        className={`w-full bg-[#1C140E] text-[#FDF6E3] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${foundersInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#1C140E] text-[#F4E8C3] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${foundersInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase">07 FOUNDERS ARCHIVE // FILE 001</span>
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase">07 FOUNDERS ARCHIVE // FILE 001</span>
 
           {/* ARJUNA */}
-          <div className="w-full bg-[#FDF6E3] text-[#11100C] border-2 border-[#15120D] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left rotate-[-1deg]">
+          <div className="w-full bg-[#F4E8C3] text-[#14110F] border-2 border-[#14110F] p-5 shadow-[6px_6px_0px_#14110F] flex flex-col gap-3 text-left rotate-[-1deg]">
             <span className="font-mono text-[9px] font-bold text-[#991B1B] tracking-widest">FOUNDER & CREATOR // EST. 2016</span>
-            <h3 className="font-poster text-2xl text-[#11100C]">ARJUNA</h3>
-            <img src="/media/arjun.png" alt="Arjuna" className="w-full aspect-[3/4] object-cover border border-[#15120D]" />
-            <p className="font-mono text-xs text-[#11100C]/90 border-l-4 border-[#991B1B] pl-3 italic">
+            <h3 className="font-poster text-2xl text-[#14110F]">ARJUNA</h3>
+            <img src="/media/arjun.png" alt="Arjuna" className="w-full aspect-[3/4] object-cover border border-[#14110F]" />
+            <p className="font-mono text-xs text-[#14110F]/90 border-l-4 border-[#991B1B] pl-3 italic">
               "Born from an obsession with underground sound and ancient spaces."
             </p>
           </div>
 
           {/* DEEPA */}
-          <div className="w-full bg-[#FDF6E3] text-[#11100C] border-2 border-[#15120D] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left rotate-[1deg]">
+          <div className="w-full bg-[#F4E8C3] text-[#14110F] border-2 border-[#14110F] p-5 shadow-[6px_6px_0px_#14110F] flex flex-col gap-3 text-left rotate-[1deg]">
             <span className="font-mono text-[9px] font-bold text-[#991B1B] tracking-widest">CO-FOUNDER // EST. 2018</span>
-            <h3 className="font-poster text-2xl text-[#11100C]">DEEPA</h3>
-            <img src="/media/deepa.jpg" alt="Deepa" className="w-full aspect-[3/4] object-cover border border-[#15120D]" />
-            <p className="font-mono text-xs text-[#11100C]/90 border-l-4 border-[#991B1B] pl-3 italic">
+            <h3 className="font-poster text-2xl text-[#14110F]">DEEPA</h3>
+            <img src="/media/deepa.jpg" alt="Deepa" className="w-full aspect-[3/4] object-cover border border-[#14110F]" />
+            <p className="font-mono text-xs text-[#14110F]/90 border-l-4 border-[#991B1B] pl-3 italic">
               "The architect of community. Deepa ensures every event feels like a homecoming."
             </p>
           </div>
@@ -398,36 +398,36 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={crewRef}
         id="m-crew" 
-        className={`w-full bg-[#991B1B] text-[#FDF6E3] py-16 px-4 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#991B1B] text-[#F4E8C3] py-16 px-4 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[360px] flex flex-col items-center gap-10">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase border-y border-[#15120D]/40 py-1 px-4">
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase border-y border-[#14110F]/40 py-1 px-4">
             08 JOIN THE CREW // RECRUITMENT DESK
           </span>
 
           {/* POSTER 01: VOLUNTEER */}
           <div 
-            className={`w-full bg-[#FDF6E3] text-[#11100C] p-5 sm:p-6 border-4 border-[#15120D] shadow-[10px_10px_0px_#15120D] rotate-[2deg] relative flex flex-col gap-4 transition-all duration-500 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+            className={`w-full bg-[#F4E8C3] text-[#14110F] p-5 sm:p-6 border-4 border-[#14110F] shadow-[10px_10px_0px_#14110F] rotate-[2deg] relative flex flex-col gap-4 transition-all duration-500 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            <div className="absolute top-0 right-0 w-6 h-6 bg-[#991B1B] border-b-2 border-l-2 border-[#15120D] shadow-sm pointer-events-none" />
-            <div className="absolute -top-3 left-6 w-20 h-5 bg-[rgba(253,246,227,0.9)] rotate-[-3deg] border border-black/30 pointer-events-none" />
-            <div className="absolute -top-4 right-8 border-2 border-[#15120D] bg-[#5A120D] text-[#FDF6E3] font-mono text-[8.5px] font-bold px-2.5 py-0.5 uppercase rotate-[-6deg] shadow-md pointer-events-none">
+            <div className="absolute top-0 right-0 w-6 h-6 bg-[#991B1B] border-b-2 border-l-2 border-[#14110F] shadow-sm pointer-events-none" />
+            <div className="absolute -top-3 left-6 w-20 h-5 bg-[rgba(244,232,195,0.9)] rotate-[-3deg] border border-black/30 pointer-events-none" />
+            <div className="absolute -top-4 right-8 border-2 border-[#14110F] bg-[#5A120D] text-[#F4E8C3] font-mono text-[8.5px] font-bold px-2.5 py-0.5 uppercase rotate-[-6deg] shadow-md pointer-events-none">
               REC • LIVE // ARCHIVE 08 ✦
             </div>
 
-            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#315D73] border-b border-[#15120D]/30 pb-2 uppercase">
+            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#315D73] border-b border-[#14110F]/30 pb-2 uppercase">
               <span>ARCHIVE 08 // FILE NO. 204</span>
               <span>HYDERABAD</span>
             </div>
 
             <div className="flex flex-col text-left">
               <span className="font-mono text-[9px] text-[#991B1B] font-black tracking-widest uppercase">PATH 01 // VOLUNTEER</span>
-              <h3 className="font-poster text-3xl sm:text-4xl text-[#11100C] leading-none my-1">
+              <h3 className="font-poster text-3xl sm:text-4xl text-[#14110F] leading-none my-1">
                 BEHIND THE SCENES
               </h3>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-[9px] font-bold bg-[#F5E9C9] p-2 border border-[#15120D]">
+            <div className="flex items-center gap-2 font-mono text-[9px] font-bold bg-[#F5E9C9] p-2 border border-[#14110F]">
               <span>🎧 HEADPHONES</span>
               <span>·</span>
               <span>🎙 MIC</span>
@@ -435,13 +435,13 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <span>⚡ SPOTLIGHT</span>
             </div>
 
-            <p className="font-mono text-xs text-[#11100C]/90 border-l-4 border-[#991B1B] pl-3 py-0.5 italic">
+            <p className="font-mono text-xs text-[#14110F]/90 border-l-4 border-[#991B1B] pl-3 py-0.5 italic">
               ✎ "Help build the nights, the stories and everything that happens between them."
             </p>
 
             <button
               onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
-              className="w-full h-[56px] bg-[#15120D] text-[#FDF6E3] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
+              className="w-full h-[56px] bg-[#14110F] text-[#F4E8C3] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#14110F] shadow-[4px_4px_0px_#14110F] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
               [ APPLY AS VOLUNTEER → ]
             </button>
@@ -449,40 +449,40 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
 
           {/* POSTER 02: ARTIST */}
           <div 
-            className={`w-full bg-[#15120D] text-[#FDF6E3] p-5 sm:p-6 border-4 border-[#FDF6E3] shadow-[10px_10px_0px_#15120D] rotate-[-2deg] relative flex flex-col gap-4 transition-all duration-500 delay-200 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+            className={`w-full bg-[#14110F] text-[#F4E8C3] p-5 sm:p-6 border-4 border-[#F4E8C3] shadow-[10px_10px_0px_#14110F] rotate-[-2deg] relative flex flex-col gap-4 transition-all duration-500 delay-200 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            <div className="absolute -top-3 right-6 w-20 h-5 bg-[rgba(253,246,227,0.85)] rotate-[4deg] border border-black/30 pointer-events-none" />
-            <div className="absolute -top-4 left-6 border-2 border-[#15120D] bg-[#991B1B] text-[#FDF6E3] font-mono text-[8.5px] font-bold px-2 py-0.5 uppercase rotate-[4deg] shadow-md pointer-events-none">
+            <div className="absolute -top-3 right-6 w-20 h-5 bg-[rgba(244,232,195,0.85)] rotate-[4deg] border border-black/30 pointer-events-none" />
+            <div className="absolute -top-4 left-6 border-2 border-[#14110F] bg-[#991B1B] text-[#F4E8C3] font-mono text-[8.5px] font-bold px-2 py-0.5 uppercase rotate-[4deg] shadow-md pointer-events-none">
               PROPERTY OF TANGY // BACKSTAGE ✦
             </div>
 
-            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#FDF6E3] border-b border-[#FDF6E3]/20 pb-2 uppercase">
+            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#F4E8C3] border-b border-[#F4E8C3]/20 pb-2 uppercase">
               <span>SIDE A // 33⅓ RPM STEREO</span>
               <span>AUDITION FILE</span>
             </div>
 
             <div className="flex flex-col text-left">
-              <span className="font-mono text-[9px] text-[#FDF6E3] font-black tracking-widest uppercase">PATH 02 // ARTIST</span>
-              <h3 className="font-poster text-3xl sm:text-4xl text-[#FDF6E3] leading-none my-1">
+              <span className="font-mono text-[9px] text-[#F4E8C3] font-black tracking-widest uppercase">PATH 02 // ARTIST</span>
+              <h3 className="font-poster text-3xl sm:text-4xl text-[#F4E8C3] leading-none my-1">
                 TAKE THE STAGE
               </h3>
             </div>
 
-            <div className="flex items-center justify-between bg-[#1C140E] p-2.5 border border-[#FDF6E3]/40 font-mono text-[9px]">
+            <div className="flex items-center justify-between bg-[#1C140E] p-2.5 border border-[#F4E8C3]/40 font-mono text-[9px]">
               <div className="flex items-center gap-2">
                 <img src="/media/vinyl.png" alt="Vinyl" className="w-6 h-6 object-contain animate-[spin_6s_linear_infinite]" />
-                <span className="font-bold text-[#FDF6E3]">33⅓ RPM LIVE RECORDING</span>
+                <span className="font-bold text-[#F4E8C3]">33⅓ RPM LIVE RECORDING</span>
               </div>
-              <span className="bg-[#991B1B] text-[#FDF6E3] px-1.5 py-0.5 text-[7.5px] font-bold uppercase">GUITAR PICK ✦</span>
+              <span className="bg-[#991B1B] text-[#F4E8C3] px-1.5 py-0.5 text-[7.5px] font-bold uppercase">GUITAR PICK ✦</span>
             </div>
 
-            <p className="font-mono text-xs text-[#FDF6E3]/90 border-l-4 border-[#991B1B] pl-3 py-0.5 italic">
+            <p className="font-mono text-xs text-[#F4E8C3]/90 border-l-4 border-[#991B1B] pl-3 py-0.5 italic">
               ✎ "Bring your sound, your story and your energy into the Tangy world."
             </p>
 
             <button
               onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
-              className="w-full h-[56px] bg-[#991B1B] text-[#FDF6E3] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
+              className="w-full h-[56px] bg-[#991B1B] text-[#F4E8C3] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#14110F] shadow-[4px_4px_0px_#14110F] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
               [ APPLY AS ARTIST → ]
             </button>
@@ -495,26 +495,26 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <section 
         ref={privateRef}
         id="m-private" 
-        className={`w-full bg-[#315D73] text-[#FDF6E3] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${privateInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#315D73] text-[#F4E8C3] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${privateInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] font-bold text-[#FDF6E3] tracking-[0.3em] uppercase">09 PRIVATE SESSIONS</span>
+          <span className="font-mono text-[10px] font-bold text-[#F4E8C3] tracking-[0.3em] uppercase">09 PRIVATE SESSIONS</span>
 
-          <div className="w-full bg-[#15120D] p-2 border-2 border-[#FDF6E3]/30 shadow-[6px_6px_0px_#15120D]">
-            <img src="/media/gallery/tangy4.jpg" alt="Private Session" className="w-full aspect-[4/3] object-cover border border-[#FDF6E3]/20" />
+          <div className="w-full bg-[#14110F] p-2 border-2 border-[#F4E8C3]/30 shadow-[6px_6px_0px_#14110F]">
+            <img src="/media/gallery/tangy4.jpg" alt="Private Session" className="w-full aspect-[4/3] object-cover border border-[#F4E8C3]/20" />
           </div>
 
-          <h2 className="font-poster text-2xl sm:text-3xl text-[#FDF6E3] leading-tight">
+          <h2 className="font-poster text-2xl sm:text-3xl text-[#F4E8C3] leading-tight">
             MAKE THE NIGHT YOUR OWN.
           </h2>
 
-          <p className="font-sans text-xs sm:text-sm text-[#FDF6E3]/90 leading-relaxed font-normal">
+          <p className="font-sans text-xs sm:text-sm text-[#F4E8C3]/90 leading-relaxed font-normal">
             Bring the Tangy music experience to your space — private gatherings, house sessions, brand experiences, and curated intimate events.
           </p>
 
           <button
             onClick={() => { playSFX('ticketClick'); onRequestPrivate(); }}
-            className="w-full max-w-[340px] h-[56px] bg-[#FDF6E3] text-[#11100C] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] active:scale-95 active:bg-[#991B1B] active:text-[#FDF6E3] transition-transform animate-[pulse_4s_ease-in-out_infinite]"
+            className="w-full max-w-[340px] h-[56px] bg-[#F4E8C3] text-[#14110F] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#14110F] shadow-[5px_5px_0px_#14110F] active:scale-95 active:bg-[#991B1B] active:text-[#F4E8C3] transition-transform animate-[pulse_4s_ease-in-out_infinite]"
           >
             REQUEST PRIVATE SESSION →
           </button>
@@ -522,16 +522,16 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       </section>
 
       {/* 12. MOBILE FOOTER */}
-      <footer className="w-full bg-[#11100C] text-[#FDF6E3] py-10 px-5 flex flex-col items-center text-center border-t border-[#FDF6E3]/20">
+      <footer className="w-full bg-[#14110F] text-[#F4E8C3] py-10 px-5 flex flex-col items-center text-center border-t border-[#F4E8C3]/20">
         <div className="w-full max-w-[480px] flex flex-col items-center gap-3">
-          <span className="font-poster text-xl text-[#FDF6E3]">TANGY SESSIONS</span>
+          <span className="font-poster text-xl text-[#F4E8C3]">TANGY SESSIONS</span>
           <p className="font-mono text-xs opacity-70">HYDERABAD · INDIA</p>
-          <div className="flex gap-4 font-mono text-xs text-[#FDF6E3]/80 my-1">
+          <div className="flex gap-4 font-mono text-xs text-[#F4E8C3]/80 my-1">
             <a href="https://instagram.com" target="_blank" rel="noreferrer" className="underline">INSTAGRAM</a>
             <span>·</span>
             <a href="mailto:hello@tangysessions.com" className="underline">EMAIL</a>
           </div>
-          <span className="font-mono text-[8.5px] opacity-40 uppercase pt-3 border-t border-[#FDF6E3]/10 w-full">
+          <span className="font-mono text-[8.5px] opacity-40 uppercase pt-3 border-t border-[#F4E8C3]/10 w-full">
             © 2026 TANGY SESSIONS // ALL RIGHTS RESERVED
           </span>
         </div>

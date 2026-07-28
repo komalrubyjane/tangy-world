@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Ultra&family=Righteous&family=Syne:wght@800;900&family=Outfit:wght@800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ultra&family=Titan+One&family=Syne:wght@800;900&family=Bungee&family=Fredoka:wght@700&display=swap');
 @import "tailwindcss";
 @import "./animations.css";
 @import "./cursor.css";
 
 @theme {
-  --color-tangy-black: #11100C;
+  --color-tangy-black: #14110F;
   --color-tangy-oxblood: #5A120D;
   --color-tangy-rust: #B94717;
-  --color-tangy-mustard: #C99A2E;
+  --color-tangy-mustard: #D9A420;
   --color-tangy-brown: #41261B;
-  --color-tangy-paper: #E7D5A4;
-  --color-tangy-cream: #FDF6E3;
+  --color-tangy-paper: #F8F1D9;
+  --color-tangy-cream: #F4E8C3;
   
-  --font-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+  --font-poster: 'Ultra', 'Titan One', 'Syne', system-ui, sans-serif;
   --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
   --font-editorial: 'Libre Baskerville', Georgia, serif;
   --font-archive: 'Special Elite', 'Courier New', monospace;
@@ -20,15 +20,15 @@
 
 @layer base {
   :root {
-    --black: #11100C;
+    --black: #14110F;
     --oxblood: #5A120D;
     --rust: #B94717;
-    --mustard: #C99A2E;
+    --mustard: #D9A420;
     --brown: #41261B;
-    --paper: #E7D5A4;
-    --cream: #FDF6E3;
+    --paper: #F8F1D9;
+    --cream: #F4E8C3;
 
-    --f-poster: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+    --f-poster: 'Ultra', 'Titan One', 'Syne', system-ui, sans-serif;
     --f-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
     --f-editorial: 'Libre Baskerville', Georgia, serif;
     --f-archive: 'Special Elite', 'Courier New', monospace;
@@ -44,15 +44,15 @@
   }
 }
 
-/* Custom 1970s Vintage Poster Typography Classes */
+/* Custom 1974 Vintage Screen-Printed Poster Typography Classes */
 .font-poster {
-  font-family: 'Ultra', 'Syne', 'Righteous', system-ui, sans-serif;
+  font-family: 'Ultra', 'Titan One', 'Syne', system-ui, sans-serif;
 }
 
-/* White Paper Sticker Outline Effect for Cutouts */
-.sticker-outline {
+/* White Paper Sticker Cutout Outline Effect */
+.sticker-cutout-border {
   box-shadow: 
-    0 0 0 10px #FDF6E3,
-    0 0 0 12px #11100C,
-    0 15px 30px rgba(0, 0, 0, 0.6);
+    0 0 0 10px #F8F1D9,
+    0 0 0 13px #14110F,
+    0 25px 50px rgba(0, 0, 0, 0.75);
 }
