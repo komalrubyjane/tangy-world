@@ -245,9 +245,8 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </span>
           </div>
 
-          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) */}
+          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20, NO BLOB) */}
           <div className="portrait-wrap absolute z-20 right-3 top-[26%] w-44 h-72 pointer-events-none opacity-95">
-            <div className="portrait-blob absolute -inset-x-2 -top-1 -bottom-1 bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-md" />
             <img 
               src="/media/hero-performer.png" 
               alt="Tangy 1970s Performer Cutout" 

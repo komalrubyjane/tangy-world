@@ -224,10 +224,9 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20)            */}
+        {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20, NO BLOB)    */}
         {/* ------------------------------------------------------------- */}
         <div className="portrait-wrap absolute z-20 left-[50%] top-[24%] w-[22cqw] max-w-[420px] h-[44cqw] max-h-[640px] pointer-events-none">
-          <div className="portrait-blob absolute -inset-x-[6%] -top-[3%] -bottom-[1%] bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-[0_1.2cqw_2.4cqw_rgba(0,0,0,0.4)]" />
           <img 
             src="/media/hero-performer.png" 
             alt="Tangy 1970s Performer Cutout" 
