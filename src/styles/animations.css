@@ -13,10 +13,10 @@
 
 @keyframes micFloat {
   0% {
-    transform: translateY(0px) rotate(-22deg);
+    transform: translateY(0px) rotate(-35deg);
   }
   100% {
-    transform: translateY(-6px) rotate(-24deg);
+    transform: translateY(-5px) rotate(-37deg);
   }
 }
 

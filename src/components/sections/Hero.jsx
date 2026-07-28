@@ -53,7 +53,7 @@ export const Hero = () => {
     gsap.from('.vintage-mic', {
       opacity: 0,
       y: 20,
-      rotation: -10,
+      rotation: -25,
       duration: 1.2,
       delay: 0.35,
       ease: 'power2.out'
@@ -80,7 +80,7 @@ export const Hero = () => {
     tl.to('.headline .word.tangy', { y: -15, duration: 0.3 }, 0.1)
       .to('.headline .word.sessions', { y: 15, duration: 0.3 }, 0.1)
       .to('.portrait-wrap', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
-      .to('.vintage-mic', { y: -15, duration: 0.35 }, 0.2)
+      .to('.vintage-mic', { y: -15, rotation: -29, duration: 0.35 }, 0.2)
       .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2)
       .to('.mic', { rotation: 3, duration: 0.4 }, 0.1);
 
@@ -246,16 +246,16 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* VINTAGE CHROME STAGE MICROPHONE AT REACHING HAND (z-25)       */}
+        {/* VINTAGE CHROME STAGE MICROPHONE ABOVE FINGERTIPS (z-25)        */}
         {/* ------------------------------------------------------------- */}
         <div 
-          className="vintage-mic absolute z-25 left-[34%] top-[30%] w-[5.5cqw] max-w-[100px] h-[16cqw] max-h-[280px] pointer-events-auto transition-transform duration-300 hover:scale-105 hover:rotate-[-19deg] group cursor-pointer"
+          className="vintage-mic absolute z-25 left-[30%] top-[24%] w-[4.2cqw] max-w-[78px] h-[12cqw] max-h-[210px] pointer-events-auto transition-all duration-300 hover:scale-[1.08] hover:-rotate-[31deg] group cursor-pointer"
           style={{ animation: 'micFloat 3.5s ease-in-out infinite alternate' }}
         >
           <img 
             src="/media/vintage-mic.png" 
             alt="Vintage Chrome Stage Microphone" 
-            className="w-full h-full object-contain filter drop-shadow-[0_12px_20px_rgba(0,0,0,0.65)] drop-shadow-[0_0_16px_rgba(255,207,106,0.25)] group-hover:drop-shadow-[0_0_24px_rgba(255,207,106,0.55)] transition-all duration-300" 
+            className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.45)] drop-shadow-[0_0_10px_rgba(255,180,80,0.18)] group-hover:drop-shadow-[0_0_18px_rgba(255,180,80,0.4)] transition-all duration-300" 
           />
         </div>
 
