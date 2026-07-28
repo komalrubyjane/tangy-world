@@ -245,7 +245,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </span>
           </div>
 
-          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) — MOVED DOWN TO TOP-[32%] (GROUNDED) */}
+          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) */}
           <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[32%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
             <img 
               src="/media/hero-performer.png" 
@@ -254,7 +254,19 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             />
           </div>
 
-          {/* ADMISSION TICKET (z-60) — MOVED DOWN TO TOP-[76%], ATTACHED TO PERFORMER WITH -3° ROTATION */}
+          {/* VINTAGE CHROME STAGE MICROPHONE AT REACHING HAND (z-25) */}
+          <div 
+            className="vintage-mic absolute z-25 left-[14%] top-[29%] w-14 sm:w-16 h-36 sm:h-40 pointer-events-auto transition-transform duration-300 hover:scale-105 hover:rotate-[-19deg] group cursor-pointer"
+            style={{ animation: 'micFloat 3.5s ease-in-out infinite alternate' }}
+          >
+            <img 
+              src="/media/vintage-mic.png" 
+              alt="Vintage Chrome Stage Microphone" 
+              className="w-full h-full object-contain filter drop-shadow-[0_12px_20px_rgba(0,0,0,0.65)] drop-shadow-[0_0_16px_rgba(255,207,106,0.25)] group-hover:drop-shadow-[0_0_24px_rgba(255,207,106,0.55)] transition-all duration-300" 
+            />
+          </div>
+
+          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 76% */}
           <div 
             ref={ticketRef}
             className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[76%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"

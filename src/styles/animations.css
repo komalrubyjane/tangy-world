@@ -11,6 +11,15 @@
   50% { transform: rotate(2deg); }
 }
 
+@keyframes micFloat {
+  0% {
+    transform: translateY(0px) rotate(-22deg);
+  }
+  100% {
+    transform: translateY(-6px) rotate(-24deg);
+  }
+}
+
 @keyframes pulseLine {
   0%, 100% { opacity: .3; }
   50% { opacity: 1; }
