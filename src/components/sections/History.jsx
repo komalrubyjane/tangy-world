@@ -1,6 +1,8 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
+import { ArchiveStamp } from '../ui/ArchiveStamp';
+import { PaperTape } from '../ui/PaperTape';
 
 const CHRONOLOGY_DATA = [
   {
@@ -129,7 +131,6 @@ export const History = () => {
     const eraBlocks = gsap.utils.toArray('.chronology-era-block');
 
     eraBlocks.forEach((block, index) => {
-      // Background Year Scale Effect
       gsap.fromTo(block.querySelector('.bg-year-text'),
         { scale: 0.7, opacity: 0 },
         { 
@@ -145,7 +146,6 @@ export const History = () => {
         }
       );
 
-      // Card / Poster Reveal Effect
       gsap.fromTo(block.querySelector('.era-card'),
         { y: 80, opacity: 0, rotation: index % 2 === 0 ? -4 : 4 },
         { 
@@ -161,7 +161,6 @@ export const History = () => {
         }
       );
 
-      // Faded Stamp Slap Effect
       const stamp = block.querySelector('.era-stamp');
       if (stamp) {
         gsap.fromTo(stamp,
@@ -193,20 +192,28 @@ export const History = () => {
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
-      {/* ------------------------------------------------------------- */}
-      {/* SECTION HEADER: DRAMATIC OPENING                               */}
-      {/* ------------------------------------------------------------- */}
+      {/* GIANT FADED BACKGROUND TYPOGRAPHY "HISTORY" AT 4% OPACITY */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
+        <span className="display text-[25vw] leading-none text-[#E7D5A4] uppercase">HISTORY</span>
+      </div>
+
+      {/* CROP MARKS & ARCHIVE METADATA */}
+      <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C99A2E] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        [ ✚ ] CROP MARK // EXHIBITION PANEL
+      </div>
+      <div className="absolute top-4 right-4 font-mono text-[9px] text-[#E7D5A4]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        33⅓ RPM STEREO // 10 YEARS ARCHIVE
+      </div>
+
+      {/* SECTION HEADER */}
       <div className="relative w-full py-28 md:py-36 px-6 text-center bg-[#E7D5A4] text-[#11100C] border-b-8 border-[#11100C] flex flex-col items-center justify-center">
         
-        {/* Giant Background Faded Year Span */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-10">
           <span className="display text-[16vw] md:text-[22vw] leading-none text-[#11100C]">2016—2026</span>
         </div>
 
         <div className="relative z-10 max-w-4xl">
-          <div className="inline-block border-2 border-[#5A120D] text-[#5A120D] font-mono text-[10px] md:text-xs font-bold tracking-[0.3em] px-4 py-1 rotate-[-3deg] mb-6 uppercase">
-            TANGY ARCHIVES // EST. MMXVI
-          </div>
+          <ArchiveStamp text="EXHIBITION PANEL" rotation="-3deg" color="red" className="mb-4" />
 
           <h2 className="display text-5xl md:text-9xl text-[#11100C] leading-[0.85] tracking-tighter ink-bleed mb-6">
             ARCHIVE / 2016–2026<br/>
@@ -220,17 +227,12 @@ export const History = () => {
 
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* CONTINUOUS VERTICAL MICROPHONE CABLE TIMELINE                  */}
-      {/* ------------------------------------------------------------- */}
+      {/* CONTINUOUS VERTICAL MICROPHONE CABLE TIMELINE */}
       <div className="relative w-full">
         
-        {/* Central Vertical Microphone Cable Line */}
-        <div className="absolute top-0 bottom-0 left-6 md:left-1/2 -translate-x-1/2 w-[3px] bg-[linear-gradient(180deg,#B94717_0%,#C99A2E_50%,#5A120D_100%)] z-10 shadow-[0_0_15px_rgba(201,154,46,0.3)] pointer-events-none" />
+        <div className="absolute top-0 bottom-0 left-6 md:left-1/2 -translate-x-1/2 w-[3px] bg-[linear-gradient(180deg,#B9471B_0%,#C99A2E_50%,#5A120D_100%)] z-10 shadow-[0_0_15px_rgba(201,154,46,0.3)] pointer-events-none" />
 
-        {/* ----------------------------------------------------------- */}
-        {/* ERA BLOCKS (2016 -> 2026)                                   */}
-        {/* ----------------------------------------------------------- */}
+        {/* ERA BLOCKS */}
         {CHRONOLOGY_DATA.map((era, index) => (
           <div 
             key={era.year}
@@ -239,7 +241,6 @@ export const History = () => {
           >
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
 
-            {/* Giant Scaling Background Year Text */}
             <div className="bg-year-text absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
               <span 
                 className="display text-[25vw] leading-none font-bold tracking-tighter opacity-15"
@@ -249,10 +250,8 @@ export const History = () => {
               </span>
             </div>
 
-            {/* Era Container */}
             <div className="relative z-20 w-full max-w-[1100px] flex flex-col items-center">
               
-              {/* Timeline Microphone Cable Node */}
               <div 
                 className="w-8 h-8 rounded-full border-4 border-[#11100C] mb-8 flex items-center justify-center shadow-xl font-mono text-[9px] font-bold z-30"
                 style={{ backgroundColor: era.accent, color: '#E7D5A4' }}
@@ -260,18 +259,14 @@ export const History = () => {
                 ✦
               </div>
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 1: 2016 — THE BEGINNING                          */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 1: 2016 — THE BEGINNING */}
               {era.format === 'BEGINNING' && (
                 <div className="era-card w-full max-w-2xl bg-[#F5E9C9] p-8 md:p-14 border-4 border-[#11100C] shadow-[20px_20px_0px_#11100C] text-[#11100C] relative text-center">
-                  <div className="era-stamp absolute -top-4 right-6 border-4 border-[#5A120D] text-[#5A120D] font-mono text-[10px] font-bold px-3 py-1 uppercase rotate-[-8deg]">
-                    ARCHIVE ENTRY {era.archiveNo}
-                  </div>
+                  <ArchiveStamp text={`ENTRY ${era.archiveNo}`} rotation="-8deg" color="red" className="era-stamp absolute -top-4 right-6 z-30" />
                   <span className="font-mono text-xs font-bold text-[#B94717] tracking-widest uppercase block mb-2">{era.year} // {era.venue}</span>
                   <h3 className="display text-4xl md:text-6xl text-[#11100C] mb-4 ink-bleed">{era.title}</h3>
                   <div className="my-6 relative inline-block bg-[#11100C] p-2 border-2 border-[#11100C] shadow-lg rotate-[-3deg]">
-                    <div className="absolute -top-3 left-1/3 w-16 h-4 bg-[rgba(231,213,164,0.8)] rotate-[-2deg] border border-black/20 z-20" />
+                    <PaperTape rotation="-2deg" width="w-16" className="absolute -top-3 left-1/3 z-20" />
                     <img src={era.image} alt={era.title} className="w-full max-w-[320px] aspect-[4/3] object-cover filter grayscale sepia-[0.4]" />
                     <span className="absolute bottom-2 left-3 font-mono text-[8px] text-[#E7D5A4]">✎ the beginning.</span>
                   </div>
@@ -281,14 +276,10 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 2: 2017-2018 — SCRAPBOOK COLLAGE                 */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 2: 2017-2018 — SCRAPBOOK COLLAGE */}
               {era.format === 'SCRAPBOOK' && (
                 <div className="era-card w-full max-w-4xl flex flex-col md:flex-row items-center gap-10 bg-[#E7D5A4] p-8 md:p-12 border-4 border-[#11100C] shadow-[20px_20px_0px_#11100C] text-[#11100C] relative">
-                  <div className="era-stamp absolute top-4 right-4 border-2 border-[#B94717] text-[#B94717] font-mono text-[9px] font-bold px-2 py-0.5 uppercase rotate-[5deg]">
-                    FILED // {era.archiveNo}
-                  </div>
+                  <ArchiveStamp text={`FILED ${era.archiveNo}`} rotation="5deg" color="orange" className="era-stamp absolute top-4 right-4 z-30" />
                   <div className="w-full md:w-1/2 relative bg-[#11100C] p-3 shadow-xl border-2 border-[#11100C] rotate-[-2deg]">
                     <img src={era.image} alt={era.title} className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                   </div>
@@ -302,9 +293,7 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 3: 2019 — CONCERT POSTER                         */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 3: 2019 — CONCERT POSTER */}
               {era.format === 'POSTER' && (
                 <div className="era-card w-full max-w-xl bg-[#E7D5A4] p-6 md:p-8 border-4 border-[#11100C] shadow-[25px_25px_0px_#11100C] text-[#11100C] relative">
                   <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#11100C] border-b-2 border-[#11100C] pb-2 mb-4">
@@ -323,9 +312,7 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 4: 2020 — THE WORLD WENT QUIET (DARK & MINIMAL)  */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 4: 2020 — THE WORLD WENT QUIET */}
               {era.format === 'QUIET' && (
                 <div className="era-card w-full max-w-2xl bg-[#11100C] p-10 md:p-16 border-4 border-[#5A120D] text-center shadow-2xl text-[#E7D5A4] relative">
                   <span className="font-mono text-xs font-bold text-[#5A120D] tracking-[0.4em] uppercase block mb-4">YEAR 2020 // PAUSE</span>
@@ -339,14 +326,10 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 5: 2021-2022 — RETURN TO STONE                   */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 5: 2021-2022 — RETURN TO STONE */}
               {era.format === 'RETURN' && (
                 <div className="era-card w-full max-w-3xl bg-[#F5E9C9] p-8 md:p-12 border-4 border-[#11100C] shadow-[20px_20px_0px_#11100C] text-[#11100C] relative">
-                  <div className="era-stamp absolute -top-4 left-6 border-4 border-[#5A120D] text-[#5A120D] font-mono text-[9px] font-bold px-3 py-1 uppercase rotate-[-6deg]">
-                    RE-OPENED // {era.archiveNo}
-                  </div>
+                  <ArchiveStamp text={`RE-OPENED ${era.archiveNo}`} rotation="-6deg" color="dark" className="era-stamp absolute -top-4 left-6 z-30" />
                   <span className="font-mono text-xs font-bold text-[#5A120D] tracking-widest uppercase block mb-2">{era.year}</span>
                   <h3 className="display text-4xl md:text-6xl text-[#11100C] mb-4 ink-bleed">{era.title}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center border-t-2 border-[#11100C] pt-6">
@@ -358,9 +341,7 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 6: 2023 — 35MM FILM STRIP                       */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 6: 2023 — 35MM FILM STRIP */}
               {era.format === 'FILMSTRIP' && (
                 <div className="era-card w-full max-w-4xl bg-[#11100C] p-6 md:p-10 border-4 border-[#B94717] shadow-2xl text-[#E7D5A4] relative">
                   <div className="flex justify-between font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase mb-4 border-b border-[#B94717]/40 pb-2">
@@ -387,9 +368,7 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 7: 2024 — MAGAZINE SPREAD                        */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 7: 2024 — MAGAZINE SPREAD */}
               {era.format === 'MAGAZINE' && (
                 <div className="era-card w-full max-w-4xl bg-[#E7D5A4] p-8 md:p-12 border-4 border-[#11100C] shadow-[20px_20px_0px_#11100C] text-[#11100C] relative">
                   <span className="font-mono text-xs font-bold text-[#5A120D] tracking-widest uppercase block mb-1">ISSUE 2024 // EDITORIAL</span>
@@ -403,33 +382,27 @@ export const History = () => {
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 8: 2025 — POSTER WALL                            */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 8: 2025 — POSTER WALL */}
               {era.format === 'POSTER_WALL' && (
                 <div className="era-card w-full max-w-3xl bg-[#E7D5A4] p-8 md:p-12 border-4 border-[#11100C] shadow-[25px_25px_0px_#11100C] text-[#11100C] relative">
-                  <div className="era-stamp absolute top-4 right-4 border-4 border-[#B94717] text-[#B94717] font-mono text-[10px] font-bold px-3 py-1 uppercase rotate-[-4deg]">
-                    SOLD OUT // {era.archiveNo}
-                  </div>
-                  <span className="font-mono text-xs font-bold text-[#B94717] tracking-widest uppercase block mb-2">{era.year}</span>
+                  <ArchiveStamp text={`SOLD OUT ${era.archiveNo}`} rotation="-4deg" color="orange" className="era-stamp absolute top-4 right-4 z-30" />
+                  <span className="font-mono text-xs font-bold text-[#B9471B] tracking-widest uppercase block mb-2">{era.year}</span>
                   <h3 className="display text-4xl md:text-6xl text-[#11100C] mb-4 ink-bleed">{era.title}</h3>
-                  <p className="font-body text-base md:text-lg text-[#11100C]/90 leading-relaxed mb-6 italic border-l-4 border-[#B94717] pl-4">
+                  <p className="font-body text-base md:text-lg text-[#11100C]/90 leading-relaxed mb-6 italic border-l-4 border-[#B9471B] pl-4">
                     "{era.description}"
                   </p>
                 </div>
               )}
 
-              {/* ------------------------------------------------------- */}
-              {/* FORMAT 9: 2026 — THE PRESENT ERA                        */}
-              {/* ------------------------------------------------------- */}
+              {/* FORMAT 9: 2026 — THE PRESENT ERA */}
               {era.format === 'PRESENT' && (
                 <div className="era-card w-full max-w-2xl bg-[#E7D5A4] p-8 md:p-14 border-4 border-[#11100C] shadow-[25px_25px_0px_#11100C] text-[#11100C] relative text-center">
-                  <div className="inline-block border-4 border-[#B94717] text-[#B94717] font-mono text-xs font-bold tracking-[0.3em] px-4 py-1.5 rotate-[-4deg] mb-6 uppercase">
+                  <div className="inline-block border-4 border-[#B9471B] text-[#B9471B] font-mono text-xs font-bold tracking-[0.3em] px-4 py-1.5 rotate-[-4deg] mb-6 uppercase">
                     RECORDING ● NOW IN PROGRESS
                   </div>
                   <h3 className="display text-5xl md:text-7xl text-[#11100C] mb-4 leading-none ink-bleed">
                     THE STORY IS STILL<br/>
-                    <span className="italic text-[#B94717] font-normal">BEING WRITTEN.</span>
+                    <span className="italic text-[#B9471B] font-normal">BEING WRITTEN.</span>
                   </h3>
                   <p className="font-mono text-xs text-[#11100C]/80 tracking-widest uppercase mb-8 border-y-2 border-[#11100C]/30 py-3">
                     HYDERABAD / GLOBAL // {era.archiveNo}

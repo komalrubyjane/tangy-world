@@ -3,6 +3,9 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { gallery } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { ArchiveStamp } from '../ui/ArchiveStamp';
+import { PaperTape } from '../ui/PaperTape';
+import { MusicalArtifact } from '../ui/MusicalArtifact';
 
 export const Hero = () => {
   const { setFilterCutoff, playSFX } = useAudio();
@@ -32,25 +35,21 @@ export const Hero = () => {
       }
     });
 
-    // -------------------------------------------------------------
-    // SAFE INTRO REVEAL (NO CLIPPING, NO OVERFLOW)
-    // -------------------------------------------------------------
     gsap.set('.poster-title-tangy', { opacity: 0, y: 15 });
     gsap.set('.poster-title-world', { opacity: 0, y: 15 });
     gsap.set('.hero-main-photo', { opacity: 0, scale: 0.95 });
-    gsap.set('.hero-blue-panel', { opacity: 0, scaleY: 0.8 });
+    gsap.set('.hero-ticket-panel', { opacity: 0, y: 20 });
     gsap.set('.hero-sub-photo', { opacity: 0, y: 15 });
 
     const introTl = gsap.timeline({ delay: 0.1 });
 
     introTl
-      .to('.hero-blue-panel', { opacity: 1, scaleY: 1, duration: 0.6, ease: 'power3.out' })
+      .to('.hero-ticket-panel', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' })
       .to('.hero-main-photo', { opacity: 1, scale: 1, duration: 0.7, ease: 'power3.out' }, '-=0.4')
       .to('.poster-title-tangy', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.4')
       .to('.poster-title-world', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3')
       .to('.hero-sub-photo', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.2');
 
-    // Subtle scroll travel progression
     tl.to('.poster-title-tangy', { y: -10, duration: 0.3 }, 0.1)
       .to('.poster-title-world', { y: 10, duration: 0.3 }, 0.1)
       .to('.hero-main-photo', { rotation: -3, y: 10, duration: 0.4 }, 0.2)
@@ -58,7 +57,6 @@ export const Hero = () => {
 
   }, []);
 
-  // Desktop Mouse Parallax (Only on fine pointer screens)
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
@@ -86,33 +84,50 @@ export const Hero = () => {
       id="hero" 
       className="relative w-full max-w-full min-h-screen md:h-screen bg-[#B9471B] overflow-hidden flex flex-col justify-between p-4 md:p-8 border-box select-none"
     >
-      {/* SOLID INK NOISE GRAIN TEXTURE */}
+      {/* SCREEN PRINTED HALFTONE NOISE TEXTURE */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
 
-      {/* OVERSIZED DARK-RED BACKGROUND PRINTED GRAPHIC TYPOGRAPHY */}
-      <div className="absolute top-[20%] left-[2%] md:left-[5%] font-display text-[22vw] md:text-[16vw] font-bold text-[#7A271B]/30 leading-none pointer-events-none z-5 select-none uppercase tracking-tighter">
-        LIVE 33⅓
+      {/* GIANT FADED BACKGROUND TYPOGRAPHY "WORLD" AT 5% OPACITY */}
+      <div className="absolute top-[15%] left-[2%] font-display text-[26vw] font-bold text-[#EAD9A6]/5 leading-none pointer-events-none z-5 uppercase tracking-tighter select-none">
+        WORLD
       </div>
 
-      {/* TOP ARCHIVAL METADATA BAR */}
+      {/* WARM SPOTLIGHT LIGHTING BEAM */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] md:w-[40vw] md:h-[40vw] rounded-full bg-[radial-gradient(circle,rgba(234,217,166,0.18)_0%,rgba(209,154,36,0.08)_50%,transparent_75%)] blur-3xl pointer-events-none z-6" />
+
+      {/* CROP MARKS & REGISTRATION CROSSES */}
+      <div className="absolute top-4 left-4 font-mono text-[9px] text-[#EAD9A6] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        [ ✚ ] CROP MARK // HERO COVER
+      </div>
+      <div className="absolute top-4 right-4 font-mono text-[9px] text-[#D19A24] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        33⅓ RPM STEREO // ARCHIVE NO. 001
+      </div>
+      <div className="absolute bottom-4 left-4 font-mono text-[9px] text-[#EAD9A6]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        REGISTRATION: PERFECT PRINT ALIGNMENT
+      </div>
+      <div className="absolute bottom-4 right-4 font-mono text-[9px] text-[#EAD9A6] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        PROPERTY OF TANGY SESSIONS
+      </div>
+
+      {/* TOP ARCHIVAL METADATA BAR & STAMP */}
       <div className="w-full flex justify-between items-center font-mono text-[8px] sm:text-[9px] md:text-[11px] font-bold text-[#EAD9A6] tracking-[0.2em] md:tracking-[0.25em] uppercase z-30 pt-14 md:pt-4">
-        <span className="flex items-center gap-1.5 truncate">
+        <span className="flex items-center gap-2 truncate">
           <span className="text-[#315D73] font-black text-xs sm:text-sm">⊕</span> TANGY SESSIONS // HYDERABAD
         </span>
-        <span className="hidden md:inline">EST. 2016 // LIVE MUSIC</span>
-        <span className="text-[#D19A24] shrink-0">ARCHIVE NO. 001</span>
+        <ArchiveStamp text="ARCHIVE NO. 001" rotation="-2deg" color="gold" className="hidden sm:inline-block" />
+        <span className="text-[#D19A24] shrink-0">EST. 2016 // LIVE MUSIC</span>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* MAIN 2-COLUMN POSTER COMPOSITION (RESPONSIVE MOBILE & DESKTOP) */}
+      {/* ASYMMETRIC 5-8 OVERLAPPING OBJECTS LAYOUT                      */}
       {/* ------------------------------------------------------------- */}
       <div 
         ref={heroContainerRef} 
         className="w-full max-w-7xl mx-auto my-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 z-20 py-4 md:py-0"
       >
         
-        {/* LEFT COLUMN: MASSIVE TYPOGRAPHY & TICKET CTA */}
-        <div className="hero-left-content w-full md:w-[52%] flex flex-col items-center md:items-start text-center md:text-left justify-center">
+        {/* LEFT SIDE: MASSIVE TYPOGRAPHY & OLD POLAROIDS */}
+        <div className="hero-left-content w-full md:w-[52%] flex flex-col items-center md:items-start text-center md:text-left justify-center relative">
           
           {/* HEADER BADGE STAMP */}
           <div className="inline-flex items-center gap-2 bg-[#15120D] text-[#EAD9A6] border-2 border-[#D19A24] px-2.5 sm:px-3 py-1 mb-2.5 md:mb-3 shadow-[3px_3px_0px_#D19A24] rotate-[-2deg]">
@@ -149,16 +164,26 @@ export const Hero = () => {
 
         </div>
 
-        {/* RIGHT COLUMN: RETRO BLUE SHAPE + HERO PHOTO */}
-        <div className="w-full md:w-[48%] flex items-center justify-center md:justify-end relative min-h-[260px] sm:min-h-[300px] md:min-h-[440px] mt-2 md:mt-0">
+        {/* RIGHT SIDE: CONCERT TICKET + CASSETTE + POLAROID STACK */}
+        <div className="w-full md:w-[48%] flex items-center justify-center md:justify-end relative min-h-[280px] sm:min-h-[320px] md:min-h-[440px] mt-2 md:mt-0">
 
-          {/* RETRO BLUE GRAPHIC PANEL */}
-          <div className="hero-blue-panel absolute right-[5%] top-[5%] w-[220px] sm:w-[320px] md:w-[26vw] max-w-[380px] h-[80%] bg-[#315D73] border-2 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[10px_10px_0px_#15120D] pointer-events-none z-10 origin-bottom hidden sm:block" />
+          {/* RETRO CONCERT TICKET STUB PANEL */}
+          <div className="hero-ticket-panel absolute right-[5%] top-[5%] w-[220px] sm:w-[300px] md:w-[24vw] max-w-[360px] bg-[#315D73] text-[#EAD9A6] border-2 border-[#15120D] p-4 shadow-[8px_8px_0px_#15120D] font-mono text-[9px] pointer-events-none z-10 hidden sm:block rotate-[2deg]">
+            <div className="flex justify-between border-b border-[#EAD9A6]/30 pb-2 mb-2 font-bold">
+              <span>ADMIT ONE // VOL. 01</span>
+              <span>₹799</span>
+            </div>
+            <p className="opacity-80">BANSILALPET STEPWELL · HYDERABAD</p>
+            <div className="mt-4 pt-2 border-t border-dashed border-[#EAD9A6]/30 flex justify-between items-center text-[8px]">
+              <span>#TK-1974-001</span>
+              <span className="bg-[#B9471B] text-[#EAD9A6] px-1.5 py-0.5">REC • LIVE</span>
+            </div>
+          </div>
 
-          {/* ONE DOMINANT HERO PERFORMANCE PHOTOGRAPH */}
+          {/* ONE DOMINANT HERO PERFORMANCE POLAROID */}
           <div className="hero-main-photo relative w-[260px] sm:w-[340px] md:w-[30vw] max-w-[430px] bg-[#EAD9A6] p-2 md:p-3 pb-7 md:pb-10 border-2 border-[#15120D] shadow-[12px_12px_0px_#15120D] md:shadow-[16px_16px_0px_#15120D] rotate-[-2deg] transition-transform hover:scale-102 cursor-pointer z-20 mx-auto md:mx-0">
-            {/* Tape Strip Overlay */}
-            <div className="absolute -top-2.5 left-1/3 w-16 sm:w-20 h-4 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30" />
+            {/* Paper Tape Overlay */}
+            <PaperTape rotation="-3deg" width="w-20" className="absolute -top-3 left-1/3" />
             
             <img 
               src={gallery[2]?.src || "/media/gallery/tangy3.jpg"} 
@@ -174,8 +199,8 @@ export const Hero = () => {
             </div>
           </div>
 
-          {/* 1 SMALL SUPPORTING PRINT (STEPWELL ARCHITECTURE) */}
-          <div className="hero-sub-photo absolute -bottom-3 right-2 sm:right-auto sm:-left-2 md:-left-4 w-[110px] sm:w-[140px] md:w-[180px] bg-[#EAD9A6] p-1.5 md:p-2 pb-5 md:pb-6 border-2 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[10px_10px_0px_#15120D] rotate-[5deg] transition-transform hover:scale-105 cursor-pointer z-25">
+          {/* SUPPORTING STEPWELL PHOTO */}
+          <div className="hero-sub-photo absolute -bottom-3 right-2 sm:right-auto sm:-left-2 md:-left-4 w-[110px] sm:w-[140px] md:w-[180px] bg-[#EAD9A6] p-1.5 md:p-2 pb-5 md:pb-6 border-2 border-[#15120D] shadow-[8px_8px_0px_#15120D] rotate-[5deg] transition-transform hover:scale-105 cursor-pointer z-25">
             <img 
               src={gallery[0]?.src || "/media/gallery/tangy1.jpg"} 
               alt="Bansilalpet Stepwell Heritage Stage" 
@@ -186,6 +211,9 @@ export const Hero = () => {
             <p className="absolute bottom-1 left-1.5 font-mono text-[6.5px] sm:text-[7px] text-[#15120D] font-bold tracking-wider">✎ STEPWELL STAGE</p>
           </div>
 
+          {/* AMBIENT FLOATING ROTATING VINYL */}
+          <MusicalArtifact type="vinyl" className="absolute -bottom-6 -right-6 w-20 md:w-28 z-30 animate-[spin_10s_linear_infinite]" />
+
         </div>
 
       </div>
@@ -193,7 +221,7 @@ export const Hero = () => {
       {/* BOTTOM POSTER FOOTER BAR */}
       <div className="w-full flex justify-between items-center font-mono text-[8px] sm:text-[9px] md:text-[10px] font-bold text-[#EAD9A6] tracking-[0.2em] md:tracking-[0.25em] uppercase z-30 pb-2 pt-2 md:pt-0 border-t border-[#15120D]/20 md:border-none">
         <span className="truncate">PEOPLE • MUSIC • PLACES • STORIES</span>
-        <span className="hidden md:inline text-[#315D73]">SIDE A // PLAY LOUD</span>
+        <span className="hidden md:inline text-[#315D73]">─────── 33⅓ RPM STEREO ───────</span>
         <span className="shrink-0 ml-2">HYD // 17°23'N</span>
       </div>
 
