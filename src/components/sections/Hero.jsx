@@ -248,7 +248,7 @@ export const Hero = () => {
         {/* VINTAGE COMIC MICROPHONE WITH STAND ON STAGE FLOOR (z-25)      */}
         {/* ------------------------------------------------------------- */}
         <div 
-          className="vintage-mic absolute z-25 left-[24%] top-[40%] w-[7.5cqw] max-w-[145px] h-[23cqw] max-h-[390px] -rotate-[25deg] pointer-events-none"
+          className="vintage-mic absolute z-25 left-[22%] top-[38%] w-[8cqw] max-w-[150px] h-[25cqw] max-h-[420px] pointer-events-none"
         >
           <img 
             src="/media/vintage-mic.png" 

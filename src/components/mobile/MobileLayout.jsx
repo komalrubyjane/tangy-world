@@ -256,7 +256,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
 
           {/* VINTAGE COMIC MICROPHONE WITH STAND ON STAGE FLOOR (z-25) */}
           <div 
-            className="vintage-mic absolute z-25 left-[6%] top-[44%] w-20 sm:w-24 h-52 sm:h-60 -rotate-[25deg] pointer-events-none"
+            className="vintage-mic absolute z-25 left-[4%] top-[42%] w-24 sm:w-28 h-60 sm:h-68 pointer-events-none"
           >
             <img 
               src="/media/vintage-mic.png" 
