@@ -70,7 +70,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
     document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleTicketClick = () => {
+  const handleTicketClick = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     playSFX('ticketClick');
     if (ticketRef.current) {
       ticketRef.current.animate(
@@ -82,7 +85,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         { duration: 220 }
       );
     }
-    document.querySelector('#m-manifesto')?.scrollIntoView({ behavior: 'smooth' });
+    const manifestoEl = document.querySelector('#m-manifesto') || document.querySelector('#manifesto');
+    if (manifestoEl) {
+      manifestoEl.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleSubscribe = (e) => {
@@ -202,7 +208,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           </div>
 
           {/* TOP METADATA BAR (z-40) */}
-          <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8px] font-bold tracking-widest text-[#ecdcaf] uppercase">
+          <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8px] font-bold tracking-widest text-[#ecdcaf] uppercase pointer-events-none">
             <span>HYDERABAD, INDIA</span>
             <span className="text-[#d1a437]">33⅓ RPM STEREO</span>
           </div>
@@ -288,13 +294,13 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </svg>
           </div>
 
-          {/* ADMISSION TICKET (z-30) AT EXACTLY TOP: 62%, LEFT: 50%, TRANSFORM: TRANSLATE(-50%, -50%) ROTATE(-3DEG) */}
+          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 62%, LEFT: 50%, TRANSFORM: TRANSLATE(-50%, -50%) ROTATE(-3DEG) */}
           <div 
             ref={ticketRef}
-            className="hero-ticket ticket absolute z-30 left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_8px_20px_rgba(0,0,0,0.65)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
+            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_8px_20px_rgba(0,0,0,0.65)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
           >
-            {/* Masking Tape Overlay (z-31) */}
-            <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-31 pointer-events-none" />
+            {/* Masking Tape Overlay (z-61) */}
+            <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
 
             <div className="w-7 flex items-center justify-center border-r border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[9px] tracking-wider text-[#241a12] opacity-75">
               TS-2016-001
@@ -310,7 +316,8 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
                 <button 
                   type="button"
                   onClick={handleTicketClick}
-                  className="enter font-poster text-xl tracking-tight flex items-center gap-1.5 cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
+                  onTouchEnd={(e) => { e.preventDefault(); handleTicketClick(e); }}
+                  className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-xl tracking-tight flex items-center gap-1.5 cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
                 >
                   Enter Tangy →
                 </button>
@@ -327,28 +334,28 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           </div>
 
           {/* BADGES & EPHEMERA (z-40) */}
-          <div className="badge absolute z-40 left-2 top-[38%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6">
+          <div className="badge absolute z-40 left-2 top-[38%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
             <div className="font-poster text-xs leading-none">33⅓</div>
             <div className="font-mono font-bold text-[7px] tracking-widest">RPM</div>
           </div>
 
-          <div className="badge absolute z-40 right-2 top-[38%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-md">
+          <div className="badge absolute z-40 right-2 top-[38%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-md pointer-events-none">
             <div className="text-center font-mono font-bold text-[7px] text-[#ecdcaf]">LIVE</div>
           </div>
 
-          <div className="badge absolute z-40 left-3 bottom-[12%] bg-[#191410] text-[#ecdcaf] -rotate-4 px-2 py-1 shadow-md">
+          <div className="badge absolute z-40 left-3 bottom-[12%] bg-[#191410] text-[#ecdcaf] -rotate-4 px-2 py-1 shadow-md pointer-events-none">
             <div className="font-mono font-bold text-[8px] tracking-wider">STEPWELL ★</div>
           </div>
 
-          <div className="badge absolute z-40 right-3 bottom-[12%] font-serif italic font-bold text-xl text-[#d1a437] -rotate-6">
+          <div className="badge absolute z-40 right-3 bottom-[12%] font-serif italic font-bold text-xl text-[#d1a437] -rotate-6 pointer-events-none">
             Tangy
           </div>
 
-          {/* TEXTURE OVERLAYS */}
-          <div className="spatter absolute inset-0 z-45 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px)]" />
-          <div className="scratches absolute inset-0 z-46 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px)]" />
-          <div className="grain absolute inset-0 z-47 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none" />
-          <div className="vignette absolute inset-0 z-48 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
+          {/* TEXTURE OVERLAYS (z-10) */}
+          <div className="spatter absolute inset-0 z-10 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px)]" />
+          <div className="scratches absolute inset-0 z-10 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px)]" />
+          <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none" />
+          <div className="vignette absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
 
         </div>
       </section>

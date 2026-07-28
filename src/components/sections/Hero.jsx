@@ -94,7 +94,10 @@ export const Hero = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleExploreClick = () => {
+  const handleExploreClick = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     playSFX('ticketClick');
     if (ticketRef.current) {
       ticketRef.current.animate(
@@ -106,7 +109,10 @@ export const Hero = () => {
         { duration: 220 }
       );
     }
-    document.querySelector('#manifesto')?.scrollIntoView({ behavior: 'smooth' });
+    const manifestoEl = document.querySelector('#manifesto') || document.querySelector('#m-manifesto');
+    if (manifestoEl) {
+      manifestoEl.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -144,7 +150,7 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         {/* TOP BAR VISUAL GRID ALIGNMENT (z-40)                          */}
         {/* ------------------------------------------------------------- */}
-        <div className="absolute z-40 top-[2.2cqw] left-[5cqw] right-[5cqw] flex items-start justify-between">
+        <div className="absolute z-40 top-[2.2cqw] left-[5cqw] right-[5cqw] flex items-start justify-between pointer-events-none">
           {/* TOP LEFT */}
           <div className="text-[1.05cqw] leading-tight text-left font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
             <div>HYDERABAD, INDIA</div>
@@ -269,14 +275,14 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* ADMISSION TICKET (z-30) AT TOP: 62% OVERLAPPING TYPOGRAPHY     */}
+        {/* ADMISSION TICKET (z-60) AT TOP: 62% OVERLAPPING TYPOGRAPHY     */}
         {/* ------------------------------------------------------------- */}
         <div 
           ref={ticketRef} 
-          className="hero-ticket ticket absolute z-30 left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[85vw] sm:w-[42cqw] md:w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
+          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[85vw] sm:w-[42cqw] md:w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
         >
-          {/* Masking Tape Overlay (z-31) */}
-          <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] h-[1.8cqw] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-31 pointer-events-none" />
+          {/* Masking Tape Overlay (z-61) */}
+          <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] h-[1.8cqw] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
           
           <div className="w-[3.4cqw] flex items-center justify-center border-r-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[0.85cqw] tracking-[0.08em] text-[#241a12] opacity-75">
             TS-2016-001
@@ -293,7 +299,8 @@ export const Hero = () => {
               <button 
                 type="button"
                 onClick={handleExploreClick}
-                className="enter font-poster text-[2.5cqw] tracking-[0.01em] flex items-center gap-[0.5cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
+                onTouchEnd={(e) => { e.preventDefault(); handleExploreClick(e); }}
+                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[2.5cqw] tracking-[0.01em] flex items-center gap-[0.5cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
               >
                 Enter Tangy
                 <svg className="w-[1.6cqw] h-[1.6cqw] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -321,7 +328,7 @@ export const Hero = () => {
               <rect x="-16" y="0" width="14" height="90" rx="7" fill="#9aa0a3" opacity=".6"/>
               <g stroke="#141110" strokeWidth="1.6" opacity=".8">
                 <line x1="-11" y1="12" x2="11" y2="12"/>
-                <line x1="-11" y1="20" x2="11" y2="20"/>
+                <line x1="-11" y1="20" x2="14" y2="20"/>
                 <line x1="-11" y1="28" x2="11" y2="28"/>
                 <line x1="-11" y1="36" x2="11" y2="36"/>
                 <line x1="-11" y1="44" x2="11" y2="44"/>
@@ -337,7 +344,7 @@ export const Hero = () => {
         {/* LABELS & STICKERS (z-40)                                      */}
         {/* ------------------------------------------------------------- */}
         {/* LEFT COLUMN: 33⅓ RPM BADGE */}
-        <div className="badge absolute z-40 left-[2.5cqw] top-[40%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6">
+        <div className="badge absolute z-40 left-[2.5cqw] top-[40%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
           <div className="font-poster text-[2.5cqw] leading-[0.9]">33<span className="text-[1.1cqw] align-super">⅓</span></div>
           <div className="font-mono font-bold text-[1.1cqw] tracking-[0.08em] mt-[0.1cqw]">RPM</div>
           <svg className="w-[0.85cqw] h-[0.85cqw] mt-[0.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
@@ -345,20 +352,20 @@ export const Hero = () => {
         </div>
 
         {/* LEFT COLUMN: LIVE AND REAL TAPE STICKER */}
-        <div className="badge absolute z-40 left-[16.5%] top-[42%] bg-[#191410] text-[#ecdcaf] p-[0.8cqw_1.2cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center">
+        <div className="badge absolute z-40 left-[16.5%] top-[42%] bg-[#191410] text-[#ecdcaf] p-[0.8cqw_1.2cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
           <div className="absolute -top-[0.8cqw] left-1/2 -translate-x-1/2 -rotate-3 w-[4cqw] h-[1.5cqw] bg-[rgba(230,220,190,0.55)] border border-[rgba(255,255,255,0.3)]" />
           <div className="font-mono font-bold text-[1.45cqw] tracking-[0.04em]">LIVE</div>
           <div className="font-mono font-medium text-[0.9cqw] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>
         </div>
 
         {/* LEFT COLUMN: BANSILALPET STEPWELL TAG */}
-        <div className="badge absolute z-40 left-[3cqw] bottom-[16%] bg-[#191410] text-[#ecdcaf] -rotate-4 p-[0.8cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.45)]">
+        <div className="badge absolute z-40 left-[3cqw] bottom-[16%] bg-[#191410] text-[#ecdcaf] -rotate-4 p-[0.8cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.45)] pointer-events-none">
           <div className="font-mono font-bold text-[1.1cqw] tracking-[0.03em] leading-[1.2]">BANSILALPET</div>
           <div className="font-mono font-bold text-[1.1cqw] tracking-[0.03em] leading-[1.2]">STEPWELL ★</div>
         </div>
 
         {/* RIGHT COLUMN: RECORDED LIVE STAMP */}
-        <div className="badge absolute z-40 right-[2.5cqw] top-[38%] w-[9cqw] h-[9cqw] rounded-full border-[0.2cqw] border-dashed border-[#ecdcaf] outline-[0.05cqw] outline-solid outline-[#c2272a] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.4)]">
+        <div className="badge absolute z-40 right-[2.5cqw] top-[38%] w-[9cqw] h-[9cqw] rounded-full border-[0.2cqw] border-dashed border-[#ecdcaf] outline-[0.05cqw] outline-solid outline-[#c2272a] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.4)] pointer-events-none">
           <div className="text-center">
             <div className="font-mono font-semibold text-[0.7cqw] tracking-[0.1em] text-[#ecdcaf]">RECORDED</div>
             <div className="font-poster text-[2cqw] text-[#c2272a] leading-none my-[0.1cqw]">LIVE</div>
@@ -367,19 +374,19 @@ export const Hero = () => {
         </div>
 
         {/* RIGHT COLUMN: INHERIT THE PAST TAG */}
-        <div className="badge absolute z-40 right-[11%] top-[74%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.6cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)] text-center">
+        <div className="badge absolute z-40 right-[11%] top-[74%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.6cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)] text-center pointer-events-none">
           <div className="font-mono font-bold text-[1cqw] tracking-[0.2em]">INHERIT THE PAST</div>
           <div className="font-mono font-bold text-[1cqw] tracking-[0.2em]">CREATE THE FUTURE</div>
         </div>
 
         {/* RIGHT COLUMN: REC TAG */}
-        <div className="badge absolute z-40 right-[3.5cqw] top-[78%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)]">
+        <div className="badge absolute z-40 right-[3.5cqw] top-[78%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)] pointer-events-none">
           <span className="font-mono font-bold text-[1.1cqw] tracking-[0.06em]">REC</span>
           <div className="w-[0.8cqw] h-[0.8cqw] rounded-full bg-[#c2272a] shadow-[0_0_0.4cqw_#c2272a]" />
         </div>
 
         {/* RIGHT COLUMN: KEEP THE CULTURE ALIVE + SIGNATURE */}
-        <div className="badge absolute z-40 right-[5.5cqw] bottom-[10%] text-left text-[#ecdcaf]">
+        <div className="badge absolute z-40 right-[5.5cqw] bottom-[10%] text-left text-[#ecdcaf] pointer-events-none">
           <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">KEEP</div>
           <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">THE CULTURE</div>
           <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">ALIVE ★</div>
@@ -388,15 +395,15 @@ export const Hero = () => {
             <span className="flex-1 h-[1px] bg-[#d1a437] opacity-70 max-w-[2.8cqw]" />
           </div>
         </div>
-        <div className="badge absolute z-40 right-[3cqw] bottom-[4%] font-serif italic font-bold text-[3cqw] text-[#d1a437] -rotate-6 drop-shadow-[0.08cqw_0.1cqw_0_rgba(0,0,0,0.3)]">
+        <div className="badge absolute z-40 right-[3cqw] bottom-[4%] font-serif italic font-bold text-[3cqw] text-[#d1a437] -rotate-6 drop-shadow-[0.08cqw_0.1cqw_0_rgba(0,0,0,0.3)] pointer-events-none">
           Tangy
         </div>
 
-        {/* TEXTURE OVERLAYS */}
-        <div className="spatter absolute inset-0 z-45 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px),radial-gradient(circle_at_9%_91%,rgba(0,0,0,0.3)_0_2px,transparent_3px),radial-gradient(circle_at_93%_12%,rgba(0,0,0,0.3)_0_2px,transparent_3px)]" />
-        <div className="scratches absolute inset-0 z-46 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px),repeating-linear-gradient(-83deg,rgba(255,255,255,0.06)_0_1px,transparent_1px_220px)]" />
-        <div className="grain absolute inset-0 z-47 bg-[url('data:image/svg+xml;utf8,<svg_xmlns=%22http://www.w3.org/2000/svg%22_width=%22180%22_height=%22180%22><filter_id=%22n%22><feTurbulence_type=%22fractalNoise%22_baseFrequency=%220.85%22_numOctaves=%222%22_stitchTiles=%22stitch%22/><feColorMatrix_type=%22saturate%22_values=%220%22/></filter><rect_width=%22100%25%22_height=%22100%25%22_filter=%22url(%23n)%22_opacity=%220.5%22/></svg>')] opacity-35 mix-blend-overlay pointer-events-none" />
-        <div className="vignette absolute inset-0 z-48 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
+        {/* TEXTURE OVERLAYS (z-10) */}
+        <div className="spatter absolute inset-0 z-10 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px),radial-gradient(circle_at_9%_91%,rgba(0,0,0,0.3)_0_2px,transparent_3px),radial-gradient(circle_at_93%_12%,rgba(0,0,0,0.3)_0_2px,transparent_3px)]" />
+        <div className="scratches absolute inset-0 z-10 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px),repeating-linear-gradient(-83deg,rgba(255,255,255,0.06)_0_1px,transparent_1px_220px)]" />
+        <div className="grain absolute inset-0 z-10 bg-[url('data:image/svg+xml;utf8,<svg_xmlns=%22http://www.w3.org/2000/svg%22_width=%22180%22_height=%22180%22><filter_id=%22n%22><feTurbulence_type=%22fractalNoise%22_baseFrequency=%220.85%22_numOctaves=%222%22_stitchTiles=%22stitch%22/><feColorMatrix_type=%22saturate%22_values=%220%22/></filter><rect_width=%22100%25%22_height=%22100%25%22_filter=%22url(%23n)%22_opacity=%220.5%22/></svg>')] opacity-35 mix-blend-overlay pointer-events-none" />
+        <div className="vignette absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
 
       </div>
     </section>
