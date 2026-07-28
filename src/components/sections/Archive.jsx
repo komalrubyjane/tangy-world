@@ -33,17 +33,31 @@ export const Archive = () => {
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
 
-      {/* Film Registration & Crop Marks */}
-      <div className="absolute top-6 left-6 font-mono text-[9px] text-tangy-mustard tracking-[0.3em] pointer-events-none uppercase">
-        ✦ KODAK SAFETY FILM 5063 // 35MM ✦
+      {/* FLOATING VINTAGE MUSICAL OBJECTS */}
+      <div className="absolute top-16 right-20 w-28 md:w-40 pointer-events-auto z-20 group cursor-pointer animate-[bounce_5s_ease-in-out_infinite]">
+        <img 
+          src="/media/vinyl.png" 
+          alt="Spinning Vinyl Record" 
+          className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.9)] transition-transform duration-700 group-hover:rotate-180" 
+        />
+        <span className="font-mono text-[7px] text-[#C99A2E] bg-[#11100C] px-1.5 py-0.5 border border-[#C99A2E] absolute -bottom-2 left-2 uppercase">33⅓ RPM STEREO</span>
       </div>
-      <div className="absolute bottom-6 left-6 font-mono text-[9px] text-tangy-paper/40 tracking-[0.3em] pointer-events-none uppercase">
-        REGISTRATION: [ ✚ ] CROSS-MARK
+
+      <div className="absolute bottom-12 left-16 w-32 md:w-48 pointer-events-none z-20 opacity-80">
+        <img src="/media/gramophone.png" alt="Vintage Gramophone" className="w-full h-full object-contain filter drop-shadow-2xl" />
+      </div>
+
+      {/* Film Registration & Crop Marks */}
+      <div className="absolute top-6 left-6 font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] pointer-events-none uppercase">
+        ✦ KODAK SAFETY FILM 5063 // 35MM ✦ REC • LIVE • HYDERABAD
+      </div>
+      <div className="absolute bottom-6 left-6 font-mono text-[9px] text-[#E7D5A4]/40 tracking-[0.3em] pointer-events-none uppercase">
+        REGISTRATION: [ ✚ ] CROSS-MARK // SIDE A
       </div>
 
       <div className="absolute top-12 left-12 z-20 pointer-events-none">
-        <p className="font-mono text-tangy-mustard text-[10px] tracking-[0.3em] uppercase">ANALOGUE CONTACT SHEET</p>
-        <h2 className="display text-6xl md:text-8xl text-tangy-cream opacity-30">THE ARCHIVE</h2>
+        <p className="font-mono text-[#C99A2E] text-[10px] tracking-[0.3em] uppercase">ANALOGUE CONTACT SHEET // FILE 35MM</p>
+        <h2 className="display text-6xl md:text-8xl text-[#E7D5A4] opacity-30">THE ARCHIVE</h2>
       </div>
 
       {/* Contact Sheet Horizontal Track */}
@@ -53,6 +67,9 @@ export const Archive = () => {
             key={photo.id}
             className={`shrink-0 w-[280px] md:w-[400px] bg-[#E3D4AC] p-3 pb-12 shadow-2xl border-2 border-[#11100C] rotate-[${(i % 3 - 1) * 4}deg] ${i === gallery.length - 1 ? 'heritage-expand-photo origin-center' : ''}`}
           >
+            {/* Masking Tape Overlay */}
+            <div className="absolute -top-3 left-1/3 w-16 h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
+
             {/* Film Edge Numbers */}
             <div className="flex justify-between font-mono text-[8px] text-[#11100C] font-bold px-1 mb-1">
               <span>{String(i + 1).padStart(2, '0')}A</span>

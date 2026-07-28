@@ -36,6 +36,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
   const [footageRef, footageInView] = useMobileInView();
   const [archiveRef, archiveInView] = useMobileInView();
   const [diaryRef, diaryInView] = useMobileInView();
+  const [foundersRef, foundersInView] = useMobileInView();
   const [crewRef, crewInView] = useMobileInView();
   const [privateRef, privateInView] = useMobileInView();
 
@@ -52,8 +53,9 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
     { label: "05 RAW FOOTAGE", target: "#m-footage" },
     { label: "06 ARCHIVE", target: "#m-archive" },
     { label: "07 DIARY", target: "#m-diary" },
-    { label: "08 CREW", target: "#m-crew" },
-    { label: "09 PRIVATE SESSIONS", target: "#m-private" },
+    { label: "08 FOUNDERS", target: "#m-founders" },
+    { label: "09 CREW", target: "#m-crew" },
+    { label: "10 PRIVATE SESSIONS", target: "#m-private" },
   ];
 
   const handleNavClick = (target) => {
@@ -72,9 +74,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
   return (
     <div className="w-full min-h-[100dvh] bg-[#11100C] text-[#EAD9A6] font-sans antialiased overflow-x-hidden selection:bg-[#B9471B] selection:text-[#EAD9A6]">
       
-      {/* ------------------------------------------------------------- */}
       {/* 1. TOUCH-NATIVE MOBILE NAVIGATION BAR & SLIDE-IN MENU OVERLAY */}
-      {/* ------------------------------------------------------------- */}
       <header className="fixed top-0 left-0 right-0 h-14 bg-[#15120D]/95 backdrop-blur-md border-b border-[#EAD9A6]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
         <button
           onClick={() => { playSFX('ticketClick'); setIsMenuOpen(true); }}
@@ -97,13 +97,11 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       <div 
         className={`fixed inset-0 z-[200] transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
-        {/* Backdrop */}
         <div 
           onClick={() => setIsMenuOpen(false)} 
           className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         />
 
-        {/* Sliding Drawer */}
         <div 
           className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-[360px] bg-[#15120D] text-[#EAD9A6] flex flex-col justify-between p-6 pt-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] shadow-2xl transition-transform duration-300 ease-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
         >
@@ -136,9 +134,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 2. MOBILE HERO SECTION (TOUCH-FIRST 1.5S TIMED INTRO SEQUENCE) */}
-      {/* ------------------------------------------------------------- */}
+      {/* 2. MOBILE HERO SECTION */}
       <section 
         id="m-hero" 
         className="w-full min-h-[100dvh] bg-[#B9471B] text-[#EAD9A6] flex flex-col items-center justify-between text-center box-border relative overflow-hidden"
@@ -149,10 +145,8 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           paddingRight: 'max(20px, env(safe-area-inset-right))',
         }}
       >
-        {/* SOLID INK NOISE GRAIN TEXTURE */}
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
 
-        {/* TOP METADATA BAR */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-1.5 z-20 transition-all duration-700 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <span className="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-[#EAD9A6] tracking-[0.25em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
             TANGY SESSIONS // HYDERABAD // EST. 2016
@@ -162,10 +156,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           </span>
         </div>
 
-        {/* MIDDLE SECTION: STATIC SWING MIC + PORTRAIT POLAROID + TITLE */}
         <div className="w-full max-w-[340px] flex flex-col items-center gap-3 my-auto z-20 py-2">
-          
-          {/* STATIC HANGING MICROPHONE WITH GENTLE IDLE SWING */}
           <div className={`w-full flex flex-col items-center pointer-events-none mb-1 transition-all duration-800 delay-200 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}>
             <div className="w-[1.5px] h-[75px] sm:h-[90px] bg-[#15120D]" />
             <div className="w-12 h-16 sm:w-14 sm:h-18 border border-black/40 rounded-b-xl shadow-xl flex items-center justify-center bg-[linear-gradient(135deg,#999_0%,#222_40%,#666_70%,#111_100%)] p-1 -mt-0.5 animate-[spin_8s_ease-in-out_infinite_alternate]">
@@ -173,7 +164,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </div>
           </div>
 
-          {/* PORTRAIT POLAROID PHOTO (SCALES & ROTATES IN VIEW) */}
           <div className={`w-[72%] max-w-[280px] sm:max-w-[320px] bg-[#EAD9A6] p-2 sm:p-2.5 pb-6 sm:pb-7 border-2 border-[#15120D] shadow-[8px_8px_0px_#15120D] rotate-[-1.5deg] transition-all duration-700 delay-400 ${heroLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             <div className="absolute -top-2.5 left-1/3 w-16 h-4 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30" />
             <img 
@@ -184,7 +174,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-1.5 text-left">✎ BANSILALPET // 11:42 PM</p>
           </div>
 
-          {/* CLAMPED RESPONSIVE TITLE */}
           <div className={`flex flex-col items-center mt-2 transition-all duration-700 delay-300 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <h1 className="font-display text-[clamp(50px,13.5vw,72px)] text-[#EAD9A6] leading-[0.82] tracking-tighter drop-shadow-[4px_4px_0px_#15120D]">
               TANGY
@@ -193,10 +182,8 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               WORLD
             </h1>
           </div>
-
         </div>
 
-        {/* BOTTOM SECTION: SUBTITLE + TACTILE 56PX BUTTON */}
         <div className={`w-full max-w-[340px] flex flex-col items-center gap-3 z-20 transition-all duration-700 delay-500 ${heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <p className="font-mono text-[9px] sm:text-[10px] font-bold text-[#EAD9A6] tracking-[0.2em] uppercase border-y border-[#15120D]/40 py-1 px-3 w-full">
             MUSIC • PEOPLE • PLACES • STORIES
@@ -210,12 +197,9 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             <span className="text-[#B9471B] font-black">✦</span>
           </button>
         </div>
-
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 3. MOBILE MANIFESTO (AGED CREAM - SMOOTH SCROLL FADE ENTRANCE) */}
-      {/* ------------------------------------------------------------- */}
+      {/* 3. MOBILE MANIFESTO */}
       <section 
         ref={manifestoRef}
         id="m-manifesto" 
@@ -223,28 +207,22 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
           <span className="font-mono text-[10px] font-bold text-[#B9471B] tracking-[0.3em] uppercase">01 MANIFESTO</span>
-          
           <div className="w-full bg-[#15120D] p-2 border-2 border-[#15120D] shadow-[6px_6px_0px_#B9471B] rotate-[1deg]">
             <img src="/media/gallery/tangy1.jpg" alt="Stepwell" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
           </div>
-
           <h2 className="font-display text-2xl sm:text-3xl text-[#15120D] leading-tight">
             AN INTERACTIVE SCREEN-PRINTED MUSIC ARCHIVE.
           </h2>
-
           <p className="font-sans text-sm sm:text-base text-[#15120D]/90 leading-relaxed">
-            Tangy Sessions is a living archive of music, people, and historic spaces in Hyderabad. We transform forgotten stepwells, secret courtyards, and ancient stone corridors into intimate gathering spaces where sound vibrates through masonry.
+            Tangy Sessions is a living archive of music, people, and historic spaces in Hyderabad.
           </p>
-
           <blockquote className="w-full bg-[#B9471B] text-[#EAD9A6] p-5 border-2 border-[#15120D] shadow-[5px_5px_0px_#15120D] font-display text-lg sm:text-xl italic my-2">
             "This world has a sound. Listen closely."
           </blockquote>
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 4. MOBILE CHRONOLOGY (HISTORY - STAGGERED YEAR CARDS)        */}
-      {/* ------------------------------------------------------------- */}
+      {/* 4. MOBILE CHRONOLOGY */}
       <section 
         ref={historyRef}
         id="m-history" 
@@ -252,7 +230,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       >
         <div className="w-full max-w-[480px] flex flex-col items-center">
           <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase mb-6">02 CHRONOLOGY // 10 YEARS</span>
-
           <div className="w-full flex flex-col gap-6">
             {[
               { year: "2016", title: "THE FIRST SPARK", desc: "First acoustic sessions inside private living rooms & stepwells." },
@@ -278,9 +255,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 5. MOBILE SESSIONS (TACTILE POSTER TICKET CARDS)              */}
-      {/* ------------------------------------------------------------- */}
+      {/* 5. MOBILE SESSIONS */}
       <section 
         ref={sessionsRef}
         id="m-sessions" 
@@ -310,9 +285,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 6. MOBILE RAW FOOTAGE (FADE & ZOOM 2-COLUMN GRID)              */}
-      {/* ------------------------------------------------------------- */}
+      {/* 6. MOBILE RAW FOOTAGE */}
       <section 
         ref={footageRef}
         id="m-footage" 
@@ -334,9 +307,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 7. MOBILE ARCHIVE & SPACES (VINTAGE BLUE BACKGROUND)           */}
-      {/* ------------------------------------------------------------- */}
+      {/* 7. MOBILE ARCHIVE & SPACES */}
       <section 
         ref={archiveRef}
         id="m-archive" 
@@ -362,9 +333,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 8. MOBILE DIARY (AGED CREAM EDITORIAL CARD)                   */}
-      {/* ------------------------------------------------------------- */}
+      {/* 8. MOBILE DIARY */}
       <section 
         ref={diaryRef}
         id="m-diary" 
@@ -384,18 +353,46 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 9. MOBILE CREW (BURNT ORANGE STACKED CARDS)                    */}
-      {/* ------------------------------------------------------------- */}
+      {/* 9. MOBILE FOUNDERS ARCHIVE */}
+      <section 
+        ref={foundersRef}
+        id="m-founders" 
+        className={`w-full bg-[#1C140E] text-[#EAD9A6] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${foundersInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
+          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">07 FOUNDERS ARCHIVE // FILE 001</span>
+
+          {/* ARJUNA */}
+          <div className="w-full bg-[#EAD9A6] text-[#15120D] border-2 border-[#15120D] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left rotate-[-1deg]">
+            <span className="font-mono text-[9px] font-bold text-[#B9471B] tracking-widest">FOUNDER & CREATOR // EST. 2016</span>
+            <h3 className="font-display text-2xl text-[#15120D]">ARJUNA</h3>
+            <img src="/media/arjun.png" alt="Arjuna" className="w-full aspect-[3/4] object-cover border border-[#15120D]" />
+            <p className="font-mono text-xs text-[#15120D]/90 border-l-4 border-[#B9471B] pl-3 italic">
+              "Born from an obsession with underground sound and ancient spaces."
+            </p>
+          </div>
+
+          {/* DEEPA */}
+          <div className="w-full bg-[#EAD9A6] text-[#15120D] border-2 border-[#15120D] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left rotate-[1deg]">
+            <span className="font-mono text-[9px] font-bold text-[#B9471B] tracking-widest">CO-FOUNDER // EST. 2018</span>
+            <h3 className="font-display text-2xl text-[#15120D]">DEEPA</h3>
+            <img src="/media/deepa.jpg" alt="Deepa" className="w-full aspect-[3/4] object-cover border border-[#15120D]" />
+            <p className="font-mono text-xs text-[#15120D]/90 border-l-4 border-[#B9471B] pl-3 italic">
+              "The architect of community. Deepa ensures every event feels like a homecoming."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. MOBILE CREW */}
       <section 
         ref={crewRef}
         id="m-crew" 
         className={`w-full bg-[#B9471B] text-[#EAD9A6] py-14 px-5 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">07 JOIN THE CREW</span>
+          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">08 JOIN THE CREW</span>
 
-          {/* VOLUNTEER CARD */}
           <div className="w-full bg-[#15120D] border-2 border-[#EAD9A6] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left">
             <span className="font-mono text-[9px] font-bold text-[#D19A24] tracking-widest">VOLUNTEER</span>
             <h3 className="font-display text-xl sm:text-2xl text-[#EAD9A6]">BEHIND THE SCENES.</h3>
@@ -408,7 +405,6 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
             </button>
           </div>
 
-          {/* ARTIST CARD */}
           <div className="w-full bg-[#15120D] border-2 border-[#D19A24] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left">
             <span className="font-mono text-[9px] font-bold text-[#B9471B] tracking-widest">ARTIST</span>
             <h3 className="font-display text-xl sm:text-2xl text-[#EAD9A6]">TAKE THE STAGE.</h3>
@@ -423,16 +419,14 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 10. MOBILE PRIVATE SESSIONS (VINTAGE BLUE - GENTLE PULSE CTA) */}
-      {/* ------------------------------------------------------------- */}
+      {/* 11. MOBILE PRIVATE SESSIONS */}
       <section 
         ref={privateRef}
         id="m-private" 
         className={`w-full bg-[#315D73] text-[#EAD9A6] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${privateInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">08 PRIVATE SESSIONS</span>
+          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">09 PRIVATE SESSIONS</span>
 
           <div className="w-full bg-[#15120D] p-2 border-2 border-[#EAD9A6]/30 shadow-[6px_6px_0px_#15120D]">
             <img src="/media/gallery/tangy4.jpg" alt="Private Session" className="w-full aspect-[4/3] object-cover border border-[#EAD9A6]/20" />
@@ -455,9 +449,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 11. MOBILE FOOTER (INK BLACK BACKGROUND)                     */}
-      {/* ------------------------------------------------------------- */}
+      {/* 12. MOBILE FOOTER */}
       <footer className="w-full bg-[#11100C] text-[#EAD9A6] py-10 px-5 flex flex-col items-center text-center border-t border-[#EAD9A6]/20">
         <div className="w-full max-w-[480px] flex flex-col items-center gap-3">
           <span className="font-display text-xl text-[#D19A24]">TANGY SESSIONS</span>

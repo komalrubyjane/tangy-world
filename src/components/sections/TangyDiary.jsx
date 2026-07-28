@@ -34,9 +34,7 @@ export const TangyDiary = () => {
       });
     });
 
-    // -------------------------------------------------------------
-    // STAGE 1: BOOK COVER OPENS ON SCROLL (0.00 -> 0.25)
-    // -------------------------------------------------------------
+    // STAGE 1: BOOK COVER OPENS ON SCROLL
     tl.to('.book-interior', { opacity: 1, scale: 1, duration: 0.20, ease: 'power2.out' }, 0.05)
       .to('.book-cover-front', { 
         rotateY: -140, 
@@ -46,10 +44,7 @@ export const TangyDiary = () => {
         onStart: () => playSFX('pageTurn')
       }, 0.05);
 
-    // -------------------------------------------------------------
-    // STAGE 2: PHYSICAL 3D PAGE TURNS (0.25 -> 1.00)
-    // Each page turns 180 degrees from right to left along Y-axis
-    // -------------------------------------------------------------
+    // STAGE 2: PHYSICAL 3D PAGE TURNS
     pages.forEach((page, i) => {
       if (i < pages.length - 1) {
         tl.to(page, {
@@ -58,7 +53,6 @@ export const TangyDiary = () => {
           ease: 'power2.inOut',
           onStart: () => playSFX('pageTurn'),
           onUpdate: function() {
-            // Lower z-index once page flips past 90 degrees to lay underneath left stack
             if (this.progress() > 0.5) {
               gsap.set(page, { zIndex: i + 1 });
             } else {
@@ -76,20 +70,25 @@ export const TangyDiary = () => {
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
 
+      {/* FLOATING VINTAGE MUSICAL OBJECTS */}
+      <div className="absolute top-12 left-10 w-24 md:w-36 pointer-events-none z-20 opacity-85 animate-[bounce_4s_ease-in-out_infinite]">
+        <img src="/media/violin.png" alt="Acoustic Violin" className="w-full h-full object-contain filter drop-shadow-2xl" />
+      </div>
+
+      <div className="absolute bottom-10 right-12 w-28 md:w-44 pointer-events-none z-20 opacity-85">
+        <img src="/media/radio.png" alt="Vintage Tube Radio" className="w-full h-full object-contain filter drop-shadow-2xl" />
+      </div>
+
       {/* Section Header */}
       <div className="absolute top-6 left-6 md:top-10 md:left-12 z-20 pointer-events-none">
-        <p className="font-mono text-tangy-mustard text-[10px] tracking-[0.3em] font-bold uppercase">PHYSICAL SCRAPBOOK // 3D PAGE TURNS</p>
+        <p className="font-mono text-[#D19A24] text-[10px] tracking-[0.3em] font-bold uppercase">PHYSICAL SCRAPBOOK // 3D FIELD LOGS</p>
         <h2 className="display text-4xl md:text-6xl text-[#E7D5A4]">THE DIARY</h2>
       </div>
 
-      {/* ------------------------------------------------------------- */}
-      {/* 3D SCRAPBOOK CONTAINER WITH PHYSICAL PAGE TURNS               */}
-      {/* ------------------------------------------------------------- */}
+      {/* 3D SCRAPBOOK CONTAINER */}
       <div className="relative w-[min(1100px,94vw)] h-[min(640px,76vh)] preserve-3d">
 
-        {/* ----------------------------------------------------------- */}
-        {/* CLOSED LEATHER FRONT COVER (Rotates open on scroll)          */}
-        {/* ----------------------------------------------------------- */}
+        {/* CLOSED LEATHER FRONT COVER */}
         <div className="book-cover-front absolute inset-0 bg-[#2A160F] rounded-xl border-8 border-[#11100C] shadow-[35px_35px_100px_rgba(0,0,0,0.95)] z-40 origin-left flex flex-col justify-between p-8 md:p-16 text-center preserve-3d">
           <div className="absolute inset-0 bg-[url('/noise.png')] opacity-30 mix-blend-overlay pointer-events-none" />
 
@@ -118,9 +117,7 @@ export const TangyDiary = () => {
           </div>
         </div>
 
-        {/* ----------------------------------------------------------- */}
-        {/* INTERIOR SCRAPBOOK WITH 3D TURNING PAGES                    */}
-        {/* ----------------------------------------------------------- */}
+        {/* INTERIOR SCRAPBOOK WITH 3D TURNING PAGES */}
         <div className="book-interior absolute inset-0 bg-[#11100C] rounded-xl p-3 md:p-6 border-4 border-[#11100C] shadow-[30px_30px_90px_rgba(0,0,0,0.95)] z-10 flex flex-col justify-center preserve-3d">
           
           {/* Leather Spine & Center Rings */}
@@ -137,7 +134,7 @@ export const TangyDiary = () => {
               key={entry.id}
               className="scrapbook-flip-page absolute inset-3 md:inset-6 bg-[#E7D5A4] border-2 border-[#11100C] rounded-lg shadow-2xl p-6 md:p-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center justify-between text-[#11100C] overflow-hidden preserve-3d origin-left backface-hidden"
             >
-              {/* LEFT PAGE: Archival Polaroid & Metadata */}
+              {/* LEFT PAGE */}
               <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-6 md:pb-0 md:pr-8">
                 <div className="w-full flex justify-between font-mono text-[10px] font-bold text-[#B94717] uppercase border-b border-[#11100C]/20 pb-2 mb-4">
                   <span>SCRAPBOOK VOL. {entry.id}</span>
@@ -161,7 +158,7 @@ export const TangyDiary = () => {
                 </div>
               </div>
 
-              {/* RIGHT PAGE: Editorial Journal Entry */}
+              {/* RIGHT PAGE */}
               <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4">
                 <div>
                   <span className="font-mono text-[10px] font-bold text-[#C99A2E] bg-[#11100C] text-[#E7D5A4] px-2 py-0.5 tracking-widest uppercase mb-3 inline-block">
@@ -179,7 +176,7 @@ export const TangyDiary = () => {
 
                 <div className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] font-mono text-[10px] text-[#5A120D] font-bold flex justify-between items-center">
                   <span>HANDWRITTEN NOTE</span>
-                  <span className="border border-[#5A120D] px-2 py-0.5 rotate-[-3deg]">KEEP THIS ✦</span>
+                  <span className="border border-[#5A120D] px-2 py-0.5 rotate-[-3deg]">─────── 33⅓ RPM ───────</span>
                 </div>
               </div>
 
