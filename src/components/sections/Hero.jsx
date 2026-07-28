@@ -216,7 +216,7 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* SCALED DOWN VIOLIN PERFORMER ILLUSTRATION (35% REDUCTION)     */}
+        {/* SCALED DOWN VIOLIN PERFORMER ILLUSTRATION                     */}
         {/* ------------------------------------------------------------- */}
         <div className="portrait-wrap absolute z-15 left-[52%] top-[34%] w-[17cqw] h-[34cqw] pointer-events-none">
           <div className="portrait-blob absolute -inset-x-[6%] -top-[3%] -bottom-[1%] bg-[#ecdcaf] rounded-[46%_54%_52%_48%/45%_40%_60%_55%] shadow-[0_1cqw_1.8cqw_rgba(0,0,0,0.35)]" />
@@ -267,7 +267,7 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* HANGING VINTAGE CHROME MICROPHONE (MOVED UPWARD)               */}
+        {/* HANGING VINTAGE CHROME MICROPHONE                             */}
         {/* ------------------------------------------------------------- */}
         <div className="mic absolute z-20 top-0 left-1/2 -translate-x-[4%] w-[8cqw] h-[20cqw] origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
           <svg viewBox="0 0 100 260" preserveAspectRatio="xMidYMin meet">
@@ -290,7 +290,7 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* BALANCED SIDE STICKERS & EPHEMERA (EQUAL VISUAL BALANCE)       */}
+        {/* BALANCED SIDE STICKERS & EPHEMERA                             */}
         {/* ------------------------------------------------------------- */}
         {/* LEFT COLUMN: 33⅓ RPM BADGE */}
         <div className="badge absolute z-32 left-[2.5cqw] top-[40%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6">
@@ -349,11 +349,11 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* LOWERED CONCERT TICKET STUB (ROTATED -2DEG AT ~65% HEIGHT)    */}
+        {/* LOWERED CONCERT TICKET STUB (MOVED DOWN TO BOTTOM EDGE 1.5%)  */}
         {/* ------------------------------------------------------------- */}
         <div 
           ref={ticketRef} 
-          className="ticket absolute z-33 left-1/2 bottom-[4%] -translate-x-1/2 -rotate-2 w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
+          className="ticket absolute z-33 left-1/2 bottom-[1.5%] -translate-x-1/2 -rotate-2 w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
         >
           {/* Masking Tape Touching Typography */}
           <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] h-[1.8cqw] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-2" />
