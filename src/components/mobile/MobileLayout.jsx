@@ -384,38 +384,112 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
         </div>
       </section>
 
-      {/* 10. MOBILE CREW */}
+      {/* 10. MOBILE CREW (HANDCRAFTED VINTAGE RECRUITMENT POSTERS) */}
       <section 
         ref={crewRef}
         id="m-crew" 
-        className={`w-full bg-[#B9471B] text-[#EAD9A6] py-14 px-5 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#B9471B] text-[#EAD9A6] py-16 px-4 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">08 JOIN THE CREW</span>
+        <div className="w-full max-w-[360px] flex flex-col items-center gap-10">
+          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase border-y border-[#15120D]/40 py-1 px-4">
+            08 JOIN THE CREW // RECRUITMENT DESK
+          </span>
 
-          <div className="w-full bg-[#15120D] border-2 border-[#EAD9A6] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left">
-            <span className="font-mono text-[9px] font-bold text-[#D19A24] tracking-widest">VOLUNTEER</span>
-            <h3 className="font-display text-xl sm:text-2xl text-[#EAD9A6]">BEHIND THE SCENES.</h3>
-            <p className="font-sans text-xs sm:text-sm text-[#EAD9A6]/80">Help build the nights, the stories and everything that happens between them.</p>
+          {/* POSTER 01: VOLUNTEER (CREAM ARCHIVAL FLYER) */}
+          <div 
+            className={`w-full bg-[#EAD9A6] text-[#15120D] p-5 sm:p-6 border-4 border-[#15120D] shadow-[10px_10px_0px_#15120D] rotate-[2deg] relative flex flex-col gap-4 transition-all duration-500 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          >
+            {/* FOLDED PAPER CORNER */}
+            <div className="absolute top-0 right-0 w-6 h-6 bg-[#D19A24] border-b-2 border-l-2 border-[#15120D] shadow-sm pointer-events-none" />
+
+            {/* MASKING TAPE */}
+            <div className="absolute -top-3 left-6 w-20 h-5 bg-[rgba(234,217,166,0.9)] rotate-[-3deg] border border-black/30 pointer-events-none" />
+
+            {/* RED ARCHIVE STAMP */}
+            <div className="absolute -top-4 right-8 border-2 border-[#15120D] bg-[#5A120D] text-[#EAD9A6] font-mono text-[8.5px] font-bold px-2.5 py-0.5 uppercase rotate-[-6deg] shadow-md pointer-events-none">
+              REC • LIVE // ARCHIVE 08 ✦
+            </div>
+
+            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#315D73] border-b border-[#15120D]/30 pb-2 uppercase">
+              <span>ARCHIVE 08 // FILE NO. 204</span>
+              <span>HYDERABAD</span>
+            </div>
+
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-[9px] text-[#B9471B] font-black tracking-widest uppercase">PATH 01 // VOLUNTEER</span>
+              <h3 className="font-display text-3xl sm:text-4xl text-[#15120D] leading-none my-1">
+                BEHIND THE SCENES
+              </h3>
+            </div>
+
+            {/* ICONS STRIP */}
+            <div className="flex items-center gap-2 font-mono text-[9px] font-bold bg-[#F5E9C9] p-2 border border-[#15120D]">
+              <span>🎧 HEADPHONES</span>
+              <span>·</span>
+              <span>🎙 MIC</span>
+              <span>·</span>
+              <span>⚡ SPOTLIGHT</span>
+            </div>
+
+            {/* HANDWRITTEN NOTE */}
+            <p className="font-mono text-xs text-[#15120D]/90 border-l-4 border-[#D19A24] pl-3 py-0.5 italic">
+              ✎ "Help build the nights, the stories and everything that happens between them."
+            </p>
+
             <button
               onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
-              className="w-full h-[56px] bg-[#EAD9A6] text-[#15120D] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#15120D] active:scale-95 active:bg-[#B9471B] active:text-[#EAD9A6] transition-transform"
+              className="w-full h-[56px] bg-[#D19A24] text-[#15120D] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
-              APPLY AS VOLUNTEER →
+              [ APPLY AS VOLUNTEER → ]
             </button>
           </div>
 
-          <div className="w-full bg-[#15120D] border-2 border-[#D19A24] p-5 shadow-[6px_6px_0px_#15120D] flex flex-col gap-3 text-left">
-            <span className="font-mono text-[9px] font-bold text-[#B9471B] tracking-widest">ARTIST</span>
-            <h3 className="font-display text-xl sm:text-2xl text-[#EAD9A6]">TAKE THE STAGE.</h3>
-            <p className="font-sans text-xs sm:text-sm text-[#EAD9A6]/80">Bring your sound, your story and your energy into the Tangy world.</p>
+          {/* POSTER 02: ARTIST (1970s CONCERT GIG FLYER / VINYL SLEEVE) */}
+          <div 
+            className={`w-full bg-[#15120D] text-[#EAD9A6] p-5 sm:p-6 border-4 border-[#D19A24] shadow-[10px_10px_0px_#15120D] rotate-[-2deg] relative flex flex-col gap-4 transition-all duration-500 delay-200 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          >
+            {/* MASKING TAPE */}
+            <div className="absolute -top-3 right-6 w-20 h-5 bg-[rgba(209,154,36,0.85)] rotate-[4deg] border border-black/30 pointer-events-none" />
+
+            {/* BACKSTAGE PASS TAG */}
+            <div className="absolute -top-4 left-6 border-2 border-[#15120D] bg-[#B9471B] text-[#EAD9A6] font-mono text-[8.5px] font-bold px-2 py-0.5 uppercase rotate-[4deg] shadow-md pointer-events-none">
+              PROPERTY OF TANGY // BACKSTAGE ✦
+            </div>
+
+            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#D19A24] border-b border-[#EAD9A6]/20 pb-2 uppercase">
+              <span>SIDE A // 33⅓ RPM STEREO</span>
+              <span>AUDITION FILE</span>
+            </div>
+
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-[9px] text-[#D19A24] font-black tracking-widest uppercase">PATH 02 // ARTIST</span>
+              <h3 className="font-display text-3xl sm:text-4xl text-[#EAD9A6] leading-none my-1">
+                TAKE THE STAGE
+              </h3>
+            </div>
+
+            {/* VISUAL COMPONENTS: SPINNING VINYL ICON + GUITAR PICK */}
+            <div className="flex items-center justify-between bg-[#1C140E] p-2.5 border border-[#D19A24]/40 font-mono text-[9px]">
+              <div className="flex items-center gap-2">
+                <img src="/media/vinyl.png" alt="Vinyl" className="w-6 h-6 object-contain animate-[spin_6s_linear_infinite]" />
+                <span className="font-bold text-[#D19A24]">33⅓ RPM LIVE RECORDING</span>
+              </div>
+              <span className="bg-[#B9471B] text-[#EAD9A6] px-1.5 py-0.5 text-[7.5px] font-bold uppercase">GUITAR PICK ✦</span>
+            </div>
+
+            {/* HANDWRITTEN NOTE */}
+            <p className="font-mono text-xs text-[#EAD9A6]/90 border-l-4 border-[#B9471B] pl-3 py-0.5 italic">
+              ✎ "Bring your sound, your story and your energy into the Tangy world."
+            </p>
+
             <button
               onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
-              className="w-full h-[56px] bg-[#D19A24] text-[#15120D] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#15120D] active:scale-95 active:bg-[#B9471B] active:text-[#EAD9A6] transition-transform"
+              className="w-full h-[56px] bg-[#B9471B] text-[#EAD9A6] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] active:scale-95 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150"
             >
-              APPLY AS ARTIST →
+              [ APPLY AS ARTIST → ]
             </button>
           </div>
+
         </div>
       </section>
 
