@@ -10,6 +10,7 @@ import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
 import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
 import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
+import { MobileLayout } from './components/mobile/MobileLayout';
 
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
@@ -33,6 +34,16 @@ export default function App() {
   const [isProgrammeOpen, setIsProgrammeOpen] = useState(false);
   const [isIntroActive, setIsIntroActive] = useState(true);
   const [showUiControls, setShowUiControls] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const alreadyPlayed = sessionStorage.getItem('tangyIntroPlayed');
@@ -42,40 +53,21 @@ export default function App() {
   }, []);
 
   const handleArtistSubmit = () => {
-    document.querySelector('#volunteer')?.scrollIntoView({ behavior: 'smooth' });
+    const target = isMobile ? '#m-crew' : '#volunteer';
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleRequestPrivate = () => {
-    document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+    const target = isMobile ? '#m-private' : '#contact';
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <AudioProvider>
       <LenisProvider>
         <CursorProvider>
-          <CustomCursor />
-          
-          {/* Temporary Theatre Curtain Opening Overlay */}
-          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
-
-          {/* Global Continuous Hanging Microphone Experience */}
-          <GlobalMicrophoneJourney active={showUiControls} />
-
-          {/* Cinematic Deep Space Intro */}
-          {isIntroActive && (
-            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
-          )}
-
-          {/* Floating Retro Sound Control */}
-          {showUiControls && <SoundControl />}
-          
-          {/* Fixed 1970s Printed Navbar */}
-          {showUiControls && (
-            <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
-          )}
-          
-          {/* Vintage Concert Programme Overlay */}
-          <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
+          {/* Custom Cursor active on fine-pointer devices */}
+          {!isMobile && <CustomCursor />}
           
           {/* Booking Ticket Stub Modal */}
           {selectedEvent && (
@@ -84,41 +76,75 @@ export default function App() {
               onClose={() => setSelectedEvent(null)} 
             />
           )}
-          
-          {/* Lightweight Grain Texture */}
-          <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
-          
-          {/* Vignette */}
-          <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
 
-          {/* Scroll Progress Rail */}
-          <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
-             <div 
-               className="w-full bg-tangy-mustard"
-               style={{ height: `${progress}%` }}
-             />
-          </div>
+          {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
+          {isMobile ? (
+            <MobileLayout 
+              onSelectBooking={(evt) => setSelectedEvent(evt)}
+              onArtistSubmit={handleArtistSubmit}
+              onRequestPrivate={handleRequestPrivate}
+            />
+          ) : (
+            /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
+            <>
+              {/* Temporary Theatre Curtain Opening Overlay */}
+              <CurtainOverlay onComplete={() => setShowUiControls(true)} />
 
-          <div className="tangy-world pt-12">
-            <main>
-              <Hero />
-              <Manifesto />
-              <History />
-              <Archive />
-              <Spaces />
-              <FrontCamera />
-              <TangyDiary />
-              <Artists onArtistSubmit={handleArtistSubmit} />
-              <Founders />
-              <UpcomingEvents onSelectBooking={(evt) => setSelectedEvent(evt)} />
-              <Volunteer onApplyVolunteer={handleArtistSubmit} onApplyArtist={handleArtistSubmit} />
-              <PrivateSessions onRequestPrivate={handleRequestPrivate} />
-              <Newsletter />
-              <Closing />
-            </main>
-            
-            <Footer />
-          </div>
+              {/* Global Continuous Hanging Microphone Experience */}
+              <GlobalMicrophoneJourney active={showUiControls} />
+
+              {/* Cinematic Deep Space Intro */}
+              {isIntroActive && (
+                <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
+              )}
+
+              {/* Floating Retro Sound Control */}
+              {showUiControls && <SoundControl />}
+              
+              {/* Fixed 1970s Printed Navbar */}
+              {showUiControls && (
+                <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
+              )}
+              
+              {/* Vintage Concert Programme Overlay */}
+              <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
+              
+              {/* Lightweight Grain Texture */}
+              <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+              
+              {/* Vignette */}
+              <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
+
+              {/* Scroll Progress Rail */}
+              <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
+                 <div 
+                   className="w-full bg-tangy-mustard"
+                   style={{ height: `${progress}%` }}
+                 />
+              </div>
+
+              <div className="tangy-world pt-12">
+                <main>
+                  <Hero />
+                  <Manifesto />
+                  <History />
+                  <Archive />
+                  <Spaces />
+                  <FrontCamera />
+                  <TangyDiary />
+                  <Artists onArtistSubmit={handleArtistSubmit} />
+                  <Founders />
+                  <UpcomingEvents onSelectBooking={(evt) => setSelectedEvent(evt)} />
+                  <Volunteer onApplyVolunteer={handleArtistSubmit} onApplyArtist={handleArtistSubmit} />
+                  <PrivateSessions onRequestPrivate={handleRequestPrivate} />
+                  <Newsletter />
+                  <Closing />
+                </main>
+                
+                <Footer />
+              </div>
+            </>
+          )}
         </CursorProvider>
       </LenisProvider>
     </AudioProvider>
