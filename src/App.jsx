@@ -26,7 +26,7 @@ import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
-// Lazy Loaded Route Pages for Code Splitting
+// Lazy Loaded Route Pages for Clean Route-Based Code Splitting
 const Home = lazy(() => import('./pages/Home'));
 const ManifestoPage = lazy(() => import('./pages/Manifesto'));
 const SessionsPage = lazy(() => import('./pages/Sessions'));
@@ -35,11 +35,11 @@ const ArtistsPage = lazy(() => import('./pages/Artists'));
 const ArtistProfilePage = lazy(() => import('./pages/Artists/ArtistProfile'));
 const ArchivePage = lazy(() => import('./pages/Archive'));
 const ArchiveItemPage = lazy(() => import('./pages/Archive/ArchiveItem'));
-const VinylPage = lazy(() => import('./pages/VinylPage'));
-const HeritagePage = lazy(() => import('./pages/HeritagePage'));
-const VenueDetailsPage = lazy(() => import('./pages/VenueDetailsPage'));
-const DiaryPage = lazy(() => import('./pages/DiaryPage'));
-const DiaryPostPage = lazy(() => import('./pages/DiaryPostPage'));
+const VinylPage = lazy(() => import('./pages/Vinyl'));
+const HeritagePage = lazy(() => import('./pages/Heritage'));
+const VenueDetailsPage = lazy(() => import('./pages/Heritage/VenueDetails'));
+const DiaryPage = lazy(() => import('./pages/Diary'));
+const DiaryPostPage = lazy(() => import('./pages/Diary/DiaryPost'));
 const CrewPage = lazy(() => import('./pages/Crew'));
 const FoundersPage = lazy(() => import('./pages/Founders'));
 const PrivateSessionsPage = lazy(() => import('./pages/PrivateSessions'));
