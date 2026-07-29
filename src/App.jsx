@@ -24,9 +24,15 @@ import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
 // Pages
 import { BookingPage } from './pages/BookingPage';
-import { ArtistPortalPage } from './pages/ArtistPortalPage';
 import { CrewPage } from './pages/CrewPage';
 import { PrivateSessionsPage } from './pages/PrivateSessionsPage';
+
+// Artist Portal Migration Imports
+import { ArtistLayout } from './artist/layouts/ArtistLayout';
+import { ArtistProtectedRoute } from './artist/components/ArtistProtectedRoute';
+import { LoginPage } from './artist/pages/LoginPage';
+import { RegisterPage } from './artist/pages/RegisterPage';
+import { ArtistPortalPage } from './pages/ArtistPortalPage';
 
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
@@ -82,7 +88,7 @@ function MainWorld() {
   };
 
   const handleNavigateArtist = () => {
-    navigate('/artists');
+    navigate('/artist');
   };
 
   const handleNavigateCrew = () => {
@@ -229,11 +235,19 @@ export default function App() {
           <CustomCursor />
           <BrowserRouter>
             <Routes>
+              {/* PUBLIC WEBSITE ROUTES */}
               <Route path="/" element={<MainWorld />} />
               <Route path="/book/:sessionId" element={<BookingPage />} />
-              <Route path="/artists" element={<ArtistPortalPage />} />
               <Route path="/crew" element={<CrewPage />} />
+              <Route path="/volunteer" element={<CrewPage />} />
               <Route path="/private-sessions" element={<PrivateSessionsPage />} />
+
+              {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
+              <Route path="/artist" element={<ArtistLayout />}>
+                <Route index element={<ArtistPortalPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
+              </Route>
             </Routes>
           </BrowserRouter>
         </CursorProvider>
