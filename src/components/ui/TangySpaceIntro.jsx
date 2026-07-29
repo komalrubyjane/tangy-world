@@ -23,18 +23,33 @@ export const TangySpaceIntro = ({ onComplete }) => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
 
-    // 2. Setup Canvas Dimensions
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const isMobile = window.innerWidth < 768;
+
+    // 2. Setup Canvas with devicePixelRatio for crisp rendering on mobile screens
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+
+    const setupCanvas = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      canvas.width = vw * dpr;
+      canvas.height = vh * dpr;
+      canvas.style.width = `${vw}px`;
+      canvas.style.height = `${vh}px`;
+      ctx.scale(dpr, dpr);
+      return { w: vw, h: vh };
+    };
+
+    let { w: width, h: height } = setupCanvas();
 
     const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      const dims = setupCanvas();
+      width = dims.w;
+      height = dims.h;
     };
     window.addEventListener('resize', handleResize);
 
-    // 3. Create 1970s Psychedelic Starfield Particles
-    const PARTICLE_COUNT = 350;
+    // 3. Reduced particle count on mobile for smooth 60fps
+    const PARTICLE_COUNT = isMobile ? 150 : 350;
     const particles = [];
     const colors = ['#E7D5A4', '#C99A2E', '#B94717', '#5A120D', '#F5E9C9'];
 
@@ -44,19 +59,19 @@ export const TangySpaceIntro = ({ onComplete }) => {
         y: (Math.random() - 0.5) * height * 2,
         z: Math.random() * width,
         color: colors[Math.floor(Math.random() * colors.length)],
-        size: Math.random() * 2 + 1
+        size: Math.random() * (isMobile ? 1.4 : 2) + 0.8
       });
     }
 
     // Motion parameters controlled by GSAP timeline
     const warpParams = {
-      speed: 1.5,
+      speed: isMobile ? 1.2 : 1.5,
       streakLength: 1,
       glowRadius: 0,
       glowOpacity: 0
     };
 
-    // 4. Render Loop
+    // 4. Optimised Render Loop with background clear on mobile
     const render = () => {
       ctx.fillStyle = '#11100C';
       ctx.fillRect(0, 0, width, height);
@@ -64,7 +79,7 @@ export const TangySpaceIntro = ({ onComplete }) => {
       const cx = width / 2;
       const cy = height / 2;
 
-      // Draw Center Faded Orange Glow Motif
+      // Central glow
       if (warpParams.glowOpacity > 0) {
         const rad = Math.max(10, warpParams.glowRadius);
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
@@ -77,7 +92,7 @@ export const TangySpaceIntro = ({ onComplete }) => {
         ctx.fill();
       }
 
-      // Draw 1970s Star Streaks
+      // Star streaks
       for (let i = 0; i < PARTICLE_COUNT; i++) {
         const p = particles[i];
         p.z -= warpParams.speed;
@@ -88,21 +103,23 @@ export const TangySpaceIntro = ({ onComplete }) => {
           p.y = (Math.random() - 0.5) * height * 2;
         }
 
-        const k = 250 / p.z;
+        const k = (isMobile ? 200 : 250) / p.z;
         const px = p.x * k + cx;
         const py = p.y * k + cy;
 
         if (px >= 0 && px <= width && py >= 0 && py <= height) {
-          const prevK = 250 / (p.z + warpParams.speed * warpParams.streakLength);
+          const prevK = (isMobile ? 200 : 250) / (p.z + warpParams.speed * warpParams.streakLength);
           const ppx = p.x * prevK + cx;
           const ppy = p.y * prevK + cy;
 
+          ctx.globalAlpha = Math.min(1, 0.6 + (1 - p.z / width) * 0.4);
           ctx.strokeStyle = p.color;
           ctx.lineWidth = p.size * (1 - p.z / width) * 1.5;
           ctx.beginPath();
           ctx.moveTo(px, py);
           ctx.lineTo(ppx, ppy);
           ctx.stroke();
+          ctx.globalAlpha = 1;
         }
       }
 
@@ -111,7 +128,8 @@ export const TangySpaceIntro = ({ onComplete }) => {
 
     render();
 
-    // 5. Master GSAP Cinematic Timeline (0.0s -> 4.7s)
+    // 5. Smoother timeline tuned for mobile — slightly slower to avoid jank
+    const speedMult = isMobile ? 1.15 : 1;
     const tl = gsap.timeline({
       onComplete: () => {
         sessionStorage.setItem('tangyIntroPlayed', 'true');
@@ -121,40 +139,50 @@ export const TangySpaceIntro = ({ onComplete }) => {
       }
     });
 
-    // Phase 1: Deep Space & Title Reveal (0.0s -> 0.8s)
-    tl.to('.intro-text-1', { opacity: 1, duration: 0.4 }, 0.2)
-      .to('.intro-text-1', { opacity: 0, duration: 0.3 }, 0.8)
+    // Phase 1: Title reveal — eased in longer on mobile
+    tl.to('.intro-text-1', { opacity: 1, duration: 0.5, ease: 'power1.out' }, 0.3 * speedMult)
+      .to('.intro-text-1', { opacity: 0, duration: 0.35, ease: 'power1.in' }, 1.0 * speedMult)
 
-    // Phase 2: Acceleration (0.8s -> 2.0s)
-      .to(warpParams, { speed: 25, streakLength: 4, duration: 1.2, ease: 'power2.in' }, 0.8)
+    // Phase 2: Gradual acceleration — power1.in for smoother feel on mobile
+      .to(warpParams, {
+        speed: isMobile ? 18 : 25,
+        streakLength: isMobile ? 3 : 4,
+        duration: 1.4 * speedMult,
+        ease: 'power1.in'
+      }, 1.0 * speedMult)
 
-    // Phase 3: Warp Speed & Orange Light Appears (2.0s -> 2.8s)
-      .to(warpParams, { 
-        speed: 60, 
-        streakLength: 12, 
-        glowRadius: 280, 
-        glowOpacity: 0.8, 
-        duration: 0.8, 
-        ease: 'power3.in' 
-      }, 2.0)
+    // Phase 3: Warp speed — softer ease on mobile
+      .to(warpParams, {
+        speed: isMobile ? 45 : 60,
+        streakLength: isMobile ? 9 : 12,
+        glowRadius: isMobile ? 220 : 280,
+        glowOpacity: 0.75,
+        duration: 0.9 * speedMult,
+        ease: 'power2.in'
+      }, 2.4 * speedMult)
 
-    // Phase 4: Tangy World Appears & Scales (2.8s -> 3.5s)
-      .fromTo('.intro-tangy-portal', 
-        { scale: 0.05, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.7, ease: 'power2.out' }, 2.8
+    // Phase 4: Tangy World portal zooms in
+      .fromTo('.intro-tangy-portal',
+        { scale: 0.06, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.75, ease: 'power2.out' },
+        3.3 * speedMult
       )
 
-    // Phase 5: Break Through the "O" Portal (3.5s -> 4.0s)
-      .to('.intro-tangy-portal', { 
-        scale: 18, 
-        duration: 0.5, 
+    // Phase 5: Break through portal — slightly less violent scale on mobile
+      .to('.intro-tangy-portal', {
+        scale: isMobile ? 14 : 18,
+        duration: 0.55,
         ease: 'power3.in',
-        onStart: () => playSFX('ticketClick')
-      }, 3.5)
-      .to('.intro-flash-overlay', { opacity: 1, duration: 0.2 }, 3.8)
+        onStart: () => { try { playSFX('ticketClick'); } catch (_) {} }
+      }, 4.05 * speedMult)
+      .to('.intro-flash-overlay', { opacity: 1, duration: 0.25, ease: 'power1.in' }, 4.35 * speedMult)
 
-    // Phase 6: Exposure Flash & Clean Transition to Concert (4.0s -> 4.7s)
-      .to(containerRef.current, { opacity: 0, duration: 0.5, ease: 'power2.out' }, 4.0);
+    // Phase 6: Fade out container
+      .to(containerRef.current, {
+        opacity: 0,
+        duration: isMobile ? 0.6 : 0.5,
+        ease: 'power2.out'
+      }, 4.5 * speedMult);
 
   }, [onComplete, playSFX]);
 
@@ -163,7 +191,8 @@ export const TangySpaceIntro = ({ onComplete }) => {
     setIsSkipped(true);
     gsap.to(containerRef.current, {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.45,
+      ease: 'power2.out',
       onComplete: () => onComplete()
     });
   };
@@ -171,32 +200,43 @@ export const TangySpaceIntro = ({ onComplete }) => {
   if (isSkipped) return null;
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className="fixed inset-0 z-[500] bg-[#11100C] overflow-hidden flex items-center justify-center pointer-events-auto"
+      style={{ willChange: 'opacity' }}
     >
-      {/* Starfield Canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+      {/* Starfield Canvas — hardware composited */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{ willChange: 'contents' }}
+      />
 
       {/* Film Grain Texture */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.14] mix-blend-overlay pointer-events-none" />
 
       {/* Phase 1 Text */}
-      <div className="intro-text-1 absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none z-20">
-        <span className="font-mono text-[10px] md:text-xs text-[#C99A2E] font-bold tracking-[0.4em] uppercase mb-2">
+      <div className="intro-text-1 absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none z-20 px-6">
+        <span className="font-mono text-[9px] sm:text-[10px] md:text-xs text-[#C99A2E] font-bold tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-2 sm:mb-3">
           TANGY SESSIONS // HYDERABAD
         </span>
-        <h2 className="display text-4xl md:text-6xl text-[#E7D5A4] tracking-tight">
+        <h2 className="display text-3xl sm:text-4xl md:text-6xl text-[#E7D5A4] tracking-tight">
           PRESENTS
         </h2>
       </div>
 
-      {/* Phase 4 & 5: Tangy World Portal Title */}
-      <div className="intro-tangy-portal absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none z-30 transform-style-3d">
-        <h1 className="display text-7xl md:text-[14vw] text-[#F5E9C9] leading-[0.8] tracking-tighter ink-bleed">
+      {/* Phase 4 & 5: Portal Title — clamp for small screens */}
+      <div className="intro-tangy-portal absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none z-30 px-4">
+        <h1
+          className="display text-[clamp(3.2rem,18vw,9rem)] text-[#F5E9C9] leading-[0.82] tracking-tighter"
+          style={{ willChange: 'transform, opacity' }}
+        >
           TANGY
         </h1>
-        <h1 className="display text-6xl md:text-[11vw] italic text-[#C99A2E] font-normal leading-[0.85] tracking-tight ink-bleed mt-2">
+        <h1
+          className="display text-[clamp(2.6rem,14vw,7rem)] italic text-[#C99A2E] font-normal leading-[0.85] tracking-tight mt-1 sm:mt-2"
+          style={{ willChange: 'transform, opacity' }}
+        >
           W<span className="inline-block portal-letter-o text-[#B94717]">O</span>RLD
         </h1>
       </div>
@@ -204,14 +244,14 @@ export const TangySpaceIntro = ({ onComplete }) => {
       {/* Exposure Flash Overlay */}
       <div className="intro-flash-overlay absolute inset-0 bg-[linear-gradient(135deg,#B94717_0%,#E7D5A4_50%,#11100C_100%)] opacity-0 pointer-events-none z-40" />
 
-      {/* Skip Intro Button */}
-      <button 
+      {/* Skip Intro Button — larger tap target on mobile */}
+      <button
         onClick={handleSkip}
-        className="absolute bottom-8 right-8 z-50 font-mono text-[10px] text-[#E7D5A4]/70 hover:text-[#C99A2E] tracking-[0.25em] border border-[#E7D5A4]/30 px-3 py-1.5 bg-black/60 backdrop-blur-xs transition-colors uppercase"
+        className="absolute bottom-8 right-5 sm:right-8 z-50 font-mono text-[10px] sm:text-[11px] text-[#E7D5A4]/80 hover:text-[#C99A2E] active:text-[#C99A2E] tracking-[0.2em] sm:tracking-[0.25em] border border-[#E7D5A4]/30 px-4 sm:px-3 py-2.5 sm:py-1.5 bg-black/60 backdrop-blur-sm transition-colors uppercase min-h-[44px] flex items-center justify-center"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         SKIP INTRO →
       </button>
-
     </div>
   );
 };
