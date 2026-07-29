@@ -6,13 +6,11 @@ import { AudioProvider } from './audio/AudioContext';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Navbar } from './components/layout/Navbar';
 import { Menu } from './components/sections/Menu';
-import { BookingModal } from './components/ui/BookingModal';
 import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
 import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
 import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
 import { MobileLayout } from './components/mobile/MobileLayout';
-import { Footer } from './components/layout/Footer';
 
 // Museum Interactive Modals & Dock
 import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
@@ -24,27 +22,28 @@ import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
-// Dedicated Route Pages
-import { Home } from './pages/Home';
-import { ManifestoPage } from './pages/Manifesto';
-import { SessionsPage } from './pages/Sessions';
-import { SessionDetailsPage } from './pages/Sessions/SessionDetails';
-import { ArtistsPage } from './pages/Artists';
-import { ArtistProfilePage } from './pages/Artists/ArtistProfile';
-import { ArchivePage } from './pages/Archive';
-import { ArchiveItemPage } from './pages/Archive/ArchiveItem';
-import { VinylPage } from './pages/Vinyl';
-import { HeritagePage } from './pages/Heritage';
-import { VenueDetailsPage } from './pages/Heritage/VenueDetails';
-import { DiaryPage } from './pages/Diary';
-import { DiaryPostPage } from './pages/Diary/DiaryPost';
-import { CrewPage } from './pages/Crew';
-import { FoundersPage } from './pages/Founders';
-import { PrivatePage } from './pages/PrivateSessions';
-import { ContactPage } from './pages/Contact';
+// Pages
+import { BookingPage } from './pages/BookingPage';
 
-function AppContent() {
-  const [selectedEvent, setSelectedEvent] = useState(null);
+import { Hero } from './components/sections/Hero';
+import { Manifesto } from './components/sections/Manifesto';
+import { History } from './components/sections/History';
+import { Archive } from './components/sections/Archive';
+import { Spaces } from './components/sections/Spaces';
+import { FrontCamera } from './components/sections/FrontCamera';
+import { TangyDiary } from './components/sections/TangyDiary';
+import { Artists } from './components/sections/Artists';
+import { Founders } from './components/sections/Founders';
+import { UpcomingEvents } from './components/sections/UpcomingEvents';
+import { Volunteer } from './components/sections/Volunteer';
+import { PrivateSessions } from './components/sections/PrivateSessions';
+import { Newsletter } from './components/sections/Newsletter';
+import { Closing } from './components/sections/Closing';
+import { Footer } from './components/layout/Footer';
+
+function MainWorld() {
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
   const [isProgrammeOpen, setIsProgrammeOpen] = useState(false);
   const [isIntroActive, setIsIntroActive] = useState(true);
   const [showUiControls, setShowUiControls] = useState(false);
@@ -58,8 +57,6 @@ function AppContent() {
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isPassportOpen, setIsPassportOpen] = useState(false);
   const [isPostcardOpen, setIsPostcardOpen] = useState(false);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -77,58 +74,75 @@ function AppContent() {
     }
   }, []);
 
+  const handleArtistSubmit = () => {
+    const target = isMobile ? '#m-crew' : '#volunteer';
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleRequestPrivate = () => {
+    const target = isMobile ? '#m-private' : '#private-sessions';
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleNavigateBooking = (evt) => {
+    navigate(`/book/${evt.slug || evt.id}`);
+  };
+
   return (
-    <LenisProvider>
-      <CursorProvider>
-        {/* Custom Cursor active on fine-pointer devices */}
-        {!isMobile && <CustomCursor />}
-        
-        {/* Booking Ticket Stub Modal */}
-        {selectedEvent && (
-          <BookingModal 
-            event={selectedEvent} 
-            onClose={() => setSelectedEvent(null)} 
-          />
-        )}
+    <>
+      {/* MUSEUM INTERACTIVE MODALS */}
+      <CassetteSoundArchiveModal 
+        isOpen={isSoundArchiveOpen} 
+        onClose={() => setIsSoundArchiveOpen(false)} 
+      />
 
-        {/* MUSEUM INTERACTIVE MODALS */}
-        <CassetteSoundArchiveModal 
-          isOpen={isSoundArchiveOpen} 
-          onClose={() => setIsSoundArchiveOpen(false)} 
-        />
+      <VinylRecordPlayerModal 
+        isOpen={isVinylOpen} 
+        onClose={() => setIsVinylOpen(false)} 
+      />
 
-        <VinylRecordPlayerModal 
-          isOpen={isVinylOpen} 
-          onClose={() => setIsVinylOpen(false)} 
-        />
+      <ProgrammeBoardModal 
+        isOpen={isProgrammeBoardOpen} 
+        onClose={() => setIsProgrammeBoardOpen(false)} 
+      />
 
-        <ProgrammeBoardModal 
-          isOpen={isProgrammeBoardOpen} 
-          onClose={() => setIsProgrammeBoardOpen(false)} 
-        />
+      <ArchiveSpreadModal 
+        isOpen={isArchiveSpreadOpen} 
+        onClose={() => setIsArchiveSpreadOpen(false)} 
+      />
 
-        <ArchiveSpreadModal 
-          isOpen={isArchiveSpreadOpen} 
-          onClose={() => setIsArchiveSpreadOpen(false)} 
-        />
+      <MerchShopModal 
+        isOpen={isShopOpen} 
+        onClose={() => setIsShopOpen(false)} 
+      />
 
-        <MerchShopModal 
-          isOpen={isShopOpen} 
-          onClose={() => setIsShopOpen(false)} 
-        />
+      <DigitalPassportModal 
+        isOpen={isPassportOpen} 
+        onClose={() => setIsPassportOpen(false)} 
+      />
 
-        <DigitalPassportModal 
-          isOpen={isPassportOpen} 
-          onClose={() => setIsPassportOpen(false)} 
-        />
+      <PostcardContactModal 
+        isOpen={isPostcardOpen} 
+        onClose={() => setIsPostcardOpen(false)} 
+      />
 
-        <PostcardContactModal 
-          isOpen={isPostcardOpen} 
-          onClose={() => setIsPostcardOpen(false)} 
-        />
+      {/* FLOATING QUICK DOCK TOOLBAR */}
+      <MuseumQuickDock 
+        onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
+        onOpenVinyl={() => setIsVinylOpen(true)}
+        onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
+        onOpenArchive={() => setIsArchiveSpreadOpen(true)}
+        onOpenShop={() => setIsShopOpen(true)}
+        onOpenPassport={() => setIsPassportOpen(true)}
+        onOpenPostcard={() => setIsPostcardOpen(true)}
+      />
 
-        {/* FLOATING QUICK DOCK TOOLBAR */}
-        <MuseumQuickDock 
+      {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
+      {isMobile ? (
+        <MobileLayout 
+          onSelectBooking={handleNavigateBooking}
+          onArtistSubmit={handleArtistSubmit}
+          onRequestPrivate={handleRequestPrivate}
           onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
           onOpenVinyl={() => setIsVinylOpen(true)}
           onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
@@ -137,90 +151,85 @@ function AppContent() {
           onOpenPassport={() => setIsPassportOpen(true)}
           onOpenPostcard={() => setIsPostcardOpen(true)}
         />
+      ) : (
+        /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
+        <>
+          {/* Temporary Theatre Curtain Opening Overlay */}
+          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
 
-        {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
-        {isMobile ? (
-          <MobileLayout 
-            onSelectBooking={(evt) => setSelectedEvent(evt)}
-            onArtistSubmit={() => navigate('/crew')}
-            onRequestPrivate={() => navigate('/private')}
-            onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-            onOpenVinyl={() => setIsVinylOpen(true)}
-            onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-            onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-            onOpenShop={() => setIsShopOpen(true)}
-            onOpenPassport={() => setIsPassportOpen(true)}
-            onOpenPostcard={() => setIsPostcardOpen(true)}
-          />
-        ) : (
-          /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
-          <>
-            {/* Temporary Theatre Curtain Opening Overlay */}
-            <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+          {/* Global Continuous Hanging Microphone Experience */}
+          <GlobalMicrophoneJourney active={showUiControls} />
 
-            {/* Global Continuous Hanging Microphone Experience */}
-            <GlobalMicrophoneJourney active={showUiControls} />
+          {/* Cinematic Deep Space Intro */}
+          {isIntroActive && (
+            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
+          )}
 
-            {/* Cinematic Deep Space Intro */}
-            {isIntroActive && (
-              <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
-            )}
+          {/* Floating Retro Sound Control */}
+          {showUiControls && <SoundControl />}
+          
+          {/* Fixed 1970s Printed Navbar */}
+          {showUiControls && (
+            <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
+          )}
+          
+          {/* Vintage Concert Programme Overlay */}
+          <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
+          
+          {/* Lightweight Grain Texture */}
+          <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+          
+          {/* Vignette */}
+          <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
 
-            {/* Floating Retro Sound Control */}
-            {showUiControls && <SoundControl />}
+          {/* Scroll Progress Rail */}
+          <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
+             <div 
+               className="w-full bg-tangy-mustard"
+               style={{ height: `${progress}%` }}
+             />
+          </div>
+
+          <div className="tangy-world pt-12">
+            <main>
+              <Hero />
+              <Manifesto />
+              <History />
+              <Archive />
+              <Spaces />
+              <FrontCamera />
+              <TangyDiary />
+              <Artists onArtistSubmit={handleArtistSubmit} />
+              <Founders />
+              <UpcomingEvents onSelectBooking={handleNavigateBooking} />
+              <Volunteer onApplyVolunteer={handleArtistSubmit} onApplyArtist={handleArtistSubmit} />
+              <PrivateSessions onRequestPrivate={handleRequestPrivate} />
+              <Newsletter />
+              <Closing />
+            </main>
             
-            {/* Fixed 1970s Printed Navbar */}
-            {showUiControls && (
-              <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
-            )}
-            
-            {/* Vintage Concert Programme Overlay */}
-            <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
-            
-            {/* Lightweight Grain Texture */}
-            <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
-            
-            {/* Vignette */}
-            <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
-
-            <div className="tangy-world">
-              <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/manifesto" element={<ManifestoPage />} />
-                  <Route path="/sessions" element={<SessionsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
-                  <Route path="/sessions/:slug" element={<SessionDetailsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
-                  <Route path="/artists" element={<ArtistsPage />} />
-                  <Route path="/artists/:slug" element={<ArtistProfilePage />} />
-                  <Route path="/archive" element={<ArchivePage onOpenArchiveSpread={() => setIsArchiveSpreadOpen(true)} />} />
-                  <Route path="/archive/:slug" element={<ArchiveItemPage />} />
-                  <Route path="/vinyl" element={<VinylPage onOpenVinylPlayer={() => setIsVinylOpen(true)} />} />
-                  <Route path="/heritage" element={<HeritagePage />} />
-                  <Route path="/venues/:slug" element={<VenueDetailsPage />} />
-                  <Route path="/diary" element={<DiaryPage />} />
-                  <Route path="/diary/:slug" element={<DiaryPostPage />} />
-                  <Route path="/crew" element={<CrewPage />} />
-                  <Route path="/founders" element={<FoundersPage />} />
-                  <Route path="/private" element={<PrivatePage onRequestPrivate={() => setIsPostcardOpen(true)} />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                </Routes>
-              </main>
-              
-              <Footer />
-            </div>
-          </>
-        )}
-      </CursorProvider>
-    </LenisProvider>
+            <Footer />
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
 export default function App() {
   return (
     <AudioProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <LenisProvider>
+        <CursorProvider>
+          <CustomCursor />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<MainWorld />} />
+              <Route path="/book/:sessionId" element={<BookingPage />} />
+            </Routes>
+          </BrowserRouter>
+        </CursorProvider>
+      </LenisProvider>
     </AudioProvider>
   );
 }
