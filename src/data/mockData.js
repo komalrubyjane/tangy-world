@@ -3,69 +3,258 @@ export const events = [
     id: 'vol-1',
     slug: 'vol-1',
     title: 'Tangy Sessions Vol. 1',
-    artist: 'VARIOUS',
+    artist: 'Damini Bhatla & Ensemble',
     date: 'Aug 15, 2025',
     time: '7:00 PM',
-    venue: 'Bansilal Stepwell',
+    venue: 'Bansilalpet Stepwell',
     city: 'HYDERABAD',
-    description: 'An immersive night of underground electronic music echoing through ancient stone corridors.',
+    description: 'An immersive night of underground acoustic & sufi music echoing through 300-year-old stone corridors.',
     image: '/media/gallery/tangy1.jpg',
     ticketUrl: '#book',
     status: 'AVAILABLE',
     price: '₹799',
-    tags: ["Deep House", "Ambient"],
-    capacity: 200
+    tags: ["Sufi", "Acoustic", "Heritage"],
+    capacity: 200,
+    story: "The night the 17th-century stepwell came alive. 200 listeners gathered under the open moonlight as acoustics rebounded off limestone walls.",
+    setlist: [
+      "01. Intro — Stepwell Echoes",
+      "02. Mast Qalandar (Acoustic Raga)",
+      "03. Sufi Drone Improvisation",
+      "04. Midnight Jam w/ Tanpura"
+    ]
   },
   {
     id: 'vol-2',
     slug: 'vol-2',
     title: 'Tangy Sessions Vol. 2',
-    artist: 'VARIOUS',
+    artist: 'Varun Rao (Violin Fusion)',
     date: 'Sep 20, 2025',
     time: '8:00 PM',
-    venue: 'Bansilal Stepwell',
+    venue: 'Taramati Baradari',
     city: 'HYDERABAD',
-    description: 'Deep house and ambient textures meet centuries-old architecture for a transcendent experience.',
-    image: '/media/gallery/tabgy2.jpg',
+    description: 'Carnatic violin ragas fused with sub-bass textures inside historic acoustic pavilions.',
+    image: '/media/gallery/tangy2.jpg',
     ticketUrl: '#book',
     status: 'AVAILABLE',
     price: '₹999',
-    tags: ["House", "Experimental"],
-    capacity: 250
+    tags: ["Violin", "Fusion", "Carnatic"],
+    capacity: 250,
+    story: "Taramati Baradari was built for music projection. Varun's violin resonated across the entire valley without amplification.",
+    setlist: [
+      "01. Raga Hamsadhwani Prelude",
+      "02. Sub-Bass & Strings",
+      "03. Midnight Raag Bhairavi"
+    ]
   },
   {
     id: 'solstice',
     slug: 'solstice',
     title: 'Tangy Sessions: Solstice',
-    artist: 'VARIOUS',
+    artist: 'Nikhil & Acoustic Collective',
     date: 'Dec 21, 2025',
     time: '6:30 PM',
-    venue: 'Bansilal Stepwell',
+    venue: 'Chowmahalla Courtyard',
     city: 'HYDERABAD',
     description: 'A winter solstice special — the longest night, the deepest sounds.',
     image: '/media/gallery/tangy3.jpg',
     ticketUrl: '#book',
     status: 'AVAILABLE',
     price: '₹1299',
-    tags: ["Techno", "Dark Ambient"],
-    capacity: 180
+    tags: ["Folk", "Solstice", "Live"],
+    capacity: 180,
+    story: "Fires lit in clay pots along the courtyard arches while folk melodies carried through midnight darkness.",
+    setlist: [
+      "01. Solstice Overture",
+      "02. Telangana Folk Lullaby",
+      "03. Open Jam & Chants"
+    ]
   }
 ];
 
 export const artists = [
-  { id: 1, name: "KRYZEN", role: "Deep House DJ", image: "/media/artists/artist1.jpg", color: "#C8FF2B", bio: "Architect of hypnotic, 4-hour deep house journeys. Influenced by Berlin minimalism and classical structure, KRYZEN's sets blur the boundary between time and trance.", genre: "Deep House / Hypnotic Techno", location: "Mumbai, India", followers: "24.5K", performances: "140+" },
-  { id: 2, name: "Aura.wav", role: "Ambient Producer", image: "/media/artists/artist2.jpg", color: "#06b6d4", bio: "Crafts breathtaking sonic landscapes from field recordings, modular synths, and processing algorithms. Aura.wav's work translates nature's chaos into crystalline sound.", genre: "Ambient / IDM", location: "Bangalore, India", followers: "18.2K", performances: "98+" },
-  { id: 3, name: "SONDER", role: "Live Electronic", image: "/media/artists/artist3.jpg", color: "#C8FF2B", bio: "Live modular synthesis meets rhythm machines — every performance built entirely from patch cables and analog hardware. No presets. No laptops. Pure human emotion.", genre: "Live Modular / Experimental", location: "New Delhi, India", followers: "31.0K", performances: "165+" },
-  { id: 4, name: "Ritvik", role: "Classical Fusion", image: "/media/artists/artist4.jpg", color: "#06b6d4", bio: "Carnatic ragas reimagined through electronic processing. Ritvik bridges centuries-old devotion with underground club dynamics — vocal purity meets synthesis power.", genre: "Classical Fusion / Electronic", location: "Chennai, India", followers: "42.1K", performances: "210+" },
-  { id: 5, name: "ZEPH", role: "Techno DJ", image: "/media/artists/artist5.jpg", color: "#f59e0b", bio: "Berlin-inspired techno fused with South Asian percussion. ZEPH's high-energy mechanical rituals push subwoofers to their limits with mridangam-meets-modular madness.", genre: "Techno / Experimental", location: "Kochi, India", followers: "15.7K", performances: "78+" },
-  { id: 6, name: "Noctis", role: "Dark Ambient", image: "/media/artists/artist6.jpg", color: "#ef4444", bio: "Sonic architect of midnight soundscapes and drone textures. Noctis creates monolithic walls of sub-drone and processed industrial feedback — music felt as physical weight.", genre: "Dark Ambient / Drone", location: "Kolkata, India", followers: "12.8K", performances: "60+" },
-  { id: 7, name: "Priya K", role: "Vocalist", image: "/media/artists/artist7.jpg", color: "#ec4899", bio: "Haunting vocals weaving through electronic beats. Priya K combines dreamlike vocal sequences with modular pitch-shifting and driving deep house for a deeply personal club experience.", genre: "Vocal / Dream House", location: "Hyderabad, India", followers: "53.4K", performances: "132+" },
-  { id: 8, name: "AXIOM", role: "Bass Music", image: "/media/artists/artist8.jpg", color: "#10b981", bio: "Sub-frequencies that you feel before you hear. AXIOM draws from UK dubstep and experimental glitch to build sets that test the physical boundaries of heavyweight sound systems.", genre: "Bass Music / Leftfield", location: "Pune, India", followers: "28.9K", performances: "105+" },
+  { id: 1, name: "Damini Bhatla", role: "Vocalist & Composer", image: "/media/gallery/tangy3.jpg", color: "#d1a437", bio: "Bridging Sufi tradition and contemporary acoustic soul. Damini's voice carries raw emotional weight that transforms historical monuments into sacred acoustic spaces.", genre: "Sufi & Contemporary", location: "Hyderabad, India", followers: "42.5K", performances: "140+", instruments: ["Vocals", "Harmonium", "Tanpura"], sessions: ["Vol. 1", "Solstice Ritual"] },
+  { id: 2, name: "Varun Rao", role: "Carnatic Violinist", image: "/media/gallery/tangy4.jpg", color: "#c2272a", bio: "Violin virtuoso trained in classical Carnatic traditions. Varun explores microscopic microtonal shifts over deep bass drones.", genre: "Carnatic Fusion", location: "Hyderabad, India", followers: "28.2K", performances: "98+", instruments: ["Violin", "Loop Pedal"], sessions: ["Vol. 2", "Stepwell Nocturne"] },
+  { id: 3, name: "Nikhil & Collective", role: "Acoustic Folk Ensemble", image: "/media/gallery/tangy5.jpg", color: "#315D73", bio: "Folk roots meets modern acoustic arrangements. Nikhil gathers rare instruments from across South Asia to weave rich tapestry soundscapes.", genre: "Acoustic Folk", location: "Secunderabad, India", followers: "31.0K", performances: "165+", instruments: ["Acoustic Guitar", "Flute", "Percussion"], sessions: ["Solstice 2024", "Vol. 3"] },
+  { id: 4, name: "Priya K", role: "Experimental Vocalist", image: "/media/gallery/tangy8.jpg", color: "#8a2320", bio: "Combining traditional vocal improvisations with analog pitch shifting and ambient tape loops.", genre: "Vocal Ambient", location: "Hyderabad, India", followers: "19.4K", performances: "85+", instruments: ["Vocals", "Tape Machine"], sessions: ["Haveli Night"] }
+];
+
+export const venuesDetailed = [
+  {
+    id: "bansilalpet",
+    name: "Bansilalpet Stepwell",
+    type: "17th Century Stepwell Sanctuary",
+    location: "Secunderabad, Telangana",
+    yearBuilt: "1670 AD",
+    image: "/media/gallery/tangy1.jpg",
+    history: "A restored 17th-century stepwell that sat buried under rubble for decades before being excavated. Its tiered stone steps create a natural acoustic amphitheatre with 2.4-second natural reverb.",
+    architecture: "Multi-tiered granite step structure with arched niches and natural spring water basin at the core.",
+    soundscape: "Natural stone reverberation, trickling water echoes, sub-bass resonance.",
+    sessionsHeld: 14
+  },
+  {
+    id: "taramati",
+    name: "Taramati Baradari",
+    type: "Historic Acoustic Pavilion",
+    location: "Ibrahim Bagh, Hyderabad",
+    yearBuilt: "1680 AD",
+    image: "/media/gallery/tangy2.jpg",
+    history: "Legendary acoustic pavilion constructed atop a hill so that the singing of courtesan Taramati could be heard at Golconda Fort 2 miles away.",
+    architecture: "12-arched open pavilion with domed ceiling designed specifically for voice projection.",
+    soundscape: "Hilltop breeze, open-air high-frequency resonance, vocal echo.",
+    sessionsHeld: 9
+  },
+  {
+    id: "old-haveli",
+    name: "Old City Courtyard",
+    type: "Private Heritage Courtyard",
+    location: "Charminar Lane, Old Hyderabad",
+    yearBuilt: "1890 AD",
+    image: "/media/gallery/tangy3.jpg",
+    history: "A private 130-year-old Nizam-era courtyard sheltered by lime-plaster arches and ancient neem trees.",
+    architecture: "Central open courtyard surrounded by carved teakwood pillars and Belgian glass lanterns.",
+    soundscape: "Neem leaves rustling, distant minaret bells, intimate acoustic warm tone.",
+    sessionsHeld: 11
+  }
+];
+
+export const vinylCatalog = [
+  {
+    id: "v-01",
+    catalogNo: "TS-VINYL-001",
+    title: "BANSILALPET STEPWELL SESSION",
+    artist: "Tangy Sessions Resident Collective",
+    year: "2024",
+    speed: "33⅓ RPM STEREO",
+    cover: "/media/gallery/tangy1.jpg",
+    previewTrack: "Side A — Stepwell Acoustics (Live at 2 AM)",
+    lyrics: "The water speaks in whispers / Stone walls hold the night / Tangy roots run deeper / Into morning light...",
+    story: "Pressed directly from 2-track master tape recorded live inside the stepwell during the winter solstice of 2024."
+  },
+  {
+    id: "v-02",
+    catalogNo: "TS-VINYL-002",
+    title: "MIDNIGHT RAGAS & REVERB",
+    artist: "Varun Rao & Damini Bhatla",
+    year: "2025",
+    speed: "33⅓ RPM MONO",
+    cover: "/media/gallery/tangy2.jpg",
+    previewTrack: "Side B — Raag Bhairavi (Acoustic Uncut)",
+    lyrics: "Echoes of the pavilion / Wind through twelve arches / We play until dawn breaks...",
+    story: "Recorded in a single live take with two vintage ribbion microphones suspended from the Baradari dome."
+  }
+];
+
+export const soundArchive = [
+  { id: "sa-1", title: "Rain at Bansilalpet Stepwell", duration: "03:45", category: "Ambient Field", freq: "432 Hz", note: "Monsoon raindrops trickling onto 350-year-old stone steps." },
+  { id: "sa-2", title: "Audience Cheers & Chais", duration: "02:10", category: "Live Crowd", freq: "440 Hz", note: "Clapping and clinking glass chai cups after Damini's final raga." },
+  { id: "sa-3", title: "Violin Practice Warmup", duration: "04:15", category: "Instrumental", freq: "432 Hz", note: "Varun tuning his 1920s violin inside the reverberant courtyard." },
+  { id: "sa-4", title: "Mic Feedback & Sub Drone", duration: "01:50", category: "Analog Sound", freq: "60 Hz", note: "Pure analog valve amplifier warm hum before showtime." },
+  { id: "sa-5", title: "Midnight Night Crickets", duration: "05:00", category: "Nature Acoustic", freq: "528 Hz", note: "Late night atmosphere at Taramati Baradari post midnight." }
+];
+
+export const archiveItems = [
+  {
+    id: "arch-1",
+    title: "VINTAGE CONCERT POSTER — VOL. 01",
+    category: "POSTER",
+    year: "2016",
+    image: "/media/gallery/tangy1.jpg",
+    headline: "HAND-SCREENPRINTED IN HYDERABAD",
+    details: "Limited 100-copy screenprinted poster on 300gsm recycled cream paper. Printed at Old City print press using oil inks."
+  },
+  {
+    id: "arch-2",
+    title: "ADMIT ONE TICKET STUB #09100",
+    category: "TICKET STUB",
+    year: "2018",
+    image: "/media/gallery/tangy3.jpg",
+    headline: "ARCHIVE ENTRY NO. 09100",
+    details: "Original perforated ticket stub stamped with vintage ink seal. Used during the first midnight stepwell gathering."
+  },
+  {
+    id: "arch-3",
+    title: "NIZAM ERA NEWSPAPER PRESS FEATURE",
+    category: "PRESS CLIPPING",
+    year: "2020",
+    image: "/media/gallery/tangy5.jpg",
+    headline: "THE DECCAN CHRONICLE EXCLUSIVE",
+    details: "\"How Tangy Sessions revived forgotten heritage stepwells through secret live acoustic concerts.\""
+  },
+  {
+    id: "arch-4",
+    title: "HANDWRITTEN ARTIST LINER NOTES",
+    category: "HANDWRITTEN NOTE",
+    year: "2023",
+    image: "/media/gallery/tangy8.jpg",
+    headline: "FIELD NOTEBOOK FILE #04",
+    details: "Original notebook page written by Arjuna outlining the acoustic echo tuning for Bansilalpet Stepwell."
+  }
+];
+
+export const todaysProgramme = [
+  { time: "06:00 PM", status: "COMPLETE", title: "GATE OPEN & ENTRY", desc: "Welcome chais served at stepwell entrance." },
+  { time: "06:30 PM", status: "COMPLETE", title: "LIVE SCREEN-PRINTING", desc: "Commemorative poster printing workshop." },
+  { time: "07:15 PM", status: "ACTIVE", title: "HERITAGE COFFEE RITUAL", desc: "Single-origin filter coffee & soundcheck." },
+  { time: "07:45 PM", status: "UPCOMING", title: "SET 01: DAMINI BHATLA", desc: "Sufi acoustic vocals & tanpura drone." },
+  { time: "08:45 PM", status: "UPCOMING", title: "ACOUSTIC BREAK & CHAIS", desc: "Intermission & courtyard networking." },
+  { time: "09:15 PM", status: "UPCOMING", title: "SET 02: VARUN RAO", desc: "Carnatic violin sub-bass fusion." },
+  { time: "10:30 PM", status: "UPCOMING", title: "OPEN ACOUSTIC JAM", desc: "Artists & audience unscripted acoustic circle." },
+  { time: "11:45 PM", status: "UPCOMING", title: "MIDNIGHT CLOSING", desc: "Final chant & candle lantern lighting." }
+];
+
+export const merchandiseStore = [
+  {
+    id: "m-01",
+    name: "1970S SCREENPRINTED POSTER",
+    category: "ART PRINT",
+    price: "₹1,299",
+    image: "/media/gallery/tangy1.jpg",
+    description: "Limited 100-run screenprinted poster on thick 300gsm hand-made cream cotton paper."
+  },
+  {
+    id: "m-02",
+    name: "STEPWELL SESSION 33⅓ VINYL",
+    category: "RECORD",
+    price: "₹2,499",
+    image: "/media/gallery/tangy2.jpg",
+    description: "180g heavyweight audiophile vinyl pressed from 2-track master tape."
+  },
+  {
+    id: "m-03",
+    name: "CULTURE ALIVE VINTAGE TEE",
+    category: "APPAREL",
+    price: "₹1,499",
+    image: "/media/gallery/tangy3.jpg",
+    description: "100% washed heavy cotton tee featuring vintage screen-printed Tangy chest badge."
+  },
+  {
+    id: "m-04",
+    name: "HERITAGE CERAMIC CHAI MUG",
+    category: "OBJECTS",
+    price: "₹699",
+    image: "/media/gallery/tangy4.jpg",
+    description: "Hand-thrown clay ceramic mug stamped with Tangy Hyderabad seal."
+  },
+  {
+    id: "m-05",
+    name: "CANVAS ARCHIVE TOTE BAG",
+    category: "ACCESSORIES",
+    price: "₹899",
+    image: "/media/gallery/tangy5.jpg",
+    description: "Heavy 16oz natural canvas tote bag with brass rivets and vinyl pouch."
+  }
+];
+
+export const digitalPassportStamps = [
+  { id: "p-1", title: "BANSILALPET STEPWELL", date: "AUG 2024", location: "HYDERABAD", stampNo: "STAMP #001", active: true },
+  { id: "p-2", title: "TARAMATI BARADARI", date: "OCT 2024", location: "HYDERABAD", stampNo: "STAMP #002", active: true },
+  { id: "p-3", title: "SOLSTICE RITUAL", date: "DEC 2024", location: "HYDERABAD", stampNo: "STAMP #003", active: true },
+  { id: "p-4", title: "OLD CITY HAVELI", date: "FEB 2025", location: "HYDERABAD", stampNo: "STAMP #004", active: false }
 ];
 
 export const gallery = [
   { id: 1, type: "img", emoji: "🏛️", label: "Stepwell Entrance", src: "/media/gallery/tangy1.jpg" },
-  { id: 2, type: "img", emoji: "🎶", label: "Stage Setup", src: "/media/gallery/tabgy2.jpg" },
+  { id: 2, type: "img", emoji: "🎶", label: "Stage Setup", src: "/media/gallery/tangy2.jpg" },
   { id: 3, type: "img", emoji: "💜", label: "Crowd Vibes", src: "/media/gallery/tangy3.jpg" },
   { id: 4, type: "img", emoji: "🌙", label: "Night Ambience", src: "/media/gallery/tangy4.jpg" },
   { id: 5, type: "img", emoji: "🎛️", label: "DJ Booth", src: "/media/gallery/tangy5.jpg" },
@@ -73,7 +262,7 @@ export const gallery = [
   { id: 7, type: "img", emoji: "🏺", label: "The Descent", src: "/media/gallery/tngy7.jpg" },
   { id: 8, type: "img", emoji: "🔊", label: "Sound Check", src: "/media/gallery/tangy8.jpg" },
   { id: 9, type: "img", emoji: "🕛", label: "After Hours", src: "/media/gallery/tangy9.jpg" },
-  { id: 10, type: "img", emoji: "🌀", label: "Sonic Rituals", src: "/media/gallery/tangy10.jpg" },
+  { id: 10, type: "img", emoji: "🌀", label: "Sonic Rituals", src: "/media/gallery/tangy10.jpg" }
 ];
 
 export const founders = [
@@ -82,41 +271,41 @@ export const founders = [
     role: "Founder & Creator",
     name: "Arjuna",
     image: "/media/arjun.png",
-    bio: "Born from an obsession with underground sound and ancient spaces. Tangy Sessions exists because Arjuna refused to let music stay ordinary.",
+    bio: "Born from an obsession with underground sound and ancient spaces. Tangy Sessions exists because Arjuna refused to let music stay ordinary."
   },
   {
     id: 2,
     role: "Co-Founder",
     name: "Deepa",
     image: "/media/deepa.jpg",
-    bio: "The architect of community. Deepa ensures every event feels like a homecoming, transforming historical monuments into intimate gathering spaces.",
+    bio: "The architect of community. Deepa ensures every event feels like a homecoming, transforming historical monuments into intimate gathering spaces."
   }
 ];
 
 export const diaryEntries = [
   {
     id: 1,
-    title: "BEFORE DOORS OPEN",
+    title: "WHY WE PLAY INSIDE A STEPWELL",
     date: "OCT 14, 2024",
     location: "BANSILALPET STEPWELL",
     image: "/media/gallery/tangy1.jpg",
-    content: "The stepwell echoes before the crowd arrives. Water dripping against 300-year-old stone, subwoofers humming at 40Hz. The air smells like rain and old limestone."
+    content: "The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification. The air smells like rain and ancient limestone."
   },
   {
     id: 2,
-    title: "MIDNIGHT ACOUSTICS",
+    title: "MONSOON ACOUSTIC SESSIONS",
     date: "DEC 21, 2024",
-    location: "STAGE B",
+    location: "TARAMATI BARADARI",
     image: "/media/gallery/tangy3.jpg",
-    content: "When the lights dropped at midnight, 300 people stood completely still. No phones in the air. Just sub-bass vibrating through ancient masonry."
+    content: "When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air. Just violin ragas vibrating through granite masonry."
   },
   {
     id: 3,
-    title: "AFTER HOURS",
+    title: "BEHIND THE MICROPHONES",
     date: "JAN 05, 2025",
-    location: "BACKSTAGE ARCHIVE",
+    location: "OLD CITY HAVELI",
     image: "/media/gallery/tangy9.jpg",
-    content: "3:00 AM. The artists gathered around the monitor speakers for an unscripted jam. Someone pulled out a tanpura, another plugged in a 303."
+    content: "3:00 AM. The artists gathered around the ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant."
   }
 ];
 
@@ -129,8 +318,8 @@ export const videos = {
   hero: "/media/videos/tangy.mp4",
   frontCamera: "/media/videos/hero-bg.mp4",
   backgrounds: [
-    "/media/background-video/first.mp4",
-    "/media/background-video/middle.mp4",
+    "/media/background-video/Fresh from the archives, when @daminibhatlach performed for us, the space softened around her, w.mp4",
+    "/media/background-video/Video-63639.mp4",
     "/media/videos/tangy.mp4"
   ]
 };

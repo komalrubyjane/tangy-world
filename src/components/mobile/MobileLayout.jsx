@@ -25,7 +25,18 @@ const useMobileInView = (options = { threshold: 0.12 }) => {
   return [ref, isInView];
 };
 
-export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate }) => {
+export const MobileLayout = ({ 
+  onSelectBooking, 
+  onArtistSubmit, 
+  onRequestPrivate,
+  onOpenSoundArchive,
+  onOpenVinyl,
+  onOpenProgramme,
+  onOpenArchive,
+  onOpenShop,
+  onOpenPassport,
+  onOpenPostcard
+}) => {
   const { playSFX } = useAudio();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -53,21 +64,29 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
     { label: "03 CHRONOLOGY", target: "#m-history" },
     { label: "04 SESSIONS", target: "#m-sessions" },
     { label: "05 RAW FOOTAGE", target: "#m-footage" },
-    { label: "06 ARCHIVE", target: "#m-archive" },
-    { label: "07 SPACES", target: "#m-spaces" },
-    { label: "08 DIARY", target: "#m-diary" },
-    { label: "09 ARTISTS", target: "#m-artists" },
-    { label: "10 FOUNDERS", target: "#m-founders" },
-    { label: "11 CREW", target: "#m-crew" },
-    { label: "12 PRIVATE SESSIONS", target: "#m-private" },
-    { label: "13 DISPATCH", target: "#m-newsletter" },
-    { label: "14 CLOSING", target: "#m-closing" },
+    { label: "06 ARCHIVE SPREADS", action: onOpenArchive },
+    { label: "07 VINYL TURNTABLE", action: onOpenVinyl },
+    { label: "08 SOUND ARCHIVE", action: onOpenSoundArchive },
+    { label: "09 TODAY'S PROGRAMME", action: onOpenProgramme },
+    { label: "10 SANCTUARY SPACES", target: "#m-spaces" },
+    { label: "11 DIARY & JOURNAL", target: "#m-diary" },
+    { label: "12 ARTISTS LINEAGE", target: "#m-artists" },
+    { label: "13 FOUNDERS DESK", target: "#m-founders" },
+    { label: "14 JOIN THE CREW", target: "#m-crew" },
+    { label: "15 PRIVATE SESSIONS", target: "#m-private" },
+    { label: "16 GENERAL STORE", action: onOpenShop },
+    { label: "17 MEMBER PASSPORT", action: onOpenPassport },
+    { label: "18 POSTCARD MAILBOX", action: onOpenPostcard }
   ];
 
-  const handleNavClick = (target) => {
+  const handleNavClick = (link) => {
     playSFX('ticketClick');
     setIsMenuOpen(false);
-    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+    if (link.action) {
+      link.action();
+    } else if (link.target) {
+      document.querySelector(link.target)?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleTicketClick = (e) => {
@@ -167,10 +186,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
           <nav className="flex flex-col gap-2 my-4">
             {navLinks.map((link, idx) => (
               <button
-                key={link.target}
-                onClick={() => handleNavClick(link.target)}
-                style={{ transitionDelay: `${idx * 30}ms` }}
-                className={`text-left font-poster text-xl text-[#ecdcaf] active:text-[#c2272a] border-b border-[#ecdcaf]/10 pb-1.5 transition-all duration-300 ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
+                key={idx}
+                onClick={() => handleNavClick(link)}
+                style={{ transitionDelay: `${idx * 25}ms` }}
+                className={`text-left font-poster text-lg text-[#ecdcaf] active:text-[#c2272a] border-b border-[#ecdcaf]/10 pb-1.5 transition-all duration-300 ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
               >
                 {link.label}
               </button>
@@ -472,10 +491,10 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
               <h3 className="font-poster text-lg sm:text-xl text-[#ecdcaf]">{item.title}</h3>
               <p className="font-sans text-xs sm:text-sm opacity-90">{item.description}</p>
               <button
-                onClick={() => playSFX('ticketClick')}
+                onClick={() => { playSFX('ticketClick'); onOpenArchive && onOpenArchive(); }}
                 className="w-full h-[48px] mt-1 border border-[#ecdcaf] text-[#ecdcaf] font-mono text-xs font-bold tracking-widest uppercase active:scale-95 active:bg-[#ecdcaf] active:text-[#191410] transition-transform"
               >
-                READ STORY →
+                READ MAGAZINE SPREAD →
               </button>
             </div>
           ))}
@@ -724,7 +743,7 @@ export const MobileLayout = ({ onSelectBooking, onArtistSubmit, onRequestPrivate
       </section>
 
       {/* 16. MOBILE FOOTER */}
-      <footer className="w-full bg-[#0D0A07] text-[#ecdcaf] py-10 px-5 flex flex-col items-center text-center border-t border-[#ecdcaf]/20">
+      <footer className="w-full bg-[#0D0A07] text-[#ecdcaf] py-10 px-5 flex flex-col items-center text-center border-t border-[#ecdcaf]/20 pb-20">
         <div className="w-full max-w-[480px] flex flex-col items-center gap-3">
           <span className="font-poster text-xl text-[#ecdcaf]">TANGY SESSIONS</span>
           <p className="font-mono text-xs opacity-70">HYDERABAD · INDIA</p>

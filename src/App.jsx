@@ -12,6 +12,16 @@ import { CurtainOverlay } from './components/ui/CurtainOverlay';
 import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
 import { MobileLayout } from './components/mobile/MobileLayout';
 
+// Museum Interactive Modals & Dock
+import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
+import { VinylRecordPlayerModal } from './components/museum/VinylRecordPlayerModal';
+import { ProgrammeBoardModal } from './components/museum/ProgrammeBoardModal';
+import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
+import { MerchShopModal } from './components/museum/MerchShopModal';
+import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
+import { PostcardContactModal } from './components/museum/PostcardContactModal';
+import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
+
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
 import { History } from './components/sections/History';
@@ -36,6 +46,15 @@ export default function App() {
   const [showUiControls, setShowUiControls] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Museum Modals State
+  const [isSoundArchiveOpen, setIsSoundArchiveOpen] = useState(false);
+  const [isVinylOpen, setIsVinylOpen] = useState(false);
+  const [isProgrammeBoardOpen, setIsProgrammeBoardOpen] = useState(false);
+  const [isArchiveSpreadOpen, setIsArchiveSpreadOpen] = useState(false);
+  const [isShopOpen, setIsShopOpen] = useState(false);
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
+  const [isPostcardOpen, setIsPostcardOpen] = useState(false);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -58,7 +77,7 @@ export default function App() {
   };
 
   const handleRequestPrivate = () => {
-    const target = isMobile ? '#m-private' : '#contact';
+    const target = isMobile ? '#m-private' : '#private-sessions';
     document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -77,12 +96,66 @@ export default function App() {
             />
           )}
 
+          {/* MUSEUM INTERACTIVE MODALS */}
+          <CassetteSoundArchiveModal 
+            isOpen={isSoundArchiveOpen} 
+            onClose={() => setIsSoundArchiveOpen(false)} 
+          />
+
+          <VinylRecordPlayerModal 
+            isOpen={isVinylOpen} 
+            onClose={() => setIsVinylOpen(false)} 
+          />
+
+          <ProgrammeBoardModal 
+            isOpen={isProgrammeBoardOpen} 
+            onClose={() => setIsProgrammeBoardOpen(false)} 
+          />
+
+          <ArchiveSpreadModal 
+            isOpen={isArchiveSpreadOpen} 
+            onClose={() => setIsArchiveSpreadOpen(false)} 
+          />
+
+          <MerchShopModal 
+            isOpen={isShopOpen} 
+            onClose={() => setIsShopOpen(false)} 
+          />
+
+          <DigitalPassportModal 
+            isOpen={isPassportOpen} 
+            onClose={() => setIsPassportOpen(false)} 
+          />
+
+          <PostcardContactModal 
+            isOpen={isPostcardOpen} 
+            onClose={() => setIsPostcardOpen(false)} 
+          />
+
+          {/* FLOATING QUICK DOCK TOOLBAR */}
+          <MuseumQuickDock 
+            onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
+            onOpenVinyl={() => setIsVinylOpen(true)}
+            onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
+            onOpenArchive={() => setIsArchiveSpreadOpen(true)}
+            onOpenShop={() => setIsShopOpen(true)}
+            onOpenPassport={() => setIsPassportOpen(true)}
+            onOpenPostcard={() => setIsPostcardOpen(true)}
+          />
+
           {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
           {isMobile ? (
             <MobileLayout 
               onSelectBooking={(evt) => setSelectedEvent(evt)}
               onArtistSubmit={handleArtistSubmit}
               onRequestPrivate={handleRequestPrivate}
+              onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
+              onOpenVinyl={() => setIsVinylOpen(true)}
+              onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
+              onOpenArchive={() => setIsArchiveSpreadOpen(true)}
+              onOpenShop={() => setIsShopOpen(true)}
+              onOpenPassport={() => setIsPassportOpen(true)}
+              onOpenPostcard={() => setIsPostcardOpen(true)}
             />
           ) : (
             /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
