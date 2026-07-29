@@ -7,6 +7,9 @@ gsap.registerPlugin(ScrollTrigger);
 export const useGSAPContext = (callback, dependencies = []) => {
   const comp = useRef(null);
 
+  // Guarantee dependencies is always a valid Array for useLayoutEffect
+  const validDeps = Array.isArray(dependencies) ? dependencies : [];
+
   useLayoutEffect(() => {
     if (!comp.current) return;
     
@@ -15,7 +18,7 @@ export const useGSAPContext = (callback, dependencies = []) => {
     }, comp.current);
 
     return () => ctx.revert();
-  }, dependencies);
+  }, validDeps);
 
   return comp;
 };

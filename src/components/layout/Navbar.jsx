@@ -1,4 +1,4 @@
-import { useNavigate } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 
 export const Navbar = ({ onOpenProgramme }) => {
