@@ -10,23 +10,26 @@ export const AudioProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // 1. Initial audio initialization & autoplay attempt
+    // Initial audio initialization & autoplay attempt
     const initAudio = () => {
-      audioManager.init();
-      if (!isMuted) {
-        audioManager.setMuted(false);
-      } else {
-        audioManager.setMuted(true);
+      try {
+        audioManager.init();
+        if (!isMuted) {
+          audioManager.setMuted(false);
+        } else {
+          audioManager.setMuted(true);
+        }
+      } catch (e) {
+        // Suppress initial autoplay policy errors until user gesture
       }
     };
 
-    // Attempt autoplay immediately
     initAudio();
 
-    // 2. Fallback listener for first user interaction (browser autoplay policy)
+    // Fallback listener for first user interaction (browser autoplay policy)
     const handleFirstInteraction = () => {
       if (audioManager.ctx && audioManager.ctx.state === 'suspended') {
-        audioManager.ctx.resume();
+        audioManager.ctx.resume().catch(() => {});
       }
       window.removeEventListener('click', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
@@ -53,20 +56,24 @@ export const AudioProvider = ({ children }) => {
 
   const playSFX = (name) => {
     if (isMuted) return;
-    if (name === 'micDrop') audioManager.playMicDrop();
-    if (name === 'pageTurn') audioManager.playPageTurn();
-    if (name === 'ticketClick') audioManager.playTicketClick();
+    try {
+      if (name === 'micDrop') audioManager.playMicDrop();
+      if (name === 'pageTurn') audioManager.playPageTurn();
+      if (name === 'ticketClick') audioManager.playTicketClick();
+    } catch (e) {
+      // Ignore SFX errors if AudioContext suspended
+    }
   };
 
   const setFilterCutoff = (freq) => {
     if (!isMuted) {
-      audioManager.setFilterCutoff(freq);
+      try { audioManager.setFilterCutoff(freq); } catch (e) {}
     }
   };
 
   const crossfadeSection = (sectionName) => {
     if (!isMuted) {
-      audioManager.crossfadeSection(sectionName);
+      try { audioManager.crossfadeSection(sectionName); } catch (e) {}
     }
   };
 
