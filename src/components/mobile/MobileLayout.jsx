@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { events, gallery, diaryEntries, archive } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { MobileMicrophoneJourney } from './MobileMicrophoneJourney';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
 const useMobileInView = (options = { threshold: 0.12 }) => {
@@ -62,18 +63,22 @@ export const MobileLayout = ({
   const navLinks = [
     { label: "01 COVER", target: "#m-hero" },
     { label: "02 MANIFESTO", target: "#m-manifesto" },
-    { label: "03 SESSIONS & TICKETS", target: "#m-sessions" },
-    { label: "04 ARTIST PORTAL ✦", route: "/artists" },
-    { label: "05 ARCHIVE SPREADS", action: onOpenArchive },
-    { label: "06 DIARY & JOURNAL", target: "#m-diary" },
-    { label: "07 JOIN THE CREW ✦", route: "/crew" },
-    { label: "08 PRIVATE SESSIONS ✦", route: "/private-sessions" },
-    { label: "09 CHRONOLOGY", target: "#m-history" },
+    { label: "03 CHRONOLOGY", target: "#m-history" },
+    { label: "04 SESSIONS & TICKETS", target: "#m-sessions" },
+    { label: "05 RAW FOOTAGE", target: "#m-footage" },
+    { label: "06 ARCHIVE SPREADS", action: onOpenArchive },
+    { label: "07 VINYL TURNTABLE", action: onOpenVinyl },
+    { label: "08 SOUND ARCHIVE", action: onOpenSoundArchive },
+    { label: "09 TODAY'S PROGRAMME", action: onOpenProgramme },
     { label: "10 SANCTUARY SPACES", target: "#m-spaces" },
-    { label: "11 FOUNDERS DESK", target: "#m-founders" },
-    { label: "12 GENERAL STORE", action: onOpenShop },
-    { label: "13 MEMBER PASSPORT", action: onOpenPassport },
-    { label: "14 POSTCARD MAILBOX", action: onOpenPostcard }
+    { label: "11 DIARY & JOURNAL", target: "#m-diary" },
+    { label: "12 ARTIST PORTAL ✦", route: "/artists" },
+    { label: "13 FOUNDERS DESK", target: "#m-founders" },
+    { label: "14 JOIN THE CREW ✦", route: "/crew" },
+    { label: "15 PRIVATE SESSIONS ✦", route: "/private-sessions" },
+    { label: "16 GENERAL STORE", action: onOpenShop },
+    { label: "17 MEMBER PASSPORT", action: onOpenPassport },
+    { label: "18 POSTCARD MAILBOX", action: onOpenPostcard }
   ];
 
   const handleNavClick = (link) => {
@@ -88,8 +93,10 @@ export const MobileLayout = ({
     }
   };
 
-  const handleScrollToSessions = (e) => {
-    if (e && e.stopPropagation) e.stopPropagation();
+  const handleTicketClick = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     playSFX('ticketClick');
     if (ticketRef.current) {
       ticketRef.current.animate(
@@ -101,16 +108,7 @@ export const MobileLayout = ({
         { duration: 220 }
       );
     }
-    const sessionsEl = document.querySelector('#m-sessions');
-    if (sessionsEl) {
-      sessionsEl.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-  
-  const handleScrollToManifesto = (e) => {
-    if (e && e.stopPropagation) e.stopPropagation();
-    playSFX('ticketClick');
-    const manifestoEl = document.querySelector('#m-manifesto');
+    const manifestoEl = document.querySelector('#m-manifesto') || document.querySelector('#manifesto');
     if (manifestoEl) {
       manifestoEl.scrollIntoView({ behavior: 'smooth' });
     }
@@ -144,6 +142,9 @@ export const MobileLayout = ({
 
   return (
     <div className="w-full min-h-[100dvh] bg-[#191410] text-[#ecdcaf] font-sans antialiased overflow-x-hidden selection:bg-[#c2272a] selection:text-[#ecdcaf]">
+      
+      {/* GLOBAL CONTINUOUS HANGING MICROPHONE STORYTELLING JOURNEY (<1024px) */}
+      <MobileMicrophoneJourney />
 
       {/* 1. TOUCH-NATIVE MOBILE NAVIGATION BAR & SLIDE-IN MENU OVERLAY */}
       <header className="fixed top-0 left-0 right-0 h-14 bg-[#191410]/95 backdrop-blur-md border-b border-[#ecdcaf]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
@@ -213,6 +214,7 @@ export const MobileLayout = ({
         id="m-hero" 
         className="relative w-full h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate pt-14"
       >
+        {/* SVG ROUGHEN FILTER */}
         <svg className="absolute width-0 height-0 overflow-hidden pointer-events-none z-0">
           <filter id="m-roughen" x="-20%" y="-20%" width="140%" height="140%">
             <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="7" result="noise"/>
@@ -220,8 +222,10 @@ export const MobileLayout = ({
           </filter>
         </svg>
 
+        {/* POSTER CANVAS */}
         <div className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size">
           
+          {/* CORNER CROSSHAIRS */}
           <div className="absolute z-30 w-7 h-7 opacity-85 top-16 left-3 pointer-events-none">
             <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
           </div>
@@ -229,11 +233,13 @@ export const MobileLayout = ({
             <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
           </div>
 
+          {/* TOP METADATA BAR (z-40) */}
           <div className="absolute z-40 top-16 left-4 right-4 flex justify-between items-center font-mono text-[8.5px] font-bold tracking-widest text-[#ecdcaf] uppercase pointer-events-none">
             <span>HYDERABAD, INDIA</span>
             <span className="text-[#d1a437]">33⅓ RPM STEREO</span>
           </div>
 
+          {/* STEPWELL SILHOUETTE (z-2) */}
           <svg className="absolute z-2 left-0 bottom-0 w-64 h-72 opacity-45 mix-blend-multiply pointer-events-none" viewBox="0 0 400 420" preserveAspectRatio="xMinYMax meet">
             <g fill="#3c0f0e">
               <rect x="0" y="360" width="400" height="60"/>
@@ -243,9 +249,19 @@ export const MobileLayout = ({
               <rect x="0" y="150" width="210" height="45"/>
               <rect x="0" y="110" width="165" height="40"/>
               <rect x="0" y="75" width="120" height="35"/>
+              <g stroke="#5a1717" strokeWidth="4" fill="none" opacity=".8">
+                <path d="M20 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M80 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M140 360 v-60 a20 20 0 0 1 40 0 v60"/>
+                <path d="M200 300 v-55 a18 18 0 0 1 36 0 v55"/>
+                <path d="M255 300 v-55 a18 18 0 0 1 36 0 v55"/>
+                <path d="M40 245 v-50 a16 16 0 0 1 32 0 v50"/>
+                <path d="M95 245 v-50 a16 16 0 0 1 32 0 v50"/>
+              </g>
             </g>
           </svg>
 
+          {/* HEADLINE "TANGY SESSIONS" (z-15) — HELD AT TOP-[18%] (~70% VISIBLE) */}
           <div className="headline absolute z-15 top-[18%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
             <span className="word block font-poster text-[clamp(58px,18vw,84px)] leading-[0.80] tracking-tight text-[#ecdcaf] uppercase [-webkit-text-stroke:1.2px_#191410] relative drop-shadow-[5px_5px_0px_#191410]">
               TANGY
@@ -255,6 +271,7 @@ export const MobileLayout = ({
             </span>
           </div>
 
+          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) */}
           <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[32%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
             <img 
               src="/media/hero-performer.png" 
@@ -263,46 +280,34 @@ export const MobileLayout = ({
             />
           </div>
 
-          <div className="vintage-mic absolute z-25 left-[4%] top-[42%] w-24 sm:w-28 h-60 sm:h-68 pointer-events-none transform -rotate-12 float-anim mix-blend-normal">
-            <img 
-              src="/vintage-mic.png" 
-              alt="Vintage Chrome Stage Microphone" 
-              className="w-full h-full object-contain filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)]" 
-            />
-          </div>
 
+          {/* ADMISSION TICKET (z-60) AT EXACTLY TOP: 76% */}
           <div 
             ref={ticketRef}
-            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[76%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[92vw] max-w-[380px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
+            className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[76%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[88vw] max-w-[340px] bg-[#e9decb] text-[#241a12] shadow-[0_10px_24px_rgba(0,0,0,0.75)] flex relative origin-center before:content-[''] before:absolute before:top-1/2 before:w-4 before:h-4 before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:z-5 before:-left-2 after:content-[''] after:absolute after:top-1/2 after:w-4 after:h-4 after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:z-5 after:-right-2"
           >
+            {/* Masking Tape Overlay (z-61) */}
             <div className="absolute -top-3 left-[36%] -rotate-4 w-[60px] h-5 bg-[rgba(255,255,255,0.45)] border border-[rgba(255,255,255,0.5)] z-[61] pointer-events-none" />
 
             <div className="w-7 flex items-center justify-center border-r border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[9px] tracking-wider text-[#241a12] opacity-75">
               TS-2016-001
             </div>
 
-            <div className="flex-1 p-2 flex flex-col justify-between">
+            <div className="flex-1 p-2.5 flex flex-col justify-between">
               <div className="flex justify-between items-center font-mono font-semibold text-[8.5px] tracking-wider uppercase opacity-80 border-b border-dashed border-[rgba(36,26,18,0.35)] pb-1">
                 <span>Admit One</span>
                 <span>Vol. 01</span>
                 <span>Archive No. 001</span>
               </div>
 
-              <div className="flex items-center justify-between gap-1.5 my-1">
+              <div className="flex items-center justify-between gap-2 my-1">
                 <button 
                   type="button"
-                  onClick={handleScrollToSessions}
-                  className="btn-ticket flex-1 py-1 px-1.5 text-[9.5px] sm:text-[10px] font-bold tracking-widest uppercase border border-[#191410] shadow-[2px_2px_0px_#191410] cursor-pointer touch-manipulation whitespace-nowrap"
+                  onClick={handleTicketClick}
+                  onTouchEnd={(e) => { e.preventDefault(); handleTicketClick(e); }}
+                  className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-xl tracking-tight flex items-center gap-1.5 cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
                 >
-                  EXPLORE SESSIONS →
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={handleScrollToManifesto}
-                  className="btn-ticket flex-1 py-1 px-1.5 text-[9.5px] sm:text-[10px] font-bold tracking-widest uppercase border border-[#191410] bg-[#191410] text-[#ecdcaf] shadow-[2px_2px_0px_#c2272a] cursor-pointer touch-manipulation whitespace-nowrap active:bg-[#c2272a]"
-                >
-                  ABOUT TANGY →
+                  Enter Tangy →
                 </button>
               </div>
 
@@ -316,6 +321,9 @@ export const MobileLayout = ({
             </div>
           </div>
 
+          {/* BALANCED BADGES & EPHEMERA (z-40) */}
+          
+          {/* LEFT SIDE BADGES */}
           <div className="badge absolute z-40 left-2 top-[34%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
             <div className="font-poster text-xs leading-none">33⅓</div>
             <div className="font-mono font-bold text-[7px] tracking-widest">RPM</div>
@@ -327,6 +335,7 @@ export const MobileLayout = ({
             <div className="font-mono text-[7px] text-[#d1a437]">STEPWELL</div>
           </div>
 
+          {/* RIGHT SIDE BADGES */}
           <div className="badge absolute z-40 right-2 top-[34%] w-14 h-14 rounded-full border border-dashed border-[#ecdcaf] bg-[radial-gradient(circle,rgba(194,39,42,0.18),transparent_70%)] flex flex-col items-center justify-center rotate-8 shadow-md pointer-events-none">
             <div className="font-mono font-semibold text-[6px] text-[#ecdcaf]">RECORDED</div>
             <div className="font-poster text-xs text-[#c2272a] leading-none my-0.5">LIVE</div>
@@ -346,16 +355,7 @@ export const MobileLayout = ({
             </div>
           </div>
 
-          {/* SCROLL TO VIEW INDICATOR */}
-          <div className="absolute z-50 right-5 bottom-4 flex flex-col items-center gap-1 pointer-events-none">
-            <span className="font-mono font-bold text-[8px] tracking-[0.25em] text-[#ecdcaf] uppercase">
-              SCROLL DOWN
-            </span>
-            <div className="w-4 h-6 border-2 border-[#ecdcaf] rounded-full flex justify-center p-0.5 animate-bounce">
-              <div className="w-0.5 h-1.5 bg-[#d1a437] rounded-full" />
-            </div>
-          </div>
-
+          {/* TEXTURE OVERLAYS (z-10) */}
           <div className="spatter absolute inset-0 z-10 pointer-events-none opacity-50 bg-[radial-gradient(circle_at_6%_88%,rgba(0,0,0,0.35)_0_3px,transparent_4px)]" />
           <div className="scratches absolute inset-0 z-10 pointer-events-none opacity-50 mix-blend-soft-light bg-[repeating-linear-gradient(78deg,rgba(0,0,0,0.12)_0_1px,transparent_1px_140px)]" />
           <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-30 mix-blend-multiply pointer-events-none" />
@@ -387,61 +387,84 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 4. MOBILE SESSIONS */}
+      {/* 4. MOBILE CHRONOLOGY */}
+      <section 
+        ref={historyRef}
+        id="m-history" 
+        className={`w-full bg-[#8a2320] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center">
+          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase mb-6">02 CHRONOLOGY // 10 YEARS</span>
+          <div className="w-full flex flex-col gap-6">
+            {[
+              { year: "2016", title: "THE FIRST SPARK", desc: "First acoustic sessions inside private living rooms & stepwells." },
+              { year: "2018", title: "THE MOVEMENT GROWS", desc: "Underground electronic producers join the lineage." },
+              { year: "2020", title: "THE ARCHIVE RECORDINGS", desc: "Bansilalpet Stepwell becomes our primary sonic sanctuary." },
+              { year: "2023", title: "PAN-INDIA EXPANSION", desc: "Curating intimate nights across Mumbai, Delhi, and Goa." },
+              { year: "2025", title: "TANGY WORLD TODAY", desc: "Over 200+ artists and thousands of listeners united by sound." },
+            ].map((item, idx) => (
+              <div 
+                key={idx} 
+                style={{ transitionDelay: `${idx * 120}ms` }}
+                className={`w-full bg-[#191410] border-2 border-[#ecdcaf] p-5 shadow-[5px_5px_0px_#ecdcaf] flex flex-col items-start text-left gap-2 transition-all duration-500 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-poster text-2xl sm:text-3xl text-[#ecdcaf]">{item.year}</span>
+                  <span className="text-[#c2272a] font-bold">○</span>
+                </div>
+                <h3 className="font-poster text-base sm:text-lg text-[#ecdcaf]">{item.title}</h3>
+                <p className="font-sans text-xs sm:text-sm text-[#ecdcaf]/80">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. MOBILE SESSIONS */}
       <section 
         ref={sessionsRef}
         id="m-sessions" 
-        className={`w-full bg-[#B94717] py-14 px-5 flex flex-col items-center transition-all duration-700 ${sessionsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#8a2320] py-14 px-5 flex flex-col items-center transition-all duration-700 ${sessionsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[420px] flex flex-col items-center gap-6">
-          <div className="w-full flex justify-between items-center">
-            <span className="font-mono text-[10px] font-bold text-[#E7D5A4] tracking-[0.3em] uppercase">02 SESSIONS // TICKETS</span>
-            <button 
-              onClick={() => { playSFX('ticketClick'); navigate('/book/vol-1'); }}
-              className="font-mono text-[9px] font-bold tracking-widest text-[#191410] underline"
-            >
-              VIEW ALL →
-            </button>
-          </div>
+          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">03 SESSIONS // TICKETS</span>
 
           {events.map((evt) => (
-            <div key={evt.id} className="w-full bg-[#ecdcaf] text-[#191410] border-4 border-[#191410] p-4 sm:p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3">
-              <img src={evt.image} alt={evt.title} onError={(e) => { e.target.onerror = null; e.target.src = '/gallery/tangy1.jpg'; }} className="w-full aspect-[4/3] object-cover border-2 border-[#191410] filter grayscale contrast-125" />
-              <div className="flex flex-col gap-1 text-left mt-2">
+            <div key={evt.id} className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-4 sm:p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3">
+              <img src={evt.image} alt={evt.title} className="w-full aspect-[4/3] object-cover border border-[#191410]" />
+              <div className="flex flex-col gap-1 text-left">
                 <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest">{evt.city} · {evt.status}</span>
-                <h3 className="font-poster text-3xl sm:text-4xl text-[#191410] leading-none mb-1">{evt.title.toUpperCase()}</h3>
-                <p className="font-mono text-[10px] font-bold opacity-80 uppercase">{evt.venue} · {evt.date}</p>
+                <h3 className="font-poster text-xl sm:text-2xl text-[#191410]">{evt.title}</h3>
+                <p className="font-mono text-xs opacity-80">{evt.venue} · {evt.date}</p>
                 <p className="font-sans text-xs sm:text-sm mt-1">{evt.description}</p>
               </div>
 
               <button
-                onClick={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
-                className="w-full mt-3 h-[56px] bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#191410] active:scale-95 active:bg-[#c2272a] transition-transform"
+                onClick={() => { playSFX('ticketClick'); onSelectBooking(evt); }}
+                className="w-full h-[56px] bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#191410] active:scale-95 active:bg-[#c2272a] transition-transform"
               >
-                ADMIT ONE — BOOK ({evt.price || '₹499'})
+                BOOK TICKET ({evt.price}) →
               </button>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 5. MOBILE FEATURED ARTISTS */}
+      {/* 6. MOBILE RAW FOOTAGE */}
       <section 
-        ref={artistsRef}
-        id="m-artists" 
-        className={`w-full bg-[#191410] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${artistsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        ref={footageRef}
+        id="m-footage" 
+        className={`w-full bg-[#0D0A07] text-[#ecdcaf] py-14 px-4 flex flex-col items-center transition-all duration-700 ${footageInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">03 ARTISTS LINEAGE // SONIC ARCHIVE</span>
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
+          <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 RAW FOOTAGE // 16MM REEL</span>
 
-          <div className="grid grid-cols-1 gap-4 w-full">
-            {artistList.map((artist) => (
-              <div key={artist.id} className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-4 shadow-[5px_5px_0px_#c2272a] flex items-center gap-4 text-left">
-                <img src={artist.image} alt={artist.name} className="w-20 h-20 object-cover border border-[#191410] rounded-sm" />
-                <div className="flex flex-col gap-0.5">
-                  <span className="font-mono text-[8.5px] font-bold text-[#c2272a] uppercase">{artist.role} · {artist.genre}</span>
-                  <h3 className="font-poster text-xl text-[#191410]">{artist.name}</h3>
-                  <button onClick={() => navigate('/artists')} className="font-mono text-[9px] text-[#c2272a] underline font-bold mt-1 text-left">VIEW ARTIST PORTAL →</button>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            {videoList.map((vid) => (
+              <div key={vid.id} className="relative aspect-[3/4] bg-[#191410] border border-[#ecdcaf]/20 rounded-md overflow-hidden flex flex-col justify-end p-2 group active:scale-95 transition-transform">
+                <video src={vid.src} loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" />
+                <div className="relative z-10 bg-[#191410]/90 p-1.5 rounded text-left">
+                  <p className="font-mono text-[8.5px] font-bold text-[#ecdcaf] truncate">{vid.title}</p>
                 </div>
               </div>
             ))}
@@ -449,14 +472,14 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 6. MOBILE ARCHIVE RECORDINGS */}
+      {/* 7. MOBILE ARCHIVE RECORDINGS */}
       <section 
         ref={archiveRef}
         id="m-archive" 
         className={`w-full bg-[#315D73] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${archiveInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">04 ARCHIVE RECORDINGS</span>
+          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">05 ARCHIVE RECORDINGS</span>
 
           {archive.map((item, idx) => (
             <div key={idx} className="w-full bg-[#191410] text-[#ecdcaf] border-2 border-[#ecdcaf]/30 p-4 sm:p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3 text-left">
@@ -475,14 +498,36 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 7. MOBILE DIARY */}
+      {/* 8. MOBILE SPACES & ARCHITECTURE */}
+      <section 
+        ref={spacesRef}
+        id="m-spaces" 
+        className={`w-full bg-[#4c1210] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${spacesInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
+          <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">06 SANCTUARY SPACES // HERITAGE</span>
+
+          <div className="flex flex-col gap-5 w-full">
+            {spacesList.map((space) => (
+              <div key={space.id} className="w-full bg-[#191410] border-2 border-[#d1a437]/40 p-4 shadow-[5px_5px_0px_#191410] flex flex-col gap-2.5 text-left">
+                <img src={space.image} alt={space.title} className="w-full aspect-[16/9] object-cover border border-[#d1a437]/20" />
+                <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase">{space.type} · {space.location}</span>
+                <h3 className="font-poster text-xl text-[#ecdcaf]">{space.title}</h3>
+                <p className="font-mono text-xs text-[#ecdcaf]/80 italic">"{space.notes}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. MOBILE DIARY */}
       <section 
         ref={diaryRef}
         id="m-diary" 
         className={`w-full bg-[#ecdcaf] text-[#191410] py-14 px-5 flex flex-col items-center transition-all duration-700 ${diaryInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">05 TANGY DIARY</span>
+          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">07 TANGY DIARY</span>
 
           {diaryEntries.map((entry) => (
             <div key={entry.id} className="w-full bg-[#191410] text-[#ecdcaf] border-2 border-[#191410] p-4 sm:p-5 shadow-[6px_6px_0px_#c2272a] flex flex-col gap-3 text-left">
@@ -495,7 +540,62 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 8. MOBILE CREW */}
+      {/* 10. MOBILE FEATURED ARTISTS */}
+      <section 
+        ref={artistsRef}
+        id="m-artists" 
+        className={`w-full bg-[#191410] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${artistsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
+          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">08 ARTISTS LINEAGE // SONIC ARCHIVE</span>
+
+          <div className="grid grid-cols-1 gap-4 w-full">
+            {artistList.map((artist) => (
+              <div key={artist.id} className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-4 shadow-[5px_5px_0px_#c2272a] flex items-center gap-4 text-left">
+                <img src={artist.image} alt={artist.name} className="w-20 h-20 object-cover border border-[#191410] rounded-sm" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-mono text-[8.5px] font-bold text-[#c2272a] uppercase">{artist.role} · {artist.genre}</span>
+                  <h3 className="font-poster text-xl text-[#191410]">{artist.name}</h3>
+                  <button onClick={() => navigate('/artists')} className="font-mono text-[9px] text-[#c2272a] underline font-bold mt-1 text-left">VIEW ARTIST PORTAL →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 11. MOBILE FOUNDERS ARCHIVE */}
+      <section 
+        ref={foundersRef}
+        id="m-founders" 
+        className={`w-full bg-[#1C140E] text-[#ecdcaf] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${foundersInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
+          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">09 FOUNDERS ARCHIVE // FILE 001</span>
+
+          {/* ARJUNA */}
+          <div className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3 text-left rotate-[-1deg]">
+            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest">FOUNDER & CREATOR // EST. 2016</span>
+            <h3 className="font-poster text-2xl text-[#191410]">ARJUNA</h3>
+            <img src="/media/arjun.png" alt="Arjuna" className="w-full aspect-[3/4] object-cover border border-[#191410]" />
+            <p className="font-mono text-xs text-[#191410]/90 border-l-4 border-[#c2272a] pl-3 italic">
+              "Born from an obsession with underground sound and ancient spaces."
+            </p>
+          </div>
+
+          {/* DEEPA */}
+          <div className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3 text-left rotate-[1deg]">
+            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest">CO-FOUNDER // EST. 2018</span>
+            <h3 className="font-poster text-2xl text-[#191410]">DEEPA</h3>
+            <img src="/media/deepa.jpg" alt="Deepa" className="w-full aspect-[3/4] object-cover border border-[#191410]" />
+            <p className="font-mono text-xs text-[#191410]/90 border-l-4 border-[#c2272a] pl-3 italic">
+              "The architect of community. Deepa ensures every event feels like a homecoming."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. MOBILE CREW */}
       <section 
         ref={crewRef}
         id="m-crew" 
@@ -503,9 +603,10 @@ export const MobileLayout = ({
       >
         <div className="w-full max-w-[360px] flex flex-col items-center gap-10">
           <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase border-y border-[#191410]/40 py-1 px-4">
-            06 JOIN THE CREW // RECRUITMENT DESK
+            10 JOIN THE CREW // RECRUITMENT DESK
           </span>
 
+          {/* POSTER 01: VOLUNTEER */}
           <div className="w-full bg-[#ecdcaf] text-[#191410] p-5 sm:p-6 border-4 border-[#191410] shadow-[10px_10px_0px_#191410] rotate-[2deg] relative flex flex-col gap-4">
             <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#315D73] border-b border-[#191410]/30 pb-2 uppercase">
               <span>ARCHIVE 08 // FILE NO. 204</span>
@@ -530,17 +631,44 @@ export const MobileLayout = ({
               [ APPLY AS VOLUNTEER → ]
             </button>
           </div>
+
+          {/* POSTER 02: ARTIST */}
+          <div className="w-full bg-[#191410] text-[#ecdcaf] p-5 sm:p-6 border-4 border-[#ecdcaf] shadow-[10px_10px_0px_#191410] rotate-[-2deg] relative flex flex-col gap-4">
+            <div className="flex justify-between items-center font-mono text-[8.5px] font-bold text-[#ecdcaf] border-b border-[#ecdcaf]/20 pb-2 uppercase">
+              <span>SIDE A // 33⅓ RPM STEREO</span>
+              <span>AUDITION FILE</span>
+            </div>
+
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-[9px] text-[#ecdcaf] font-black tracking-widest uppercase">PATH 02 // ARTIST</span>
+              <h3 className="font-poster text-3xl sm:text-4xl text-[#ecdcaf] leading-none my-1">
+                TAKE THE STAGE
+              </h3>
+            </div>
+
+            <p className="font-mono text-xs text-[#ecdcaf]/90 border-l-4 border-[#c2272a] pl-3 py-0.5 italic">
+              ✎ "Bring your sound, your story and your energy into the Tangy world."
+            </p>
+
+            <button
+              onClick={() => { playSFX('ticketClick'); navigate('/artists'); }}
+              className="w-full h-[56px] bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
+            >
+              [ APPLY AS ARTIST → ]
+            </button>
+          </div>
+
         </div>
       </section>
 
-      {/* 9. MOBILE PRIVATE SESSIONS */}
+      {/* 13. MOBILE PRIVATE SESSIONS */}
       <section 
         ref={privateRef}
         id="m-private" 
         className={`w-full bg-[#315D73] text-[#ecdcaf] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${privateInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">07 PRIVATE SESSIONS</span>
+          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">11 PRIVATE SESSIONS</span>
 
           <div className="w-full bg-[#191410] p-2 border-2 border-[#ecdcaf]/30 shadow-[6px_6px_0px_#191410]">
             <img src="/media/gallery/tangy4.jpg" alt="Private Session" className="w-full aspect-[4/3] object-cover border border-[#ecdcaf]/20" />
@@ -560,112 +688,6 @@ export const MobileLayout = ({
           >
             REQUEST PRIVATE SESSION →
           </button>
-        </div>
-      </section>
-
-      {/* 10. MOBILE CHRONOLOGY */}
-      <section 
-        ref={historyRef}
-        id="m-history" 
-        className={`w-full bg-[#0D0A07] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-      >
-        <div className="w-full max-w-[480px] flex flex-col items-center">
-          <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase mb-6">08 CHRONOLOGY // 10 YEARS</span>
-          <div className="w-full flex flex-col gap-6">
-            {[
-              { year: "2016", title: "THE FIRST SPARK", desc: "First acoustic sessions inside private living rooms & stepwells." },
-              { year: "2018", title: "THE MOVEMENT GROWS", desc: "Underground electronic producers join the lineage." },
-              { year: "2020", title: "THE ARCHIVE RECORDINGS", desc: "Bansilalpet Stepwell becomes our primary sonic sanctuary." },
-              { year: "2023", title: "PAN-INDIA EXPANSION", desc: "Curating intimate nights across Mumbai, Delhi, and Goa." },
-              { year: "2025", title: "TANGY WORLD TODAY", desc: "Over 200+ artists and thousands of listeners united by sound." },
-            ].map((item, idx) => (
-              <div 
-                key={idx} 
-                style={{ transitionDelay: `${idx * 120}ms` }}
-                className={`w-full bg-[#191410] border-2 border-[#ecdcaf]/30 p-5 shadow-[5px_5px_0px_#191410] flex flex-col items-start text-left gap-2 transition-all duration-500 ${historyInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-poster text-2xl sm:text-3xl text-[#d1a437]">{item.year}</span>
-                  <span className="text-[#c2272a] font-bold">○</span>
-                </div>
-                <h3 className="font-poster text-base sm:text-lg text-[#ecdcaf]">{item.title}</h3>
-                <p className="font-sans text-xs sm:text-sm text-[#ecdcaf]/80">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 11. MOBILE RAW FOOTAGE */}
-      <section 
-        ref={footageRef}
-        id="m-footage" 
-        className={`w-full bg-[#3c0f0e] text-[#ecdcaf] py-14 px-4 flex flex-col items-center transition-all duration-700 ${footageInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-      >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">09 RAW FOOTAGE // 16MM REEL</span>
-
-          <div className="grid grid-cols-2 gap-3 w-full">
-            {videoList.map((vid) => (
-              <div key={vid.id} className="relative aspect-[3/4] bg-[#191410] border border-[#ecdcaf]/20 rounded-md overflow-hidden flex flex-col justify-end p-2 group active:scale-95 transition-transform">
-                <video src={vid.src} loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" />
-                <div className="relative z-10 bg-[#191410]/90 p-1.5 rounded text-left">
-                  <p className="font-mono text-[8.5px] font-bold text-[#ecdcaf] truncate">{vid.title}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 12. MOBILE SPACES & ARCHITECTURE */}
-      <section 
-        ref={spacesRef}
-        id="m-spaces" 
-        className={`w-full bg-[#4c1210] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${spacesInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-      >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">10 SANCTUARY SPACES // HERITAGE</span>
-
-          <div className="flex flex-col gap-5 w-full">
-            {spacesList.map((space) => (
-              <div key={space.id} className="w-full bg-[#191410] border-2 border-[#d1a437]/40 p-4 shadow-[5px_5px_0px_#191410] flex flex-col gap-2.5 text-left">
-                <img src={space.image} alt={space.title} className="w-full aspect-[16/9] object-cover border border-[#d1a437]/20" />
-                <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase">{space.type} · {space.location}</span>
-                <h3 className="font-poster text-xl text-[#ecdcaf]">{space.title}</h3>
-                <p className="font-mono text-xs text-[#ecdcaf]/80 italic">"{space.notes}"</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 13. MOBILE FOUNDERS ARCHIVE */}
-      <section 
-        ref={foundersRef}
-        id="m-founders" 
-        className={`w-full bg-[#1C140E] text-[#ecdcaf] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${foundersInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-      >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">11 FOUNDERS ARCHIVE // FILE 001</span>
-
-          <div className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3 text-left rotate-[-1deg]">
-            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest">FOUNDER & CREATOR // EST. 2016</span>
-            <h3 className="font-poster text-2xl text-[#191410]">ARJUNA</h3>
-            <img src="/media/arjun.png" alt="Arjuna" className="w-full aspect-[3/4] object-cover border border-[#191410]" />
-            <p className="font-mono text-xs text-[#191410]/90 border-l-4 border-[#c2272a] pl-3 italic">
-              "Born from an obsession with underground sound and ancient spaces."
-            </p>
-          </div>
-
-          <div className="w-full bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] p-5 shadow-[6px_6px_0px_#191410] flex flex-col gap-3 text-left rotate-[1deg]">
-            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest">CO-FOUNDER // EST. 2018</span>
-            <h3 className="font-poster text-2xl text-[#191410]">DEEPA</h3>
-            <img src="/media/deepa.jpg" alt="Deepa" className="w-full aspect-[3/4] object-cover border border-[#191410]" />
-            <p className="font-mono text-xs text-[#191410]/90 border-l-4 border-[#c2272a] pl-3 italic">
-              "The architect of community. Deepa ensures every event feels like a homecoming."
-            </p>
-          </div>
         </div>
       </section>
 

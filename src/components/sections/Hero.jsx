@@ -50,14 +50,6 @@ export const Hero = () => {
       ease: 'back.out(1.2)'
     });
 
-    gsap.from('.vintage-mic', {
-      opacity: 0,
-      y: 20,
-      duration: 1,
-      delay: 0.35,
-      ease: 'power2.out'
-    });
-
     gsap.from('.hero-ticket', {
       opacity: 0,
       y: 40,
@@ -79,7 +71,6 @@ export const Hero = () => {
     tl.to('.headline .word.tangy', { y: -15, duration: 0.3 }, 0.1)
       .to('.headline .word.sessions', { y: 15, duration: 0.3 }, 0.1)
       .to('.portrait-wrap', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
-      .to('.vintage-mic', { y: -10, duration: 0.35 }, 0.2)
       .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2)
       .to('.mic', { rotation: 3, duration: 0.4 }, 0.1);
 
@@ -94,7 +85,6 @@ export const Hero = () => {
       const moveY = (clientY / window.innerHeight - 0.5) * 16;
 
       gsap.to('.portrait-wrap', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.vintage-mic', { x: moveX * 0.22, y: moveY * 0.22, duration: 1.2, ease: 'power2.out' });
       gsap.to('.mic', { x: moveX * 0.35, y: moveY * 0.35, duration: 1.2, ease: 'power2.out' });
       gsap.to('.hero-ticket', { x: moveX * 0.15, y: moveY * 0.15, duration: 1.2, ease: 'power2.out' });
       gsap.to('.headline', { x: moveX * 0.08, y: moveY * 0.08, duration: 1.2, ease: 'power2.out' });
@@ -241,19 +231,6 @@ export const Hero = () => {
             src="/media/hero-performer.png" 
             alt="Tangy 1970s Performer Cutout" 
             className="relative w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)] z-2" 
-          />
-        </div>
-
-        {/* ------------------------------------------------------------- */}
-        {/* VINTAGE COMIC MICROPHONE WITH STAND ON STAGE FLOOR (z-25)      */}
-        {/* ------------------------------------------------------------- */}
-        <div 
-          className="vintage-mic absolute z-25 left-[22%] top-[38%] w-[8cqw] max-w-[150px] h-[25cqw] max-h-[420px] pointer-events-none"
-        >
-          <img 
-            src="/media/vintage-mic.png" 
-            alt="Vintage Comic Stage Microphone Stand" 
-            className="w-full h-full object-contain filter drop-shadow-[0_14px_20px_rgba(0,0,0,0.65)]" 
           />
         </div>
 

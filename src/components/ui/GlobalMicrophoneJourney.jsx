@@ -185,7 +185,7 @@ export const GlobalMicrophoneJourney = ({ active }) => {
       >
         <div className="relative w-full h-full flex flex-col items-center">
           <img 
-            src="/media/vintage-mic.png" 
+            src="/media/vintage-mic2.png" 
             alt="Tangy Vintage Suspended Microphone" 
             className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125"
           />

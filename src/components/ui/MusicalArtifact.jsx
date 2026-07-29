@@ -5,7 +5,7 @@ export const MusicalArtifact = ({ type = "vinyl", className = "" }) => {
     radio: "/media/radio.png",
     violin: "/media/violin.png",
     mic: "/media/microphone.png",
-    vintageMic: "/media/vintage-mic.png"
+    vintageMic: "/media/vintage-mic2.png"
   };
 
   const src = artifactMap[type] || artifactMap.vinyl;
