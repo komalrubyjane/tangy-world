@@ -156,18 +156,28 @@ function MainWorld() {
 
       {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
       {isMobile ? (
-        <MobileLayout 
-          onSelectBooking={handleNavigateBooking}
-          onArtistSubmit={handleNavigateCrew}
-          onRequestPrivate={handleNavigatePrivate}
-          onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-          onOpenVinyl={() => setIsVinylOpen(true)}
-          onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-          onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-          onOpenShop={() => setIsShopOpen(true)}
-          onOpenPassport={() => setIsPassportOpen(true)}
-          onOpenPostcard={() => setIsPostcardOpen(true)}
-        />
+        <>
+          {/* Theatre Curtain Opening for Mobile */}
+          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+
+          {/* Cinematic Deep Space Intro for Mobile */}
+          {isIntroActive && (
+            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
+          )}
+
+          <MobileLayout 
+            onSelectBooking={handleNavigateBooking}
+            onArtistSubmit={handleNavigateCrew}
+            onRequestPrivate={handleNavigatePrivate}
+            onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
+            onOpenVinyl={() => setIsVinylOpen(true)}
+            onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
+            onOpenArchive={() => setIsArchiveSpreadOpen(true)}
+            onOpenShop={() => setIsShopOpen(true)}
+            onOpenPassport={() => setIsPassportOpen(true)}
+            onOpenPostcard={() => setIsPostcardOpen(true)}
+          />
+        </>
       ) : (
         /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
         <>
