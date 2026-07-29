@@ -1,220 +1,25 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
 import { CustomCursor } from './components/ui/CustomCursor';
-import { Navbar } from './components/layout/Navbar';
-import { Menu } from './components/sections/Menu';
-import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
-import { SoundControl } from './components/ui/SoundControl';
-import { CurtainOverlay } from './components/ui/CurtainOverlay';
-import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
-import { MobileLayout } from './components/mobile/MobileLayout';
 
-// Museum Interactive Modals & Dock
-import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
-import { VinylRecordPlayerModal } from './components/museum/VinylRecordPlayerModal';
-import { ProgrammeBoardModal } from './components/museum/ProgrammeBoardModal';
-import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
-import { MerchShopModal } from './components/museum/MerchShopModal';
-import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
-import { PostcardContactModal } from './components/museum/PostcardContactModal';
-import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
-
-// Pages
+// Multi-Page Routes
+import { HomePage } from './pages/HomePage';
+import { SessionsPage } from './pages/SessionsPage';
+import { SessionDetailPage } from './pages/SessionDetailPage';
 import { BookingPage } from './pages/BookingPage';
-
-import { Hero } from './components/sections/Hero';
-import { Manifesto } from './components/sections/Manifesto';
-import { History } from './components/sections/History';
-import { Archive } from './components/sections/Archive';
-import { Spaces } from './components/sections/Spaces';
-import { FrontCamera } from './components/sections/FrontCamera';
-import { TangyDiary } from './components/sections/TangyDiary';
-import { Artists } from './components/sections/Artists';
-import { Founders } from './components/sections/Founders';
-import { UpcomingEvents } from './components/sections/UpcomingEvents';
-import { Volunteer } from './components/sections/Volunteer';
-import { PrivateSessions } from './components/sections/PrivateSessions';
-import { Newsletter } from './components/sections/Newsletter';
-import { Closing } from './components/sections/Closing';
-import { Footer } from './components/layout/Footer';
-
-function MainWorld() {
-  const navigate = useNavigate();
-  const [progress, setProgress] = useState(0);
-  const [isProgrammeOpen, setIsProgrammeOpen] = useState(false);
-  const [isIntroActive, setIsIntroActive] = useState(true);
-  const [showUiControls, setShowUiControls] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Museum Modals State
-  const [isSoundArchiveOpen, setIsSoundArchiveOpen] = useState(false);
-  const [isVinylOpen, setIsVinylOpen] = useState(false);
-  const [isProgrammeBoardOpen, setIsProgrammeBoardOpen] = useState(false);
-  const [isArchiveSpreadOpen, setIsArchiveSpreadOpen] = useState(false);
-  const [isShopOpen, setIsShopOpen] = useState(false);
-  const [isPassportOpen, setIsPassportOpen] = useState(false);
-  const [isPostcardOpen, setIsPostcardOpen] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    const alreadyPlayed = sessionStorage.getItem('tangyIntroPlayed');
-    if (alreadyPlayed) {
-      setIsIntroActive(false);
-    }
-  }, []);
-
-  const handleArtistSubmit = () => {
-    const target = isMobile ? '#m-crew' : '#volunteer';
-    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleRequestPrivate = () => {
-    const target = isMobile ? '#m-private' : '#private-sessions';
-    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleNavigateBooking = (evt) => {
-    navigate(`/book/${evt.slug || evt.id}`);
-  };
-
-  return (
-    <>
-      {/* MUSEUM INTERACTIVE MODALS */}
-      <CassetteSoundArchiveModal 
-        isOpen={isSoundArchiveOpen} 
-        onClose={() => setIsSoundArchiveOpen(false)} 
-      />
-
-      <VinylRecordPlayerModal 
-        isOpen={isVinylOpen} 
-        onClose={() => setIsVinylOpen(false)} 
-      />
-
-      <ProgrammeBoardModal 
-        isOpen={isProgrammeBoardOpen} 
-        onClose={() => setIsProgrammeBoardOpen(false)} 
-      />
-
-      <ArchiveSpreadModal 
-        isOpen={isArchiveSpreadOpen} 
-        onClose={() => setIsArchiveSpreadOpen(false)} 
-      />
-
-      <MerchShopModal 
-        isOpen={isShopOpen} 
-        onClose={() => setIsShopOpen(false)} 
-      />
-
-      <DigitalPassportModal 
-        isOpen={isPassportOpen} 
-        onClose={() => setIsPassportOpen(false)} 
-      />
-
-      <PostcardContactModal 
-        isOpen={isPostcardOpen} 
-        onClose={() => setIsPostcardOpen(false)} 
-      />
-
-      {/* FLOATING QUICK DOCK TOOLBAR */}
-      <MuseumQuickDock 
-        onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-        onOpenVinyl={() => setIsVinylOpen(true)}
-        onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-        onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-        onOpenShop={() => setIsShopOpen(true)}
-        onOpenPassport={() => setIsPassportOpen(true)}
-        onOpenPostcard={() => setIsPostcardOpen(true)}
-      />
-
-      {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
-      {isMobile ? (
-        <MobileLayout 
-          onSelectBooking={handleNavigateBooking}
-          onArtistSubmit={handleArtistSubmit}
-          onRequestPrivate={handleRequestPrivate}
-          onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-          onOpenVinyl={() => setIsVinylOpen(true)}
-          onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-          onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-          onOpenShop={() => setIsShopOpen(true)}
-          onOpenPassport={() => setIsPassportOpen(true)}
-          onOpenPostcard={() => setIsPostcardOpen(true)}
-        />
-      ) : (
-        /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
-        <>
-          {/* Temporary Theatre Curtain Opening Overlay */}
-          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
-
-          {/* Global Continuous Hanging Microphone Experience */}
-          <GlobalMicrophoneJourney active={showUiControls} />
-
-          {/* Cinematic Deep Space Intro */}
-          {isIntroActive && (
-            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
-          )}
-
-          {/* Floating Retro Sound Control */}
-          {showUiControls && <SoundControl />}
-          
-          {/* Fixed 1970s Printed Navbar */}
-          {showUiControls && (
-            <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
-          )}
-          
-          {/* Vintage Concert Programme Overlay */}
-          <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
-          
-          {/* Lightweight Grain Texture */}
-          <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
-          
-          {/* Vignette */}
-          <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
-
-          {/* Scroll Progress Rail */}
-          <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
-             <div 
-               className="w-full bg-tangy-mustard"
-               style={{ height: `${progress}%` }}
-             />
-          </div>
-
-          <div className="tangy-world pt-12">
-            <main>
-              <Hero />
-              <Manifesto />
-              <History />
-              <Archive />
-              <Spaces />
-              <FrontCamera />
-              <TangyDiary />
-              <Artists onArtistSubmit={handleArtistSubmit} />
-              <Founders />
-              <UpcomingEvents onSelectBooking={handleNavigateBooking} />
-              <Volunteer onApplyVolunteer={handleArtistSubmit} onApplyArtist={handleArtistSubmit} />
-              <PrivateSessions onRequestPrivate={handleRequestPrivate} />
-              <Newsletter />
-              <Closing />
-            </main>
-            
-            <Footer />
-          </div>
-        </>
-      )}
-    </>
-  );
-}
+import { ArtistPortalPage } from './pages/ArtistPortalPage';
+import { VolunteerPage } from './pages/VolunteerPage';
+import { PrivateSessionsPage } from './pages/PrivateSessionsPage';
+import { ArchivePage } from './pages/ArchivePage';
+import { ProgrammePage } from './pages/ProgrammePage';
+import { VinylPage } from './pages/VinylPage';
+import { DiaryPage } from './pages/DiaryPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
+import { StorePage } from './pages/StorePage';
+import { AdminPage } from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -224,8 +29,21 @@ export default function App() {
           <CustomCursor />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<MainWorld />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/sessions" element={<SessionsPage />} />
+              <Route path="/sessions/:slug" element={<SessionDetailPage />} />
               <Route path="/book/:sessionId" element={<BookingPage />} />
+              <Route path="/artists" element={<ArtistPortalPage />} />
+              <Route path="/crew" element={<VolunteerPage />} />
+              <Route path="/private-sessions" element={<PrivateSessionsPage />} />
+              <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/programme" element={<ProgrammePage />} />
+              <Route path="/vinyl" element={<VinylPage />} />
+              <Route path="/diary" element={<DiaryPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/store" element={<StorePage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Routes>
           </BrowserRouter>
         </CursorProvider>
