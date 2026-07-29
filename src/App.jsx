@@ -35,7 +35,8 @@ import { RegisterPage } from './artist/pages/RegisterPage';
 import { DashboardPage } from './artist/pages/DashboardPage';
 import { ProfilePage } from './artist/pages/ProfilePage';
 import { CalendarPage } from './artist/pages/CalendarPage';
-import { ArtistPortalPage } from './pages/ArtistPortalPage';
+import { ArtistsDirectoryPage } from './artist/pages/ArtistsDirectoryPage';
+import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
 
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
@@ -247,9 +248,10 @@ export default function App() {
 
               {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
               <Route path="/artist" element={<ArtistLayout />}>
-                <Route index element={<ArtistPortalPage />} />
+                <Route index element={<ArtistsDirectoryPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route path="profile/:id" element={<ArtistDetailsPage />} />
                 <Route 
                   path="dashboard" 
                   element={
