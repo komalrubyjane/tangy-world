@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
@@ -13,6 +14,7 @@ import { CurtainOverlay } from './components/ui/CurtainOverlay';
 import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
 import { MobileLayout } from './components/mobile/MobileLayout';
 import { Footer } from './components/layout/Footer';
+import { RouteLoader } from './components/ui/RouteLoader';
 
 // Museum Interactive Modals & Dock
 import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
@@ -24,24 +26,42 @@ import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
-// Dedicated Route Pages
-import { Home } from './pages/Home';
-import { ManifestoPage } from './pages/ManifestoPage';
-import { SessionsPage } from './pages/SessionsPage';
-import { SessionDetailsPage } from './pages/SessionDetailsPage';
-import { ArtistsPage } from './pages/ArtistsPage';
-import { ArtistProfilePage } from './pages/ArtistProfilePage';
-import { ArchivePage } from './pages/ArchivePage';
-import { ArchiveItemPage } from './pages/ArchiveItemPage';
-import { VinylPage } from './pages/VinylPage';
-import { HeritagePage } from './pages/HeritagePage';
-import { VenueDetailsPage } from './pages/VenueDetailsPage';
-import { DiaryPage } from './pages/DiaryPage';
-import { DiaryPostPage } from './pages/DiaryPostPage';
-import { CrewPage } from './pages/CrewPage';
-import { FoundersPage } from './pages/FoundersPage';
-import { PrivatePage } from './pages/PrivatePage';
-import { ContactPage } from './pages/ContactPage';
+// Lazy Loaded Route Pages for Code Splitting
+const Home = lazy(() => import('./pages/Home'));
+const ManifestoPage = lazy(() => import('./pages/Manifesto'));
+const SessionsPage = lazy(() => import('./pages/Sessions'));
+const SessionDetailsPage = lazy(() => import('./pages/Sessions/SessionDetails'));
+const ArtistsPage = lazy(() => import('./pages/Artists'));
+const ArtistProfilePage = lazy(() => import('./pages/Artists/ArtistProfile'));
+const ArchivePage = lazy(() => import('./pages/Archive'));
+const ArchiveItemPage = lazy(() => import('./pages/Archive/ArchiveItem'));
+const VinylPage = lazy(() => import('./pages/VinylPage'));
+const HeritagePage = lazy(() => import('./pages/HeritagePage'));
+const VenueDetailsPage = lazy(() => import('./pages/VenueDetailsPage'));
+const DiaryPage = lazy(() => import('./pages/DiaryPage'));
+const DiaryPostPage = lazy(() => import('./pages/DiaryPostPage'));
+const CrewPage = lazy(() => import('./pages/Crew'));
+const FoundersPage = lazy(() => import('./pages/Founders'));
+const PrivateSessionsPage = lazy(() => import('./pages/PrivateSessions'));
+const GalleryPage = lazy(() => import('./pages/Gallery'));
+const ProgrammePage = lazy(() => import('./pages/Programme'));
+const VolunteerPage = lazy(() => import('./pages/Volunteer'));
+const ContactPage = lazy(() => import('./pages/Contact'));
+
+// Lazy Loaded Admin Pages
+const AdminLogin = lazy(() => import('./pages/Admin/Login'));
+const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
+const AdminEvents = lazy(() => import('./pages/Admin/Events'));
+const AdminBookings = lazy(() => import('./pages/Admin/Bookings'));
+const AdminArtists = lazy(() => import('./pages/Admin/ArtistsAdmin'));
+const AdminGallery = lazy(() => import('./pages/Admin/GalleryAdmin'));
+const AdminCrew = lazy(() => import('./pages/Admin/CrewAdmin'));
+const AdminFounders = lazy(() => import('./pages/Admin/FoundersAdmin'));
+const AdminPrivate = lazy(() => import('./pages/Admin/PrivateAdmin'));
+const AdminPayments = lazy(() => import('./pages/Admin/PaymentsAdmin'));
+const AdminUsers = lazy(() => import('./pages/Admin/UsersAdmin'));
+const AdminSettings = lazy(() => import('./pages/Admin/SettingsAdmin'));
+const AdminCheckin = lazy(() => import('./pages/Admin/CheckinAdmin'));
 
 function AppContent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -60,6 +80,8 @@ function AppContent() {
   const [isPostcardOpen, setIsPostcardOpen] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -81,7 +103,7 @@ function AppContent() {
     <LenisProvider>
       <CursorProvider>
         {/* Custom Cursor active on fine-pointer devices */}
-        {!isMobile && <CustomCursor />}
+        {!isMobile && !isAdminRoute && <CustomCursor />}
         
         {/* Booking Ticket Stub Modal */}
         {selectedEvent && (
@@ -127,23 +149,25 @@ function AppContent() {
           onClose={() => setIsPostcardOpen(false)} 
         />
 
-        {/* FLOATING QUICK DOCK TOOLBAR */}
-        <MuseumQuickDock 
-          onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-          onOpenVinyl={() => setIsVinylOpen(true)}
-          onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-          onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-          onOpenShop={() => setIsShopOpen(true)}
-          onOpenPassport={() => setIsPassportOpen(true)}
-          onOpenPostcard={() => setIsPostcardOpen(true)}
-        />
+        {/* FLOATING QUICK DOCK TOOLBAR (Hidden on Admin routes) */}
+        {!isAdminRoute && (
+          <MuseumQuickDock 
+            onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
+            onOpenVinyl={() => setIsVinylOpen(true)}
+            onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
+            onOpenArchive={() => setIsArchiveSpreadOpen(true)}
+            onOpenShop={() => setIsShopOpen(true)}
+            onOpenPassport={() => setIsPassportOpen(true)}
+            onOpenPostcard={() => setIsPostcardOpen(true)}
+          />
+        )}
 
         {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
-        {isMobile ? (
+        {isMobile && !isAdminRoute ? (
           <MobileLayout 
             onSelectBooking={(evt) => setSelectedEvent(evt)}
             onArtistSubmit={() => navigate('/crew')}
-            onRequestPrivate={() => navigate('/private')}
+            onRequestPrivate={() => navigate('/private-sessions')}
             onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
             onOpenVinyl={() => setIsVinylOpen(true)}
             onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
@@ -155,58 +179,80 @@ function AppContent() {
         ) : (
           /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
           <>
-            {/* Temporary Theatre Curtain Opening Overlay */}
-            <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+            {!isAdminRoute && <CurtainOverlay onComplete={() => setShowUiControls(true)} />}
 
             {/* Global Continuous Hanging Microphone Experience */}
-            <GlobalMicrophoneJourney active={showUiControls} />
+            {!isAdminRoute && <GlobalMicrophoneJourney active={showUiControls} />}
 
             {/* Cinematic Deep Space Intro */}
-            {isIntroActive && (
+            {isIntroActive && !isAdminRoute && (
               <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
             )}
 
             {/* Floating Retro Sound Control */}
-            {showUiControls && <SoundControl />}
+            {showUiControls && !isAdminRoute && <SoundControl />}
             
             {/* Fixed 1970s Printed Navbar */}
-            {showUiControls && (
+            {showUiControls && !isAdminRoute && (
               <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
             )}
             
             {/* Vintage Concert Programme Overlay */}
-            <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
+            {!isAdminRoute && <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />}
             
             {/* Lightweight Grain Texture */}
-            <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+            {!isAdminRoute && <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />}
             
             {/* Vignette */}
-            <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
+            {!isAdminRoute && <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />}
 
             <div className="tangy-world">
               <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/manifesto" element={<ManifestoPage />} />
-                  <Route path="/sessions" element={<SessionsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
-                  <Route path="/sessions/:slug" element={<SessionDetailsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
-                  <Route path="/artists" element={<ArtistsPage />} />
-                  <Route path="/artists/:slug" element={<ArtistProfilePage />} />
-                  <Route path="/archive" element={<ArchivePage onOpenArchiveSpread={() => setIsArchiveSpreadOpen(true)} />} />
-                  <Route path="/archive/:slug" element={<ArchiveItemPage />} />
-                  <Route path="/vinyl" element={<VinylPage onOpenVinylPlayer={() => setIsVinylOpen(true)} />} />
-                  <Route path="/heritage" element={<HeritagePage />} />
-                  <Route path="/venues/:slug" element={<VenueDetailsPage />} />
-                  <Route path="/diary" element={<DiaryPage />} />
-                  <Route path="/diary/:slug" element={<DiaryPostPage />} />
-                  <Route path="/crew" element={<CrewPage />} />
-                  <Route path="/founders" element={<FoundersPage />} />
-                  <Route path="/private" element={<PrivatePage onRequestPrivate={() => setIsPostcardOpen(true)} />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                </Routes>
+                <Suspense fallback={<RouteLoader />}>
+                  <AnimatePresence mode="wait">
+                    <Routes location={location} key={location.pathname}>
+                      {/* USER ROUTES */}
+                      <Route path="/" element={<Home />} />
+                      <Route path="/manifesto" element={<ManifestoPage />} />
+                      <Route path="/sessions" element={<SessionsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
+                      <Route path="/sessions/:slug" element={<SessionDetailsPage onSelectBooking={(evt) => setSelectedEvent(evt)} />} />
+                      <Route path="/artists" element={<ArtistsPage />} />
+                      <Route path="/artists/:slug" element={<ArtistProfilePage />} />
+                      <Route path="/crew" element={<CrewPage />} />
+                      <Route path="/founders" element={<FoundersPage />} />
+                      <Route path="/private-sessions" element={<PrivateSessionsPage onRequestPrivate={() => setIsPostcardOpen(true)} />} />
+                      <Route path="/gallery" element={<GalleryPage />} />
+                      <Route path="/archive" element={<ArchivePage onOpenArchiveSpread={() => setIsArchiveSpreadOpen(true)} />} />
+                      <Route path="/archive/:slug" element={<ArchiveItemPage />} />
+                      <Route path="/vinyl" element={<VinylPage onOpenVinylPlayer={() => setIsVinylOpen(true)} />} />
+                      <Route path="/heritage" element={<HeritagePage />} />
+                      <Route path="/venues/:slug" element={<VenueDetailsPage />} />
+                      <Route path="/diary" element={<DiaryPage />} />
+                      <Route path="/diary/:slug" element={<DiaryPostPage />} />
+                      <Route path="/programme" element={<ProgrammePage />} />
+                      <Route path="/volunteer" element={<VolunteerPage />} />
+                      <Route path="/contact" element={<ContactPage />} />
+
+                      {/* ADMIN ROUTES */}
+                      <Route path="/admin/login" element={<AdminLogin />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                      <Route path="/admin/events" element={<AdminEvents />} />
+                      <Route path="/admin/bookings" element={<AdminBookings />} />
+                      <Route path="/admin/artists" element={<AdminArtists />} />
+                      <Route path="/admin/gallery" element={<AdminGallery />} />
+                      <Route path="/admin/crew" element={<AdminCrew />} />
+                      <Route path="/admin/founders" element={<AdminFounders />} />
+                      <Route path="/admin/private" element={<AdminPrivate />} />
+                      <Route path="/admin/payments" element={<AdminPayments />} />
+                      <Route path="/admin/users" element={<AdminUsers />} />
+                      <Route path="/admin/settings" element={<AdminSettings />} />
+                      <Route path="/admin/checkin" element={<AdminCheckin />} />
+                    </Routes>
+                  </AnimatePresence>
+                </Suspense>
               </main>
               
-              <Footer />
+              {!isAdminRoute && <Footer />}
             </div>
           </>
         )}
