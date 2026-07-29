@@ -34,6 +34,7 @@ import { LoginPage } from './artist/pages/LoginPage';
 import { RegisterPage } from './artist/pages/RegisterPage';
 import { DashboardPage } from './artist/pages/DashboardPage';
 import { ProfilePage } from './artist/pages/ProfilePage';
+import { CalendarPage } from './artist/pages/CalendarPage';
 import { ArtistPortalPage } from './pages/ArtistPortalPage';
 
 import { Hero } from './components/sections/Hero';
@@ -262,6 +263,14 @@ export default function App() {
                   element={
                     <ArtistProtectedRoute>
                       <ProfilePage />
+                    </ArtistProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="calendar" 
+                  element={
+                    <ArtistProtectedRoute>
+                      <CalendarPage />
                     </ArtistProtectedRoute>
                   } 
                 />
