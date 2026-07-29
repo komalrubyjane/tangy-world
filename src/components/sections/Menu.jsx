@@ -1,99 +1,67 @@
-import { useEffect } from 'react';
-import gsap from 'gsap';
+import { Link } from 'react-router-dom';
+import { useAudio } from '../../audio/AudioContext';
 
 export const Menu = ({ isOpen, onClose }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      gsap.fromTo('.programme-paper',
-        { yPercent: -100 },
-        { yPercent: 0, duration: 0.7, ease: 'power3.out' }
-      );
-      gsap.fromTo('.programme-item',
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.04, duration: 0.5, delay: 0.3, ease: 'power2.out' }
-      );
-    } else {
-      document.body.style.overflow = '';
-      gsap.to('.programme-paper', {
-        yPercent: -100, duration: 0.5, ease: 'power3.in'
-      });
-    }
+  const { playSFX } = useAudio();
 
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onClose]);
-
-  const links = [
-    { num: "01", label: "THE STAGE", href: "#hero" },
-    { num: "02", label: "MANIFESTO", href: "#manifesto" },
-    { num: "03", label: "TIMELINE", href: "#history" },
-    { num: "04", label: "THE ARCHIVE", href: "#archive" },
-    { num: "05", label: "HERITAGE SPACES", href: "#spaces" },
-    { num: "06", label: "RAW FOOTAGE", href: "#front-camera" },
-    { num: "07", label: "PRIVATE DIARY", href: "#diary" },
-    { num: "08", label: "ARTIST DIRECTORY", href: "#artists" },
-    { num: "09", label: "ARCHITECTS", href: "#founders" },
-    { num: "10", label: "SESSIONS & TICKETS", href: "#sessions" },
-    { num: "11", label: "VOLUNTEER CREW", href: "#volunteer" },
-    { num: "12", label: "PRIVATE SESSIONS", href: "#private-sessions" }
+  const navLinks = [
+    { label: "01 COVER (HOME)", path: "/" },
+    { label: "02 MANIFESTO", path: "/manifesto" },
+    { label: "03 SESSIONS ARCHIVE", path: "/sessions" },
+    { label: "04 ARTISTS LINEAGE", path: "/artists" },
+    { label: "05 PRINTED ARCHIVE", path: "/archive" },
+    { label: "06 VINYL SHELF", path: "/vinyl" },
+    { label: "07 HERITAGE VENUES", path: "/heritage" },
+    { label: "08 DIARY JOURNAL", path: "/diary" },
+    { label: "09 CREW & VOLUNTEERS", path: "/crew" },
+    { label: "10 FOUNDERS DESK", path: "/founders" },
+    { label: "11 PRIVATE SESSIONS", path: "/private" },
+    { label: "12 POSTCARD CONTACT", path: "/contact" }
   ];
 
-  const handleNav = (href) => {
+  const handleNavClick = () => {
+    playSFX('ticketClick');
     onClose();
-    setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div 
-      className="programme-paper fixed inset-0 bg-[#E7D5A4] border-b-8 border-[#5A120D] z-[150] p-6 md:p-16 flex flex-col justify-between shadow-[0_30px_100px_rgba(0,0,0,0.95)]"
-      style={{ transform: 'translateY(-100%)' }}
-    >
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+    <div className="fixed inset-0 z-[200] flex justify-end">
+      {/* Backdrop */}
+      <div onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-      {/* Top Header */}
-      <div className="flex justify-between items-start border-b-2 border-[#11100C] pb-4 relative z-10">
-        <div>
-          <span className="font-mono text-[10px] text-[#5A120D] font-bold tracking-[0.3em] uppercase block">TANGY SESSIONS</span>
-          <h2 className="display text-3xl md:text-4xl text-[#11100C]">TONIGHT'S PROGRAMME</h2>
+      {/* MENU DRAWER */}
+      <div className="relative w-full max-w-md bg-[#191410] text-[#ecdcaf] border-l-4 border-[#d1a437] p-8 shadow-2xl flex flex-col justify-between overflow-y-auto z-10">
+        
+        <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-4">
+          <span className="font-mono text-xs font-bold text-[#d1a437] tracking-[0.3em]">📜 PROGRAMME INDEX</span>
+          <button 
+            onClick={onClose}
+            className="font-mono text-xs font-bold border border-[#ecdcaf] px-3 py-1 hover:bg-[#c2272a] transition-all"
+          >
+            ✕ CLOSE
+          </button>
         </div>
-        <button 
-          onClick={onClose} 
-          className="font-mono text-xs text-[#11100C] border-2 border-[#11100C] px-3 py-1 hover:bg-[#11100C] hover:text-[#E7D5A4] transition-colors font-bold tracking-widest"
-        >
-          CLOSE [ ✕ ]
-        </button>
-      </div>
 
-      {/* Programme Index Grid */}
-      <div className="flex-grow flex items-center justify-center py-8 relative z-10">
-        <ul className="w-full max-w-2xl flex flex-col gap-2 font-mono text-sm md:text-base text-[#11100C]">
-          {links.map((link) => (
-            <li key={link.num} className="programme-item flex justify-between items-baseline border-b border-[#11100C]/20 py-2 group cursor-pointer" onClick={() => handleNav(link.href)}>
-              <span className="font-bold text-[#B94717] text-xs mr-4">{link.num}</span>
-              <span className="display text-2xl md:text-4xl group-hover:italic group-hover:text-[#5A120D] transition-all uppercase">{link.label}</span>
-              <span className="opacity-40 group-hover:opacity-100 transition-opacity">⟶</span>
-            </li>
+        <nav className="flex flex-col gap-3 my-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              onClick={handleNavClick}
+              className="font-poster text-xl text-[#ecdcaf] hover:text-[#d1a437] border-b border-[#ecdcaf]/10 pb-2 transition-colors text-left"
+            >
+              {link.label}
+            </Link>
           ))}
-        </ul>
-      </div>
+        </nav>
 
-      {/* Bottom Metadata */}
-      <div className="flex justify-between items-end border-t-2 border-[#11100C] pt-4 font-mono text-[10px] tracking-widest text-[#11100C] relative z-10 uppercase">
-        <div>
-          HYDERABAD · INDIA<br/>
-          EST. 2016 // PRIVATE ARCHIVE
+        <div className="font-mono text-[10px] text-[#ecdcaf]/60 text-center uppercase border-t border-[#ecdcaf]/20 pt-4">
+          TANGY SESSIONS // HYDERABAD // EST. 2016
         </div>
-        <div className="text-right">
-          <span>33⅓ RPM // SIDE A</span>
-        </div>
-      </div>
 
+      </div>
     </div>
   );
 };
