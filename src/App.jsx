@@ -32,6 +32,7 @@ import { ArtistLayout } from './artist/layouts/ArtistLayout';
 import { ArtistProtectedRoute } from './artist/components/ArtistProtectedRoute';
 import { LoginPage } from './artist/pages/LoginPage';
 import { RegisterPage } from './artist/pages/RegisterPage';
+import { DashboardPage } from './artist/pages/DashboardPage';
 import { ArtistPortalPage } from './pages/ArtistPortalPage';
 
 import { Hero } from './components/sections/Hero';
@@ -247,6 +248,14 @@ export default function App() {
                 <Route index element={<ArtistPortalPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
+                <Route 
+                  path="dashboard" 
+                  element={
+                    <ArtistProtectedRoute>
+                      <DashboardPage />
+                    </ArtistProtectedRoute>
+                  } 
+                />
               </Route>
             </Routes>
           </BrowserRouter>
