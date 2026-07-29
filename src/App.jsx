@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
@@ -248,6 +248,10 @@ export default function App() {
               <Route path="/volunteer" element={<CrewPage />} />
               <Route path="/private-sessions" element={<PrivateSessionsPage />} />
 
+              {/* REDIRECT ALIASES */}
+              <Route path="/artists" element={<Navigate to="/artist" replace />} />
+              <Route path="/artists/*" element={<Navigate to="/artist" replace />} />
+
               {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
               <Route path="/artist" element={<ArtistLayout />}>
                 <Route index element={<ArtistsDirectoryPage />} />
@@ -295,6 +299,9 @@ export default function App() {
                   } 
                 />
               </Route>
+
+              {/* FALLBACK REDIRECT */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </CursorProvider>
