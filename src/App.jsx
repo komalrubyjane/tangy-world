@@ -33,6 +33,7 @@ import { ArtistProtectedRoute } from './artist/components/ArtistProtectedRoute';
 import { LoginPage } from './artist/pages/LoginPage';
 import { RegisterPage } from './artist/pages/RegisterPage';
 import { DashboardPage } from './artist/pages/DashboardPage';
+import { ProfilePage } from './artist/pages/ProfilePage';
 import { ArtistPortalPage } from './pages/ArtistPortalPage';
 
 import { Hero } from './components/sections/Hero';
@@ -253,6 +254,14 @@ export default function App() {
                   element={
                     <ArtistProtectedRoute>
                       <DashboardPage />
+                    </ArtistProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="profile" 
+                  element={
+                    <ArtistProtectedRoute>
+                      <ProfilePage />
                     </ArtistProtectedRoute>
                   } 
                 />
