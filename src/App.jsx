@@ -37,6 +37,8 @@ import { ProfilePage } from './artist/pages/ProfilePage';
 import { CalendarPage } from './artist/pages/CalendarPage';
 import { ArtistsDirectoryPage } from './artist/pages/ArtistsDirectoryPage';
 import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
+import { MediaPage } from './artist/pages/MediaPage';
+import { SettingsPage } from './artist/pages/SettingsPage';
 
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
@@ -273,6 +275,22 @@ export default function App() {
                   element={
                     <ArtistProtectedRoute>
                       <CalendarPage />
+                    </ArtistProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="media" 
+                  element={
+                    <ArtistProtectedRoute>
+                      <MediaPage />
+                    </ArtistProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="settings" 
+                  element={
+                    <ArtistProtectedRoute>
+                      <SettingsPage />
                     </ArtistProtectedRoute>
                   } 
                 />
