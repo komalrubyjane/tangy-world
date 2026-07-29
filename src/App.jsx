@@ -9,7 +9,6 @@ import { Menu } from './components/sections/Menu';
 import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
 import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
-import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
 import { MobileLayout } from './components/mobile/MobileLayout';
 
 // Museum Interactive Modals & Dock
@@ -174,9 +173,6 @@ function MainWorld() {
           {/* Temporary Theatre Curtain Opening Overlay */}
           <CurtainOverlay onComplete={() => setShowUiControls(true)} />
 
-          {/* Global Continuous Hanging Microphone Experience */}
-          <GlobalMicrophoneJourney active={showUiControls} />
-
           {/* Cinematic Deep Space Intro */}
           {isIntroActive && (
             <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
@@ -209,18 +205,22 @@ function MainWorld() {
 
           <div className="tangy-world pt-12">
             <main>
+              {/* ORDER: 1. Hero, 2. Manifesto, 3. Sessions, 4. Artists, 5. Archive, 6. Diary, 7. Crew, 8. Private Sessions, 9. Contact/Footer */}
               <Hero />
               <Manifesto />
-              <History />
-              <Archive />
-              <Spaces />
-              <FrontCamera />
-              <TangyDiary />
-              <Artists onArtistSubmit={handleNavigateArtist} />
-              <Founders />
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
+              <Artists onArtistSubmit={handleNavigateArtist} />
+              <Archive />
+              <TangyDiary />
               <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
               <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
+              
+              {/* Remaining sections pushed to bottom before Footer */}
+              <History />
+              <Spaces />
+              <FrontCamera />
+              <Founders />
+              
               <Newsletter />
               <Closing />
             </main>
