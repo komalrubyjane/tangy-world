@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 
 export const Menu = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -35,18 +38,29 @@ export const Menu = ({ isOpen, onClose }) => {
     { num: "05", label: "HERITAGE SPACES", href: "#spaces" },
     { num: "06", label: "RAW FOOTAGE", href: "#front-camera" },
     { num: "07", label: "PRIVATE DIARY", href: "#diary" },
-    { num: "08", label: "ARTIST DIRECTORY", href: "#artists" },
+    { num: "08", label: "ARTIST PORTAL ✦", route: "/artists" },
     { num: "09", label: "ARCHITECTS", href: "#founders" },
     { num: "10", label: "SESSIONS & TICKETS", href: "#sessions" },
-    { num: "11", label: "VOLUNTEER CREW", href: "#volunteer" },
-    { num: "12", label: "PRIVATE SESSIONS", href: "#private-sessions" }
+    { num: "11", label: "VOLUNTEER CREW ✦", route: "/crew" },
+    { num: "12", label: "PRIVATE SESSIONS ✦", route: "/private-sessions" }
   ];
 
-  const handleNav = (href) => {
+  const handleNav = (link) => {
     onClose();
     setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
+      if (link.route) {
+        navigate(link.route);
+      } else if (link.href) {
+        if (window.location.pathname !== '/') {
+          navigate('/');
+          setTimeout(() => {
+            document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        } else {
+          document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }, 400);
   };
 
   return (
@@ -74,7 +88,7 @@ export const Menu = ({ isOpen, onClose }) => {
       <div className="flex-grow flex items-center justify-center py-8 relative z-10">
         <ul className="w-full max-w-2xl flex flex-col gap-2 font-mono text-sm md:text-base text-[#11100C]">
           {links.map((link) => (
-            <li key={link.num} className="programme-item flex justify-between items-baseline border-b border-[#11100C]/20 py-2 group cursor-pointer" onClick={() => handleNav(link.href)}>
+            <li key={link.num} className="programme-item flex justify-between items-baseline border-b border-[#11100C]/20 py-2 group cursor-pointer" onClick={() => handleNav(link)}>
               <span className="font-bold text-[#B94717] text-xs mr-4">{link.num}</span>
               <span className="display text-2xl md:text-4xl group-hover:italic group-hover:text-[#5A120D] transition-all uppercase">{link.label}</span>
               <span className="opacity-40 group-hover:opacity-100 transition-opacity">⟶</span>

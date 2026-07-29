@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { events, gallery, diaryEntries, archive } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
 import { MobileMicrophoneJourney } from './MobileMicrophoneJourney';
@@ -37,6 +38,7 @@ export const MobileLayout = ({
   onOpenPassport,
   onOpenPostcard
 }) => {
+  const navigate = useNavigate();
   const { playSFX } = useAudio();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -62,7 +64,7 @@ export const MobileLayout = ({
     { label: "01 COVER", target: "#m-hero" },
     { label: "02 MANIFESTO", target: "#m-manifesto" },
     { label: "03 CHRONOLOGY", target: "#m-history" },
-    { label: "04 SESSIONS", target: "#m-sessions" },
+    { label: "04 SESSIONS & TICKETS", target: "#m-sessions" },
     { label: "05 RAW FOOTAGE", target: "#m-footage" },
     { label: "06 ARCHIVE SPREADS", action: onOpenArchive },
     { label: "07 VINYL TURNTABLE", action: onOpenVinyl },
@@ -70,10 +72,10 @@ export const MobileLayout = ({
     { label: "09 TODAY'S PROGRAMME", action: onOpenProgramme },
     { label: "10 SANCTUARY SPACES", target: "#m-spaces" },
     { label: "11 DIARY & JOURNAL", target: "#m-diary" },
-    { label: "12 ARTISTS LINEAGE", target: "#m-artists" },
+    { label: "12 ARTIST PORTAL ✦", route: "/artists" },
     { label: "13 FOUNDERS DESK", target: "#m-founders" },
-    { label: "14 JOIN THE CREW", target: "#m-crew" },
-    { label: "15 PRIVATE SESSIONS", target: "#m-private" },
+    { label: "14 JOIN THE CREW ✦", route: "/crew" },
+    { label: "15 PRIVATE SESSIONS ✦", route: "/private-sessions" },
     { label: "16 GENERAL STORE", action: onOpenShop },
     { label: "17 MEMBER PASSPORT", action: onOpenPassport },
     { label: "18 POSTCARD MAILBOX", action: onOpenPostcard }
@@ -82,7 +84,9 @@ export const MobileLayout = ({
   const handleNavClick = (link) => {
     playSFX('ticketClick');
     setIsMenuOpen(false);
-    if (link.action) {
+    if (link.route) {
+      navigate(link.route);
+    } else if (link.action) {
       link.action();
     } else if (link.target) {
       document.querySelector(link.target)?.scrollIntoView({ behavior: 'smooth' });
@@ -152,7 +156,10 @@ export const MobileLayout = ({
           <span>INDEX ({navLinks.length})</span>
         </button>
 
-        <span className="font-poster text-sm font-bold tracking-widest text-[#ecdcaf] uppercase">
+        <span 
+          onClick={() => navigate('/')}
+          className="font-poster text-sm font-bold tracking-widest text-[#ecdcaf] uppercase cursor-pointer"
+        >
           TANGY SESSIONS
         </span>
 
@@ -559,7 +566,7 @@ export const MobileLayout = ({
                 <div className="flex flex-col gap-0.5">
                   <span className="font-mono text-[8.5px] font-bold text-[#c2272a] uppercase">{artist.role} · {artist.genre}</span>
                   <h3 className="font-poster text-xl text-[#191410]">{artist.name}</h3>
-                  <span className="font-mono text-[9px] text-[#191410]/80">✦ TANGY RESIDENT</span>
+                  <button onClick={() => navigate('/artists')} className="font-mono text-[9px] text-[#c2272a] underline font-bold mt-1 text-left">VIEW ARTIST PORTAL →</button>
                 </div>
               </div>
             ))}
@@ -628,7 +635,7 @@ export const MobileLayout = ({
             </p>
 
             <button
-              onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
+              onClick={() => { playSFX('ticketClick'); navigate('/crew'); }}
               className="w-full h-[56px] bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
             >
               [ APPLY AS VOLUNTEER → ]
@@ -654,7 +661,7 @@ export const MobileLayout = ({
             </p>
 
             <button
-              onClick={() => { playSFX('ticketClick'); onArtistSubmit(); }}
+              onClick={() => { playSFX('ticketClick'); navigate('/artists'); }}
               className="w-full h-[56px] bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
             >
               [ APPLY AS ARTIST → ]
@@ -686,7 +693,7 @@ export const MobileLayout = ({
           </p>
 
           <button
-            onClick={() => { playSFX('ticketClick'); onRequestPrivate(); }}
+            onClick={() => { playSFX('ticketClick'); navigate('/private-sessions'); }}
             className="w-full max-w-[340px] h-[56px] bg-[#ecdcaf] text-[#191410] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[5px_5px_0px_#191410] active:scale-95 active:bg-[#c2272a] active:text-[#ecdcaf] transition-transform animate-[pulse_4s_ease-in-out_infinite]"
           >
             REQUEST PRIVATE SESSION →
