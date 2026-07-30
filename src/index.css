@@ -109,3 +109,16 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@keyframes micSway {
+  0%, 100% {
+    transform: translateX(-50%) rotate(-3.5deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(3.5deg);
+  }
+}
+
+.animate-mic-sway {
+  animation: micSway 5.5s ease-in-out infinite !important;
+}
