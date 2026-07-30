@@ -1,7 +1,13 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { gallery } from '../../data/mockData';
-import { TornPaperEdgeTop } from '../ui/BackgroundDecorations';
+import { 
+  TornPaperEdgeTop, 
+  NotebookGridPattern, 
+  PushPin, 
+  PaperClip, 
+  TapeStrip 
+} from '../ui/BackgroundDecorations';
 
 export const Archive = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -36,6 +42,15 @@ export const Archive = () => {
 
       {/* TORN PAPER EDGE AT SECTION TOP */}
       <TornPaperEdgeTop fill="#11100C" />
+
+      {/* NOTEBOOK GRID FRAGMENT UNDERLAY */}
+      <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0">
+        <NotebookGridPattern opacity={0.5} />
+      </div>
+
+      {/* RED PUSHPIN ACCENT (INSPIRED BY REF 3) */}
+      <PushPin className="top-8 left-1/3" />
+      <PushPin className="top-12 right-1/4" />
 
       {/* RUBBER STAMP OVERLAY ACCENT */}
       <div className="absolute bottom-16 right-16 z-20 pointer-events-none border-2 border-[#C2272A] text-[#C2272A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.3em] uppercase rotate-[-8deg] opacity-75">

@@ -39,9 +39,12 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
       {/* SCREEN PRINTED PAPER TEXTURE & HALFTONE GRAIN */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-0" />
 
-      {/* RETRO WARPED CHECKERBOARD ACCENT RIBBON (8% OPACITY TOP STRIP) */}
+      {/* RETRO WARPED CHECKERBOARD ACCENT RIBBONS (TOP & BOTTOM BORDERS) */}
       <div className="absolute top-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5">
-        <WarpedCheckerPattern opacity={0.08} />
+        <WarpedCheckerPattern opacity={0.12} />
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5">
+        <WarpedCheckerPattern opacity={0.12} />
       </div>
 
       {/* CROP MARKS & ARCHIVE LABELS */}
