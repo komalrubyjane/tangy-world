@@ -3,6 +3,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import { gallery, artists } from '../../data/mockData';
+import { BlueprintGridPattern } from '../ui/BackgroundDecorations';
 
 export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
   const { playSFX } = useAudio();
@@ -89,6 +90,9 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       
       {/* INK GRAIN OVERLAY */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-10" />
+
+      {/* TECHNICAL BACKSTAGE BLUEPRINT GRID PATTERN */}
+      <BlueprintGridPattern opacity={0.08} />
 
       {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-10 z-5">

@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { events, gallery, diaryEntries, archive } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
 import { GlobalMicrophoneJourney } from '../ui/GlobalMicrophoneJourney';
+import { 
+  NotebookGridPattern, 
+  MusicManuscriptPattern, 
+  BlueprintGridPattern, 
+  WarpedCheckerPattern, 
+  BotanicalRoseInk 
+} from '../ui/BackgroundDecorations';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
 const useMobileInView = (options = { threshold: 0.12 }) => {
@@ -387,9 +394,10 @@ export const MobileLayout = ({
       <section 
         ref={manifestoRef}
         id="m-manifesto" 
-        className={`w-full bg-[#ecdcaf] text-[#191410] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 ${manifestoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#ecdcaf] text-[#191410] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 relative overflow-hidden ${manifestoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-5">
+        <NotebookGridPattern opacity={0.07} />
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-5 relative z-10">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">01 MANIFESTO</span>
           <div className="w-full bg-[#191410] p-2 border-2 border-[#191410] shadow-[6px_6px_0px_#c2272a] rotate-[1deg]">
             <img src="/media/gallery/tangy1.jpg" alt="Stepwell" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
@@ -443,9 +451,12 @@ export const MobileLayout = ({
       <section 
         ref={sessionsRef}
         id="m-sessions" 
-        className={`w-full bg-[#8a2320] py-14 px-5 flex flex-col items-center transition-all duration-700 ${sessionsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#8a2320] py-14 px-5 flex flex-col items-center transition-all duration-700 relative overflow-hidden ${sessionsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[420px] flex flex-col items-center gap-6">
+        <div className="absolute top-0 left-0 right-0 h-8 overflow-hidden pointer-events-none z-5">
+          <WarpedCheckerPattern opacity={0.08} />
+        </div>
+        <div className="w-full max-w-[420px] flex flex-col items-center gap-6 relative z-10">
           <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">03 SESSIONS // TICKETS</span>
 
           {events.map((evt) => (
@@ -564,9 +575,11 @@ export const MobileLayout = ({
       <section 
         ref={artistsRef}
         id="m-artists" 
-        className={`w-full bg-[#191410] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 ${artistsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#191410] text-[#ecdcaf] py-14 px-5 flex flex-col items-center transition-all duration-700 relative overflow-hidden ${artistsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
+        <MusicManuscriptPattern opacity={0.06} color="#E7D5A4" />
+        <BotanicalRoseInk color="#E7D5A4" opacity={0.10} className="absolute -bottom-6 -right-6 w-48 h-64 rotate-[-10deg]" />
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6 relative z-10">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">08 ARTISTS LINEAGE // SONIC ARCHIVE</span>
 
           <div className="grid grid-cols-1 gap-4 w-full">
@@ -615,13 +628,14 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 12. MOBILE CREW */}
+      {/* 12. MOBILE JOIN THE CREW */}
       <section 
         ref={crewRef}
         id="m-crew" 
-        className={`w-full bg-[#8a2320] text-[#ecdcaf] py-16 px-4 flex flex-col items-center transition-all duration-700 ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#315B66] text-[#ecdcaf] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 relative overflow-hidden ${crewInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[360px] flex flex-col items-center gap-10">
+        <BlueprintGridPattern opacity={0.08} />
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6 relative z-10">
           <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase border-y border-[#191410]/40 py-1 px-4">
             10 JOIN THE CREW // RECRUITMENT DESK
           </span>

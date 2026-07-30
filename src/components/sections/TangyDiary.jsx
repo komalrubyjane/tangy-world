@@ -2,6 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { diaryEntries } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { NotebookGridPattern } from '../ui/BackgroundDecorations';
 
 export const TangyDiary = () => {
   const { playSFX } = useAudio();
@@ -69,6 +70,9 @@ export const TangyDiary = () => {
     <section ref={sectionRef} id="diary" className="relative w-full h-screen bg-[#41261B] text-[#E7D5A4] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-4 md:p-10 perspective-[2000px]">
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+
+      {/* NOTEBOOK GRID BACKGROUND PATTERN */}
+      <NotebookGridPattern opacity={0.06} />
 
       {/* FLOATING VINTAGE MUSICAL OBJECTS */}
       <div className="absolute top-12 left-10 w-24 md:w-36 pointer-events-none z-20 opacity-85 animate-[bounce_4s_ease-in-out_infinite]">

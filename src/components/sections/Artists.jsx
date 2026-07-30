@@ -2,6 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { artists } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { MusicManuscriptPattern, BotanicalRoseInk } from '../ui/BackgroundDecorations';
 
 export const Artists = ({ onArtistSubmit }) => {
   const { playSFX } = useAudio();
@@ -36,7 +37,14 @@ export const Artists = ({ onArtistSubmit }) => {
   return (
     <section ref={sectionRef} id="artists" className="relative w-full h-screen bg-[#5A120D] text-[#E7D5A4] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C]">
       
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none z-0" />
+
+      {/* 5-LINE MUSIC MANUSCRIPT STAFF PATTERN */}
+      <MusicManuscriptPattern opacity={0.06} color="#E7D5A4" />
+
+      {/* VINTAGE BOTANICAL INK ROSE ART ACCENT IN CORNER */}
+      <BotanicalRoseInk color="#E7D5A4" opacity={0.12} className="absolute -bottom-10 -right-10 w-72 h-96 rotate-[-12deg]" />
+      <BotanicalRoseInk color="#E7D5A4" opacity={0.08} className="absolute -top-10 -left-10 w-60 h-80 rotate-[140deg]" />
 
       {/* Header */}
       <div className="absolute top-8 left-8 md:top-12 md:left-12 z-20 pointer-events-none">

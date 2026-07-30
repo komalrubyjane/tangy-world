@@ -1,6 +1,7 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { gallery } from '../../data/mockData';
+import { TornPaperEdgeTop } from '../ui/BackgroundDecorations';
 
 export const Archive = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -32,6 +33,14 @@ export const Archive = () => {
     <section ref={sectionRef} id="archive" className="relative w-full h-screen bg-[#11100C] overflow-hidden flex items-center border-t-8 border-[#4A0C0C] perspective-[1000px]">
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
+
+      {/* TORN PAPER EDGE AT SECTION TOP */}
+      <TornPaperEdgeTop fill="#11100C" />
+
+      {/* RUBBER STAMP OVERLAY ACCENT */}
+      <div className="absolute bottom-16 right-16 z-20 pointer-events-none border-2 border-[#C2272A] text-[#C2272A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.3em] uppercase rotate-[-8deg] opacity-75">
+        CLASSIFIED // ARCHIVAL RECORD ✦
+      </div>
 
       {/* FLOATING VINTAGE MUSICAL OBJECTS */}
       <div className="absolute top-16 right-20 w-28 md:w-40 pointer-events-auto z-20 group cursor-pointer animate-[bounce_5s_ease-in-out_infinite]">

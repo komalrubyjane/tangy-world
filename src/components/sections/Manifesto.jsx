@@ -1,5 +1,6 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
+import { NotebookGridPattern } from '../ui/BackgroundDecorations';
 
 export const Manifesto = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -25,7 +26,10 @@ export const Manifesto = () => {
     <section ref={sectionRef} id="manifesto" className="relative w-full h-screen bg-[#E7D5A4] text-[#11100C] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-6 md:p-12">
       
       {/* NOISE & AGED HANDMADE PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
+
+      {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
+      <NotebookGridPattern opacity={0.07} />
 
       {/* 4% OPACITY HYDERABAD STEPWELL ARCHWAY WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04] mix-blend-multiply select-none z-5">

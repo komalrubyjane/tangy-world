@@ -1,6 +1,7 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
+import { BotanicalRoseInk } from '../ui/BackgroundDecorations';
 
 export const PrivateSessions = ({ onRequestPrivate }) => {
   const { playSFX } = useAudio();
@@ -60,7 +61,11 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
     >
       
       {/* SOFT NOISE & PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-0" />
+
+      {/* DELICATE VINTAGE BOTANICAL ROSE INK LINE ART ACCENTS */}
+      <BotanicalRoseInk color="#E7D7AC" opacity={0.14} className="absolute -top-8 -left-8 w-72 h-96 rotate-[15deg]" />
+      <BotanicalRoseInk color="#E7D7AC" opacity={0.10} className="absolute -bottom-8 -right-8 w-80 h-96 rotate-[-165deg]" />
 
       {/* CROP MARKS & ARCHIVE LABELS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">

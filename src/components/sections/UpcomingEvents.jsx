@@ -2,6 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { events } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
+import { WarpedCheckerPattern } from '../ui/BackgroundDecorations';
 
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
@@ -37,6 +38,11 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
       
       {/* SCREEN PRINTED PAPER TEXTURE & HALFTONE GRAIN */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-0" />
+
+      {/* RETRO WARPED CHECKERBOARD ACCENT RIBBON (8% OPACITY TOP STRIP) */}
+      <div className="absolute top-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5">
+        <WarpedCheckerPattern opacity={0.08} />
+      </div>
 
       {/* CROP MARKS & ARCHIVE LABELS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#E7D5A4] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
