@@ -63,19 +63,19 @@ export const MobileLayout = ({
   const navLinks = [
     { label: "01 COVER", target: "#m-hero" },
     { label: "02 MANIFESTO", target: "#m-manifesto" },
-    { label: "03 CHRONOLOGY", target: "#m-history" },
-    { label: "04 SESSIONS & TICKETS", target: "#m-sessions" },
-    { label: "05 RAW FOOTAGE", target: "#m-footage" },
-    { label: "06 ARCHIVE SPREADS", action: onOpenArchive },
-    { label: "07 VINYL TURNTABLE", action: onOpenVinyl },
-    { label: "08 SOUND ARCHIVE", action: onOpenSoundArchive },
-    { label: "09 TODAY'S PROGRAMME", action: onOpenProgramme },
-    { label: "10 SANCTUARY SPACES", target: "#m-spaces" },
-    { label: "11 DIARY & JOURNAL", target: "#m-diary" },
-    { label: "12 ARTIST PORTAL ✦", route: "/artists" },
-    { label: "13 FOUNDERS DESK", target: "#m-founders" },
-    { label: "14 JOIN THE CREW ✦", route: "/crew" },
-    { label: "15 PRIVATE SESSIONS ✦", route: "/private-sessions" },
+    { label: "03 SESSIONS & TICKETS", target: "#m-sessions" },
+    { label: "04 ARTIST PORTAL ✦", route: "/artists" },
+    { label: "05 ARCHIVE RECORDINGS", target: "#m-archive" },
+    { label: "06 DIARY & JOURNAL", target: "#m-diary" },
+    { label: "07 JOIN THE CREW ✦", route: "/crew" },
+    { label: "08 PRIVATE SESSIONS ✦", route: "/private-sessions" },
+    { label: "09 CHRONOLOGY", target: "#m-history" },
+    { label: "10 RAW FOOTAGE", target: "#m-footage" },
+    { label: "11 SANCTUARY SPACES", target: "#m-spaces" },
+    { label: "12 ARCHIVE SPREADS", action: onOpenArchive },
+    { label: "13 VINYL TURNTABLE", action: onOpenVinyl },
+    { label: "14 SOUND ARCHIVE", action: onOpenSoundArchive },
+    { label: "15 TODAY'S PROGRAMME", action: onOpenProgramme },
     { label: "16 GENERAL STORE", action: onOpenShop },
     { label: "17 MEMBER PASSPORT", action: onOpenPassport },
     { label: "18 POSTCARD MAILBOX", action: onOpenPostcard }
@@ -300,14 +300,24 @@ export const MobileLayout = ({
                 <span>Archive No. 001</span>
               </div>
 
-              <div className="flex items-center justify-between gap-2 my-1">
+              <div className="flex flex-col gap-1.5 my-1">
                 <button 
                   type="button"
                   onClick={handleTicketClick}
                   onTouchEnd={(e) => { e.preventDefault(); handleTicketClick(e); }}
-                  className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-xl tracking-tight flex items-center gap-1.5 cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
+                  className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-lg tracking-tight flex items-center justify-between cursor-pointer bg-transparent border-none text-[#241a12] p-0 active:text-[#c2272a]"
                 >
-                  Enter Tangy →
+                  <span>Enter Tangy</span>
+                  <span>→</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { playSFX('ticketClick'); navigate('/book/vol-1'); }}
+                  onTouchEnd={(e) => { e.preventDefault(); playSFX('ticketClick'); navigate('/book/vol-1'); }}
+                  className="book-tickets-mobile relative z-[70] pointer-events-auto touch-manipulation font-mono text-[9px] font-bold tracking-wider uppercase px-2 py-1 bg-[#c2272a] text-[#ecdcaf] border border-[#191410] shadow-[2px_2px_0px_#191410] active:scale-95 text-center"
+                >
+                  BOOK TICKETS →
                 </button>
               </div>
 
@@ -353,6 +363,14 @@ export const MobileLayout = ({
             <div className="font-serif italic font-bold text-lg text-[#d1a437] -rotate-6 mt-0.5">
               Tangy
             </div>
+          </div>
+
+          {/* SCROLL TO VIEW INDICATOR */}
+          <div className="absolute z-40 bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 font-mono text-[8px] font-bold tracking-[0.2em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
+            <span>SCROLL TO VIEW</span>
+            <svg className="w-3 h-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
           </div>
 
           {/* TEXTURE OVERLAYS (z-10) */}
@@ -441,9 +459,10 @@ export const MobileLayout = ({
 
               <button
                 onClick={() => { playSFX('ticketClick'); onSelectBooking(evt); }}
-                className="w-full h-[56px] bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border border-[#191410] active:scale-95 active:bg-[#c2272a] transition-transform"
+                className="w-full h-[52px] bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-transform flex items-center justify-center gap-2"
               >
-                BOOK TICKET ({evt.price}) →
+                <span>BOOK TICKETS</span>
+                <span>→</span>
               </button>
             </div>
           ))}

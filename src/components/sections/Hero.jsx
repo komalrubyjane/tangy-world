@@ -1,9 +1,11 @@
 import { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 
 export const Hero = () => {
+  const navigate = useNavigate();
   const { setFilterCutoff, playSFX } = useAudio();
   const ticketRef = useRef(null);
 
@@ -113,6 +115,14 @@ export const Hero = () => {
     if (manifestoEl) {
       manifestoEl.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleBookTicketsClick = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    playSFX('ticketClick');
+    navigate('/book/vol-1');
   };
 
   return (
@@ -255,15 +265,24 @@ export const Hero = () => {
               <span>Archive No. 001</span>
             </div>
 
-            <div className="flex items-center justify-between gap-[1cqw] my-[0.6cqw]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-[0.6cqw] my-[0.6cqw]">
               <button 
                 type="button"
                 onClick={handleExploreClick}
                 onTouchEnd={(e) => { e.preventDefault(); handleExploreClick(e); }}
-                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[2.5cqw] tracking-[0.01em] flex items-center gap-[0.5cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
+                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[2.2cqw] tracking-[0.01em] flex items-center gap-[0.4cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
               >
                 Enter Tangy
-                <svg className="w-[1.6cqw] h-[1.6cqw] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                <svg className="w-[1.4cqw] h-[1.4cqw] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleBookTicketsClick}
+                onTouchEnd={(e) => { e.preventDefault(); handleBookTicketsClick(e); }}
+                className="book-tickets-hero relative z-[70] pointer-events-auto touch-manipulation font-mono text-[0.8cqw] min-text-[10px] font-bold tracking-[0.1em] uppercase px-[0.8cqw] py-[0.35cqw] bg-[#c2272a] text-[#ecdcaf] border border-[#191410] shadow-[0.18cqw_0.18cqw_0px_#191410] hover:bg-[#191410] hover:text-[#ecdcaf] active:scale-95 transition-all"
+              >
+                BOOK TICKETS →
               </button>
             </div>
 
@@ -280,23 +299,21 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         {/* HANGING VINTAGE CHROME MICROPHONE (z-35)                       */}
         {/* ------------------------------------------------------------- */}
-        <div className="mic absolute z-35 top-0 left-1/2 -translate-x-[4%] w-[8cqw] h-[20cqw] origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
-          <svg viewBox="0 0 100 260" preserveAspectRatio="xMidYMin meet">
-            <line x1="50" y1="0" x2="50" y2="90" stroke="#141110" strokeWidth="2.5"/>
-            <g transform="translate(50,90)">
-              <rect x="-16" y="0" width="32" height="90" rx="16" fill="#cfd2d4" stroke="#141110" strokeWidth="2"/>
-              <rect x="-16" y="0" width="14" height="90" rx="7" fill="#9aa0a3" opacity=".6"/>
-              <g stroke="#141110" strokeWidth="1.6" opacity=".8">
-                <line x1="-11" y1="12" x2="11" y2="12"/>
-                <line x1="-11" y1="20" x2="14" y2="20"/>
-                <line x1="-11" y1="28" x2="11" y2="28"/>
-                <line x1="-11" y1="36" x2="11" y2="36"/>
-                <line x1="-11" y1="44" x2="11" y2="44"/>
-                <line x1="-11" y1="52" x2="11" y2="52"/>
-              </g>
-              <rect x="-19" y="88" width="38" height="14" rx="4" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
-              <rect x="-6" y="100" width="12" height="26" fill="#3a3d3f" stroke="#141110" strokeWidth="2"/>
-            </g>
+        <div className="mic absolute z-35 top-0 left-1/2 -translate-x-1/2 w-[8cqw] max-w-[130px] min-w-[70px] h-[22cqw] max-h-[380px] origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
+          <img 
+            src="/media/vintage-mic2.png" 
+            alt="Tangy Vintage Hanging Microphone" 
+            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)]" 
+          />
+        </div>
+
+        {/* ------------------------------------------------------------- */}
+        {/* SCROLL TO VIEW INDICATOR (z-40)                                */}
+        {/* ------------------------------------------------------------- */}
+        <div className="absolute z-40 bottom-[1.8cqw] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 font-mono text-[0.7cqw] min-text-[10px] font-bold tracking-[0.25em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
+          <span>SCROLL TO VIEW</span>
+          <svg className="w-[1.1cqw] h-[1.1cqw] min-w-[12px] min-h-[12px] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M12 5v14M19 12l-7 7-7-7" />
           </svg>
         </div>
 

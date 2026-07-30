@@ -104,9 +104,10 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
                 {/* Perforated Ticket Button */}
                 <button 
                   onClick={() => handleBookClick(event)}
-                  className="btn-ticket mt-auto w-full text-center"
+                  className="btn-ticket mt-auto w-full text-center flex items-center justify-center gap-2 font-mono text-xs font-bold uppercase tracking-widest bg-[#c2272a] text-[#ecdcaf] hover:bg-[#11100C] border-2 border-[#11100C] py-2.5 px-3 transition-colors shadow-[3px_3px_0px_#11100C] active:scale-95"
                 >
-                  ADMIT ONE — BOOK ({event.price})
+                  <span>BOOK TICKETS</span>
+                  <span>→</span>
                 </button>
               </div>
 
