@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAudio } from '../../audio/AudioContext';
 
-export const GlobalMicrophoneJourney = ({ active }) => {
+export const GlobalMicrophoneJourney = ({ active = true }) => {
   const { isAudioEnabled, isMuted } = useAudio();
   const containerRef = useRef(null);
   const svgRef = useRef(null);
@@ -13,8 +13,6 @@ export const GlobalMicrophoneJourney = ({ active }) => {
   const targetScrollY = useRef(0);
 
   useEffect(() => {
-    if (!active) return;
-
     const pathEl = pathRef.current;
     if (!pathEl) return;
 

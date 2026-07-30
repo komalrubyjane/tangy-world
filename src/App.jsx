@@ -184,6 +184,9 @@ function MainWorld() {
           {/* Temporary Theatre Curtain Opening Overlay */}
           <CurtainOverlay onComplete={() => setShowUiControls(true)} />
 
+          {/* Global Continuous Hanging Microphone Experience */}
+          <GlobalMicrophoneJourney active={showUiControls} />
+
           {/* Cinematic Deep Space Intro */}
           {isIntroActive && (
             <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
@@ -225,26 +228,16 @@ function MainWorld() {
               {/* 3. SESSIONS */}
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
-              {/* 4. ARTISTS */}
-              <Artists onArtistSubmit={handleNavigateArtist} />
-
-              {/* 5. ARCHIVE */}
-              <Archive />
-
-              {/* 6. DIARY */}
-              <TangyDiary />
-
-              {/* 7. CREW */}
-              <Founders />
-              <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
-
-              {/* 8. PRIVATE SESSIONS */}
-              <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
-
-              {/* 9. REMAINING SECTIONS */}
+              {/* ORIGINAL UNTOUCHED SECTION FLOW */}
               <History />
+              <Archive />
               <Spaces />
               <FrontCamera />
+              <TangyDiary />
+              <Artists onArtistSubmit={handleNavigateArtist} />
+              <Founders />
+              <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
+              <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
               <Newsletter />
               <Closing />
             </main>
