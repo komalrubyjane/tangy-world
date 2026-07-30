@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
-import { HeroMicrophone } from '../ui/HeroMicrophone';
 
 export const Hero = () => {
   const navigate = useNavigate();
@@ -296,11 +295,6 @@ export const Hero = () => {
             09100
           </div>
         </div>
-
-        {/* ------------------------------------------------------------- */}
-        {/* SINGLE SOURCE OF TRUTH HANGING VINTAGE CHROME MICROPHONE        */}
-        {/* ------------------------------------------------------------- */}
-        <HeroMicrophone className="w-[8cqw] max-w-[130px] min-w-[70px] h-[22cqw] max-h-[380px]" />
 
         {/* ------------------------------------------------------------- */}
         {/* SCROLL TO VIEW INDICATOR (z-40)                                */}
