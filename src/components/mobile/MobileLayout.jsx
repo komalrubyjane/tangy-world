@@ -259,7 +259,7 @@ export const MobileLayout = ({
           </svg>
 
           {/* SINGLE SOURCE OF TRUTH HANGING VINTAGE CHROME MICROPHONE */}
-          <HeroMicrophone className="w-16 sm:w-20 h-32 sm:h-40 top-4 z-35" />
+          <HeroMicrophone isMobile={true} />
 
           {/* HEADLINE "TANGY SESSIONS" (z-15) — HELD AT TOP-[18%] (~70% VISIBLE) */}
           <div className="headline absolute z-15 top-[18%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">
