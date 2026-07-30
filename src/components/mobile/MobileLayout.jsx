@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { events, gallery, diaryEntries, archive } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
-import { MobileMicrophoneJourney } from './MobileMicrophoneJourney';
+import { HeroMicrophone } from '../ui/HeroMicrophone';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
 const useMobileInView = (options = { threshold: 0.12 }) => {
@@ -143,9 +143,6 @@ export const MobileLayout = ({
   return (
     <div className="w-full min-h-[100dvh] bg-[#191410] text-[#ecdcaf] font-sans antialiased overflow-x-hidden selection:bg-[#c2272a] selection:text-[#ecdcaf]">
       
-      {/* GLOBAL CONTINUOUS HANGING MICROPHONE STORYTELLING JOURNEY (<1024px) */}
-      <MobileMicrophoneJourney />
-
       {/* 1. TOUCH-NATIVE MOBILE NAVIGATION BAR & SLIDE-IN MENU OVERLAY */}
       <header className="fixed top-0 left-0 right-0 h-14 bg-[#191410]/95 backdrop-blur-md border-b border-[#ecdcaf]/20 z-[100] flex items-center justify-between px-4 pt-[max(0px,env(safe-area-inset-top))]">
         <button
@@ -260,6 +257,9 @@ export const MobileLayout = ({
               </g>
             </g>
           </svg>
+
+          {/* SINGLE SOURCE OF TRUTH HANGING VINTAGE CHROME MICROPHONE */}
+          <HeroMicrophone className="w-16 sm:w-20 h-32 sm:h-40 top-4 z-35" />
 
           {/* HEADLINE "TANGY SESSIONS" (z-15) — HELD AT TOP-[18%] (~70% VISIBLE) */}
           <div className="headline absolute z-15 top-[18%] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#m-roughen)] pointer-events-none">

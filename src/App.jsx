@@ -9,7 +9,6 @@ import { Menu } from './components/sections/Menu';
 import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
 import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
-import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
 import { MobileLayout } from './components/mobile/MobileLayout';
 
 // Museum Interactive Modals & Dock
@@ -183,9 +182,6 @@ function MainWorld() {
         <>
           {/* Temporary Theatre Curtain Opening Overlay */}
           <CurtainOverlay onComplete={() => setShowUiControls(true)} />
-
-          {/* Global Continuous Hanging Microphone Experience */}
-          <GlobalMicrophoneJourney active={showUiControls} />
 
           {/* Cinematic Deep Space Intro */}
           {isIntroActive && (
