@@ -297,17 +297,6 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* HANGING VINTAGE CHROME MICROPHONE (z-35)                       */}
-        {/* ------------------------------------------------------------- */}
-        <div className="mic absolute z-35 top-0 left-1/2 -translate-x-1/2 w-[8cqw] max-w-[130px] min-w-[70px] h-[22cqw] max-h-[380px] origin-top animate-[sway_6s_ease-in-out_infinite] pointer-events-none">
-          <img 
-            src="/media/vintage-mic2.png" 
-            alt="Tangy Vintage Hanging Microphone" 
-            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)]" 
-          />
-        </div>
-
-        {/* ------------------------------------------------------------- */}
         {/* SCROLL TO VIEW INDICATOR (z-40)                                */}
         {/* ------------------------------------------------------------- */}
         <div className="absolute z-40 bottom-[1.8cqw] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 font-mono text-[0.7cqw] min-text-[10px] font-bold tracking-[0.25em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
