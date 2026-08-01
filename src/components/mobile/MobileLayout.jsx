@@ -556,21 +556,55 @@ export const MobileLayout = ({
         </div>
       </section>
 
-      {/* 9. MOBILE DIARY */}
+      {/* 9. MOBILE DIARY (SCRAPBOOK ARCHIVE) */}
       <section 
         ref={diaryRef}
         id="m-diary" 
-        className={`w-full bg-[#ecdcaf] text-[#191410] py-14 px-5 flex flex-col items-center transition-all duration-700 ${diaryInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        className={`w-full bg-[#41261B] text-[#E7D5A4] py-14 px-5 flex flex-col items-center transition-all duration-700 relative overflow-hidden ${diaryInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
-        <div className="w-full max-w-[480px] flex flex-col items-center gap-6">
-          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">07 TANGY DIARY</span>
+        <NotebookGridPattern opacity={0.06} />
+        <div className="w-full max-w-[480px] flex flex-col items-center gap-6 relative z-10">
+          <span className="font-mono text-[10px] font-bold text-[#D19A24] tracking-[0.3em] uppercase">07 HANDCRAFTED SCRAPBOOK // FIELD LOGS</span>
 
-          {diaryEntries.map((entry) => (
-            <div key={entry.id} className="w-full bg-[#191410] text-[#ecdcaf] border-2 border-[#191410] p-4 sm:p-5 shadow-[6px_6px_0px_#c2272a] flex flex-col gap-3 text-left">
-              <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover border border-[#ecdcaf]/20" />
-              <span className="font-mono text-[9px] font-bold text-[#ecdcaf]">{entry.date} · {entry.location}</span>
-              <h3 className="font-poster text-lg sm:text-xl text-[#ecdcaf]">{entry.title}</h3>
-              <p className="font-sans text-xs sm:text-sm text-[#ecdcaf]/90">{entry.content}</p>
+          {diaryEntries.map((entry, idx) => (
+            <div 
+              key={entry.id} 
+              className={`w-full bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[12px_12px_0px_#11100C] flex flex-col gap-4 text-left relative ${idx % 2 === 0 ? 'rotate-[-1.5deg]' : 'rotate-[1.5deg]'}`}
+            >
+              {/* Tape Strip Accent */}
+              <TapeStrip className="-top-3 left-1/2 -translate-x-1/2 w-24 h-5 rotate-[-2deg]" />
+              
+              {/* Red Archive Stamp */}
+              <div className="absolute top-3 right-3 border border-[#C2272A] text-[#C2272A] px-2 py-0.5 font-mono text-[8px] font-bold tracking-widest uppercase rotate-[-5deg]">
+                LOG #{String(entry.id).padStart(3, '0')} ✦
+              </div>
+
+              <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B94717] uppercase border-b border-[#11100C]/20 pb-2">
+                <span>VOL. 0{entry.id} // FIELD RECORD</span>
+                <span>{entry.date}</span>
+              </div>
+
+              {/* Polaroid Photo Frame */}
+              <div className="relative w-full bg-[#F5E9C9] p-2.5 pb-7 border border-[#11100C] shadow-md rotate-[-1deg]">
+                <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
+                <span className="absolute bottom-2 left-2 font-mono text-[8.5px] font-bold text-[#11100C]">
+                  ✎ {entry.location}
+                </span>
+              </div>
+
+              <h3 className="font-poster text-2xl text-[#11100C] leading-tight ink-bleed">
+                {entry.title.toUpperCase()}
+              </h3>
+
+              <p className="font-mono text-xs text-[#11100C]/90 border-l-4 border-[#B94717] pl-3 italic leading-relaxed">
+                "{entry.content}"
+              </p>
+
+              {/* Taped Annotation Note */}
+              <div className="bg-[#F5E9C9] p-2.5 border border-[#11100C] font-mono text-[9px] font-bold text-[#5A120D] flex justify-between items-center rotate-[1deg]">
+                <span>HANDWRITTEN FIELD NOTE</span>
+                <span className="border border-[#5A120D] px-1.5 py-0.5">33⅓ RPM</span>
+              </div>
             </div>
           ))}
         </div>
