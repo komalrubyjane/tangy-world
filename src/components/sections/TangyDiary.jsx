@@ -28,6 +28,10 @@ export const TangyDiary = () => {
       }
     });
 
+    // Initial States: Closed Cover covers the book
+    gsap.set('.book-cover-front', { rotateY: 0, opacity: 1, zIndex: 40 });
+    gsap.set('.book-interior', { opacity: 0, scale: 0.96 });
+
     // Initialize all flip pages stacked flat on the right side (rotateY: 0deg)
     pages.forEach((page, index) => {
       gsap.set(page, { 
@@ -38,7 +42,17 @@ export const TangyDiary = () => {
       });
     });
 
-    // PHYSICAL 3D PAGE TURNS (BOOK REMAINS FIXED IN CENTER)
+    // STAGE 1: BOOK COVER OPENS ON INITIAL SCROLL
+    tl.to('.book-interior', { opacity: 1, scale: 1, duration: 0.20, ease: 'power2.out' }, 0.05)
+      .to('.book-cover-front', { 
+        rotateY: -140, 
+        opacity: 0, 
+        duration: 0.25, 
+        ease: 'power2.inOut',
+        onStart: () => playSFX('pageTurn')
+      }, 0.05);
+
+    // STAGE 2: PHYSICAL 3D PAGE TURNS
     pages.forEach((page, i) => {
       if (i < pages.length - 1) {
         tl.to(page, {
@@ -53,7 +67,7 @@ export const TangyDiary = () => {
               gsap.set(page, { zIndex: pages.length - i });
             }
           }
-        }, i * 0.35);
+        }, 0.30 + i * 0.35);
       }
     });
 
@@ -71,11 +85,38 @@ export const TangyDiary = () => {
         TANGY SESSIONS // HYDERABAD - 1974 ARCHIVE
       </div>
 
+      {/* TOP LEFT LUGGAGE TAG & RED ADMISSION TICKET (MATCHING REF IMAGE 2) */}
+      <div className="absolute top-10 left-10 hidden xl:flex flex-col gap-2 z-20 pointer-events-none opacity-90 rotate-[-8deg]">
+        <div className="bg-[#B89868] text-[#3D2517] p-3 border border-[#3D2517] shadow-xl font-mono text-[8px] font-bold uppercase w-40">
+          <div className="border-b border-[#3D2517]/40 pb-1">PROPERTY OF</div>
+          <div className="text-[9.5px] font-black text-[#7C2D18] my-0.5">TANGY SESSIONS</div>
+          <div className="text-[7.5px]">ARCHIVE NO. 1974-01</div>
+        </div>
+        <div className="bg-[#E7D5A4] text-[#11100C] p-1.5 border border-[#11100C] font-mono text-[7.5px] font-bold uppercase rotate-[3deg]">
+          FIELD LOGS FROM THE ROAD LESS RECORDED.
+        </div>
+      </div>
+
+      {/* TOP RIGHT ADMISSION TICKET STUB (MATCHING REF IMAGE 2) */}
+      <div className="absolute top-10 right-14 hidden xl:flex flex-col gap-2 z-20 pointer-events-none opacity-90 rotate-[6deg]">
+        <div className="bg-[#8A2320] text-[#E7D5A4] p-3 border border-[#11100C] shadow-2xl font-mono text-[8.5px] font-bold uppercase w-44">
+          <div className="border-b border-[#E7D5A4]/30 pb-1 flex justify-between">
+            <span>TANGY SESSIONS</span>
+            <span>21 DEC</span>
+          </div>
+          <div className="text-[9px] font-black my-1">LIVE AT OLD CITY HAVELI</div>
+          <div className="flex justify-between border-t border-[#E7D5A4]/30 pt-1 text-[7.5px]">
+            <span>ADMIT ONE</span>
+            <span>1974</span>
+          </div>
+        </div>
+      </div>
+
       {/* LEFT COLUMN / DESK AREA (STATIC DESK CONTENT) */}
       <div className="hidden lg:flex flex-col justify-between w-1/3 max-w-[320px] h-[82vh] z-20 pointer-events-none pr-4">
         
         {/* Title Section */}
-        <div className="mt-8">
+        <div className="mt-16">
           <p className="font-serif italic text-sm text-[#D19A24] mb-1">
             Field logs from the road less recorded.
           </p>
@@ -93,18 +134,16 @@ export const TangyDiary = () => {
           </span>
         </div>
 
-        {/* Bottom Left Desk Ephemera */}
+        {/* Bottom Left Desk Ephemera (Cassette Tape & Performer Pass) */}
         <div className="flex flex-col gap-4 mb-4">
-          {/* Cassette Tape */}
           <CassetteTapeGraphic className="w-44 rotate-[-6deg] shadow-2xl" />
 
-          {/* Artist Crew Backstage Ticket Stub */}
           <div className="bg-[#D3B480] text-[#3D2517] p-2.5 border border-[#3D2517] shadow-xl w-44 font-mono text-[8px] font-bold flex flex-col gap-1 uppercase rotate-[4deg]">
-            <div className="text-[9px] font-black text-[#7C2D18]">BACKSTAGE ACCESS</div>
-            <div className="text-[8px] font-bold">ARTIST CREW</div>
+            <div className="text-[9px] font-black text-[#7C2D18]">PERFORMER PASS</div>
+            <div className="text-[8px] font-bold">BACKSTAGE ACCESS · 1974</div>
             <div className="border-t border-[#3D2517]/40 pt-1 text-[7px] flex justify-between">
-              <span>21/09/75</span>
-              <span>TANGY SESSIONS</span>
+              <span>DATE: 21/09/75</span>
+              <span>VALID ✦</span>
             </div>
           </div>
         </div>
@@ -119,12 +158,51 @@ export const TangyDiary = () => {
           <div className="border-b border-[#3D2517]/40 pb-1 font-bold">HYDERABAD OLD CITY</div>
           <div className="text-[7px] opacity-70 mt-1">MAP REF. 1974</div>
           <div className="mt-4 border-2 border-dashed border-[#3D2517]/30 h-28 flex items-center justify-center font-bold text-[7px] text-[#7C2D18]">
-            CHARMINAR LANE
+            OLD CITY HAVELI
           </div>
         </div>
 
-        {/* REALISTIC HARDCOVER JOURNAL OUTER FRAME */}
-        <div className="absolute inset-0 bg-[#23120B] rounded-xl border-4 border-[#11100C] shadow-[35px_35px_100px_rgba(0,0,0,0.95)] z-10 flex flex-col justify-center preserve-3d">
+        {/* CLOSED LEATHER FRONT COVER (MATCHING REF IMAGE 2) */}
+        <div className="book-cover-front absolute inset-0 bg-[#25140C] rounded-lg border-4 border-[#120A06] shadow-[40px_40px_110px_rgba(0,0,0,0.95)] z-40 origin-left flex flex-col items-center justify-between p-8 md:p-12 text-center preserve-3d">
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-35 mix-blend-overlay pointer-events-none" />
+
+          {/* Worn Leather Edges & Gold Brass Details */}
+          <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[#C99A2E]/60" />
+          <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-[#C99A2E]/60" />
+          <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[#C99A2E]/60" />
+          <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[#C99A2E]/60" />
+
+          {/* Pressed Dried Flower Sprig with Masking Tape on Left */}
+          <PressedFlower className="absolute top-1/3 left-6 -rotate-12 z-30" />
+
+          {/* Horizontal Jute Twine String Wrapped Twice around Book */}
+          <div className="absolute top-1/2 left-0 right-0 h-4 -translate-y-1/2 border-t-2 border-b-2 border-[#8C6B41]/80 pointer-events-none z-20 flex items-center justify-end pr-8">
+            <div className="w-8 h-8 rounded-full border-2 border-[#8C6B41] flex items-center justify-center font-bold text-xs text-[#8C6B41]">
+              ⌘
+            </div>
+          </div>
+
+          {/* Header Stenciled Tag */}
+          <div className="font-mono text-xs text-[#D19A24] font-bold tracking-[0.35em] uppercase z-10 pt-4">
+            TANGY SESSIONS
+          </div>
+
+          {/* Center Script Calligraphic Title (MATCHING REF IMAGE 2 EXACTLY!) */}
+          <div className="relative z-10 my-auto">
+            <h3 className="font-serif italic text-6xl md:text-8xl text-[#E7D5A4] font-normal leading-none tracking-normal drop-shadow-2xl">
+              Diary
+            </h3>
+            <div className="w-32 h-0.5 bg-[#C99A2E]/50 mx-auto mt-2" />
+          </div>
+
+          {/* Year Stamp */}
+          <div className="font-mono text-sm text-[#D19A24] font-bold tracking-[0.4em] uppercase border-b-2 border-[#D19A24]/40 pb-1 z-10 mb-4">
+            1974
+          </div>
+        </div>
+
+        {/* INTERIOR SCRAPBOOK WITH 3D TURNING PAGES */}
+        <div className="book-interior absolute inset-0 bg-[#11100C] rounded-xl p-3 md:p-6 border-4 border-[#11100C] shadow-[30px_30px_90px_rgba(0,0,0,0.95)] z-10 flex flex-col justify-center preserve-3d">
           
           {/* Leather Spine & Center Brass Binder Rings */}
           <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-6 md:w-10 bg-[linear-gradient(90deg,#190d07,#351c11_50%,#190d07)] border-x-2 border-[#11100C] z-30 pointer-events-none flex flex-col justify-around items-center py-6 shadow-2xl">
@@ -137,18 +215,15 @@ export const TangyDiary = () => {
           {/* Hanging Woven Bookmark Ribbon */}
           <div className="absolute top-full left-1/2 -translate-x-1/2 w-3.5 h-16 bg-[#7C2D18] border-x border-[#11100C] rounded-b-md shadow-xl z-20 pointer-events-none" />
 
-          {/* DYNAMIC 3D TURNING SCRAPBOOK PAGES (FIXED CENTER BOOK) */}
+          {/* DYNAMIC 3D TURNING SCRAPBOOK PAGES */}
           {diaryEntries.map((entry, idx) => (
             <div 
               key={entry.id}
               className="scrapbook-flip-page absolute inset-2 md:inset-4 bg-[#F2E5C6] border-2 border-[#11100C] rounded-md shadow-2xl p-4 md:p-8 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-between text-[#11100C] overflow-hidden preserve-3d origin-left backface-hidden"
             >
-              {/* ------------------------------------------------------------- */}
-              {/* SPREAD 1: BANSILALPET STEPWELL                                */}
-              {/* ------------------------------------------------------------- */}
+              {/* SPREAD 1: BANSILALPET STEPWELL */}
               {idx === 0 && (
                 <>
-                  {/* LEFT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
                     <NotebookGridPattern opacity={0.05} />
                     
@@ -169,13 +244,11 @@ export const TangyDiary = () => {
                       The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.
                     </p>
 
-                    {/* Taped Quote Card */}
                     <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[-1.5deg] relative w-4/5">
                       <TapeStrip className="-top-2 left-3 w-14 h-3.5 rotate-[1deg]" />
                       "Acoustic echoes off 350-year-old stone."
                     </div>
 
-                    {/* Overlapping Center Polaroid Photo with Paper Clip */}
                     <div className="relative w-44 bg-[#F5E9C9] p-2 pb-6 shadow-xl border border-[#11100C] rotate-[-4deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
                       <PaperClip className="-top-2 left-2 rotate-[-10deg]" />
                       <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
@@ -185,11 +258,8 @@ export const TangyDiary = () => {
                     </div>
                   </div>
 
-                  {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
                     <NotebookGridPattern opacity={0.05} />
-
-                    {/* Pressed Dried Flower Taped Top Right */}
                     <PressedFlower className="absolute top-2 right-2" />
 
                     <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
@@ -200,10 +270,8 @@ export const TangyDiary = () => {
                       "The acoustic echo bounced off limestone steps for 2.4 seconds before fading."
                     </p>
 
-                    {/* Performer Pass Stub */}
                     <PerformerPassStub date="14/10/24" className="mb-3 self-end" />
 
-                    {/* Sound Check Log */}
                     <div className="w-full bg-[#E7D5A4] p-2 border border-[#11100C] font-mono text-[8px] text-[#11100C] flex flex-col gap-0.5">
                       <div className="font-bold text-[#7C2D18] border-b border-[#11100C]/30 pb-0.5 uppercase">SOUND CHECK LOG</div>
                       <div>MIC: RIBBON R44 | PREAMP: TUBE U47</div>
@@ -211,7 +279,6 @@ export const TangyDiary = () => {
                       <span className="border border-[#7C2D18] text-[#7C2D18] font-bold px-1 py-0.5 self-start mt-1 rotate-[-2deg]">UNRELEASED</span>
                     </div>
 
-                    {/* Secondary Small Polaroid */}
                     <div className="relative w-28 bg-[#F5E9C9] p-1.5 pb-4 shadow-lg border border-[#11100C] rotate-[4deg] self-end mt-2">
                       <img src="/media/gallery/tangy2.jpg" alt="Acoustic Setup" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                     </div>
@@ -219,12 +286,9 @@ export const TangyDiary = () => {
                 </>
               )}
 
-              {/* ------------------------------------------------------------- */}
-              {/* SPREAD 2: TARAMATI BARADARI                                   */}
-              {/* ------------------------------------------------------------- */}
+              {/* SPREAD 2: TARAMATI BARADARI */}
               {idx === 1 && (
                 <>
-                  {/* LEFT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
                     <NotebookGridPattern opacity={0.05} />
                     
@@ -245,13 +309,11 @@ export const TangyDiary = () => {
                       When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air.
                     </p>
 
-                    {/* Taped Quote Card */}
                     <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[2deg] relative w-4/5">
                       <TapeStrip className="-top-2 left-4 w-14 h-3.5 rotate-[-1deg]" />
                       "300 people stayed till sunrise."
                     </div>
 
-                    {/* Overlapping Center Polaroid Photo */}
                     <div className="relative w-44 bg-[#F5E9C9] p-2 pb-6 shadow-xl border border-[#11100C] rotate-[3.5deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
                       <PaperClip className="-top-2 right-2 rotate-[12deg]" />
                       <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
@@ -261,10 +323,8 @@ export const TangyDiary = () => {
                     </div>
                   </div>
 
-                  {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
                     <NotebookGridPattern opacity={0.05} />
-
                     <PressedFlower className="absolute top-2 right-2" />
 
                     <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
@@ -291,12 +351,9 @@ export const TangyDiary = () => {
                 </>
               )}
 
-              {/* ------------------------------------------------------------- */}
-              {/* SPREAD 3: OLD CITY HAVELI (MATCHES REFERENCE IMAGE EXACTLY!)  */}
-              {/* ------------------------------------------------------------- */}
+              {/* SPREAD 3: OLD CITY HAVELI (EXACT MATCH TO REF IMAGE 1) */}
               {idx === 2 && (
                 <>
-                  {/* LEFT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
                     <NotebookGridPattern opacity={0.05} />
                     
@@ -317,13 +374,11 @@ export const TangyDiary = () => {
                       The artists gathered around the ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant. No plan. No setlist. Just the night deciding what to play.
                     </p>
 
-                    {/* Taped Quote Card */}
                     <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[-1deg] relative w-4/5">
                       <TapeStrip className="-top-2 left-3 w-14 h-3.5 rotate-[2deg]" />
                       "300 people stayed till sunrise."
                     </div>
 
-                    {/* Center Overlapping Polaroid Photo with Paper Clip (EXACT MATCH TO REFERENCE IMAGE!) */}
                     <div className="relative w-48 bg-[#F5E9C9] p-2 pb-6 shadow-2xl border border-[#11100C] rotate-[-2.5deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
                       <PaperClip className="-top-3 left-3 rotate-[-10deg]" />
                       <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
@@ -334,11 +389,8 @@ export const TangyDiary = () => {
                     </div>
                   </div>
 
-                  {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
                     <NotebookGridPattern opacity={0.05} />
-
-                    {/* Pressed Dried Flower with Masking Tape */}
                     <PressedFlower className="absolute top-2 right-2" />
 
                     <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
@@ -349,10 +401,8 @@ export const TangyDiary = () => {
                       "The rain almost ruined the set. Then it became the set."
                     </p>
 
-                    {/* Performer Pass Ticket Stub */}
                     <PerformerPassStub date="21/09/75" className="mb-3 self-end" />
 
-                    {/* Sound Check Log */}
                     <div className="w-full bg-[#E7D5A4] p-2 border border-[#11100C] font-mono text-[8px] text-[#11100C] flex flex-col gap-0.5">
                       <div className="font-bold text-[#7C2D18] border-b border-[#11100C]/30 pb-0.5 uppercase">SOUND CHECK LOG</div>
                       <div>MIC: RIBBON R44 | PREAMP: TUBE U47</div>
@@ -360,7 +410,6 @@ export const TangyDiary = () => {
                       <span className="border border-[#7C2D18] text-[#7C2D18] font-bold px-1 py-0.5 self-start mt-1 rotate-[-2deg]">UNRELEASED</span>
                     </div>
 
-                    {/* Secondary Small Polaroid Photo Pinned to Bottom Right */}
                     <div className="relative w-32 bg-[#F5E9C9] p-1.5 pb-4 shadow-lg border border-[#11100C] rotate-[4deg] self-end mt-2">
                       <img src="/media/gallery/tangy9.jpg" alt="Late Night Crowd" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                     </div>
