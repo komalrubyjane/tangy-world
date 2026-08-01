@@ -16,8 +16,10 @@ export const Hero = () => {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: 'bottom top',
+        end: '+=160%',
         scrub: 0.5,
+        pin: true,
+        anticipatePin: 1,
         onUpdate: (self) => {
           setFilterCutoff(400 + self.progress * 12000);
 

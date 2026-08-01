@@ -8,7 +8,12 @@ import {
   MusicManuscriptPattern, 
   BlueprintGridPattern, 
   WarpedCheckerPattern, 
-  BotanicalRoseInk 
+  BotanicalRoseInk,
+  BotanicalRoseStem,
+  GinghamRibbonPattern,
+  FloralCutoutAccent,
+  TornNewspaperScrap,
+  PushPin
 } from '../ui/BackgroundDecorations';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
@@ -397,6 +402,7 @@ export const MobileLayout = ({
         className={`w-full bg-[#ecdcaf] text-[#191410] py-14 px-5 flex flex-col items-center text-center transition-all duration-700 relative overflow-hidden ${manifestoInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <NotebookGridPattern opacity={0.07} />
+        <FloralCutoutAccent className="absolute -top-4 -right-4 w-28 h-28 rotate-12" />
         <div className="w-full max-w-[480px] flex flex-col items-center gap-5 relative z-10">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">01 MANIFESTO</span>
           <div className="w-full bg-[#191410] p-2 border-2 border-[#191410] shadow-[6px_6px_0px_#c2272a] rotate-[1deg]">

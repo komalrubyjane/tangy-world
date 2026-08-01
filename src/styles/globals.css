@@ -45,17 +45,6 @@
     font-family: 'Oswald', sans-serif;
     overflow-x: hidden;
   }
-
-  @media (min-width: 1024px) {
-    html {
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
-    }
-    section {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
-  }
 }
 
 /* Custom 1970s Vintage Poster Typography Classes */

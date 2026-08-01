@@ -1,7 +1,7 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
-import { BotanicalRoseInk } from '../ui/BackgroundDecorations';
+import { BotanicalRoseInk, BotanicalRoseStem } from '../ui/BackgroundDecorations';
 
 export const PrivateSessions = ({ onRequestPrivate }) => {
   const { playSFX } = useAudio();
@@ -63,9 +63,11 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       {/* SOFT NOISE & PAPER FIBER TEXTURE */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-0" />
 
+      {/* CLIMBING BOTANICAL DARK RED ROSE STEM (LEFT EDGE ARTWORK — INSPIRED BY REF 2) */}
+      <BotanicalRoseStem className="absolute left-0 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[90%] opacity-90 hidden md:block" />
+
       {/* DELICATE VINTAGE BOTANICAL ROSE INK LINE ART ACCENTS */}
-      <BotanicalRoseInk color="#E7D7AC" opacity={0.14} className="absolute -top-8 -left-8 w-72 h-96 rotate-[15deg]" />
-      <BotanicalRoseInk color="#E7D7AC" opacity={0.10} className="absolute -bottom-8 -right-8 w-80 h-96 rotate-[-165deg]" />
+      <BotanicalRoseInk color="#E7D7AC" opacity={0.12} className="absolute -bottom-8 -right-8 w-80 h-96 rotate-[-165deg]" />
 
       {/* CROP MARKS & ARCHIVE LABELS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">

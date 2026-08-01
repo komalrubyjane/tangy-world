@@ -16,14 +16,14 @@ export const LenisProvider = ({ children }) => {
     if (prefersReducedMotion) return;
 
     const newLenis = new Lenis({
-      duration: 0.7,
+      duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       direction: 'vertical',
       gestureDirection: 'vertical',
       smooth: true,
-      mouseMultiplier: 1.0,
+      mouseMultiplier: 1,
       smoothTouch: false,
-      touchMultiplier: 1.2,
+      touchMultiplier: 1.5,
     });
 
     lenisRef.current = newLenis;

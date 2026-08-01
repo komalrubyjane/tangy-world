@@ -2,7 +2,12 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { diaryEntries } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
-import { NotebookGridPattern } from '../ui/BackgroundDecorations';
+import { 
+  NotebookGridPattern, 
+  GinghamRibbonPattern, 
+  PushPin, 
+  TapeStrip 
+} from '../ui/BackgroundDecorations';
 
 export const TangyDiary = () => {
   const { playSFX } = useAudio();
@@ -13,9 +18,11 @@ export const TangyDiary = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 75%',
-        end: 'bottom 25%',
-        scrub: 0.5
+        start: 'top top',
+        end: '+=400%',
+        scrub: 0.5,
+        pin: true,
+        anticipatePin: 1
       }
     });
 
@@ -71,6 +78,17 @@ export const TangyDiary = () => {
 
       {/* NOTEBOOK GRID BACKGROUND PATTERN */}
       <NotebookGridPattern opacity={0.06} />
+
+      {/* RED & WHITE GINGHAM RIBBON CORNER CUTOUTS (INSPIRED BY REF 3) */}
+      <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none z-10 hidden md:block">
+        <GinghamRibbonPattern opacity={0.75} className="w-44 h-24 rotate-[-45deg] -translate-x-12 -translate-y-8 shadow-md" />
+      </div>
+      <div className="absolute bottom-0 right-0 w-32 h-32 overflow-hidden pointer-events-none z-10 hidden md:block">
+        <GinghamRibbonPattern opacity={0.75} className="w-44 h-24 rotate-[135deg] translate-x-12 translate-y-8 shadow-md" />
+      </div>
+
+      {/* RED PUSHPIN ACCENT ON TOP EDGE */}
+      <PushPin className="top-6 left-1/4" />
 
       {/* FLOATING VINTAGE MUSICAL OBJECTS */}
       <div className="absolute top-12 left-10 w-24 md:w-36 pointer-events-none z-20 opacity-85 animate-[bounce_4s_ease-in-out_infinite]">

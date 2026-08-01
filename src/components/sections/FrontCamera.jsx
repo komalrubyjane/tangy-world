@@ -54,9 +54,11 @@ export const FrontCamera = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 75%',
-        end: 'bottom 25%',
+        start: 'top top',
+        end: '+=300%',
         scrub: 0.5,
+        pin: true,
+        anticipatePin: 1,
         onUpdate: (self) => {
           const currentIdx = Math.min(
             FOOTAGE_LIST.length - 1,
