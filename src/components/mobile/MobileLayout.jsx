@@ -569,7 +569,7 @@ export const MobileLayout = ({
           {diaryEntries.map((entry, idx) => (
             <div 
               key={entry.id} 
-              className={`w-full bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[12px_12px_0px_#11100C] flex flex-col gap-4 text-left relative ${idx % 2 === 0 ? 'rotate-[-1.5deg]' : 'rotate-[1.5deg]'}`}
+              className={`w-full bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[14px_14px_0px_#11100C] flex flex-col gap-4 text-left relative ${idx === 0 ? 'rotate-[-2.5deg]' : idx === 1 ? 'rotate-[3.2deg]' : 'rotate-[-1.8deg]'}`}
             >
               {/* Tape Strip Accent */}
               <TapeStrip className="-top-3 left-1/2 -translate-x-1/2 w-24 h-5 rotate-[-2deg]" />
@@ -590,6 +590,9 @@ export const MobileLayout = ({
                 <span className="absolute bottom-2 left-2 font-mono text-[8.5px] font-bold text-[#11100C]">
                   ✎ {entry.location}
                 </span>
+                <span className="absolute bottom-2 right-2 font-mono text-[7.5px] font-bold text-[#B94717] border border-[#B94717] px-1">
+                  {idx === 0 ? 'TICKET #09100' : idx === 1 ? 'STAGE PASS #02' : 'TAPE REEL #03'}
+                </span>
               </div>
 
               <h3 className="font-poster text-2xl text-[#11100C] leading-tight ink-bleed">
@@ -600,9 +603,9 @@ export const MobileLayout = ({
                 "{entry.content}"
               </p>
 
-              {/* Taped Annotation Note */}
+              {/* Unique Taped Annotation Note per entry */}
               <div className="bg-[#F5E9C9] p-2.5 border border-[#11100C] font-mono text-[9px] font-bold text-[#5A120D] flex justify-between items-center rotate-[1deg]">
-                <span>HANDWRITTEN FIELD NOTE</span>
+                <span>✎ {idx === 0 ? '"Soundcheck lasted till 2 AM."' : idx === 1 ? '"300 people stayed till sunrise."' : '"Water speaks in whispers."'}</span>
                 <span className="border border-[#5A120D] px-1.5 py-0.5">33⅓ RPM</span>
               </div>
             </div>
