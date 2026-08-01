@@ -48,8 +48,8 @@ export const TangyDiary = () => {
     // SCROLL STEP 1: DIARY SHELL TILTS SLIGHTLY & ZOOMS (FIRST SCROLL)
     tl.to('.diary-shell-wrapper', {
       scale: 1.03,
-      rotateZ: -2,
-      y: -10,
+      rotateZ: -2.5,
+      y: -12,
       duration: 0.25,
       ease: 'power1.inOut'
     }, 0)
@@ -99,6 +99,50 @@ export const TangyDiary = () => {
 
   }, []);
 
+  // COVER CONTENT FOR THE VINTAGE DIARY SHELL (MATCHING USER REFERENCE IMAGE)
+  const coverContent = (
+    <>
+      {/* Header Stenciled Tag */}
+      <div className="font-mono text-[10px] md:text-xs text-[#D19A24]/90 font-bold tracking-[0.35em] uppercase z-10 pt-2 pointer-events-none">
+        <div>TANGY SESSIONS</div>
+        <div className="text-[8.5px] tracking-[0.25em] opacity-75 mt-0.5">HYDERABAD · EST. 2016</div>
+      </div>
+
+      {/* Pressed Dried Flower Sprig with Masking Tape on Left Side of Twine */}
+      <PressedFlower className="absolute top-[42%] left-7 -translate-y-1/2 -rotate-12 z-30 scale-90" />
+
+      {/* Horizontal Jute Twine String Wrapped Twice around Book */}
+      <div className="absolute top-[46%] left-0 right-0 h-4 -translate-y-1/2 border-t-2 border-b-2 border-[#8C6B41]/90 pointer-events-none z-20 flex items-center justify-end pr-6">
+        <div className="w-9 h-9 rounded-full border-2 border-[#8C6B41] flex items-center justify-center font-bold text-sm text-[#8C6B41] bg-[#23120B]">
+          ⌘
+        </div>
+      </div>
+
+      {/* Faded Gold Cursive Calligraphic Script Title: Tangy Diary */}
+      <div className="relative z-10 my-auto flex flex-col items-center pointer-events-none">
+        <h3 className="font-serif italic text-6xl md:text-8xl text-[#E7D5A4] font-normal leading-none tracking-normal drop-shadow-2xl">
+          Tangy
+        </h3>
+        <h4 className="font-serif italic text-5xl md:text-7xl text-[#E7D5A4] font-normal leading-none tracking-normal drop-shadow-2xl -mt-2">
+          Diary
+        </h4>
+      </div>
+
+      {/* Aged Paper Card Snippet at Bottom Center */}
+      <div className="relative bg-[#E7D5A4] text-[#11100C] p-3 md:p-4 border border-[#11100C] shadow-lg font-mono text-[9px] md:text-[10px] font-bold z-10 w-4/5 max-w-[320px] mb-2 rotate-[-1deg] pointer-events-none">
+        <div className="border-b border-[#11100C]/30 pb-1 tracking-widest uppercase text-center text-[#7C2D18]">
+          NOTES. MOMENTS. MEMORIES.
+        </div>
+        <p className="font-serif italic text-xs text-[#11100C] my-1 text-center font-normal leading-tight">
+          A RECORD OF EVERYTHING THAT HAPPENED IN BETWEEN THE MUSIC.
+        </p>
+        <div className="font-bold text-[#7C2D18] tracking-[0.3em] uppercase text-center mt-1 text-[10px]">
+          ★ 1974 ★
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <section ref={sectionRef} id="diary" className="relative w-full h-screen bg-[#1C0E08] text-[#E7D5A4] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-4 md:p-8 perspective-[2000px]">
       
@@ -114,7 +158,7 @@ export const TangyDiary = () => {
 
       {/* CENTERPIECE VINTAGE DIARY SHELL (OCCUPIES ~70% VIEWPORT) */}
       <div className="diary-shell-wrapper relative w-full flex items-center justify-center z-20">
-        <VintageDiaryShell isCoverOpen={isCoverOpen}>
+        <VintageDiaryShell isCoverOpen={isCoverOpen} coverContent={coverContent}>
           
           {/* DYNAMIC 3D TURNING SCRAPBOOK PAGES INSIDE SHELL */}
           {diaryEntries.map((entry, idx) => (

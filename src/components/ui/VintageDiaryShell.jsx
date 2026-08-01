@@ -3,6 +3,7 @@
 
 export const VintageDiaryShell = ({ 
   isCoverOpen = false, 
+  coverContent = null,
   children,
   className = "" 
 }) => {
@@ -51,8 +52,8 @@ export const VintageDiaryShell = ({
           {children}
         </div>
 
-        {/* CLOSED LEATHER FRONT COVER (PURE VINTAGE DIARY SHELL - NO TEXT, NO STICKERS, NO FLOWERS) */}
-        <div className={`book-cover-front absolute inset-0 bg-[#25140C] rounded-xl border-4 border-[#120A06] border-r-[16px] border-b-[16px] border-r-[#D6C19A] border-b-[#C2B08B] shadow-[45px_45px_120px_rgba(0,0,0,0.98)] z-40 origin-left flex flex-col items-center justify-center p-8 text-center preserve-3d transition-transform duration-700 ${isCoverOpen ? 'rotate-y-[-140deg] opacity-0 pointer-events-none' : 'rotate-y-0 opacity-100'}`}>
+        {/* CLOSED LEATHER FRONT COVER (VINTAGE DIARY SHELL) */}
+        <div className={`book-cover-front absolute inset-0 bg-[#25140C] rounded-xl border-4 border-[#120A06] border-r-[16px] border-b-[16px] border-r-[#D6C19A] border-b-[#C2B08B] shadow-[45px_45px_120px_rgba(0,0,0,0.98)] z-40 origin-left flex flex-col items-center justify-between p-8 text-center preserve-3d transition-transform duration-700 ${isCoverOpen ? 'rotate-y-[-140deg] opacity-0 pointer-events-none' : 'rotate-y-0 opacity-100'}`}>
           <div className="absolute inset-0 bg-[url('/noise.png')] opacity-40 mix-blend-overlay pointer-events-none rounded-xl" />
 
           {/* Worn Leather Edges & Faded Brass Corner Details */}
@@ -61,10 +62,12 @@ export const VintageDiaryShell = ({
           <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[#C99A2E]/50 pointer-events-none" />
           <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[#C99A2E]/50 pointer-events-none" />
 
-          {/* Aged Blank Leather Frame Center Badge */}
-          <div className="w-48 h-28 border-2 border-[#C99A2E]/40 bg-[#1A0D07]/60 rounded-md flex items-center justify-center shadow-inner pointer-events-none">
-            <div className="w-44 h-24 border border-[#C99A2E]/20 rounded-sm" />
-          </div>
+          {/* Render Cover Content inside Shell */}
+          {coverContent || (
+            <div className="w-48 h-28 border-2 border-[#C99A2E]/40 bg-[#1A0D07]/60 rounded-md flex items-center justify-center shadow-inner pointer-events-none my-auto">
+              <div className="w-44 h-24 border border-[#C99A2E]/20 rounded-sm" />
+            </div>
+          )}
         </div>
 
       </div>
