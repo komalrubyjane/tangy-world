@@ -2,7 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { artists } from '../../data/mockData';
 import { useAudio } from '../../audio/AudioContext';
-import { MusicManuscriptPattern, BotanicalRoseStem } from '../ui/BackgroundDecorations';
+import { MusicManuscriptPattern, SoundWaveGraphic } from '../ui/BackgroundDecorations';
 
 export const Artists = ({ onArtistSubmit }) => {
   const { playSFX } = useAudio();
@@ -42,8 +42,8 @@ export const Artists = ({ onArtistSubmit }) => {
       {/* 5-LINE MUSIC MANUSCRIPT STAFF PATTERN */}
       <MusicManuscriptPattern opacity={0.06} color="#E7D5A4" />
 
-      {/* VINTAGE BOTANICAL DARK RED ROSE STEM (RIGHT EDGE CLIMBING ARTWORK — INSPIRED BY REF 2) */}
-      <BotanicalRoseStem className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[90%] opacity-90 hidden md:block" />
+      {/* ANALOG SOUND WAVE FREQUENCY GRAPHIC */}
+      <SoundWaveGraphic color="#E7D5A4" opacity={0.20} className="absolute right-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />
 
       {/* Header */}
       <div className="absolute top-8 left-8 md:top-12 md:left-12 z-20 pointer-events-none">

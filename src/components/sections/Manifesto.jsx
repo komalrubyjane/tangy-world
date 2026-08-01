@@ -2,7 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { 
   NotebookGridPattern, 
-  FloralCutoutAccent, 
+  CassetteTapeGraphic, 
   TornNewspaperScrap, 
   TapeStrip, 
   CoffeeStain, 
@@ -38,12 +38,9 @@ export const Manifesto = () => {
       {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
       <NotebookGridPattern opacity={0.07} />
 
-      {/* TORN NEWSPAPER SCRAP CUTOUT (TOP LEFT CORNER COLLAGE) */}
-      <TornNewspaperScrap className="absolute top-12 left-10 w-44 hidden md:block" />
-
-      {/* FLORAL PAPER CUTOUT ACCENT (TOP RIGHT CORNER) */}
-      <FloralCutoutAccent className="absolute -top-6 -right-6 w-48 h-48 rotate-[12deg] hidden md:block" />
-      <FloralCutoutAccent className="absolute -bottom-8 -left-8 w-44 h-44 rotate-[-35deg] hidden md:block" />
+      {/* CASSETTE TAPE / AUDIO REEL ACCENT (TOP RIGHT & BOTTOM LEFT CORNERS) */}
+      <CassetteTapeGraphic className="absolute top-10 right-10 w-44 hidden md:block" />
+      <TornNewspaperScrap className="absolute bottom-12 left-10 w-48 hidden md:block" />
 
       {/* COFFEE STAIN GRAPHIC ACCENT IN BACKGROUND */}
       <CoffeeStain className="-bottom-16 left-1/4 w-52 h-52 rotate-45" />

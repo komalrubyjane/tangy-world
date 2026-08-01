@@ -1,4 +1,4 @@
-// Modular SVG & CSS Decorative Texture & Collage Utilities for Tangy World Background System Redesign
+// Modular SVG & CSS Decorative Texture & Print Archive Utilities for Tangy World
 
 // 1. Notebook / Graph Grid Pattern (Faint 24px Grid)
 export const NotebookGridPattern = ({ opacity = 0.08, className = "" }) => (
@@ -67,7 +67,7 @@ export const WarpedCheckerPattern = ({ opacity = 0.08, className = "" }) => (
   </div>
 );
 
-// 5. Red-and-White Gingham Fabric Ribbon Pattern (Inspired by Reference Image 3)
+// 5. Red-and-White Gingham Fabric Ribbon Pattern
 export const GinghamRibbonPattern = ({ opacity = 0.85, className = "" }) => (
   <div className={`pointer-events-none z-10 ${className}`} style={{ opacity }}>
     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -83,72 +83,64 @@ export const GinghamRibbonPattern = ({ opacity = 0.85, className = "" }) => (
   </div>
 );
 
-// 6. Vintage Botanical Dark Red Rose Stem Illustration (Inspired by Reference Image 2)
+// 6. Sound Wave Frequency Graphic (Replaces Botanical Stems with Sonic Frequency Waves)
+export const SoundWaveGraphic = ({ color = "#E7D5A4", opacity = 0.25, className = "" }) => (
+  <svg 
+    viewBox="0 0 240 360" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    className={`pointer-events-none z-0 ${className}`}
+    style={{ opacity }}
+  >
+    <g stroke={color} strokeWidth="2" strokeLinecap="round">
+      <line x1="20" y1="180" x2="20" y2="200" />
+      <line x1="35" y1="160" x2="35" y2="220" />
+      <line x1="50" y1="120" x2="50" y2="260" />
+      <line x1="65" y1="80" x2="65" y2="290" />
+      <line x1="80" y1="40" x2="80" y2="330" />
+      <line x1="95" y1="10" x2="95" y2="350" strokeWidth="3" />
+      <line x1="110" y1="50" x2="110" y2="320" />
+      <line x1="125" y1="90" x2="125" y2="280" />
+      <line x1="140" y1="130" x2="140" y2="240" />
+      <line x1="155" y1="150" x2="155" y2="220" />
+      <line x1="170" y1="110" x2="170" y2="270" />
+      <line x1="185" y1="70" x2="185" y2="300" />
+      <line x1="200" y1="120" x2="200" y2="250" />
+      <line x1="215" y1="160" x2="215" y2="210" />
+    </g>
+  </svg>
+);
+
+// Fallback compatibility aliases for any legacy references
 export const BotanicalRoseStem = ({ className = "" }) => (
-  <svg 
-    viewBox="0 0 280 480" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg" 
-    className={`pointer-events-none z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)] ${className}`}
-  >
-    {/* Rose Flower Petals */}
-    <g transform="translate(140, 90)">
-      <circle cx="0" cy="0" r="48" fill="#5A120D" stroke="#220505" strokeWidth="2" />
-      <path d="M-30,-20 C-10,-45 20,-45 35,-15 C50,15 20,40 -10,35 C-35,30 -45,0 -30,-20 Z" fill="#8A2320" stroke="#320407" strokeWidth="2" />
-      <path d="M-20,-10 C-5,-30 15,-30 25,-8 C35,12 10,28 -8,22 C-25,18 -30,-2 -20,-10 Z" fill="#C2272A" stroke="#4A0C0C" strokeWidth="1.5" />
-      <path d="M-10,-5 C0,-18 10,-18 15,-4 C20,8 6,16 -4,13 Z" fill="#E7D5A4" fillOpacity="0.3" stroke="#8A2320" strokeWidth="1" />
-    </g>
-
-    {/* Stem & Leaves */}
-    <g stroke="#2D4A27" strokeWidth="4" strokeLinecap="round">
-      <path d="M 140 138 Q 135 260, 150 470" />
-      
-      {/* Thorns */}
-      <path d="M 138 180 L 152 172 L 139 190 Z" fill="#2D4A27" stroke="none" />
-      <path d="M 136 240 L 122 232 L 135 250 Z" fill="#2D4A27" stroke="none" />
-      <path d="M 142 320 L 156 312 L 143 330 Z" fill="#2D4A27" stroke="none" />
-
-      {/* Leaf Pair 1 */}
-      <path d="M 138 200 Q 80 180, 50 215 Q 95 240, 138 200 Z" fill="#263E21" stroke="#182A14" strokeWidth="2" />
-      <path d="M 138 200 Q 92 212, 50 215" stroke="#182A14" strokeWidth="1.5" />
-
-      {/* Leaf Pair 2 */}
-      <path d="M 142 270 Q 200 250, 230 285 Q 185 310, 142 270 Z" fill="#263E21" stroke="#182A14" strokeWidth="2" />
-      <path d="M 142 270 Q 188 282, 230 285" stroke="#182A14" strokeWidth="1.5" />
-
-      {/* Leaf Pair 3 */}
-      <path d="M 145 360 Q 85 340, 60 375 Q 105 400, 145 360 Z" fill="#263E21" stroke="#182A14" strokeWidth="2" />
-      <path d="M 145 360 Q 99 372, 60 375" stroke="#182A14" strokeWidth="1.5" />
-    </g>
-  </svg>
+  <SoundWaveGraphic color="#B94717" opacity={0.35} className={className} />
 );
 
-// 7. Cream & Crimson Floral Paper Cutout (Inspired by Reference Image 1)
+export const BotanicalRoseInk = ({ color = "#E7D5A4", opacity = 0.12, className = "" }) => (
+  <SoundWaveGraphic color={color} opacity={opacity} className={className} />
+);
+
+// 7. Vintage Cassette Tape & Reel Label Graphic (Replaces Floral Cutouts)
+export const CassetteTapeGraphic = ({ className = "" }) => (
+  <div className={`pointer-events-none z-10 bg-[#11100C] text-[#E7D5A4] p-3 border-2 border-[#E7D5A4] shadow-xl rotate-[-4deg] ${className}`}>
+    <div className="flex justify-between font-mono text-[8px] border-b border-[#E7D5A4]/40 pb-1 mb-2 font-bold uppercase">
+      <span>TANGY AUDIO REEL</span>
+      <span>60 MIN</span>
+    </div>
+    <div className="flex items-center justify-around bg-[#E7D5A4] text-[#11100C] p-2 border border-[#11100C]">
+      <div className="w-6 h-6 rounded-full border-2 border-[#11100C] border-dashed animate-spin" />
+      <span className="font-mono text-[7px] font-bold tracking-widest uppercase">SIDE A</span>
+      <div className="w-6 h-6 rounded-full border-2 border-[#11100C] border-dashed animate-spin" />
+    </div>
+  </div>
+);
+
+// Fallback export for FloralCutoutAccent so legacy imports output Cassette Tape / Reel label instead of flowers
 export const FloralCutoutAccent = ({ className = "" }) => (
-  <svg 
-    viewBox="0 0 200 200" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg" 
-    className={`pointer-events-none z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.35)] ${className}`}
-  >
-    {/* Hibiscus Petals (Cream with Fine Inking) */}
-    <g fill="#F5E9C9" stroke="#3A2B15" strokeWidth="1.5" strokeLinejoin="round">
-      <path d="M 100 100 C 60 40, 20 70, 40 110 C 60 140, 100 100, 100 100 Z" />
-      <path d="M 100 100 C 140 40, 180 70, 160 110 C 140 140, 100 100, 100 100 Z" />
-      <path d="M 100 100 C 140 140, 110 180, 70 160 C 40 140, 100 100, 100 100 Z" />
-      <path d="M 100 100 C 60 140, 90 180, 130 160 C 160 140, 100 100, 100 100 Z" />
-      <path d="M 100 100 C 80 40, 120 40, 100 100 Z" fill="#C2272A" />
-    </g>
-
-    {/* Stamen Pistil */}
-    <path d="M 100 100 Q 120 60, 135 45" stroke="#C99A2E" strokeWidth="2.5" strokeLinecap="round" />
-    <circle cx="135" cy="45" r="4" fill="#C99A2E" />
-    <circle cx="128" cy="52" r="3" fill="#C99A2E" />
-    <circle cx="138" cy="54" r="3" fill="#C99A2E" />
-  </svg>
+  <CassetteTapeGraphic className={className} />
 );
 
-// 8. Torn Newspaper Fragment Graphic (Inspired by Reference Image 1)
+// 8. Torn Newspaper Fragment Graphic
 export const TornNewspaperScrap = ({ className = "" }) => (
   <div className={`pointer-events-none z-10 bg-[#E7D5A4] p-3 border border-[#11100C]/40 shadow-md rotate-[-3deg] ${className}`}>
     <div className="font-mono text-[7px] text-[#11100C]/70 leading-tight uppercase tracking-tighter">
@@ -195,7 +187,7 @@ export const PaperClip = ({ className = "" }) => (
   <div className={`absolute z-30 pointer-events-none w-3.5 h-10 border-2 border-slate-700 rounded-full shadow-sm ${className}`} />
 );
 
-// 13. Red PushPin Graphic Accent (Inspired by Reference Image 3)
+// 13. Red PushPin Graphic Accent
 export const PushPin = ({ className = "" }) => (
   <div className={`absolute z-30 pointer-events-none flex flex-col items-center ${className}`}>
     <div className="w-4 h-4 rounded-full bg-[#C2272A] border-2 border-[#11100C] shadow-md flex items-center justify-center">
@@ -203,27 +195,4 @@ export const PushPin = ({ className = "" }) => (
     </div>
     <div className="w-0.5 h-2.5 bg-[#11100C]" />
   </div>
-);
-
-// 14. Vintage Botanical Ink Rose & Leaves Line Art SVG
-export const BotanicalRoseInk = ({ color = "#E7D5A4", opacity = 0.12, className = "" }) => (
-  <svg 
-    viewBox="0 0 240 320" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg" 
-    className={`pointer-events-none z-0 ${className}`} 
-    style={{ opacity }}
-  >
-    <g stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M 120 70 C 100 40, 140 20, 150 50 C 170 30, 190 70, 160 90 C 180 120, 140 140, 120 110 C 100 130, 70 100, 90 80 C 70 50, 100 30, 120 70 Z" />
-      <path d="M 120 60 C 110 45, 135 35, 140 55 C 150 45, 160 65, 145 75 C 155 90, 135 100, 120 85 C 110 95, 95 80, 105 70 Z" />
-      <path d="M 120 65 C 115 58, 128 52, 130 62 C 136 56, 142 68, 132 72 C 138 82, 125 88, 120 78 Z" fill={color} fillOpacity="0.15" />
-      <path d="M 120 110 Q 115 170, 125 240 T 115 310" strokeWidth="2.2" />
-      <path d="M 122 140 L 134 132 L 123 150 Z" fill={color} />
-      <path d="M 119 180 L 106 174 L 118 190 Z" fill={color} />
-      <path d="M 124 220 L 138 214 L 125 232 Z" fill={color} />
-      <path d="M 122 155 Q 160 140, 185 165 Q 150 185, 122 155 Z" />
-      <path d="M 119 195 Q 80 180, 55 205 Q 90 225, 119 195 Z" />
-    </g>
-  </svg>
 );
