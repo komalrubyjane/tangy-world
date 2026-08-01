@@ -7,10 +7,9 @@ export const Gallery = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=300%',
-        scrub: 1,
-        pin: true
+        start: 'top 75%',
+        end: 'bottom 25%',
+        scrub: 1
       }
     });
 
