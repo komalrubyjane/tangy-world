@@ -36,6 +36,9 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
 
       const isMobile = fullW < 768;
 
+      // Adjust stroke thickness: 3.5px on desktop, 2.2px on mobile
+      pathEl.setAttribute('stroke-width', isMobile ? '2.2' : '3.5');
+
       // Section Landmark Waypoints (Gutter & Edge Aligned)
       const points = [
         { x: fullW * 0.50, y: 0 },
@@ -112,14 +115,16 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       if (pathObj && micObj) {
         const totalLength = pathObj.getTotalLength();
         const vh = window.innerHeight;
+        const isMobile = window.innerWidth < 768;
+        const halfWidth = isMobile ? 28 : 32;
 
         // Position microphone suspended near ~55% of user's active viewport
         const targetDocY = currentScrollY.current + (vh * 0.55);
 
         const distance = findPathDistanceForY(pathObj, totalLength, targetDocY);
 
-        // Cable ends exactly at the microphone tip
-        pathObj.style.strokeDashoffset = `${totalLength - distance}`;
+        // Cable extends 3px past the connection point to enter directly inside the metallic ferrule (0 gap!)
+        pathObj.style.strokeDashoffset = `${totalLength - distance + 3}`;
 
         // Get exact position and curve tangent angle
         const pt = pathObj.getPointAtLength(distance);
@@ -127,9 +132,10 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
 
         const angleRad = Math.atan2(ptNext.y - pt.y, ptNext.x - pt.x);
         let angleDeg = (angleRad * (180 / Math.PI)) - 90;
-        angleDeg = Math.min(7, Math.max(-7, angleDeg)); // Gentle pendulum sway (-7deg to +7deg)
+        angleDeg = Math.min(6, Math.max(-6, angleDeg)); // Natural subtle pendulum sway (-6deg to +6deg)
 
-        micObj.style.transform = `translate3d(${pt.x - 28}px, ${pt.y}px, 0px) rotate(${angleDeg}deg)`;
+        // Pivot exactly from (pt.x, pt.y) top center mount
+        micObj.style.transform = `translate3d(${pt.x - halfWidth}px, ${pt.y - 2}px, 0px) rotate(${angleDeg}deg)`;
       }
 
       animationFrameRef.current = requestAnimationFrame(renderLoop);
@@ -151,7 +157,7 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       ref={containerRef}
       className="absolute top-0 left-0 w-full pointer-events-none z-[85] overflow-visible"
     >
-      {/* 1. SINGLE CONTINUOUS VINTAGE CABLE (Warm Cream / Gold, 3.2px thick, Smooth Bézier) */}
+      {/* 1. SINGLE CONTINUOUS VINTAGE CABLE (Warm Cream / Gold, Smooth Bézier) */}
       <svg 
         ref={svgRef} 
         className="absolute top-0 left-0 w-full h-full pointer-events-none z-[85] overflow-visible"
@@ -160,23 +166,28 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
           ref={pathRef}
           fill="none"
           stroke="#E7D5A4"
-          strokeWidth="3.2"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           className="opacity-90 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]"
         />
       </svg>
 
-      {/* 2. SUSPENDED MICROPHONE HEAD (Attached directly to top center of cable tip) */}
+      {/* 2. SUSPENDED MICROPHONE HEAD (Attached directly to top center of cable tip with metallic ferrule) */}
       <div 
         ref={micHeadRef}
-        className="absolute top-0 left-0 w-14 h-28 md:w-16 md:h-32 pointer-events-none z-[86] origin-top flex flex-col items-center will-change-transform"
+        className="absolute top-0 left-0 w-14 h-28 md:w-16 md:h-32 pointer-events-none z-[86] flex flex-col items-center will-change-transform"
+        style={{ transformOrigin: '50% 0px' }}
       >
+        {/* Metal Ferrule / Brass Cable Connector (disappears wire seamlessly into microphone mount) */}
+        <div className="w-2.5 h-3 md:w-3 md:h-3.5 bg-[linear-gradient(180deg,#E7D5A4_0%,#C99A2E_60%,#11100C_100%)] rounded-t-xs border border-[#11100C] shadow-sm z-20 -mb-1.5 shrink-0" />
+
+        {/* Vintage Microphone Image Centered Directly Below Ferrule */}
         <div className="relative w-full h-full flex flex-col items-center">
           <img 
             src="/media/vintage-mic2.png" 
             alt="Tangy Vintage Suspended Microphone" 
-            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125"
+            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125 -mt-0.5"
           />
 
           {/* Audio Micro-Pulse Glow when Sound is ON */}
