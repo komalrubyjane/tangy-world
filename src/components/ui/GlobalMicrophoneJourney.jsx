@@ -36,8 +36,8 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
 
       const isMobile = fullW < 768;
 
-      // Adjust stroke thickness: 3.5px on desktop, 2.2px on mobile
-      pathEl.setAttribute('stroke-width', isMobile ? '2.2' : '3.5');
+      // Stroke thickness: 3.2px on desktop, 2.0px on mobile
+      pathEl.setAttribute('stroke-width', isMobile ? '2.0' : '3.2');
 
       // Section Landmark Waypoints (Gutter & Edge Aligned)
       const points = [
@@ -116,15 +116,18 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         const totalLength = pathObj.getTotalLength();
         const vh = window.innerHeight;
         const isMobile = window.innerWidth < 768;
-        const halfWidth = isMobile ? 28 : 32;
+        
+        // Microphone display width & top connector X offset (58.5% of width)
+        const micWidth = isMobile ? 48 : 56;
+        const connectorXOffset = micWidth * 0.585;
 
         // Position microphone suspended near ~55% of user's active viewport
         const targetDocY = currentScrollY.current + (vh * 0.55);
 
         const distance = findPathDistanceForY(pathObj, totalLength, targetDocY);
 
-        // Cable extends 3px past the connection point to enter directly inside the metallic ferrule (0 gap!)
-        pathObj.style.strokeDashoffset = `${totalLength - distance + 3}`;
+        // Cable terminates exactly at distance (pt.x, pt.y) without extra extension
+        pathObj.style.strokeDashoffset = `${totalLength - distance}`;
 
         // Get exact position and curve tangent angle
         const pt = pathObj.getPointAtLength(distance);
@@ -134,8 +137,8 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         let angleDeg = (angleRad * (180 / Math.PI)) - 90;
         angleDeg = Math.min(6, Math.max(-6, angleDeg)); // Natural subtle pendulum sway (-6deg to +6deg)
 
-        // Pivot exactly from (pt.x, pt.y) top center mount
-        micObj.style.transform = `translate3d(${pt.x - halfWidth}px, ${pt.y - 2}px, 0px) rotate(${angleDeg}deg)`;
+        // Translate so top metal connector (58.5%, 0px) meets (pt.x, pt.y) exactly with 0 gap
+        micObj.style.transform = `translate3d(${pt.x - connectorXOffset}px, ${pt.y}px, 0px) rotate(${angleDeg}deg)`;
       }
 
       animationFrameRef.current = requestAnimationFrame(renderLoop);
@@ -166,28 +169,24 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
           ref={pathRef}
           fill="none"
           stroke="#E7D5A4"
-          strokeWidth="3.5"
+          strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"
           className="opacity-90 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]"
         />
       </svg>
 
-      {/* 2. SUSPENDED MICROPHONE HEAD (Attached directly to top center of cable tip with metallic ferrule) */}
+      {/* 2. SUSPENDED MICROPHONE HEAD (Tightly cropped asset starting at metal connector top pixel) */}
       <div 
         ref={micHeadRef}
-        className="absolute top-0 left-0 w-14 h-28 md:w-16 md:h-32 pointer-events-none z-[86] flex flex-col items-center will-change-transform"
-        style={{ transformOrigin: '50% 0px' }}
+        className="absolute top-0 left-0 w-[48px] h-[114px] md:w-[56px] md:h-[133px] pointer-events-none z-[86] flex flex-col items-center will-change-transform"
+        style={{ transformOrigin: '58.5% 0px' }}
       >
-        {/* Metal Ferrule / Brass Cable Connector (disappears wire seamlessly into microphone mount) */}
-        <div className="w-2.5 h-3 md:w-3 md:h-3.5 bg-[linear-gradient(180deg,#E7D5A4_0%,#C99A2E_60%,#11100C_100%)] rounded-t-xs border border-[#11100C] shadow-sm z-20 -mb-1.5 shrink-0" />
-
-        {/* Vintage Microphone Image Centered Directly Below Ferrule */}
-        <div className="relative w-full h-full flex flex-col items-center">
+        <div className="relative w-full h-full">
           <img 
             src="/media/vintage-mic2.png" 
             alt="Tangy Vintage Suspended Microphone" 
-            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125 -mt-0.5"
+            className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125 block"
           />
 
           {/* Audio Micro-Pulse Glow when Sound is ON */}
