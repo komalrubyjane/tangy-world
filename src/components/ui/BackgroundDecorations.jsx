@@ -120,7 +120,7 @@ export const BotanicalRoseInk = ({ color = "#E7D5A4", opacity = 0.12, className 
   <SoundWaveGraphic color={color} opacity={opacity} className={className} />
 );
 
-// 7. Vintage Cassette Tape & Reel Label Graphic (Replaces Floral Cutouts)
+// 7. Vintage Cassette Tape & Reel Label Graphic
 export const CassetteTapeGraphic = ({ className = "" }) => (
   <div className={`pointer-events-none z-10 bg-[#11100C] text-[#E7D5A4] p-3 border-2 border-[#E7D5A4] shadow-xl rotate-[-4deg] ${className}`}>
     <div className="flex justify-between font-mono text-[8px] border-b border-[#E7D5A4]/40 pb-1 mb-2 font-bold uppercase">
@@ -135,7 +135,7 @@ export const CassetteTapeGraphic = ({ className = "" }) => (
   </div>
 );
 
-// Fallback export for FloralCutoutAccent so legacy imports output Cassette Tape / Reel label instead of flowers
+// Fallback export for FloralCutoutAccent so legacy imports output Cassette Tape / Reel label
 export const FloralCutoutAccent = ({ className = "" }) => (
   <CassetteTapeGraphic className={className} />
 );
@@ -194,5 +194,38 @@ export const PushPin = ({ className = "" }) => (
       <div className="w-1.5 h-1.5 rounded-full bg-[#F5E9C9] opacity-80" />
     </div>
     <div className="w-0.5 h-2.5 bg-[#11100C]" />
+  </div>
+);
+
+// 14. Pressed Dried Flower Illustration with Stem & Tape
+export const PressedFlower = ({ className = "" }) => (
+  <div className={`pointer-events-none z-20 flex flex-col items-center ${className}`}>
+    <svg width="48" height="80" viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-md">
+      <path d="M 24 75 Q 22 45, 24 15" stroke="#685438" strokeWidth="2" strokeLinecap="round" />
+      <path d="M 24 45 Q 15 35, 10 38" stroke="#52422B" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M 24 55 Q 33 48, 38 52" stroke="#52422B" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="24" cy="12" r="5" fill="#B38F46" />
+      <circle cx="18" cy="18" r="4" fill="#8C6E30" />
+      <circle cx="30" cy="18" r="4" fill="#A48239" />
+      <circle cx="10" cy="38" r="3" fill="#6B5424" />
+      <circle cx="38" cy="52" r="3" fill="#6B5424" />
+    </svg>
+    <div className="w-10 h-3 bg-[rgba(231,213,164,0.85)] border border-black/20 shadow-xs -mt-10 rotate-[-4deg]" />
+  </div>
+);
+
+// 15. Tangy Sessions Performer Pass Ticket Stub
+export const PerformerPassStub = ({ date = "21/09/75", className = "" }) => (
+  <div className={`pointer-events-none z-20 bg-[#D3B480] text-[#3D2517] p-2.5 border border-[#3D2517] shadow-md font-mono text-[8px] font-bold flex flex-col gap-1 uppercase rotate-[-2deg] ${className}`}>
+    <div className="border-b border-[#3D2517]/40 pb-1 flex justify-between tracking-widest">
+      <span>TANGY SESSIONS</span>
+      <span>1974</span>
+    </div>
+    <div className="text-[9px] font-black tracking-wider text-[#7C2D18]">PERFORMER PASS</div>
+    <div className="text-[7.5px] opacity-80">BACKSTAGE ACCESS</div>
+    <div className="border-t border-[#3D2517]/40 pt-1 text-[7px] flex justify-between">
+      <span>DATE: {date}</span>
+      <span>VALID ✦</span>
+    </div>
   </div>
 );

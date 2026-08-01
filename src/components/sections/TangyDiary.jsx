@@ -5,12 +5,10 @@ import { useAudio } from '../../audio/AudioContext';
 import { 
   NotebookGridPattern, 
   TapeStrip, 
-  PushPin, 
-  CoffeeStain, 
   PaperClip,
-  TornNewspaperScrap,
   CassetteTapeGraphic,
-  SoundWaveGraphic
+  PressedFlower,
+  PerformerPassStub
 } from '../ui/BackgroundDecorations';
 
 export const TangyDiary = () => {
@@ -30,10 +28,6 @@ export const TangyDiary = () => {
       }
     });
 
-    // Initial States: Closed Cover covers the book
-    gsap.set('.book-cover-front', { rotateY: 0, opacity: 1, zIndex: 40 });
-    gsap.set('.book-interior', { opacity: 0, scale: 0.95 });
-
     // Initialize all flip pages stacked flat on the right side (rotateY: 0deg)
     pages.forEach((page, index) => {
       gsap.set(page, { 
@@ -44,17 +38,7 @@ export const TangyDiary = () => {
       });
     });
 
-    // STAGE 1: BOOK COVER OPENS ON SCROLL
-    tl.to('.book-interior', { opacity: 1, scale: 1, duration: 0.20, ease: 'power2.out' }, 0.05)
-      .to('.book-cover-front', { 
-        rotateY: -140, 
-        opacity: 0, 
-        duration: 0.25, 
-        ease: 'power2.inOut',
-        onStart: () => playSFX('pageTurn')
-      }, 0.05);
-
-    // STAGE 2: PHYSICAL 3D PAGE TURNS
+    // PHYSICAL 3D PAGE TURNS (BOOK REMAINS FIXED IN CENTER)
     pages.forEach((page, i) => {
       if (i < pages.length - 1) {
         tl.to(page, {
@@ -69,289 +53,316 @@ export const TangyDiary = () => {
               gsap.set(page, { zIndex: pages.length - i });
             }
           }
-        }, 0.25 + i * 0.30);
+        }, i * 0.35);
       }
     });
 
   }, []);
 
   return (
-    <section ref={sectionRef} id="diary" className="relative w-full h-screen bg-[#3B2016] text-[#E7D5A4] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-4 md:p-10 perspective-[2000px]">
+    <section ref={sectionRef} id="diary" className="relative w-full h-screen bg-[#2A160F] text-[#E7D5A4] overflow-hidden flex items-center justify-between border-t-8 border-[#11100C] p-4 md:px-12 md:py-8 perspective-[2000px]">
       
       {/* HANDMADE PAPER FIBER TEXTURE & VIGNETTE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none" />
-      <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.85)] pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
+      <div className="absolute inset-0 shadow-[inset_0_0_160px_rgba(0,0,0,0.92)] pointer-events-none z-10" />
 
-      {/* NOTEBOOK GRAPH GRID BACKGROUND UNDERLAY */}
-      <NotebookGridPattern opacity={0.06} />
-
-      {/* COFFEE STAIN RING ACCENTS IN BACKGROUND */}
-      <CoffeeStain className="-top-12 -left-12 w-56 h-56 rotate-12" />
-      <CoffeeStain className="-bottom-16 -right-16 w-64 h-64 rotate-[-45deg]" />
-
-      {/* RED PUSHPIN ACCENT ON TOP EDGE */}
-      <PushPin className="top-6 left-1/4" />
-
-      {/* FLOATING VINTAGE MUSICAL OBJECTS */}
-      <div className="absolute top-12 left-10 w-24 md:w-36 pointer-events-none z-20 opacity-85 animate-[bounce_4s_ease-in-out_infinite]">
-        <img src="/media/violin.png" alt="Acoustic Violin" className="w-full h-full object-contain filter drop-shadow-2xl" />
+      {/* TOP DESK HEADER BAR */}
+      <div className="absolute top-4 left-6 md:top-6 md:left-12 font-mono text-[9px] md:text-[10px] text-[#D19A24] tracking-[0.25em] font-bold uppercase z-20 pointer-events-none">
+        TANGY SESSIONS // HYDERABAD - 1974 ARCHIVE
       </div>
 
-      <div className="absolute bottom-10 right-12 w-28 md:w-44 pointer-events-none z-20 opacity-85">
-        <img src="/media/radio.png" alt="Vintage Tube Radio" className="w-full h-full object-contain filter drop-shadow-2xl" />
-      </div>
-
-      {/* Section Header */}
-      <div className="absolute top-6 left-6 md:top-10 md:left-12 z-20 pointer-events-none">
-        <p className="font-mono text-[#D19A24] text-[10px] tracking-[0.3em] font-bold uppercase">PHYSICAL HANDPRINTED SCRAPBOOK // FIELD LOGS</p>
-        <h2 className="display text-4xl md:text-6xl text-[#E7D5A4]">THE DIARY</h2>
-      </div>
-
-      {/* 3D SCRAPBOOK CONTAINER */}
-      <div className="relative w-[min(1100px,94vw)] h-[min(640px,76vh)] preserve-3d">
-
-        {/* CLOSED LEATHER FRONT COVER */}
-        <div className="book-cover-front absolute inset-0 bg-[#23120B] rounded-xl border-8 border-[#11100C] shadow-[40px_40px_110px_rgba(0,0,0,0.95)] z-40 origin-left flex flex-col justify-between p-8 md:p-16 text-center preserve-3d">
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-35 mix-blend-overlay pointer-events-none" />
-
-          {/* Embossed Antique Brass Corners */}
-          <div className="absolute top-3 left-3 w-9 h-9 border-t-4 border-l-4 border-[#C99A2E]" />
-          <div className="absolute top-3 right-3 w-9 h-9 border-t-4 border-r-4 border-[#C99A2E]" />
-          <div className="absolute bottom-3 left-3 w-9 h-9 border-b-4 border-l-4 border-[#C99A2E]" />
-          <div className="absolute bottom-3 right-3 w-9 h-9 border-b-4 border-r-4 border-[#C99A2E]" />
-
-          {/* Masking Tape Snippet Holding Vintage Photo on Cover */}
-          <TapeStrip className="top-8 right-16 w-24 h-6 rotate-[-12deg]" />
-          <div className="absolute top-10 right-14 w-28 bg-[#E7D5A4] p-1.5 pb-6 border border-[#11100C] shadow-xl rotate-[-5.5deg] hidden md:block">
-            <img src="/media/gallery/tangy1.jpg" alt="Stepwell Cover Snippet" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125 border border-[#11100C]" />
-            <span className="font-mono text-[7px] text-[#11100C] font-bold block mt-1">FIG 01. COVER</span>
+      {/* LEFT COLUMN / DESK AREA (STATIC DESK CONTENT) */}
+      <div className="hidden lg:flex flex-col justify-between w-1/3 max-w-[320px] h-[82vh] z-20 pointer-events-none pr-4">
+        
+        {/* Title Section */}
+        <div className="mt-8">
+          <p className="font-serif italic text-sm text-[#D19A24] mb-1">
+            Field logs from the road less recorded.
+          </p>
+          <h2 className="display text-6xl xl:text-7xl text-[#E7D5A4] leading-none mb-3 tracking-tight">
+            THE DIARY
+          </h2>
+          <div className="font-mono text-[10px] text-[#D19A24] font-bold tracking-[0.25em] border-b border-[#D19A24]/30 pb-2 mb-3 uppercase">
+            NOTES. MOMENTS. MEMORIES.
           </div>
+          <p className="font-serif italic text-xs text-[#E7D5A4]/80 leading-relaxed mb-4">
+            A record of everything that happened in between the music.
+          </p>
+          <span className="font-mono text-[9px] text-[#B94717] font-bold tracking-widest uppercase border border-[#B94717] px-2 py-0.5 inline-block">
+            ARCHIVE SERIES | VOL. 03
+          </span>
+        </div>
 
-          <div className="border-b-2 border-[#C99A2E]/50 pb-4 font-mono text-xs text-[#C99A2E] font-bold tracking-[0.3em] uppercase relative z-10">
-            PRIVATE ARCHIVE // RESTRICTED ACCESS NO. 1974-D
-          </div>
+        {/* Bottom Left Desk Ephemera */}
+        <div className="flex flex-col gap-4 mb-4">
+          {/* Cassette Tape */}
+          <CassetteTapeGraphic className="w-44 rotate-[-6deg] shadow-2xl" />
 
-          <div className="relative z-10 my-auto">
-            <h3 className="display text-5xl md:text-8xl text-[#E7D5A4] tracking-tighter ink-bleed drop-shadow-2xl">
-              TANGY<br/>DIARY
-            </h3>
-            <p className="font-mono text-xs text-[#C99A2E] tracking-[0.4em] uppercase mt-4 font-bold border-y border-[#C99A2E]/40 py-2 inline-block px-6 bg-black/50 backdrop-blur-xs">
-              1974 – 2026 // HANDCRAFTED FIELD LOGS
-            </p>
-          </div>
-
-          <div className="border-t-2 border-[#C99A2E]/50 pt-4 font-mono text-[10px] text-[#E7D5A4]/70 tracking-widest uppercase flex justify-between items-center relative z-10">
-            <span>HYDERABAD · INDIA</span>
-            <span className="border-2 border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-bold">SCROLL TO TURN PAGES ↓</span>
+          {/* Artist Crew Backstage Ticket Stub */}
+          <div className="bg-[#D3B480] text-[#3D2517] p-2.5 border border-[#3D2517] shadow-xl w-44 font-mono text-[8px] font-bold flex flex-col gap-1 uppercase rotate-[4deg]">
+            <div className="text-[9px] font-black text-[#7C2D18]">BACKSTAGE ACCESS</div>
+            <div className="text-[8px] font-bold">ARTIST CREW</div>
+            <div className="border-t border-[#3D2517]/40 pt-1 text-[7px] flex justify-between">
+              <span>21/09/75</span>
+              <span>TANGY SESSIONS</span>
+            </div>
           </div>
         </div>
 
-        {/* INTERIOR SCRAPBOOK WITH 3D TURNING PAGES */}
-        <div className="book-interior absolute inset-0 bg-[#11100C] rounded-xl p-3 md:p-6 border-4 border-[#11100C] shadow-[30px_30px_90px_rgba(0,0,0,0.95)] z-10 flex flex-col justify-center preserve-3d">
+      </div>
+
+      {/* CENTER BOOK CONTAINER (FIXED POSITION & REALISTIC JOURNAL RATIO) */}
+      <div className="relative w-full lg:w-[min(880px,62vw)] h-[min(580px,76vh)] preserve-3d mx-auto z-20">
+
+        {/* FOLDED HYDERABAD OLD CITY MAP TUCKED UNDER RIGHT EDGE */}
+        <div className="absolute -bottom-6 -right-10 w-44 h-48 bg-[#D8C7A5] border border-[#11100C] shadow-2xl rotate-[12deg] z-0 hidden md:block opacity-90 pointer-events-none p-2 font-mono text-[8px] text-[#3D2517] overflow-hidden">
+          <div className="border-b border-[#3D2517]/40 pb-1 font-bold">HYDERABAD OLD CITY</div>
+          <div className="text-[7px] opacity-70 mt-1">MAP REF. 1974</div>
+          <div className="mt-4 border-2 border-dashed border-[#3D2517]/30 h-28 flex items-center justify-center font-bold text-[7px] text-[#7C2D18]">
+            CHARMINAR LANE
+          </div>
+        </div>
+
+        {/* REALISTIC HARDCOVER JOURNAL OUTER FRAME */}
+        <div className="absolute inset-0 bg-[#23120B] rounded-xl border-4 border-[#11100C] shadow-[35px_35px_100px_rgba(0,0,0,0.95)] z-10 flex flex-col justify-center preserve-3d">
           
-          {/* Leather Spine & Center Brass Rings */}
-          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 md:w-12 bg-[linear-gradient(90deg,#22140e,#41261b_50%,#22140e)] border-x-2 border-[#11100C] z-30 pointer-events-none hidden md:flex flex-col justify-around items-center py-6">
-            <div className="w-6 h-3 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
-            <div className="w-6 h-3 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
-            <div className="w-6 h-3 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
-            <div className="w-6 h-3 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
+          {/* Leather Spine & Center Brass Binder Rings */}
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-6 md:w-10 bg-[linear-gradient(90deg,#190d07,#351c11_50%,#190d07)] border-x-2 border-[#11100C] z-30 pointer-events-none flex flex-col justify-around items-center py-6 shadow-2xl">
+            <div className="w-5 h-2.5 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
+            <div className="w-5 h-2.5 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
+            <div className="w-5 h-2.5 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
+            <div className="w-5 h-2.5 rounded-full border-2 border-[#C99A2E] bg-black shadow-md" />
           </div>
 
-          {/* DYNAMIC 3D TURNING SCRAPBOOK PAGES WITH UNIQUE ASYMMETRICAL LAYOUTS */}
+          {/* Hanging Woven Bookmark Ribbon */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 w-3.5 h-16 bg-[#7C2D18] border-x border-[#11100C] rounded-b-md shadow-xl z-20 pointer-events-none" />
+
+          {/* DYNAMIC 3D TURNING SCRAPBOOK PAGES (FIXED CENTER BOOK) */}
           {diaryEntries.map((entry, idx) => (
             <div 
               key={entry.id}
-              className="scrapbook-flip-page absolute inset-3 md:inset-6 bg-[#E7D5A4] border-2 border-[#11100C] rounded-lg shadow-2xl p-6 md:p-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center justify-between text-[#11100C] overflow-hidden preserve-3d origin-left backface-hidden"
+              className="scrapbook-flip-page absolute inset-2 md:inset-4 bg-[#F2E5C6] border-2 border-[#11100C] rounded-md shadow-2xl p-4 md:p-8 flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-between text-[#11100C] overflow-hidden preserve-3d origin-left backface-hidden"
             >
               {/* ------------------------------------------------------------- */}
-              {/* SPREAD 1: BANSILALPET STEPWELL (POLAROID & TICKET STUB)       */}
+              {/* SPREAD 1: BANSILALPET STEPWELL                                */}
               {/* ------------------------------------------------------------- */}
               {idx === 0 && (
                 <>
                   {/* LEFT PAGE */}
-                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-6 md:pb-0 md:pr-8 relative">
-                    <PaperClip className="top-2 left-4 rotate-[-15deg]" />
+                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
+                    <NotebookGridPattern opacity={0.05} />
                     
-                    <div className="w-full flex justify-between font-mono text-[10px] font-bold text-[#B94717] uppercase border-b border-[#11100C]/20 pb-2 mb-4 pl-6">
-                      <span>SCRAPBOOK VOL. 01</span>
+                    <div className="w-full flex justify-between font-mono text-[9px] font-bold text-[#7C2D18] uppercase border-b border-[#11100C]/20 pb-1.5 mb-2">
+                      <span>ENTRY #001</span>
                       <span>{entry.date}</span>
                     </div>
 
-                    {/* Main Polaroid Photo Mat */}
-                    <div className="relative w-full max-w-[340px] bg-[#F5E9C9] p-3 pb-10 shadow-[18px_18px_45px_rgba(0,0,0,0.8)] border border-[#11100C] rotate-[-3.5deg] group hover:-translate-y-1 hover:rotate-0 transition-transform duration-300">
-                      <TapeStrip className="-top-3 left-1/2 -translate-x-1/2 w-24 h-5 rotate-[4.2deg]" />
-                      <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
-                      <p className="absolute bottom-2.5 left-3 font-mono text-[9px] font-bold text-[#11100C]">
-                        ✎ {entry.location}
-                      </p>
-                      <span className="absolute bottom-2.5 right-3 font-mono text-[8px] text-[#B94717] font-bold border border-[#B94717] px-1.5 py-0.5">
-                        TICKET #09100
-                      </span>
+                    <h3 className="font-serif italic text-2xl md:text-3xl text-[#11100C] leading-tight font-bold">
+                      Why We Play Inside a Stepwell
+                    </h3>
+
+                    <div className="font-mono text-[8.5px] text-[#7C2D18] font-bold my-1 uppercase">
+                      DATE: 14 OCT, 2024 | LOCATION: BANSILALPET STEPWELL
                     </div>
 
-                    <div className="w-full mt-4 font-mono text-[9px] text-[#11100C]/70 tracking-widest flex justify-between uppercase">
-                      <span>35MM FILM STUFF</span>
-                      <span>ENTRY #001</span>
+                    <p className="font-body text-xs md:text-sm text-[#11100C]/90 leading-relaxed text-justify mb-2">
+                      The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.
+                    </p>
+
+                    {/* Taped Quote Card */}
+                    <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[-1.5deg] relative w-4/5">
+                      <TapeStrip className="-top-2 left-3 w-14 h-3.5 rotate-[1deg]" />
+                      "Acoustic echoes off 350-year-old stone."
+                    </div>
+
+                    {/* Overlapping Center Polaroid Photo with Paper Clip */}
+                    <div className="relative w-44 bg-[#F5E9C9] p-2 pb-6 shadow-xl border border-[#11100C] rotate-[-4deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
+                      <PaperClip className="-top-2 left-2 rotate-[-10deg]" />
+                      <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
+                      <p className="absolute bottom-1.5 left-2 font-mono text-[7.5px] font-bold text-[#11100C]">
+                        BANSILALPET STEPWELL 14.10.24
+                      </p>
                     </div>
                   </div>
 
                   {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
-                    <div className="absolute top-2 right-2 border-2 border-[#C2272A] text-[#C2272A] px-2.5 py-0.5 font-mono text-[9px] font-bold tracking-widest uppercase rotate-[-7deg] opacity-85 pointer-events-none">
-                      CLASSIFIED LOG ✦
+                    <NotebookGridPattern opacity={0.05} />
+
+                    {/* Pressed Dried Flower Taped Top Right */}
+                    <PressedFlower className="absolute top-2 right-2" />
+
+                    <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
+                      HANDWRITTEN NOTE
                     </div>
 
-                    <div>
-                      <span className="font-mono text-[10px] font-bold text-[#C99A2E] bg-[#11100C] text-[#E7D5A4] px-2 py-0.5 tracking-widest uppercase mb-3 inline-block">
-                        RESTRICTED FILE NO. 1974-D
-                      </span>
-                      
-                      <h3 className="display text-3xl md:text-5xl text-[#11100C] mb-4 leading-none ink-bleed">
-                        {entry.title.toUpperCase()}
-                      </h3>
+                    <p className="font-serif italic text-sm md:text-base text-[#11100C] leading-relaxed mb-3">
+                      "The acoustic echo bounced off limestone steps for 2.4 seconds before fading."
+                    </p>
 
-                      <p className="font-body text-sm md:text-base text-[#11100C]/90 leading-relaxed border-l-4 border-[#B94717] pl-4 italic mb-6">
-                        "{entry.content}"
-                      </p>
+                    {/* Performer Pass Stub */}
+                    <PerformerPassStub date="14/10/24" className="mb-3 self-end" />
+
+                    {/* Sound Check Log */}
+                    <div className="w-full bg-[#E7D5A4] p-2 border border-[#11100C] font-mono text-[8px] text-[#11100C] flex flex-col gap-0.5">
+                      <div className="font-bold text-[#7C2D18] border-b border-[#11100C]/30 pb-0.5 uppercase">SOUND CHECK LOG</div>
+                      <div>MIC: RIBBON R44 | PREAMP: TUBE U47</div>
+                      <div>REEL: STUDER A80 | TAPE: AMPEX 456</div>
+                      <span className="border border-[#7C2D18] text-[#7C2D18] font-bold px-1 py-0.5 self-start mt-1 rotate-[-2deg]">UNRELEASED</span>
                     </div>
 
-                    {/* Handwritten Annotation Note Taped to Page */}
-                    <div className="relative w-full p-3 bg-[#F5E9C9] border border-[#11100C] shadow-md font-mono text-[9.5px] text-[#5A120D] font-bold flex justify-between items-center rotate-[1.5deg]">
-                      <TapeStrip className="-top-2 left-4 w-16 h-4 rotate-[-2deg]" />
-                      <span>✎ "Soundcheck lasted till 2 AM."</span>
-                      <span className="border border-[#5A120D] px-2 py-0.5 rotate-[-3deg]">33⅓ RPM</span>
+                    {/* Secondary Small Polaroid */}
+                    <div className="relative w-28 bg-[#F5E9C9] p-1.5 pb-4 shadow-lg border border-[#11100C] rotate-[4deg] self-end mt-2">
+                      <img src="/media/gallery/tangy2.jpg" alt="Acoustic Setup" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                     </div>
                   </div>
                 </>
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SPREAD 2: TARAMATI BARADARI (NEWSPAPER SCRAP & PERFORMER PASS) */}
+              {/* SPREAD 2: TARAMATI BARADARI                                   */}
               {/* ------------------------------------------------------------- */}
               {idx === 1 && (
                 <>
                   {/* LEFT PAGE */}
-                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-6 md:pb-0 md:pr-8 relative">
-                    <div className="w-full flex justify-between font-mono text-[10px] font-bold text-[#5A120D] uppercase border-b border-[#11100C]/20 pb-2 mb-4">
-                      <span>SCRAPBOOK VOL. 02</span>
+                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
+                    <NotebookGridPattern opacity={0.05} />
+                    
+                    <div className="w-full flex justify-between font-mono text-[9px] font-bold text-[#7C2D18] uppercase border-b border-[#11100C]/20 pb-1.5 mb-2">
+                      <span>ENTRY #002</span>
                       <span>{entry.date}</span>
                     </div>
 
-                    {/* Overlapping Photo Mat & Newspaper Fragment */}
-                    <div className="relative w-full max-w-[340px] flex flex-col items-center">
-                      <TornNewspaperScrap className="absolute -top-4 -left-4 w-44 z-20 rotate-[-5deg]" />
-                      
-                      <div className="relative w-full bg-[#F5E9C9] p-3 pb-10 shadow-[18px_18px_45px_rgba(0,0,0,0.8)] border border-[#11100C] rotate-[3.2deg] group hover:-translate-y-1 hover:rotate-0 transition-transform duration-300 z-10">
-                        <TapeStrip className="-top-3 right-4 w-20 h-5 rotate-[-3deg]" />
-                        <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
-                        <p className="absolute bottom-2.5 left-3 font-mono text-[9px] font-bold text-[#11100C]">
-                          ✎ {entry.location}
-                        </p>
-                        <span className="absolute bottom-2.5 right-3 font-mono text-[8px] text-[#5A120D] font-bold border border-[#5A120D] px-1.5 py-0.5">
-                          STAGE PASS #02
-                        </span>
-                      </div>
+                    <h3 className="font-serif italic text-2xl md:text-3xl text-[#11100C] leading-tight font-bold">
+                      Monsoon Acoustic Sessions
+                    </h3>
+
+                    <div className="font-mono text-[8.5px] text-[#7C2D18] font-bold my-1 uppercase">
+                      DATE: 21 DEC, 2024 | LOCATION: TARAMATI BARADARI
                     </div>
 
-                    <div className="w-full mt-4 font-mono text-[9px] text-[#11100C]/70 tracking-widest flex justify-between uppercase">
-                      <span>HYDERABAD HERITAGE DOC</span>
-                      <span>ENTRY #002</span>
+                    <p className="font-body text-xs md:text-sm text-[#11100C]/90 leading-relaxed text-justify mb-2">
+                      When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air.
+                    </p>
+
+                    {/* Taped Quote Card */}
+                    <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[2deg] relative w-4/5">
+                      <TapeStrip className="-top-2 left-4 w-14 h-3.5 rotate-[-1deg]" />
+                      "300 people stayed till sunrise."
+                    </div>
+
+                    {/* Overlapping Center Polaroid Photo */}
+                    <div className="relative w-44 bg-[#F5E9C9] p-2 pb-6 shadow-xl border border-[#11100C] rotate-[3.5deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
+                      <PaperClip className="-top-2 right-2 rotate-[12deg]" />
+                      <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
+                      <p className="absolute bottom-1.5 left-2 font-mono text-[7.5px] font-bold text-[#11100C]">
+                        TARAMATI BARADARI 21.12.24
+                      </p>
                     </div>
                   </div>
 
                   {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
-                    <div className="absolute top-2 right-2 border-2 border-[#5A120D] text-[#5A120D] px-2.5 py-0.5 font-mono text-[9px] font-bold tracking-widest uppercase rotate-[6deg] opacity-85 pointer-events-none">
-                      FILED UNDER: MONSOON NOCTURNE ✦
+                    <NotebookGridPattern opacity={0.05} />
+
+                    <PressedFlower className="absolute top-2 right-2" />
+
+                    <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
+                      HANDWRITTEN NOTE
                     </div>
 
-                    <div>
-                      <span className="font-mono text-[10px] font-bold text-[#E7D5A4] bg-[#5A120D] px-2 py-0.5 tracking-widest uppercase mb-3 inline-block">
-                        PERFORMER PASS FILE
-                      </span>
-                      
-                      <h3 className="display text-3xl md:text-5xl text-[#11100C] mb-4 leading-none ink-bleed">
-                        {entry.title.toUpperCase()}
-                      </h3>
+                    <p className="font-serif italic text-sm md:text-base text-[#11100C] leading-relaxed mb-3">
+                      "Taramati pavilion was built so voice travels 2 miles without amplifiers."
+                    </p>
 
-                      <p className="font-body text-sm md:text-base text-[#11100C]/90 leading-relaxed border-l-4 border-[#5A120D] pl-4 italic mb-6">
-                        "{entry.content}"
-                      </p>
+                    <PerformerPassStub date="21/12/24" className="mb-3 self-end" />
+
+                    <div className="w-full bg-[#E7D5A4] p-2 border border-[#11100C] font-mono text-[8px] text-[#11100C] flex flex-col gap-0.5">
+                      <div className="font-bold text-[#7C2D18] border-b border-[#11100C]/30 pb-0.5 uppercase">SOUND CHECK LOG</div>
+                      <div>MIC: SHURE SM7B | PREAMP: NEVE 1073</div>
+                      <div>REEL: NAGRA IV-S | TAPE: TDK SA90</div>
+                      <span className="border border-[#7C2D18] text-[#7C2D18] font-bold px-1 py-0.5 self-start mt-1 rotate-[2deg]">LIVE ARCHIVE</span>
                     </div>
 
-                    {/* Stenciled Library Checkout Note */}
-                    <div className="relative w-full p-3 bg-[#F5E9C9] border border-[#11100C] shadow-md font-mono text-[9.5px] text-[#B94717] font-bold flex justify-between items-center rotate-[-2deg]">
-                      <TapeStrip className="-top-2 left-6 w-18 h-4 rotate-[2deg]" />
-                      <span>✎ "300 people stayed till sunrise."</span>
-                      <span className="border border-[#B94717] px-2 py-0.5 rotate-[3deg]">REOPENED 2025</span>
+                    <div className="relative w-28 bg-[#F5E9C9] p-1.5 pb-4 shadow-lg border border-[#11100C] rotate-[-3deg] self-end mt-2">
+                      <img src="/media/gallery/tangy4.jpg" alt="Violin Solo" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                     </div>
                   </div>
                 </>
               )}
 
               {/* ------------------------------------------------------------- */}
-              {/* SPREAD 3: OLD CITY HAVELI (CASSETTE GRAPHIC & SOUND WAVE)     */}
+              {/* SPREAD 3: OLD CITY HAVELI (MATCHES REFERENCE IMAGE EXACTLY!)  */}
               {/* ------------------------------------------------------------- */}
               {idx === 2 && (
                 <>
                   {/* LEFT PAGE */}
-                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-center border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-6 md:pb-0 md:pr-8 relative">
-                    <PaperClip className="top-2 right-4 rotate-[14deg]" />
-
-                    <div className="w-full flex justify-between font-mono text-[10px] font-bold text-[#C99A2E] uppercase border-b border-[#11100C]/20 pb-2 mb-4">
-                      <span>SCRAPBOOK VOL. 03</span>
+                  <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start border-b-2 md:border-b-0 md:border-r-2 border-[#11100C]/20 pb-4 md:pb-0 md:pr-6 relative">
+                    <NotebookGridPattern opacity={0.05} />
+                    
+                    <div className="w-full flex justify-between font-mono text-[9px] font-bold text-[#7C2D18] uppercase border-b border-[#11100C]/20 pb-1.5 mb-2">
+                      <span>ENTRY #003</span>
                       <span>{entry.date}</span>
                     </div>
 
-                    {/* Cassette Tape & Polaroid Presentation */}
-                    <div className="relative w-full max-w-[340px] flex flex-col items-center">
-                      <CassetteTapeGraphic className="absolute -top-5 right-2 w-36 z-20 rotate-[4deg]" />
+                    <h3 className="font-serif italic text-2xl md:text-3xl text-[#11100C] leading-tight font-bold">
+                      Behind the Microphones
+                    </h3>
 
-                      <div className="relative w-full bg-[#F5E9C9] p-3 pb-10 shadow-[18px_18px_45px_rgba(0,0,0,0.8)] border border-[#11100C] rotate-[-2.8deg] group hover:-translate-y-1 hover:rotate-0 transition-transform duration-300 z-10">
-                        <TapeStrip className="-top-3 left-4 w-20 h-5 rotate-[-2deg]" />
-                        <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
-                        <p className="absolute bottom-2.5 left-3 font-mono text-[9px] font-bold text-[#11100C]">
-                          ✎ {entry.location}
-                        </p>
-                        <span className="absolute bottom-2.5 right-3 font-mono text-[8px] text-[#C99A2E] bg-[#11100C] text-[#E7D5A4] px-1.5 py-0.5">
-                          TAPE REEL #03
-                        </span>
-                      </div>
+                    <div className="font-mono text-[8.5px] text-[#7C2D18] font-bold my-1 uppercase">
+                      DATE: 05 JAN, 2025 | LOCATION: OLD CITY HAVELI | TIME: 03:00 AM
                     </div>
 
-                    <div className="w-full mt-4 font-mono text-[9px] text-[#11100C]/70 tracking-widest flex justify-between uppercase">
-                      <span>ANALOG TAPE REEL</span>
-                      <span>ENTRY #003</span>
+                    <p className="font-body text-xs md:text-sm text-[#11100C]/90 leading-relaxed text-justify mb-2">
+                      The artists gathered around the ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant. No plan. No setlist. Just the night deciding what to play.
+                    </p>
+
+                    {/* Taped Quote Card */}
+                    <div className="bg-[#E7D5A4] p-2 border border-[#11100C] font-serif italic text-xs text-[#3D2517] shadow-sm rotate-[-1deg] relative w-4/5">
+                      <TapeStrip className="-top-2 left-3 w-14 h-3.5 rotate-[2deg]" />
+                      "300 people stayed till sunrise."
+                    </div>
+
+                    {/* Center Overlapping Polaroid Photo with Paper Clip (EXACT MATCH TO REFERENCE IMAGE!) */}
+                    <div className="relative w-48 bg-[#F5E9C9] p-2 pb-6 shadow-2xl border border-[#11100C] rotate-[-2.5deg] self-center mt-2 group hover:-translate-y-1 transition-transform">
+                      <PaperClip className="-top-3 left-3 rotate-[-10deg]" />
+                      <img src={entry.image} alt={entry.title} className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35] contrast-125 border border-[#11100C]" />
+                      <div className="flex justify-between items-center mt-1.5 font-mono text-[7.5px] font-bold text-[#11100C]">
+                        <span>OLD CITY HAVELI</span>
+                        <span>21.09.75</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* RIGHT PAGE */}
                   <div className="w-full md:w-1/2 h-full flex flex-col justify-between items-start md:pl-4 relative">
-                    <SoundWaveGraphic color="#B94717" opacity={0.18} className="absolute right-2 top-10 w-44 h-44 pointer-events-none" />
+                    <NotebookGridPattern opacity={0.05} />
 
-                    <div className="absolute top-2 right-2 border-2 border-[#C99A2E] text-[#C99A2E] bg-[#11100C] px-2.5 py-0.5 font-mono text-[9px] font-bold tracking-widest uppercase rotate-[-4deg] opacity-90 pointer-events-none">
-                      UNRELEASED TAPE LOG ✦
+                    {/* Pressed Dried Flower with Masking Tape */}
+                    <PressedFlower className="absolute top-2 right-2" />
+
+                    <div className="w-full border-b border-[#11100C]/20 pb-1 mb-2 font-mono text-[9px] font-bold text-[#7C2D18] uppercase">
+                      HANDWRITTEN NOTE
                     </div>
 
-                    <div>
-                      <span className="font-mono text-[10px] font-bold text-[#11100C] bg-[#C99A2E] px-2 py-0.5 tracking-widest uppercase mb-3 inline-block">
-                        FIELD NOTEBOOK FILE #04
-                      </span>
-                      
-                      <h3 className="display text-3xl md:text-5xl text-[#11100C] mb-4 leading-none ink-bleed">
-                        {entry.title.toUpperCase()}
-                      </h3>
+                    <p className="font-serif italic text-sm md:text-base text-[#11100C] leading-relaxed mb-3">
+                      "The rain almost ruined the set. Then it became the set."
+                    </p>
 
-                      <p className="font-body text-sm md:text-base text-[#11100C]/90 leading-relaxed border-l-4 border-[#C99A2E] pl-4 italic mb-6">
-                        "{entry.content}"
-                      </p>
+                    {/* Performer Pass Ticket Stub */}
+                    <PerformerPassStub date="21/09/75" className="mb-3 self-end" />
+
+                    {/* Sound Check Log */}
+                    <div className="w-full bg-[#E7D5A4] p-2 border border-[#11100C] font-mono text-[8px] text-[#11100C] flex flex-col gap-0.5">
+                      <div className="font-bold text-[#7C2D18] border-b border-[#11100C]/30 pb-0.5 uppercase">SOUND CHECK LOG</div>
+                      <div>MIC: RIBBON R44 | PREAMP: TUBE U47</div>
+                      <div>REEL: STUDER A80 | TAPE: AMPEX 456 | SPEED: 15 IPS</div>
+                      <span className="border border-[#7C2D18] text-[#7C2D18] font-bold px-1 py-0.5 self-start mt-1 rotate-[-2deg]">UNRELEASED</span>
                     </div>
 
-                    {/* Handwritten Lyrics Quote Card */}
-                    <div className="relative w-full p-3 bg-[#F5E9C9] border border-[#11100C] shadow-md font-mono text-[9.5px] text-[#11100C] font-bold flex justify-between items-center rotate-[1.8deg]">
-                      <TapeStrip className="-top-2 left-4 w-16 h-4 rotate-[-1deg]" />
-                      <span>✎ "Water speaks in whispers."</span>
-                      <span className="border border-[#11100C] px-2 py-0.5 rotate-[-2deg]">UNSOLICITED JAM</span>
+                    {/* Secondary Small Polaroid Photo Pinned to Bottom Right */}
+                    <div className="relative w-32 bg-[#F5E9C9] p-1.5 pb-4 shadow-lg border border-[#11100C] rotate-[4deg] self-end mt-2">
+                      <img src="/media/gallery/tangy9.jpg" alt="Late Night Crowd" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                     </div>
                   </div>
                 </>
