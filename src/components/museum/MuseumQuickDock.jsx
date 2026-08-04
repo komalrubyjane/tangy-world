@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 
 export const MuseumQuickDock = ({ 
@@ -9,97 +11,178 @@ export const MuseumQuickDock = ({
   onOpenPassport, 
   onOpenPostcard 
 }) => {
+  const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   const handleAction = (cb) => {
     playSFX('ticketClick');
-    cb();
+    if (typeof cb === 'function') {
+      cb();
+    }
+  };
+
+  const handleLoginNav = () => {
+    playSFX('ticketClick');
+    navigate('/artist/login');
   };
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[140] bg-[#191410]/95 backdrop-blur-md border-2 border-[#d1a437] px-3 py-2 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.85)] flex items-center gap-1.5 max-w-[95vw] overflow-x-auto select-none">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[140] bg-[#191410]/95 backdrop-blur-md border-2 border-[#C99A2E] px-3 md:px-5 py-2 rounded-full shadow-[0_12px_35px_rgba(0,0,0,0.9)] flex items-center gap-1.5 md:gap-3 max-w-[96vw] overflow-x-auto select-none">
       
-      {/* 1. CASSETTE SOUND ARCHIVE */}
-      <button
-        onClick={() => handleAction(onOpenSoundArchive)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Cassette Sound Archive"
+      {/* ------------------------------------------------------------- */}
+      {/* PRIMARY UTILITY ITEMS                                         */}
+      {/* ------------------------------------------------------------- */}
+
+      {/* 1. SOUND ARCHIVE */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('sound')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>📻</span>
-        <span className="hidden sm:inline">SOUND ARCHIVE</span>
-      </button>
+        <button
+          onClick={() => handleAction(onOpenSoundArchive)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">📻</span>
+          <span>SOUND ARCHIVE</span>
+        </button>
+        {activeTooltip === 'sound' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            35mm Field Tape Archive
+          </div>
+        )}
+      </div>
 
-      <span className="text-[#d1a437]/40 text-xs">|</span>
-
-      {/* 2. VINYL TURNTABLE */}
-      <button
-        onClick={() => handleAction(onOpenVinyl)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Vinyl Turntable"
+      {/* 2. VINYL */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('vinyl')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>💿</span>
-        <span className="hidden sm:inline">VINYL</span>
-      </button>
+        <button
+          onClick={() => handleAction(onOpenVinyl)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">💿</span>
+          <span>VINYL</span>
+        </button>
+        {activeTooltip === 'vinyl' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            33⅓ Audiophile Vinyl Pressing
+          </div>
+        )}
+      </div>
 
-      <span className="text-[#d1a437]/40 text-xs">|</span>
-
-      {/* 3. TODAY'S PROGRAMME */}
-      <button
-        onClick={() => handleAction(onOpenProgramme)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Today's Programme"
+      {/* 3. TANGY RECORDS */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('records')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>📜</span>
-        <span className="hidden sm:inline">PROGRAMME</span>
-      </button>
+        <button
+          onClick={() => handleAction(onOpenVinyl)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">🎙️</span>
+          <span>TANGY RECORDS</span>
+        </button>
+        {activeTooltip === 'records' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            Tangy Independent Record Label
+          </div>
+        )}
+      </div>
 
-      <span className="text-[#d1a437]/40 text-xs">|</span>
+      {/* STENCILED DIVIDER */}
+      <span className="text-[#C99A2E]/50 font-mono text-xs font-bold px-0.5">|</span>
 
-      {/* 4. MAGAZINE SPREAD ARCHIVE */}
-      <button
-        onClick={() => handleAction(onOpenArchive)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Magazine Spread Archive"
+      {/* ------------------------------------------------------------- */}
+      {/* INTERACTIVE ITEMS                                             */}
+      {/* ------------------------------------------------------------- */}
+
+      {/* 4. PASSPORT */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('passport')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>📚</span>
-        <span className="hidden sm:inline">ARCHIVE</span>
-      </button>
+        <button
+          onClick={() => handleAction(onOpenPassport)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">🛂</span>
+          <span>PASSPORT</span>
+        </button>
+        {activeTooltip === 'passport' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            Digital Member Stamp Book
+          </div>
+        )}
+      </div>
 
-      <span className="text-[#d1a437]/40 text-xs">|</span>
-
-      {/* 5. GENERAL STORE */}
-      <button
-        onClick={() => handleAction(onOpenShop)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="General Store"
+      {/* 5. LOGIN */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('login')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>🛒</span>
-        <span className="hidden sm:inline">STORE</span>
-      </button>
+        <button
+          onClick={handleLoginNav}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">🔑</span>
+          <span>LOGIN</span>
+        </button>
+        {activeTooltip === 'login' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            Artist & Crew Portal Access
+          </div>
+        )}
+      </div>
 
-      <span className="text-[#d1a437]/40 text-xs">|</span>
-
-      {/* 6. PASSPORT */}
-      <button
-        onClick={() => handleAction(onOpenPassport)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Member Stamp Passport"
+      {/* 6. STORE (WITH COMING SOON BADGE) */}
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('store')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>Passport</span>
-        <span className="hidden sm:inline">PASSPORT</span>
-      </button>
-
-      <span className="text-[#d1a437]/40 text-xs">|</span>
+        <button
+          onClick={() => handleAction(onOpenShop)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">🛍️</span>
+          <span>STORE</span>
+          <span className="bg-[#C2272A] text-white text-[7px] px-1 py-0.5 rounded font-mono font-bold tracking-tighter ml-0.5 animate-pulse">
+            COMING SOON
+          </span>
+        </button>
+        {activeTooltip === 'store' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            Official Tangy Merchandise [Coming Soon]
+          </div>
+        )}
+      </div>
 
       {/* 7. POSTCARD */}
-      <button
-        onClick={() => handleAction(onOpenPostcard)}
-        className="px-2.5 py-1 font-mono text-[9.5px] font-bold tracking-wider text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        title="Postcard Contact"
+      <div 
+        className="relative group flex items-center"
+        onMouseEnter={() => setActiveTooltip('postcard')}
+        onMouseLeave={() => setActiveTooltip(null)}
       >
-        <span>✉️</span>
-        <span className="hidden sm:inline">POSTCARD</span>
-      </button>
+        <button
+          onClick={() => handleAction(onOpenPostcard)}
+          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+        >
+          <span className="text-xs">✉️</span>
+          <span>POSTCARD</span>
+        </button>
+        {activeTooltip === 'postcard' && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
+            Send Heritage Postcard Message
+          </div>
+        )}
+      </div>
 
     </div>
   );

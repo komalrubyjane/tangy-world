@@ -219,29 +219,35 @@ function MainWorld() {
 
           <div className="tangy-world pt-12">
             <main>
-              {/* 1. HERO */}
+              {/* 1. HERO (LANDING) */}
               <Hero />
 
-              {/* 2. MANIFESTO / INTRO */}
+              {/* 2. WHY TANGY (MANIFESTO PREVIEW) */}
               <Manifesto />
 
-              {/* 3. SESSIONS */}
+              {/* 3. SESSIONS (PREVIEW CURRENT PROGRAMMING) */}
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
-              {/* ORIGINAL UNTOUCHED SECTION FLOW */}
-              <History />
+              {/* 4. ARCHIVE (PAST SESSIONS PREVIEW) */}
               <Archive />
-              <Spaces />
-              <FrontCamera />
-              <TangyDiary />
-              <Artists onArtistSubmit={handleNavigateArtist} />
-              <Founders />
+
+              {/* 5. JOIN THE CREW & 6. LET'S BUILD THIS WORLD TOGETHER */}
               <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
+
+              {/* 7. PRIVATE SESSIONS PREVIEW */}
               <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
+
+              {/* 8. TANGY DIARY (LATEST BLOG PREVIEW) */}
+              <TangyDiary />
+
+              {/* 9. INNER CIRCLE (MEMBERSHIP PREVIEW) */}
               <Newsletter />
+
+              {/* 10. COME FIND US (LOCATION & CONTACT CTA) */}
               <Closing />
             </main>
             
+            {/* 11. FOOTER */}
             <Footer />
           </div>
         </>

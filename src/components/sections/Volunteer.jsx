@@ -288,6 +288,88 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
 
       </div>
 
+      {/* ------------------------------------------------------------- */}
+      {/* 6. LET'S BUILD THIS WORLD TOGETHER (3 CARDS: VENDORS, SPONSORS, HOST) */}
+      {/* ------------------------------------------------------------- */}
+      <div id="build-together" className="max-w-[1200px] mx-auto px-6 mt-28 md:mt-36 relative z-20">
+        
+        {/* SINGLE-LINE CTA HEADING */}
+        <div className="text-center mb-12">
+          <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
+            COLLABORATION ARCHIVE // TANGY SESSIONS
+          </span>
+          <h2 className="display text-4xl md:text-7xl text-[#E7D5A4] leading-none ink-bleed uppercase">
+            LET'S BUILD THIS WORLD TOGETHER
+          </h2>
+        </div>
+
+        {/* THREE CARDS: VENDORS, SPONSORS, VENUE / HOST */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          
+          {/* CARD 1: VENDORS */}
+          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
+            <div>
+              <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#315B66] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
+                <span>FILE NO. 01</span>
+                <span>PARTNER</span>
+              </div>
+              <h3 className="display text-3xl text-[#17120D] leading-none mb-3">VENDORS</h3>
+              <p className="font-mono text-xs text-[#17120D]/90 leading-relaxed mb-6">
+                Chai stalls, artisanal food popups, vintage print presses, and craft makers bringing local flavor to every session.
+              </p>
+            </div>
+            <button 
+              onClick={handleVolunteerClick}
+              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#315B66] !text-[#E7D7AC] !border-2 !border-[#17120D]"
+            >
+              APPLY AS VENDOR →
+            </button>
+          </div>
+
+          {/* CARD 2: SPONSORS */}
+          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[1.5deg] hover:-translate-y-1 transition-transform">
+            <div>
+              <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B84718] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
+                <span>FILE NO. 02</span>
+                <span>SPONSOR</span>
+              </div>
+              <h3 className="display text-3xl text-[#17120D] leading-none mb-3">SPONSORS</h3>
+              <p className="font-mono text-xs text-[#17120D]/90 leading-relaxed mb-6">
+                Cultural foundations, audio gear brands, and independent supporters powering heritage music preservation.
+              </p>
+            </div>
+            <button 
+              onClick={handleVolunteerClick}
+              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D]"
+            >
+              BECOME A SPONSOR →
+            </button>
+          </div>
+
+          {/* CARD 3: VENUE / HOST */}
+          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
+            <div>
+              <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#C69A32] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
+                <span>FILE NO. 03</span>
+                <span>HERITAGE</span>
+              </div>
+              <h3 className="display text-3xl text-[#17120D] leading-none mb-3">VENUE / HOST</h3>
+              <p className="font-mono text-xs text-[#17120D]/90 leading-relaxed mb-6">
+                Have a 300-year-old stepwell, private Nizam-era courtyard, or historic acoustic sanctuary? Host a session.
+              </p>
+            </div>
+            <button 
+              onClick={handleVolunteerClick}
+              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D]"
+            >
+              HOST A VENUE →
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
     </section>
   );
 };

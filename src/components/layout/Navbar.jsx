@@ -1,12 +1,110 @@
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 
 export const Navbar = ({ onOpenProgramme }) => {
   const navigate = useNavigate();
-  const { isAudioEnabled, isMuted, toggleMute } = useAudio();
+  const { isAudioEnabled, isMuted, toggleMute, playSFX } = useAudio();
+  
+  // Active dropdown state for desktop & mobile
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const leaveTimeoutRef = useRef(null);
 
-  const handleNav = (path) => {
-    if (path.startsWith('#')) {
+  const navCategories = [
+    {
+      title: 'ABOUT',
+      items: [
+        { label: 'Why Tangy', path: '#manifesto' },
+        { label: 'Chronology', path: '#history' },
+        { label: 'Media Highlights', path: '/media' },
+        { label: 'Archive Preview', path: '#archive' },
+        { label: 'Tangy Team', path: '#founders' }
+      ]
+    },
+    {
+      title: 'SESSIONS',
+      items: [
+        { label: 'Current Sessions', path: '#sessions' },
+        { label: 'Future Programming', path: '#sessions' },
+        { label: 'Concert Culture', path: '#manifesto' },
+        { label: 'Glimpse of the Past', path: '#archive' },
+        { label: 'Join Waitlist', path: '#sessions' }
+      ]
+    },
+    {
+      title: 'FORMATS',
+      items: [
+        { label: 'Heritage Shows', path: '#spaces' },
+        { label: 'Glamping', path: '/private-sessions' },
+        { label: 'Private Sessions', path: '/private-sessions' },
+        { label: 'Corporate', path: '/private-sessions' }
+      ]
+    },
+    {
+      title: 'ARCHIVE',
+      items: [
+        { label: 'Session Archive', path: '#archive' },
+        { label: 'Videos', path: '/media' },
+        { label: 'Photos', path: '#gallery' },
+        { label: 'Audio', path: '#archive' },
+        { label: 'Open Archive', path: '#archive' }
+      ]
+    },
+    {
+      title: 'APPLY',
+      items: [
+        { label: 'Artist', path: '/artist/register' },
+        { label: 'Crew', path: '/crew' },
+        { label: 'Venue / Host', path: '#build-together' },
+        { label: 'Private Sessions', path: '/private-sessions' },
+        { label: 'Sponsors', path: '#build-together' },
+        { label: 'Vendors', path: '#build-together' }
+      ]
+    },
+    {
+      title: 'BLOGS',
+      items: [
+        { label: 'Tangy Diary', path: '#diary' },
+        { label: 'Show Stories', path: '#diary' },
+        { label: 'Music Launches', path: '#diary' },
+        { label: 'Behind the Scenes', path: '#diary' },
+        { label: 'Opinion Pieces', path: '#diary' }
+      ]
+    },
+    {
+      title: 'MEDIA',
+      items: [
+        { label: 'Press Coverage', path: '/media' },
+        { label: 'Interviews', path: '/media' },
+        { label: 'Videos', path: '/media' },
+        { label: 'Podcasts', path: '/media' },
+        { label: 'Gallery', path: '#gallery' }
+      ]
+    },
+    {
+      title: 'CONTACT',
+      items: [
+        { label: 'Email', path: 'mailto:hello@tangysessions.com', external: true },
+        { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true },
+        { label: 'YouTube', path: 'https://youtube.com/tangysessions', external: true },
+        { label: 'Visit Us', path: '#contact' }
+      ]
+    }
+  ];
+
+  const handleNav = (item) => {
+    playSFX('ticketClick');
+    setActiveDropdown(null);
+    setIsMobileMenuOpen(false);
+
+    if (item.external) {
+      window.open(item.path, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const path = item.path || item;
+    if (typeof path === 'string' && path.startsWith('#')) {
       if (window.location.pathname !== '/') {
         navigate('/');
         setTimeout(() => {
@@ -15,58 +113,93 @@ export const Navbar = ({ onOpenProgramme }) => {
       } else {
         document.querySelector(path)?.scrollIntoView({ behavior: 'smooth' });
       }
-    } else {
+    } else if (typeof path === 'string') {
       navigate(path);
     }
   };
 
+  const handleMouseEnter = (title) => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+    }
+    setActiveDropdown(title);
+  };
+
+  const handleMouseLeave = () => {
+    leaveTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 180);
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/90 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
-      {/* LEFT: TANGY SESSIONS STAMP */}
+      {/* LEFT: TANGY SESSIONS BRAND LOGO */}
       <div 
         onClick={() => handleNav('/')}
         className="flex items-center gap-2 cursor-pointer group"
       >
-        <span className="w-2 h-2 rounded-full bg-[#B94717] group-hover:scale-125 transition-transform" />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#B94717] group-hover:scale-125 transition-transform" />
         <span className="font-display font-bold text-sm md:text-base tracking-tight text-[#E7D5A4] group-hover:text-[#C99A2E] transition-colors">
           TANGY SESSIONS
         </span>
-        <span className="text-[#C99A2E] hidden lg:inline opacity-70">
+        <span className="text-[#C99A2E] hidden xl:inline opacity-70">
           // HYDERABAD · 1974 ARCHIVE
         </span>
       </div>
 
-      {/* CENTER: QUICK SECTIONS NAV */}
-      <nav className="hidden lg:flex items-center gap-5 text-[#E7D5A4]/80">
-        <button onClick={() => handleNav('/')} className="hover:text-[#C99A2E] transition-colors uppercase">
-          01 COVER
-        </button>
-        <button onClick={() => handleNav('#manifesto')} className="hover:text-[#C99A2E] transition-colors uppercase">
-          02 MANIFESTO
-        </button>
-        <button onClick={() => handleNav('#sessions')} className="hover:text-[#C99A2E] transition-colors uppercase">
-          03 SESSIONS
-        </button>
-        <button onClick={() => handleNav('/artists')} className="hover:text-[#C99A2E] transition-colors uppercase text-[#C99A2E] font-bold">
-          04 ARTISTS ✦
-        </button>
-        <button onClick={() => handleNav('#archive')} className="hover:text-[#C99A2E] transition-colors uppercase">
-          05 ARCHIVE
-        </button>
-        <button onClick={() => handleNav('#diary')} className="hover:text-[#C99A2E] transition-colors uppercase">
-          06 DIARY
-        </button>
-        <button onClick={() => handleNav('/crew')} className="hover:text-[#C99A2E] transition-colors uppercase text-[#C99A2E] font-bold">
-          07 CREW ✦
-        </button>
-        <button onClick={() => handleNav('/private-sessions')} className="hover:text-[#C99A2E] transition-colors uppercase text-[#C99A2E] font-bold">
-          08 PRIVATE ✦
-        </button>
+      {/* CENTER: DESKTOP MULTI-LEVEL ARCHIVAL DROPDOWN MENU */}
+      <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-[#E7D5A4]">
+        {navCategories.map((cat, idx) => {
+          const isOpen = activeDropdown === cat.title;
+          const isRightAligned = idx >= navCategories.length - 2;
+
+          return (
+            <div 
+              key={cat.title}
+              className="relative group"
+              onMouseEnter={() => handleMouseEnter(cat.title)}
+              onMouseLeave={handleMouseLeave}
+            >
+              {/* Category Header Button */}
+              <button 
+                className={`py-1 flex items-center gap-1 uppercase transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
+              >
+                <span>{cat.title}</span>
+                <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
+              </button>
+
+              {/* Cream Paper Dropdown Menu */}
+              <div 
+                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#F5E9C9] text-[#11100C] p-3 border-2 border-[#C99A2E]/80 rounded-md shadow-[0_15px_35px_rgba(17,16,12,0.9)] z-[150] transition-all duration-200 ease-out origin-top ${
+                  isOpen ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' : 'opacity-0 translate-y-2 pointer-events-none scale-95'
+                }`}
+              >
+                {/* Paper Fiber Noise Overlay */}
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply pointer-events-none rounded-md" />
+                
+                {/* Dropdown Items List */}
+                <div className="relative z-10 flex flex-col gap-1">
+                  {cat.items.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => handleNav(item)}
+                      className="group/item flex items-center justify-between p-1.5 rounded-sm hover:bg-[#11100C]/10 text-left font-mono text-[10.5px] font-bold text-[#11100C] hover:text-[#C2272A] transition-colors"
+                    >
+                      <span>{item.label}</span>
+                      <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all text-[#C2272A]">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </nav>
 
-      {/* RIGHT: SOUND SYSTEM & PROGRAMME BUTTONS */}
+      {/* RIGHT: SOUND CONTROL & PROGRAMME & MOBILE TOGGLE */}
       <div className="flex items-center gap-3">
+        {/* Sound Toggle */}
         <button 
           onClick={toggleMute}
           className="border border-[#E7D5A4]/40 bg-[#41261B]/60 hover:bg-[#C99A2E] hover:text-[#11100C] px-2.5 py-1 transition-colors font-bold uppercase flex items-center gap-1.5"
@@ -75,13 +208,71 @@ export const Navbar = ({ onOpenProgramme }) => {
           <span>{!isAudioEnabled || isMuted ? "[ OFF ]" : "[ ON ● ]"}</span>
         </button>
 
+        {/* Concert Programme Button */}
         <button 
           onClick={onOpenProgramme}
-          className="btn-ticket py-1 px-3 text-[10px] shadow-none hover:shadow-xs"
+          className="btn-ticket py-1 px-3 text-[10px] shadow-none hover:shadow-xs hidden sm:block"
         >
           PROGRAMME ✦
         </button>
+
+        {/* Mobile Accordion Menu Toggle Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden border border-[#C99A2E] text-[#C99A2E] px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
+        >
+          {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
+        </button>
       </div>
+
+      {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1024px) */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 lg:hidden">
+          <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
+            ARCHIVAL NAVIGATION MENU
+          </div>
+
+          <div className="flex flex-col gap-3 mt-2">
+            {navCategories.map((cat) => {
+              const isCatOpen = activeDropdown === cat.title;
+
+              return (
+                <div key={cat.title} className="border-b border-[#E7D5A4]/10 pb-2">
+                  <button
+                    onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
+                    className="w-full flex justify-between items-center font-mono text-sm font-bold text-[#E7D5A4] py-1 uppercase"
+                  >
+                    <span>{cat.title}</span>
+                    <span className="text-xs text-[#C99A2E]">{isCatOpen ? '▲' : '▼'}</span>
+                  </button>
+
+                  {isCatOpen && (
+                    <div className="mt-2 pl-4 flex flex-col gap-2 bg-[#F5E9C9] text-[#11100C] p-3 rounded-md border border-[#C99A2E]">
+                      {cat.items.map((item) => (
+                        <button
+                          key={item.label}
+                          onClick={() => handleNav(item)}
+                          className="text-left font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] py-1 flex justify-between items-center"
+                        >
+                          <span>{item.label}</span>
+                          <span className="text-[#C2272A]">→</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => { setIsMobileMenuOpen(false); onOpenProgramme(); }}
+            className="w-full py-3 mt-4 btn-ticket text-center font-mono text-xs font-bold tracking-widest uppercase"
+          >
+            VIEW PROGRAMME BOARD ✦
+          </button>
+        </div>
+      )}
 
     </header>
   );
