@@ -22,10 +22,19 @@ import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
-// Pages
+// Dedicated Standalone Pages
 import { BookingPage } from './pages/BookingPage';
 import { CrewPage } from './pages/CrewPage';
 import { PrivateSessionsPage } from './pages/PrivateSessionsPage';
+import { AboutPage } from './pages/AboutPage';
+import { SessionsPage } from './pages/SessionsPage';
+import { ArchivePage } from './pages/ArchivePage';
+import { VendorApplyPage } from './pages/VendorApplyPage';
+import { SponsorApplyPage } from './pages/SponsorApplyPage';
+import { VenueHostApplyPage } from './pages/VenueHostApplyPage';
+import { BlogsPage } from './pages/BlogsPage';
+import { InnerCirclePage } from './pages/InnerCirclePage';
+import { ContactPage } from './pages/ContactPage';
 
 // Artist Portal Migration Imports
 import { ArtistLayout } from './artist/layouts/ArtistLayout';
@@ -40,6 +49,7 @@ import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
 import { MediaPage } from './artist/pages/MediaPage';
 import { SettingsPage } from './artist/pages/SettingsPage';
 
+// Homepage Sections
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
 import { History } from './components/sections/History';
@@ -179,7 +189,7 @@ function MainWorld() {
           />
         </>
       ) : (
-        /* 100% UNTOUCHED PERFECT DESKTOP EXPERIENCE (>=1024px) */
+        /* DESKTOP EXPERIENCE (>=1024px) */
         <>
           {/* Temporary Theatre Curtain Opening Overlay */}
           <CurtainOverlay onComplete={() => setShowUiControls(true)} />
@@ -219,35 +229,49 @@ function MainWorld() {
 
           <div className="tangy-world pt-12">
             <main>
-              {/* 1. HERO (LANDING) */}
+              {/* 1. HERO */}
               <Hero />
 
-              {/* 2. WHY TANGY (MANIFESTO PREVIEW) */}
+              {/* 2. WHY TANGY (MANIFESTO) */}
               <Manifesto />
 
-              {/* 3. SESSIONS (PREVIEW CURRENT PROGRAMMING) */}
+              {/* 3. SESSIONS */}
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
-              {/* 4. ARCHIVE (PAST SESSIONS PREVIEW) */}
+              {/* 4. CHRONOLOGY */}
+              <History />
+
+              {/* 5. ARCHIVE */}
               <Archive />
 
-              {/* 5. JOIN THE CREW & 6. LET'S BUILD THIS WORLD TOGETHER */}
-              <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
+              {/* 6. SPACES */}
+              <Spaces />
 
-              {/* 7. PRIVATE SESSIONS PREVIEW */}
-              <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
+              {/* 7. FRONT CAMERA / MEDIA */}
+              <FrontCamera />
 
-              {/* 8. TANGY DIARY (LATEST BLOG PREVIEW) */}
+              {/* 8. TANGY DIARY */}
               <TangyDiary />
 
-              {/* 9. INNER CIRCLE (MEMBERSHIP PREVIEW) */}
+              {/* 9. ARTISTS */}
+              <Artists onArtistSubmit={handleNavigateArtist} />
+
+              {/* 10. FOUNDERS / TEAM */}
+              <Founders />
+
+              {/* 11. JOIN THE CREW & LET'S BUILD THIS WORLD TOGETHER */}
+              <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
+
+              {/* 12. PRIVATE SESSIONS */}
+              <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
+
+              {/* 13. INNER CIRCLE */}
               <Newsletter />
 
-              {/* 10. COME FIND US (LOCATION & CONTACT CTA) */}
+              {/* 14. COME FIND US */}
               <Closing />
             </main>
             
-            {/* 11. FOOTER */}
             <Footer />
           </div>
         </>
@@ -264,12 +288,26 @@ export default function App() {
           <CustomCursor />
           <BrowserRouter>
             <Routes>
-              {/* PUBLIC WEBSITE ROUTES */}
+              {/* PUBLIC WEBSITE HOMEPAGE */}
               <Route path="/" element={<MainWorld />} />
-              <Route path="/book/:sessionId" element={<BookingPage />} />
+
+              {/* DEDICATED STANDALONE PAGES */}
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/sessions" element={<SessionsPage />} />
+              <Route path="/archive" element={<ArchivePage />} />
               <Route path="/crew" element={<CrewPage />} />
+              <Route path="/apply/crew" element={<CrewPage />} />
               <Route path="/volunteer" element={<CrewPage />} />
+              <Route path="/apply/vendors" element={<VendorApplyPage />} />
+              <Route path="/apply/sponsors" element={<SponsorApplyPage />} />
+              <Route path="/apply/venue-host" element={<VenueHostApplyPage />} />
+              <Route path="/apply/host" element={<VenueHostApplyPage />} />
               <Route path="/private-sessions" element={<PrivateSessionsPage />} />
+              <Route path="/blogs" element={<BlogsPage />} />
+              <Route path="/diary" element={<BlogsPage />} />
+              <Route path="/inner-circle" element={<InnerCirclePage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/book/:sessionId" element={<BookingPage />} />
 
               {/* REDIRECT ALIASES */}
               <Route path="/artists" element={<Navigate to="/artist" replace />} />

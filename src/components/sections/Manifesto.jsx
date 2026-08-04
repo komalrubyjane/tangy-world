@@ -114,9 +114,17 @@ export const Manifesto = () => {
         </div>
 
         {/* Newspaper Footer Stamp & Archival Note */}
-        <div className="mt-8 pt-4 border-t-2 border-[#11100C] flex justify-between items-center font-mono text-[10px] font-bold">
+        <div className="mt-8 pt-4 border-t-2 border-[#11100C] flex justify-between items-center font-mono text-[10px] md:text-xs font-bold">
           <span>✎ "Every room has a memory." // FILED UNDER: CULTURAL PRESERVATION</span>
-          <span className="border border-[#5A120D] text-[#5A120D] px-2.5 py-1 rotate-[-5deg] bg-[#5A120D]/10">DO NOT DISCARD ✦</span>
+          <div className="flex items-center gap-3">
+            <span className="border border-[#5A120D] text-[#5A120D] px-2.5 py-1 rotate-[-5deg] bg-[#5A120D]/10 hidden sm:inline">DO NOT DISCARD ✦</span>
+            <a 
+              href="/about" 
+              className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border-2 border-[#11100C] px-3.5 py-1.5 font-mono font-bold tracking-widest uppercase transition-colors shadow-[3px_3px_0px_#11100C]"
+            >
+              VIEW MORE →
+            </a>
+          </div>
         </div>
 
       </div>

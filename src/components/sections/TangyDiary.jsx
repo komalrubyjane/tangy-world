@@ -151,9 +151,17 @@ export const TangyDiary = () => {
       <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,0.96)] pointer-events-none z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(217,175,108,0.08)_0%,transparent_70%)] pointer-events-none z-10" />
 
-      {/* TOP ARCHIVE LABEL */}
-      <div className="absolute top-6 left-8 font-mono text-[9.5px] md:text-[10.5px] text-[#D19A24] tracking-[0.3em] font-bold uppercase z-20 pointer-events-none opacity-80">
-        TANGY SESSIONS // ANTIQUE VINTAGE DIARY ARCHIVE
+      {/* TOP ARCHIVE LABEL & READ MORE CTA */}
+      <div className="absolute top-6 left-8 right-8 flex justify-between items-center z-20 pointer-events-auto">
+        <div className="font-mono text-[9.5px] md:text-[10.5px] text-[#D19A24] tracking-[0.3em] font-bold uppercase opacity-80">
+          TANGY SESSIONS // ANTIQUE VINTAGE DIARY ARCHIVE
+        </div>
+        <a 
+          href="/blogs"
+          className="bg-[#D19A24] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-3.5 py-1 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[3px_3px_0px_#11100C]"
+        >
+          READ MORE →
+        </a>
       </div>
 
       {/* CENTERPIECE VINTAGE DIARY SHELL (OCCUPIES ~70% VIEWPORT) */}

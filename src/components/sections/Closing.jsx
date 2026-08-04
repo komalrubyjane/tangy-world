@@ -35,7 +35,7 @@ export const Closing = () => {
           <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
         </h2>
 
-        {/* Contact Info Cards */}
+        {/* Contact Info Cards & Contact Us CTA */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-8 border-t-2 border-[#E7D5A4]/30 pt-8">
           <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">LOCATION</span>
@@ -51,6 +51,15 @@ export const Closing = () => {
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">ARCHIVE</span>
             <span>INSTAGRAM: @TANGYSESSIONS</span>
           </div>
+        </div>
+
+        <div className="mt-10">
+          <a 
+            href="/contact" 
+            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
+          >
+            CONTACT US →
+          </a>
         </div>
 
       </div>

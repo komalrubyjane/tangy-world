@@ -28,26 +28,40 @@ export const Newsletter = () => {
         {status === 'SUCCESS' ? (
           <div className="border-4 border-[#11100C] p-6 bg-[#E3D4AC] text-[#11100C] shadow-[10px_10px_0_#11100C]">
              <h3 className="font-display text-3xl font-bold mb-2">YOU'RE IN THE CIRCLE ✦</h3>
-             <p className="font-mono text-xs">Check your inbox for session confirmation.</p>
+             <p className="font-mono text-xs mb-4">Check your inbox for session confirmation.</p>
+             <a 
+               href="/inner-circle"
+               className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-2 px-4 !bg-[#C99A2E] !text-[#11100C]"
+             >
+               EXPLORE INNER CIRCLE →
+             </a>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 w-full">
-            <input 
-              type="email" 
-              placeholder="ENTER YOUR EMAIL"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="flex-grow bg-transparent border-b-2 border-[#E3D4AC]/40 p-4 font-mono text-[#E3D4AC] focus:outline-none focus:border-tangy-mustard text-center md:text-left"
-            />
-            <button 
-              type="submit"
-              disabled={status === 'SUBMITTING'}
-              className="btn-ticket shrink-0"
+          <div className="flex flex-col items-center gap-6 w-full">
+            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 w-full">
+              <input 
+                type="email" 
+                placeholder="ENTER YOUR EMAIL"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="flex-grow bg-transparent border-b-2 border-[#E3D4AC]/40 p-4 font-mono text-[#E3D4AC] focus:outline-none focus:border-tangy-mustard text-center md:text-left"
+              />
+              <button 
+                type="submit"
+                disabled={status === 'SUBMITTING'}
+                className="btn-ticket shrink-0"
+              >
+                {status === 'SUBMITTING' ? '...' : 'SUBSCRIBE →'}
+              </button>
+            </form>
+            <a 
+              href="/inner-circle" 
+              className="font-mono text-xs text-[#C99A2E] hover:text-[#E3D4AC] font-bold tracking-widest uppercase transition-colors flex items-center gap-1 mt-2"
             >
-              {status === 'SUBMITTING' ? '...' : 'SUBSCRIBE →'}
-            </button>
-          </form>
+              JOIN INNER CIRCLE & EXPLORE BENEFITS →
+            </a>
+          </div>
         )}
       </div>
     </section>

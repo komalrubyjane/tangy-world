@@ -61,9 +61,17 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
         PROPERTY OF TANGY SESSIONS
       </div>
 
-      <div className="absolute top-12 left-12 z-20 pointer-events-none">
-        <p className="font-mono text-[#E7D5A4] text-[10px] tracking-[0.3em] font-bold uppercase">COLLECTIBLE CONCERT TICKETS // 1974 SERIES</p>
-        <h2 className="display text-6xl md:text-8xl text-[#E7D5A4] opacity-30">SESSIONS</h2>
+      <div className="absolute top-12 left-12 right-12 z-20 flex justify-between items-start pointer-events-auto">
+        <div>
+          <p className="font-mono text-[#E7D5A4] text-[10px] tracking-[0.3em] font-bold uppercase">COLLECTIBLE CONCERT TICKETS // 1974 SERIES</p>
+          <h2 className="display text-6xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">SESSIONS</h2>
+        </div>
+        <a 
+          href="/sessions" 
+          className="bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C]"
+        >
+          VIEW MORE →
+        </a>
       </div>
 
       {/* Scrubbed Ticket Poster Track */}

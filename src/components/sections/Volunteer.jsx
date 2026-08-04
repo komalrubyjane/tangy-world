@@ -201,12 +201,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
           </div>
 
           {/* Volunteer Action Button */}
-          <button 
-            onClick={handleVolunteerClick}
-            className="btn-ticket w-full text-center !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none"
+          <a 
+            href="/apply/crew"
+            className="btn-ticket w-full text-center block !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
           >
-            [ APPLY AS VOLUNTEER → ]
-          </button>
+            APPLY NOW →
+          </a>
 
         </div>
 
@@ -277,12 +277,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
           </div>
 
           {/* Artist Action Button */}
-          <button 
-            onClick={handleArtistClick}
-            className="btn-ticket w-full text-center !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none"
+          <a 
+            href="/artist/register"
+            className="btn-ticket w-full text-center block !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
           >
-            [ APPLY AS ARTIST → ]
-          </button>
+            APPLY AS ARTIST →
+          </a>
 
         </div>
 
@@ -318,12 +318,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
                 Chai stalls, artisanal food popups, vintage print presses, and craft makers bringing local flavor to every session.
               </p>
             </div>
-            <button 
-              onClick={handleVolunteerClick}
-              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#315B66] !text-[#E7D7AC] !border-2 !border-[#17120D]"
+            <a 
+              href="/apply/vendors"
+              className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#315B66] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
               APPLY AS VENDOR →
-            </button>
+            </a>
           </div>
 
           {/* CARD 2: SPONSORS */}
@@ -338,12 +338,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
                 Cultural foundations, audio gear brands, and independent supporters powering heritage music preservation.
               </p>
             </div>
-            <button 
-              onClick={handleVolunteerClick}
-              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D]"
+            <a 
+              href="/apply/sponsors"
+              className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
               BECOME A SPONSOR →
-            </button>
+            </a>
           </div>
 
           {/* CARD 3: VENUE / HOST */}
@@ -358,12 +358,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
                 Have a 300-year-old stepwell, private Nizam-era courtyard, or historic acoustic sanctuary? Host a session.
               </p>
             </div>
-            <button 
-              onClick={handleVolunteerClick}
-              className="btn-ticket w-full text-center text-xs font-mono font-bold uppercase !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D]"
+            <a 
+              href="/apply/venue-host"
+              className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] py-2.5"
             >
               HOST A VENUE →
-            </button>
+            </a>
           </div>
 
         </div>
