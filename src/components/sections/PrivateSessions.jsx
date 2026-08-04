@@ -145,7 +145,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
             </div>
 
             <p className="font-body text-base md:text-xl text-[#17120D]/90 leading-relaxed italic max-w-xl mx-auto mb-8 border-y-2 border-[#17120D]/20 py-4">
-              "Private gatherings deserve more than a playlist. Tangy brings the artists, sound, atmosphere and experience to spaces that mean something to you."
+              "Some performances aren't announced. They're created exclusively for those who ask."
             </p>
 
             <div className="flex flex-wrap justify-center gap-2 mb-10 font-mono text-[9px] font-bold text-[#17120D] uppercase">
@@ -157,18 +157,12 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
           </div>
 
           {/* Primary Action Button */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full">
-            <button 
-              onClick={handleRequestClick}
-              className="btn-ticket flex-1 text-center !bg-[#4A2638] !text-[#E7D7AC] hover:!bg-[#C69A32] hover:!text-[#17120D]"
-            >
-              REQUEST A PRIVATE SESSION →
-            </button>
+          <div className="w-full">
             <a 
               href="/private-sessions" 
-              className="btn-ticket flex-1 text-center block !bg-[#C69A32] !text-[#17120D] hover:!bg-[#17120D] hover:!text-[#E7D7AC] font-mono text-xs font-bold uppercase tracking-widest py-3"
+              className="btn-ticket w-full text-center block !bg-[#4A2638] !text-[#E7D7AC] hover:!bg-[#C69A32] hover:!text-[#17120D] font-mono text-xs font-bold uppercase tracking-widest py-3.5"
             >
-              LEARN MORE →
+              → PLAN A PRIVATE EXPERIENCE
             </a>
           </div>
 

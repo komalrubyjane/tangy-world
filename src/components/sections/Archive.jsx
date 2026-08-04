@@ -79,16 +79,19 @@ export const Archive = () => {
         REGISTRATION: [ ✚ ] CROSS-MARK // SIDE A
       </div>
 
-      <div className="absolute top-12 left-12 right-12 z-20 flex justify-between items-start pointer-events-auto">
+      <div className="absolute top-10 left-12 right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pointer-events-auto">
         <div>
           <p className="font-mono text-[#C99A2E] text-[10px] tracking-[0.3em] uppercase font-bold">ANALOGUE CONTACT SHEET // FILE 35MM</p>
-          <h2 className="display text-6xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">THE ARCHIVE</h2>
+          <h2 className="display text-5xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">THE ARCHIVE</h2>
+          <p className="font-serif italic text-xs md:text-sm text-[#E7D5A4]/90 mt-1 max-w-xl">
+            "Every gathering leaves behind more than photographs. It leaves behind history."
+          </p>
         </div>
         <a 
           href="/archive" 
-          className="bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C]"
+          className="bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
         >
-          EXPLORE ARCHIVE →
+          → STEP INTO THE ARCHIVE
         </a>
       </div>
 

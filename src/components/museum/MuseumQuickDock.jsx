@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 
 export const MuseumQuickDock = ({ 
-  onOpenSoundArchive, 
-  onOpenVinyl, 
-  onOpenProgramme, 
   onOpenShop, 
-  onOpenArchive, 
   onOpenPassport, 
   onOpenPostcard 
 }) => {
@@ -28,80 +24,9 @@ export const MuseumQuickDock = ({
   };
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[140] bg-[#191410]/95 backdrop-blur-md border-2 border-[#C99A2E] px-3 md:px-5 py-2 rounded-full shadow-[0_12px_35px_rgba(0,0,0,0.9)] flex items-center gap-1.5 md:gap-3 max-w-[96vw] overflow-x-auto select-none">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[140] bg-[#191410]/95 backdrop-blur-md border-2 border-[#C99A2E] px-4 py-2 rounded-full shadow-[0_12px_35px_rgba(0,0,0,0.9)] flex items-center gap-2 md:gap-4 max-w-[96vw] overflow-x-auto select-none">
       
-      {/* ------------------------------------------------------------- */}
-      {/* PRIMARY UTILITY ITEMS                                         */}
-      {/* ------------------------------------------------------------- */}
-
-      {/* 1. SOUND ARCHIVE */}
-      <div 
-        className="relative group flex items-center"
-        onMouseEnter={() => setActiveTooltip('sound')}
-        onMouseLeave={() => setActiveTooltip(null)}
-      >
-        <button
-          onClick={() => handleAction(onOpenSoundArchive)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        >
-          <span className="text-xs">📻</span>
-          <span>SOUND ARCHIVE</span>
-        </button>
-        {activeTooltip === 'sound' && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
-            35mm Field Tape Archive
-          </div>
-        )}
-      </div>
-
-      {/* 2. VINYL */}
-      <div 
-        className="relative group flex items-center"
-        onMouseEnter={() => setActiveTooltip('vinyl')}
-        onMouseLeave={() => setActiveTooltip(null)}
-      >
-        <button
-          onClick={() => handleAction(onOpenVinyl)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        >
-          <span className="text-xs">💿</span>
-          <span>VINYL</span>
-        </button>
-        {activeTooltip === 'vinyl' && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
-            33⅓ Audiophile Vinyl Pressing
-          </div>
-        )}
-      </div>
-
-      {/* 3. TANGY RECORDS */}
-      <div 
-        className="relative group flex items-center"
-        onMouseEnter={() => setActiveTooltip('records')}
-        onMouseLeave={() => setActiveTooltip(null)}
-      >
-        <button
-          onClick={() => handleAction(onOpenVinyl)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
-        >
-          <span className="text-xs">🎙️</span>
-          <span>TANGY RECORDS</span>
-        </button>
-        {activeTooltip === 'records' && (
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
-            Tangy Independent Record Label
-          </div>
-        )}
-      </div>
-
-      {/* STENCILED DIVIDER */}
-      <span className="text-[#C99A2E]/50 font-mono text-xs font-bold px-0.5">|</span>
-
-      {/* ------------------------------------------------------------- */}
-      {/* INTERACTIVE ITEMS                                             */}
-      {/* ------------------------------------------------------------- */}
-
-      {/* 4. PASSPORT */}
+      {/* 1. PASSPORT */}
       <div 
         className="relative group flex items-center"
         onMouseEnter={() => setActiveTooltip('passport')}
@@ -109,7 +34,7 @@ export const MuseumQuickDock = ({
       >
         <button
           onClick={() => handleAction(onOpenPassport)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+          className="px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
         >
           <span className="text-xs">🛂</span>
           <span>PASSPORT</span>
@@ -121,7 +46,9 @@ export const MuseumQuickDock = ({
         )}
       </div>
 
-      {/* 5. LOGIN */}
+      <span className="text-[#C99A2E]/40 font-mono text-xs font-bold">|</span>
+
+      {/* 2. LOGIN */}
       <div 
         className="relative group flex items-center"
         onMouseEnter={() => setActiveTooltip('login')}
@@ -129,7 +56,7 @@ export const MuseumQuickDock = ({
       >
         <button
           onClick={handleLoginNav}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+          className="px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
         >
           <span className="text-xs">🔑</span>
           <span>LOGIN</span>
@@ -141,7 +68,9 @@ export const MuseumQuickDock = ({
         )}
       </div>
 
-      {/* 6. STORE (WITH COMING SOON BADGE) */}
+      <span className="text-[#C99A2E]/40 font-mono text-xs font-bold">|</span>
+
+      {/* 3. STORE (WITH COMING SOON BADGE) */}
       <div 
         className="relative group flex items-center"
         onMouseEnter={() => setActiveTooltip('store')}
@@ -149,7 +78,7 @@ export const MuseumQuickDock = ({
       >
         <button
           onClick={() => handleAction(onOpenShop)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
+          className="px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
         >
           <span className="text-xs">🛍️</span>
           <span>STORE</span>
@@ -164,7 +93,9 @@ export const MuseumQuickDock = ({
         )}
       </div>
 
-      {/* 7. POSTCARD */}
+      <span className="text-[#C99A2E]/40 font-mono text-xs font-bold">|</span>
+
+      {/* 4. POSTCARD */}
       <div 
         className="relative group flex items-center"
         onMouseEnter={() => setActiveTooltip('postcard')}
@@ -172,7 +103,7 @@ export const MuseumQuickDock = ({
       >
         <button
           onClick={() => handleAction(onOpenPostcard)}
-          className="px-2 md:px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
+          className="px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all text-nowrap"
         >
           <span className="text-xs">✉️</span>
           <span>POSTCARD</span>

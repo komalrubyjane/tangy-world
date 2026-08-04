@@ -2,9 +2,9 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 
-export const Navbar = ({ onOpenProgramme }) => {
+export const Navbar = () => {
   const navigate = useNavigate();
-  const { isAudioEnabled, isMuted, toggleMute, playSFX } = useAudio();
+  const { playSFX } = useAudio();
   
   // Active dropdown state for desktop & mobile
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -13,82 +13,82 @@ export const Navbar = ({ onOpenProgramme }) => {
 
   const navCategories = [
     {
-      title: 'ABOUT',
+      title: 'About',
       items: [
-        { label: 'Why Tangy', path: '#manifesto' },
-        { label: 'Chronology', path: '#history' },
+        { label: 'Why Tangy', path: '/about#manifesto' },
+        { label: 'Chronology', path: '/about#history' },
         { label: 'Media Highlights', path: '/media' },
-        { label: 'Archive Preview', path: '#archive' },
-        { label: 'Tangy Team', path: '#founders' }
+        { label: 'Archive Preview', path: '/archive' },
+        { label: 'Tangy Team', path: '/about#founders' }
       ]
     },
     {
-      title: 'SESSIONS',
+      title: 'Sessions',
       items: [
-        { label: 'Current Sessions', path: '#sessions' },
-        { label: 'Future Programming', path: '#sessions' },
-        { label: 'Concert Culture', path: '#manifesto' },
-        { label: 'Glimpse of the Past', path: '#archive' },
-        { label: 'Join Waitlist', path: '#sessions' }
+        { label: 'Current Sessions', path: '/sessions' },
+        { label: 'Future Programming', path: '/sessions' },
+        { label: 'Concert Culture', path: '/about' },
+        { label: 'Glimpse of the Past', path: '/archive' },
+        { label: 'Join Waitlist', path: '/sessions' }
       ]
     },
     {
-      title: 'FORMATS',
+      title: 'Formats',
       items: [
-        { label: 'Heritage Shows', path: '#spaces' },
+        { label: 'Heritage Shows', path: '/sessions' },
         { label: 'Glamping', path: '/private-sessions' },
         { label: 'Private Sessions', path: '/private-sessions' },
         { label: 'Corporate', path: '/private-sessions' }
       ]
     },
     {
-      title: 'ARCHIVE',
+      title: 'Archive',
       items: [
-        { label: 'Session Archive', path: '#archive' },
+        { label: 'Session Archive', path: '/archive' },
         { label: 'Videos', path: '/media' },
-        { label: 'Photos', path: '#gallery' },
-        { label: 'Audio', path: '#archive' },
-        { label: 'Open Archive', path: '#archive' }
+        { label: 'Photos', path: '/archive' },
+        { label: 'Audio', path: '/archive' },
+        { label: 'Open Archive', path: '/archive' }
       ]
     },
     {
-      title: 'APPLY',
+      title: 'Apply',
       items: [
         { label: 'Artist', path: '/artist/register' },
-        { label: 'Crew', path: '/crew' },
-        { label: 'Venue / Host', path: '#build-together' },
+        { label: 'Crew', path: '/apply/crew' },
+        { label: 'Venue / Host', path: '/apply/venue-host' },
         { label: 'Private Sessions', path: '/private-sessions' },
-        { label: 'Sponsors', path: '#build-together' },
-        { label: 'Vendors', path: '#build-together' }
+        { label: 'Sponsors', path: '/apply/sponsors' },
+        { label: 'Vendors', path: '/apply/vendors' }
       ]
     },
     {
-      title: 'BLOGS',
+      title: 'Blogs',
       items: [
-        { label: 'Tangy Diary', path: '#diary' },
-        { label: 'Show Stories', path: '#diary' },
-        { label: 'Music Launches', path: '#diary' },
-        { label: 'Behind the Scenes', path: '#diary' },
-        { label: 'Opinion Pieces', path: '#diary' }
+        { label: 'Tangy Diary', path: '/blogs' },
+        { label: 'Show Stories', path: '/blogs' },
+        { label: 'Music Launches', path: '/blogs' },
+        { label: 'Behind the Scenes', path: '/blogs' },
+        { label: 'Opinion Pieces', path: '/blogs' }
       ]
     },
     {
-      title: 'MEDIA',
+      title: 'Media',
       items: [
         { label: 'Press Coverage', path: '/media' },
         { label: 'Interviews', path: '/media' },
         { label: 'Videos', path: '/media' },
         { label: 'Podcasts', path: '/media' },
-        { label: 'Gallery', path: '#gallery' }
+        { label: 'Gallery', path: '/archive' }
       ]
     },
     {
-      title: 'CONTACT',
+      title: 'Contact',
       items: [
         { label: 'Email', path: 'mailto:hello@tangysessions.com', external: true },
         { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true },
         { label: 'YouTube', path: 'https://youtube.com/tangysessions', external: true },
-        { label: 'Visit Us', path: '#contact' }
+        { label: 'Visit Us', path: '/contact' }
       ]
     }
   ];
@@ -134,22 +134,19 @@ export const Navbar = ({ onOpenProgramme }) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
-      {/* LEFT: TANGY SESSIONS BRAND LOGO */}
+      {/* LEFT: SIMPLIFIED BRAND TITLE */}
       <div 
         onClick={() => handleNav('/')}
         className="flex items-center gap-2 cursor-pointer group"
       >
         <span className="w-2.5 h-2.5 rounded-full bg-[#B94717] group-hover:scale-125 transition-transform" />
-        <span className="font-display font-bold text-sm md:text-base tracking-tight text-[#E7D5A4] group-hover:text-[#C99A2E] transition-colors">
+        <span className="font-display font-bold text-sm md:text-base tracking-tight text-[#E7D5A4] group-hover:text-[#C99A2E] transition-colors uppercase">
           TANGY SESSIONS
-        </span>
-        <span className="text-[#C99A2E] hidden xl:inline opacity-70">
-          // HYDERABAD · 1974 ARCHIVE
         </span>
       </div>
 
-      {/* CENTER: DESKTOP MULTI-LEVEL ARCHIVAL DROPDOWN MENU */}
-      <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-[#E7D5A4]">
+      {/* CENTER: DESKTOP EDITORIAL DROPDOWN MENU */}
+      <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[#E7D5A4]">
         {navCategories.map((cat, idx) => {
           const isOpen = activeDropdown === cat.title;
           const isRightAligned = idx >= navCategories.length - 2;
@@ -163,7 +160,7 @@ export const Navbar = ({ onOpenProgramme }) => {
             >
               {/* Category Header Button */}
               <button 
-                className={`py-1 flex items-center gap-1 uppercase transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
+                className={`py-1 flex items-center gap-1 font-mono text-xs uppercase tracking-widest transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
                 <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
@@ -197,29 +194,11 @@ export const Navbar = ({ onOpenProgramme }) => {
         })}
       </nav>
 
-      {/* RIGHT: SOUND CONTROL & PROGRAMME & MOBILE TOGGLE */}
-      <div className="flex items-center gap-3">
-        {/* Sound Toggle */}
-        <button 
-          onClick={toggleMute}
-          className="border border-[#E7D5A4]/40 bg-[#41261B]/60 hover:bg-[#C99A2E] hover:text-[#11100C] px-2.5 py-1 transition-colors font-bold uppercase flex items-center gap-1.5"
-        >
-          <span className="opacity-70 hidden sm:inline">SOUND</span>
-          <span>{!isAudioEnabled || isMuted ? "[ OFF ]" : "[ ON ● ]"}</span>
-        </button>
-
-        {/* Concert Programme Button */}
-        <button 
-          onClick={onOpenProgramme}
-          className="btn-ticket py-1 px-3 text-[10px] shadow-none hover:shadow-xs hidden sm:block"
-        >
-          PROGRAMME ✦
-        </button>
-
-        {/* Mobile Accordion Menu Toggle Button */}
+      {/* RIGHT: MOBILE MENU TOGGLE BUTTON */}
+      <div className="lg:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden border border-[#C99A2E] text-[#C99A2E] px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
+          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
         >
           {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
         </button>
@@ -229,7 +208,7 @@ export const Navbar = ({ onOpenProgramme }) => {
       {isMobileMenuOpen && (
         <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 lg:hidden">
           <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
-            ARCHIVAL NAVIGATION MENU
+            NAVIGATION MENU
           </div>
 
           <div className="flex flex-col gap-3 mt-2">
@@ -264,13 +243,6 @@ export const Navbar = ({ onOpenProgramme }) => {
               );
             })}
           </div>
-
-          <button
-            onClick={() => { setIsMobileMenuOpen(false); onOpenProgramme(); }}
-            className="w-full py-3 mt-4 btn-ticket text-center font-mono text-xs font-bold tracking-widest uppercase"
-          >
-            VIEW PROGRAMME BOARD ✦
-          </button>
         </div>
       )}
 

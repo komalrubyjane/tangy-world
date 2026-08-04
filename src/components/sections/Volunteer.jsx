@@ -126,6 +126,9 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
         <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] leading-none ink-bleed mb-4">
           JOIN THE CREW
         </h2>
+        <p className="font-serif italic text-sm md:text-base text-[#E7D7AC] max-w-xl mx-auto mb-3">
+          "Great experiences are built by passionate people behind the scenes."
+        </p>
         <p className="font-mono text-xs md:text-sm text-[#E7D7AC]/90 tracking-[0.3em] uppercase border-y-2 border-[#17120D] py-2 inline-block px-6 bg-[#172E33]/90 backdrop-blur-xs shadow-md">
           BEHIND THE SOUND · ON THE STAGE
         </p>
@@ -205,7 +208,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
             href="/apply/crew"
             className="btn-ticket w-full text-center block !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
           >
-            APPLY NOW →
+            → BECOME PART OF THE CREW
           </a>
 
         </div>
@@ -293,14 +296,17 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       {/* ------------------------------------------------------------- */}
       <div id="build-together" className="max-w-[1200px] mx-auto px-6 mt-28 md:mt-36 relative z-20">
         
-        {/* SINGLE-LINE CTA HEADING */}
+        {/* SINGLE-LINE CTA HEADING & EDITORIAL COPY */}
         <div className="text-center mb-12">
           <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
             COLLABORATION ARCHIVE // TANGY SESSIONS
           </span>
-          <h2 className="display text-4xl md:text-7xl text-[#E7D5A4] leading-none ink-bleed uppercase">
-            LET'S BUILD THIS WORLD TOGETHER
+          <h2 className="display text-4xl md:text-7xl text-[#E7D5A4] leading-none ink-bleed uppercase mb-3">
+            BUILD THIS WORLD TOGETHER
           </h2>
+          <p className="font-serif italic text-sm md:text-base text-[#E7D7AC] max-w-xl mx-auto">
+            "Artists, venues, partners and dreamers have always shaped Tangy."
+          </p>
         </div>
 
         {/* THREE CARDS: VENDORS, SPONSORS, VENUE / HOST */}
@@ -322,7 +328,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/vendors"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#315B66] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
-              APPLY AS VENDOR →
+              → START COLLABORATING
             </a>
           </div>
 
@@ -342,7 +348,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/sponsors"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
-              BECOME A SPONSOR →
+              → START COLLABORATING
             </a>
           </div>
 
@@ -362,7 +368,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/venue-host"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] py-2.5"
             >
-              HOST A VENUE →
+              → START COLLABORATING
             </a>
           </div>
 

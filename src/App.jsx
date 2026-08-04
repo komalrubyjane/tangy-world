@@ -232,43 +232,40 @@ function MainWorld() {
               {/* 1. HERO */}
               <Hero />
 
-              {/* 2. WHY TANGY (MANIFESTO) */}
+              {/* 2. WHY TANGY */}
               <Manifesto />
 
               {/* 3. SESSIONS */}
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
-              {/* 4. CHRONOLOGY */}
-              <History />
-
-              {/* 5. ARCHIVE */}
+              {/* 4. ARCHIVE */}
               <Archive />
 
-              {/* 6. SPACES */}
+              {/* 5. SPACES */}
               <Spaces />
 
-              {/* 7. FRONT CAMERA / MEDIA */}
+              {/* 6. FRONT CAMERA / MEDIA */}
               <FrontCamera />
 
-              {/* 8. TANGY DIARY */}
+              {/* 7. TANGY DIARY */}
               <TangyDiary />
 
-              {/* 9. ARTISTS */}
+              {/* 8. ARTISTS */}
               <Artists onArtistSubmit={handleNavigateArtist} />
 
-              {/* 10. FOUNDERS / TEAM */}
+              {/* 9. FOUNDERS / TEAM */}
               <Founders />
 
-              {/* 11. JOIN THE CREW & LET'S BUILD THIS WORLD TOGETHER */}
+              {/* 10. JOIN THE CREW & LET'S BUILD THIS WORLD TOGETHER */}
               <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
 
-              {/* 12. PRIVATE SESSIONS */}
+              {/* 11. PRIVATE SESSIONS */}
               <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
 
-              {/* 13. INNER CIRCLE */}
+              {/* 12. INNER CIRCLE */}
               <Newsletter />
 
-              {/* 14. COME FIND US */}
+              {/* 13. COME FIND US */}
               <Closing />
             </main>
             

@@ -61,16 +61,19 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
         PROPERTY OF TANGY SESSIONS
       </div>
 
-      <div className="absolute top-12 left-12 right-12 z-20 flex justify-between items-start pointer-events-auto">
+      <div className="absolute top-10 left-12 right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pointer-events-auto">
         <div>
           <p className="font-mono text-[#E7D5A4] text-[10px] tracking-[0.3em] font-bold uppercase">COLLECTIBLE CONCERT TICKETS // 1974 SERIES</p>
-          <h2 className="display text-6xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">SESSIONS</h2>
+          <h2 className="display text-5xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">SESSIONS</h2>
+          <p className="font-serif italic text-xs md:text-sm text-[#E7D5A4]/90 mt-1 max-w-xl">
+            "Every session is designed around a place, a culture and a memory waiting to be experienced."
+          </p>
         </div>
         <a 
           href="/sessions" 
-          className="bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C]"
+          className="bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
         >
-          VIEW MORE →
+          → EXPLORE UPCOMING SESSIONS
         </a>
       </div>
 

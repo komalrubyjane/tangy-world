@@ -22,8 +22,10 @@ export const Newsletter = () => {
       
       <div className="relative z-10 max-w-xl w-full px-4">
         <span className="font-mono text-tangy-mustard text-[10px] tracking-[0.3em] font-bold uppercase mb-2 block">PRIVATE MAILING LIST</span>
-        <h2 className="display text-5xl md:text-7xl text-[#E3D4AC] mb-4 ink-bleed">INNER CIRCLE</h2>
-        <p className="font-mono text-tangy-paper text-[10px] tracking-widest uppercase mb-12">Private announcements. Early access.</p>
+        <h2 className="display text-5xl md:text-7xl text-[#E3D4AC] mb-2 ink-bleed">INNER CIRCLE</h2>
+        <p className="font-serif italic text-sm md:text-base text-[#E3D4AC]/90 mb-10">
+          "The best stories are shared with those who stay close."
+        </p>
 
         {status === 'SUCCESS' ? (
           <div className="border-4 border-[#11100C] p-6 bg-[#E3D4AC] text-[#11100C] shadow-[10px_10px_0_#11100C]">
@@ -33,7 +35,7 @@ export const Newsletter = () => {
                href="/inner-circle"
                className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-2 px-4 !bg-[#C99A2E] !text-[#11100C]"
              >
-               EXPLORE INNER CIRCLE →
+               → JOIN THE INNER CIRCLE
              </a>
           </div>
         ) : (
@@ -57,9 +59,9 @@ export const Newsletter = () => {
             </form>
             <a 
               href="/inner-circle" 
-              className="font-mono text-xs text-[#C99A2E] hover:text-[#E3D4AC] font-bold tracking-widest uppercase transition-colors flex items-center gap-1 mt-2"
+              className="btn-ticket py-2.5 px-6 font-mono text-xs font-bold uppercase tracking-widest !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E3D4AC] transition-colors mt-2"
             >
-              JOIN INNER CIRCLE & EXPLORE BENEFITS →
+              → JOIN THE INNER CIRCLE
             </a>
           </div>
         )}

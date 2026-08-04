@@ -30,13 +30,17 @@ export const Closing = () => {
           CONTACT // MAGAZINE BACK PAGE
         </span>
         
-        <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] mb-8 leading-none ink-bleed">
+        <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] mb-3 leading-none ink-bleed">
           COME<br/>
           <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
         </h2>
 
+        <p className="font-serif italic text-sm md:text-base text-[#E7D5A4]/90 mb-6">
+          "Every journey begins somewhere."
+        </p>
+
         {/* Contact Info Cards & Contact Us CTA */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-8 border-t-2 border-[#E7D5A4]/30 pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-6 border-t-2 border-[#E7D5A4]/30 pt-8">
           <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">LOCATION</span>
             <span>HYDERABAD · TELANGANA<br/>INDIA</span>
@@ -56,9 +60,9 @@ export const Closing = () => {
         <div className="mt-10">
           <a 
             href="/contact" 
-            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
+            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3.5 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
           >
-            CONTACT US →
+            → VISIT TANGY
           </a>
         </div>
 
