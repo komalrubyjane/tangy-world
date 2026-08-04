@@ -162,7 +162,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
               href="/private-sessions" 
               className="btn-ticket w-full text-center block !bg-[#4A2638] !text-[#E7D7AC] hover:!bg-[#C69A32] hover:!text-[#17120D] font-mono text-xs font-bold uppercase tracking-widest py-3.5"
             >
-              → PLAN A PRIVATE EXPERIENCE
+              PRIVATE SESSIONS → VIEW MORE
             </a>
           </div>
 

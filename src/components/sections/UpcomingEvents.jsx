@@ -73,7 +73,7 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
           href="/sessions" 
           className="bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
         >
-          → EXPLORE UPCOMING SESSIONS
+          SESSIONS → VIEW MORE
         </a>
       </div>
 

@@ -122,7 +122,7 @@ export const Manifesto = () => {
             href="/about" 
             className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border-2 border-[#11100C] px-4 py-2 font-mono font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
           >
-            → DISCOVER OUR STORY
+            WHY TANGY → VIEW MORE
           </a>
         </div>
 

@@ -11,84 +11,98 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const leaveTimeoutRef = useRef(null);
 
+  // EXACT NAVIGATION ORDER SPECIFIED:
+  // About -> Sessions -> Archive -> Crew -> Collaborate -> Private -> Diary -> Inner Circle -> Contact
   const navCategories = [
     {
       title: 'About',
+      path: '/about',
       items: [
         { label: 'Why Tangy', path: '/about#manifesto' },
         { label: 'Chronology', path: '/about#history' },
+        { label: 'Tangy Team', path: '/about#founders' },
         { label: 'Media Highlights', path: '/media' },
-        { label: 'Archive Preview', path: '/archive' },
-        { label: 'Tangy Team', path: '/about#founders' }
+        { label: 'Full Story', path: '/about' }
       ]
     },
     {
       title: 'Sessions',
+      path: '/sessions',
       items: [
-        { label: 'Current Sessions', path: '/sessions' },
-        { label: 'Future Programming', path: '/sessions' },
-        { label: 'Concert Culture', path: '/about' },
-        { label: 'Glimpse of the Past', path: '/archive' },
+        { label: 'Upcoming Sessions', path: '/sessions' },
+        { label: 'Concert Culture', path: '/sessions' },
+        { label: 'Session Calendar', path: '/sessions' },
         { label: 'Join Waitlist', path: '/sessions' }
       ]
     },
     {
-      title: 'Formats',
-      items: [
-        { label: 'Heritage Shows', path: '/sessions' },
-        { label: 'Glamping', path: '/private-sessions' },
-        { label: 'Private Sessions', path: '/private-sessions' },
-        { label: 'Corporate', path: '/private-sessions' }
-      ]
-    },
-    {
       title: 'Archive',
+      path: '/archive',
       items: [
         { label: 'Session Archive', path: '/archive' },
-        { label: 'Videos', path: '/media' },
-        { label: 'Photos', path: '/archive' },
-        { label: 'Audio', path: '/archive' },
-        { label: 'Open Archive', path: '/archive' }
+        { label: 'Museum Timeline', path: '/archive' },
+        { label: 'Past Memories', path: '/archive' },
+        { label: '35mm Contact Sheets', path: '/archive' }
       ]
     },
     {
-      title: 'Apply',
+      title: 'Crew',
+      path: '/apply/crew',
       items: [
-        { label: 'Artist', path: '/artist/register' },
-        { label: 'Crew', path: '/apply/crew' },
-        { label: 'Venue / Host', path: '/apply/venue-host' },
-        { label: 'Private Sessions', path: '/private-sessions' },
+        { label: 'Volunteer Opportunities', path: '/apply/crew' },
+        { label: 'Production Team', path: '/crew' },
+        { label: 'Stage Operations', path: '/crew' },
+        { label: 'Apply Now', path: '/apply/crew' }
+      ]
+    },
+    {
+      title: 'Collaborate',
+      path: '/apply/vendors',
+      items: [
+        { label: 'Vendors', path: '/apply/vendors' },
         { label: 'Sponsors', path: '/apply/sponsors' },
-        { label: 'Vendors', path: '/apply/vendors' }
+        { label: 'Venue / Host', path: '/apply/venue-host' },
+        { label: 'Explore Opportunities', path: '/apply/vendors' }
       ]
     },
     {
-      title: 'Blogs',
+      title: 'Private',
+      path: '/private-sessions',
       items: [
-        { label: 'Tangy Diary', path: '/blogs' },
-        { label: 'Show Stories', path: '/blogs' },
+        { label: 'Private Gatherings', path: '/private-sessions' },
+        { label: 'Corporate Events', path: '/private-sessions' },
+        { label: 'Weddings', path: '/private-sessions' },
+        { label: 'Heritage Experiences', path: '/private-sessions' }
+      ]
+    },
+    {
+      title: 'Diary',
+      path: '/blogs',
+      items: [
+        { label: 'Museum Journal', path: '/blogs' },
+        { label: 'Recent Stories', path: '/blogs' },
         { label: 'Music Launches', path: '/blogs' },
-        { label: 'Behind the Scenes', path: '/blogs' },
-        { label: 'Opinion Pieces', path: '/blogs' }
+        { label: 'Behind the Scenes', path: '/blogs' }
       ]
     },
     {
-      title: 'Media',
+      title: 'Inner Circle',
+      path: '/inner-circle',
       items: [
-        { label: 'Press Coverage', path: '/media' },
-        { label: 'Interviews', path: '/media' },
-        { label: 'Videos', path: '/media' },
-        { label: 'Podcasts', path: '/media' },
-        { label: 'Gallery', path: '/archive' }
+        { label: 'Membership Benefits', path: '/inner-circle' },
+        { label: 'Early Access', path: '/inner-circle' },
+        { label: 'Secret Events', path: '/inner-circle' },
+        { label: 'Join Now', path: '/inner-circle' }
       ]
     },
     {
       title: 'Contact',
+      path: '/contact',
       items: [
-        { label: 'Email', path: 'mailto:hello@tangysessions.com', external: true },
+        { label: 'Location & Map', path: '/contact' },
+        { label: 'Email Dispatch', path: 'mailto:hello@tangysessions.com', external: true },
         { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true },
-        { label: 'YouTube', path: 'https://youtube.com/tangysessions', external: true },
-        { label: 'Visit Us', path: '/contact' }
+        { label: 'Visit Tangy', path: '/contact' }
       ]
     }
   ];
@@ -134,7 +148,7 @@ export const Navbar = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
-      {/* LEFT: SIMPLIFIED BRAND TITLE */}
+      {/* LEFT: BRAND LOGO */}
       <div 
         onClick={() => handleNav('/')}
         className="flex items-center gap-2 cursor-pointer group"
@@ -146,7 +160,7 @@ export const Navbar = () => {
       </div>
 
       {/* CENTER: DESKTOP EDITORIAL DROPDOWN MENU */}
-      <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-[#E7D5A4]">
+      <nav className="hidden xl:flex items-center gap-4 xl:gap-5 text-[#E7D5A4]">
         {navCategories.map((cat, idx) => {
           const isOpen = activeDropdown === cat.title;
           const isRightAligned = idx >= navCategories.length - 2;
@@ -160,7 +174,8 @@ export const Navbar = () => {
             >
               {/* Category Header Button */}
               <button 
-                className={`py-1 flex items-center gap-1 font-mono text-xs uppercase tracking-widest transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
+                onClick={() => handleNav(cat.path)}
+                className={`py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
                 <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
@@ -195,7 +210,7 @@ export const Navbar = () => {
       </nav>
 
       {/* RIGHT: MOBILE MENU TOGGLE BUTTON */}
-      <div className="lg:hidden">
+      <div className="xl:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
@@ -204,9 +219,9 @@ export const Navbar = () => {
         </button>
       </div>
 
-      {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1024px) */}
+      {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 lg:hidden">
+        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
           <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
             NAVIGATION MENU
           </div>

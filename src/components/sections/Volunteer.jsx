@@ -208,7 +208,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
             href="/apply/crew"
             className="btn-ticket w-full text-center block !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
           >
-            → BECOME PART OF THE CREW
+            JOIN THE CREW → APPLY NOW
           </a>
 
         </div>
@@ -328,7 +328,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/vendors"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#315B66] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
-              → START COLLABORATING
+              COLLABORATE → EXPLORE OPPORTUNITIES
             </a>
           </div>
 
@@ -348,7 +348,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/sponsors"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#B84718] !text-[#E7D7AC] !border-2 !border-[#17120D] py-2.5"
             >
-              → START COLLABORATING
+              COLLABORATE → EXPLORE OPPORTUNITIES
             </a>
           </div>
 
@@ -368,7 +368,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
               href="/apply/venue-host"
               className="btn-ticket w-full text-center block text-xs font-mono font-bold uppercase !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] py-2.5"
             >
-              → START COLLABORATING
+              COLLABORATE → EXPLORE OPPORTUNITIES
             </a>
           </div>
 

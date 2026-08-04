@@ -91,7 +91,7 @@ export const Archive = () => {
           href="/archive" 
           className="bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
         >
-          → STEP INTO THE ARCHIVE
+          ARCHIVE → VIEW MORE
         </a>
       </div>
 

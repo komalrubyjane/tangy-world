@@ -229,46 +229,35 @@ function MainWorld() {
 
           <div className="tangy-world pt-12">
             <main>
-              {/* 1. HERO */}
+              {/* 01 — LANDING PAGE (HERO) */}
               <Hero />
 
-              {/* 2. WHY TANGY */}
+              {/* 02 — WHY TANGY */}
               <Manifesto />
 
-              {/* 3. SESSIONS */}
+              {/* 03 — SESSIONS */}
               <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
-              {/* 4. ARCHIVE */}
+              {/* 04 — ARCHIVE */}
               <Archive />
 
-              {/* 5. SPACES */}
-              <Spaces />
-
-              {/* 6. FRONT CAMERA / MEDIA */}
-              <FrontCamera />
-
-              {/* 7. TANGY DIARY */}
-              <TangyDiary />
-
-              {/* 8. ARTISTS */}
-              <Artists onArtistSubmit={handleNavigateArtist} />
-
-              {/* 9. FOUNDERS / TEAM */}
-              <Founders />
-
-              {/* 10. JOIN THE CREW & LET'S BUILD THIS WORLD TOGETHER */}
+              {/* 05 — JOIN THE CREW & 06 — LET'S BUILD THIS WORLD TOGETHER */}
               <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
 
-              {/* 11. PRIVATE SESSIONS */}
+              {/* 07 — PRIVATE SESSIONS */}
               <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
 
-              {/* 12. INNER CIRCLE */}
+              {/* 08 — TANGY DIARY */}
+              <TangyDiary />
+
+              {/* 09 — INNER CIRCLE */}
               <Newsletter />
 
-              {/* 13. COME FIND US */}
+              {/* 10 — COME FIND US */}
               <Closing />
             </main>
             
+            {/* 11 — FOOTER */}
             <Footer />
           </div>
         </>

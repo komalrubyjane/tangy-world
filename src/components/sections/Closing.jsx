@@ -62,7 +62,7 @@ export const Closing = () => {
             href="/contact" 
             className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3.5 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
           >
-            → VISIT TANGY
+            CONTACT → VISIT TANGY
           </a>
         </div>
 

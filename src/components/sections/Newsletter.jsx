@@ -35,7 +35,7 @@ export const Newsletter = () => {
                href="/inner-circle"
                className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-2 px-4 !bg-[#C99A2E] !text-[#11100C]"
              >
-               → JOIN THE INNER CIRCLE
+               INNER CIRCLE → JOIN NOW
              </a>
           </div>
         ) : (
@@ -61,7 +61,7 @@ export const Newsletter = () => {
               href="/inner-circle" 
               className="btn-ticket py-2.5 px-6 font-mono text-xs font-bold uppercase tracking-widest !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E3D4AC] transition-colors mt-2"
             >
-              → JOIN THE INNER CIRCLE
+              INNER CIRCLE → JOIN NOW
             </a>
           </div>
         )}
