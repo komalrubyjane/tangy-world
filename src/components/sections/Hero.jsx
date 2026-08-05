@@ -129,7 +129,7 @@ export const Hero = () => {
     <section 
       ref={sectionRef} 
       id="hero" 
-      className="hero relative w-screen h-screen min-h-[680px] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate"
+      className="hero relative w-screen h-screen min-h-[680px] bg-[#3A241A] overflow-hidden p-0 m-0 select-none isolate"
     >
       {/* SVG ROUGHEN FILTER */}
       <svg className="absolute width-0 height-0 overflow-hidden pointer-events-none z-0">
@@ -141,7 +141,7 @@ export const Hero = () => {
 
       {/* FULL-SCREEN EDGE-TO-EDGE POSTER CANVAS */}
       <div 
-        className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
+        className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#4B2D22_0%,#3A241A_60%,#2D1B13_100%)] overflow-hidden container-inline-size"
       >
         {/* CORNER CROSSHAIRS (z-30) */}
         <div className="absolute z-30 w-[2.8cqw] h-[2.8cqw] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none">

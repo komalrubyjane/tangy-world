@@ -1,53 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Special+Elite&family=Caveat:wght@700&display=swap');
 @import "tailwindcss";
 @import "./animations.css";
 @import "./cursor.css";
 
 @theme {
-  --color-tangy-black: #191410;
-  --color-tangy-oxblood: #4c1210;
-  --color-tangy-rust: #8a2320;
-  --color-tangy-mustard: #d1a437;
-  --color-tangy-brown: #241a12;
-  --color-tangy-paper: #e9decb;
-  --color-tangy-cream: #ecdcaf;
-  
-  --font-poster: 'Anton', 'Oswald', system-ui, sans-serif;
-  --font-display: 'Oswald', sans-serif;
-  --font-editorial: 'Oswald', sans-serif;
+  --color-archive-primary: #3A241A;
+  --color-archive-secondary: #4B2D22;
+  --color-archive-paper: #D9C6A0;
+  --color-archive-aged: #CBB38C;
+  --color-archive-gold: #9E6D35;
+  --color-archive-ink: #35251A;
+  --color-archive-red: #7A2B24;
+
+  --color-tangy-black: #3A241A;
+  --color-tangy-oxblood: #7A2B24;
+  --color-tangy-rust: #7A2B24;
+  --color-tangy-mustard: #9E6D35;
+  --color-tangy-brown: #4B2D22;
+  --color-tangy-paper: #D9C6A0;
+  --color-tangy-cream: #CBB38C;
+
+  --font-poster: 'Bebas Neue', 'Oswald', sans-serif;
+  --font-display: 'Oswald', 'Bebas Neue', sans-serif;
+  --font-editorial: 'Cormorant Garamond', 'Libre Baskerville', serif;
+  --font-serif: 'Cormorant Garamond', 'EB Garamond', 'Libre Baskerville', serif;
+  --font-handwritten: 'Caveat', 'Patrick Hand', cursive;
   --font-archive: 'Special Elite', 'Courier New', monospace;
 }
 
 @layer base {
   :root {
-    --red-1: #8a2320;
-    --red-2: #6e1a19;
-    --red-3: #4c1210;
-    --red-bright: #c2272a;
-    --cream: #ecdcaf;
-    --cream-2: #e2cd97;
-    --paper: #e9decb;
-    --ink: #241a12;
-    --black: #191410;
-    --gold: #d1a437;
+    --bg-primary: #3A241A;
+    --bg-secondary: #4B2D22;
+    --paper-light: #D9C6A0;
+    --paper-aged: #CBB38C;
+    --gold-vintage: #9E6D35;
+    --ink-old: #35251A;
+    --accent-red: #7A2B24;
 
-    --f-poster: 'Anton', 'Oswald', system-ui, sans-serif;
-    --f-display: 'Oswald', sans-serif;
-    --f-editorial: 'Oswald', sans-serif;
-    --f-archive: 'Special Elite', 'Courier New', monospace;
+    --f-poster: 'Bebas Neue', 'Oswald', sans-serif;
+    --f-serif: 'Cormorant Garamond', 'EB Garamond', serif;
+    --f-handwritten: 'Caveat', 'Patrick Hand', cursive;
+    --f-archive: 'Special Elite', monospace;
   }
 
   html, body {
     margin: 0;
     padding: 0;
-    background: var(--black);
-    color: var(--paper);
-    font-family: 'Oswald', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--paper-light);
+    font-family: 'Cormorant Garamond', serif;
     overflow-x: hidden;
+    color-scheme: dark;
   }
 }
 
-/* Custom 1970s Vintage Poster Typography Classes */
+/* 1970s Vintage Archive Typography & Component Helpers */
 .font-poster {
-  font-family: 'Anton', 'Oswald', system-ui, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.font-serif-book {
+  font-family: 'Cormorant Garamond', 'Libre Baskerville', serif;
+}
+
+.font-handwritten {
+  font-family: 'Caveat', 'Patrick Hand', cursive;
+}
+
+.font-mono-archive {
+  font-family: 'Special Elite', monospace;
+}
+
+/* Scanned Archive Photo Utilities */
+.scanned-photo {
+  filter: sepia(0.28) contrast(0.88) brightness(0.92) saturate(0.75);
+  box-shadow: inset 0 0 20px rgba(53, 37, 26, 0.4);
+}
+
+/* Soft Archival Shadow Utility */
+.shadow-archival {
+  box-shadow: 0 16px 40px -10px rgba(53, 37, 26, 0.35);
+}
+
+/* Atmospheric Tungsten Lighting Glow Overlay */
+.tungsten-glow {
+  background: radial-gradient(circle at 50% 30%, rgba(158, 109, 53, 0.12) 0%, transparent 75%);
 }

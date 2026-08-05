@@ -182,6 +182,22 @@ export const CoffeeStain = ({ className = "", style = {} }) => (
   />
 );
 
+// 11b. Vintage Ink Splatter Accent
+export const InkSplatter = ({ className = "", color = "#35251A", opacity = 0.25 }) => (
+  <svg 
+    viewBox="0 0 100 100" 
+    fill={color}
+    className={`absolute pointer-events-none mix-blend-multiply ${className}`}
+    style={{ opacity }}
+  >
+    <path d="M50 15 C45 10 38 18 35 25 C30 20 20 25 22 35 C15 35 12 45 20 50 C10 55 12 68 25 65 C20 75 32 85 42 78 C48 85 62 82 65 72 C75 75 82 65 78 55 C85 50 82 38 72 38 C75 28 65 20 55 25 Z" />
+    <circle cx="20" cy="20" r="3" />
+    <circle cx="85" cy="30" r="2" />
+    <circle cx="80" cy="80" r="4" />
+    <circle cx="15" cy="70" r="2" />
+  </svg>
+);
+
 // 12. Paper Clip Graphic Accent
 export const PaperClip = ({ className = "" }) => (
   <div className={`absolute z-30 pointer-events-none w-3.5 h-10 border-2 border-slate-700 rounded-full shadow-sm ${className}`} />

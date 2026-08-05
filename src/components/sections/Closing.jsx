@@ -1,58 +1,48 @@
-import { useGSAPContext } from '../../hooks/useGSAPContext';
-import gsap from 'gsap';
-
 export const Closing = () => {
-  const sectionRef = useGSAPContext((ctx) => {
-    gsap.from('.contact-back-page', {
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top 75%'
-      },
-      y: 60,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    });
-  }, []);
-
   return (
-    <section ref={sectionRef} id="contact" className="relative w-full py-32 bg-[#11100C] text-[#E7D5A4] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#5A120D]">
-      
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
+    <section 
+      id="contact" 
+      className="relative w-full min-h-screen bg-[#4B2D22] text-[#D9C6A0] overflow-hidden flex flex-col items-center justify-center p-8 md:p-16 border-t-8 border-[#3A241A]"
+    >
+      {/* NOISE OVERLAY & VINTAGE MAGAZINE BACK PAGE TEXTURE */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-0" />
 
-      {/* Background Archival Photo */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <img src="/media/gallery/tangy9.jpg" alt="After Hours" className="w-full h-full object-cover filter grayscale contrast-150" />
+      {/* RETRO CROP MARKS */}
+      <div className="absolute top-6 left-6 font-mono text-[9px] text-[#9E6D35] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+        [ ✚ ] CROP MARK // BACK PAGE DISPATCH
+      </div>
+      <div className="absolute top-6 right-6 font-mono text-[9px] text-[#D9C6A0]/50 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+        HYDERABAD HERITAGE DESK
       </div>
 
-      <div className="contact-back-page relative z-30 text-center px-4 max-w-4xl">
-        <span className="font-mono text-[#C99A2E] text-[11px] tracking-[0.4em] mb-4 uppercase block font-bold">
+      <div className="relative z-10 max-w-4xl text-center">
+        <span className="font-mono text-[10px] md:text-xs font-bold text-[#9E6D35] tracking-[0.35em] uppercase mb-4 block">
           CONTACT // MAGAZINE BACK PAGE
         </span>
         
-        <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] mb-3 leading-none ink-bleed">
+        <h2 className="font-poster text-6xl md:text-9xl text-[#D9C6A0] mb-3 leading-none uppercase">
           COME<br/>
-          <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
+          <span className="italic text-[#9E6D35] font-serif-book font-normal">FIND US.</span>
         </h2>
 
-        <p className="font-serif italic text-sm md:text-base text-[#E7D5A4]/90 mb-6">
+        <p className="font-handwritten text-xl text-[#D9C6A0] mb-6">
           "Every journey begins somewhere."
         </p>
 
         {/* Contact Info Cards & Contact Us CTA */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-6 border-t-2 border-[#E7D5A4]/30 pt-8">
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">LOCATION</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#D9C6A0] tracking-widest mt-6 border-t-2 border-[#D9C6A0]/20 pt-8">
+          <div className="bg-[#3A241A]/90 border-2 border-[#9E6D35]/40 p-6 backdrop-blur-xs shadow-archival">
+            <span className="text-[#9E6D35] font-bold block mb-2 uppercase">LOCATION</span>
             <span>HYDERABAD · TELANGANA<br/>INDIA</span>
           </div>
 
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">DISPATCH</span>
+          <div className="bg-[#3A241A]/90 border-2 border-[#9E6D35]/40 p-6 backdrop-blur-xs shadow-archival">
+            <span className="text-[#9E6D35] font-bold block mb-2 uppercase">DISPATCH</span>
             <span>HELLO@TANGYSESSIONS.COM</span>
           </div>
 
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">ARCHIVE</span>
+          <div className="bg-[#3A241A]/90 border-2 border-[#9E6D35]/40 p-6 backdrop-blur-xs shadow-archival">
+            <span className="text-[#9E6D35] font-bold block mb-2 uppercase">ARCHIVE</span>
             <span>INSTAGRAM: @TANGYSESSIONS</span>
           </div>
         </div>
@@ -60,14 +50,13 @@ export const Closing = () => {
         <div className="mt-10">
           <a 
             href="/contact" 
-            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3.5 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
+            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3.5 px-8 !bg-[#9E6D35] !text-[#35251A] hover:!bg-[#D9C6A0] shadow-archival !border-2 !border-[#35251A]"
           >
             CONTACT → VISIT TANGY
           </a>
         </div>
 
       </div>
-
     </section>
   );
 };
