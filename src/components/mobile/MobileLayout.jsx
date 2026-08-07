@@ -12,7 +12,8 @@ import {
   CassetteTapeGraphic,
   GinghamRibbonPattern,
   TornNewspaperScrap,
-  PushPin
+  PushPin,
+  TapeStrip
 } from '../ui/BackgroundDecorations';
 
 // Lightweight 60 FPS IntersectionObserver Hook for Mobile Scroll Animations
