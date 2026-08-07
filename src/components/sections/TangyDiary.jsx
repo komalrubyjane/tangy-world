@@ -11,7 +11,7 @@ export const TangyDiary = () => {
 
   const sectionRef = useGSAPContext((ctx) => {
     const leaves = gsap.utils.toArray('.diary-leaf');
-    const totalLeaves = leaves.length; // 7 physical leaves (Leaf 0 = Cover, Leaf 1 = Spread 1 Right/Spread 2 Left, Leaf 2 = Spread 2 Right/Spread 3 Left, etc.)
+    const totalLeaves = leaves.length; // 7 physical leaves (Leaf 0 = Cover, Leaf 1 = Spread 1 Right/Spread 2 Left, etc.)
 
     // Master ScrollTrigger timeline pinned to the diary section
     const tl = gsap.timeline({
@@ -40,7 +40,7 @@ export const TangyDiary = () => {
     });
 
     // INITIAL 3D STATES & STRICT LAYER HIERARCHY
-    // Leaves initially rest on right stack.
+    // Each leaf is hinged along the spine edge (0% 50%)
     leaves.forEach((leaf, i) => {
       gsap.set(leaf, {
         rotateY: 0,
@@ -55,8 +55,7 @@ export const TangyDiary = () => {
     gsap.set('.read-hint-cover', { opacity: 1 });
 
     // =========================================================================
-    // SCROLL TIMELINE SEQUENCE & Z-INDEX MANAGEMENT
-    // Active Left Page is always accumulated beneath turning pages!
+    // SCROLL TIMELINE SEQUENCE & HARDCOVER SPINE ROTATION (170° RESTING ANGLE)
     // =========================================================================
 
     // 0% - 8%: LANDING (COVER CLOSED) -> COVER OPENS
@@ -69,15 +68,15 @@ export const TangyDiary = () => {
     }, 0.01)
     .to('.read-hint-cover', { opacity: 0, duration: 0.02 }, 0.01)
 
-    // Cover (Leaf 0) turns open 180° to left side cover.
-    // When progress > 0.5, set zIndex to 1 so turned cover rests at bottom of left stack!
+    // Cover (Leaf 0) turns open ~170° to rest naturally on the left back cover board.
+    // As soon as cover opens (progress > 0.4), set zIndex: 0 so it rests BEHIND the left page stack!
     .to(leaves[0], {
-      rotateY: -180,
+      rotateY: -170,
       duration: 0.06,
       ease: 'power2.inOut',
       onUpdate: function () {
-        if (this.progress() > 0.5) {
-          gsap.set(leaves[0], { zIndex: 1 });
+        if (this.progress() > 0.4) {
+          gsap.set(leaves[0], { zIndex: 0 }); // Rest cover behind left page stack
         } else {
           gsap.set(leaves[0], { zIndex: totalLeaves + 10 });
         }
@@ -86,19 +85,19 @@ export const TangyDiary = () => {
 
     // -------------------------------------------------------------------------
     // SPREAD 1 (8% - 22%):
-    // Left  = Inside Cover & Title / Field Diary Stamp (Leaf 0 Back)
+    // Left  = Title / Field Diary Stamp (Leaf 0 Back, rests on open cover)
     // Right = The Beginning / Bansilalpet Stepwell (Leaf 1 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[1], { // Leaf 1 turns 180° to Left
+    .to(leaves[1], { // Leaf 1 turns -180° to Left
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
       onUpdate: function () {
         if (this.progress() > 0.5) {
-          gsap.set(leaves[1], { zIndex: 2 }); // Turned page becomes top active left page (zIndex 2 > zIndex 1)
+          gsap.set(leaves[1], { zIndex: 2 }); // Turned page becomes top active left page (zIndex 2 > Leaf 0 zIndex 0)
         } else {
-          gsap.set(leaves[1], { zIndex: totalLeaves + 10 }); // Turning page is topmost layer during animation
+          gsap.set(leaves[1], { zIndex: totalLeaves + 10 });
         }
       }
     }, 0.18)
@@ -109,7 +108,7 @@ export const TangyDiary = () => {
     // Right = Monsoon Acoustics / Old City Haveli (Leaf 2 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[2], { // Leaf 2 turns 180° to Left
+    .to(leaves[2], { // Leaf 2 turns -180° to Left
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
@@ -128,7 +127,7 @@ export const TangyDiary = () => {
     // Right = Artists & Performers (Leaf 3 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[3], { // Leaf 3 turns 180° to Left
+    .to(leaves[3], { // Leaf 3 turns -180° to Left
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
@@ -147,7 +146,7 @@ export const TangyDiary = () => {
     // Right = Backstage Notes & Hidden Spaces (Leaf 4 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[4], { // Leaf 4 turns 180° to Left
+    .to(leaves[4], { // Leaf 4 turns -180° to Left
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
@@ -166,7 +165,7 @@ export const TangyDiary = () => {
     // Right = Community & Volunteers (Leaf 5 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[5], { // Leaf 5 turns 180° to Left
+    .to(leaves[5], { // Leaf 5 turns -180° to Left
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
@@ -279,7 +278,7 @@ export const TangyDiary = () => {
         </div>
       </div>
 
-      {/* 3D BOOK STAGE - FIXED & PERFECTLY CENTERED */}
+      {/* 3D BOOK STAGE - SINGLE CONNECTED HARDCOVER JOURNAL */}
       <div className="relative [perspective:2200px] [perspective-origin:50%_42%]">
         
         {/* DESK SHADOW (LAYER 1) */}
@@ -288,7 +287,7 @@ export const TangyDiary = () => {
         {/* DIARY CONTAINER */}
         <div className="relative w-[min(880px,90vw)] h-[min(650px,76vh)] [transform-style:preserve-3d]">
           
-          {/* PERMANENT FIXED LEATHER SPINE BAR (LAYER 5) */}
+          {/* PERMANENT FIXED LEATHER SPINE BAR (LAYER 80 - ROTATION PIVOT HINGE) */}
           <div className="absolute left-[calc(50%-14px)] -top-[4px] -bottom-[4px] w-[28px] z-[80] rounded-sm bg-[linear-gradient(90deg,#2E221B_0%,#4B3529_12%,#6B4B39_50%,#4B3529_88%,#2E221B_100%)] shadow-[inset_0_0_16px_rgba(0,0,0,0.6),3px_0_8px_rgba(0,0,0,0.5),-3px_0_8px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-0 rounded-sm bg-[repeating-linear-gradient(90deg,rgba(234,223,197,0.04)_0_2px,transparent_2px_7px,rgba(0,0,0,0.15)_7px_9px,transparent_9px_14px)]" />
             <div className="absolute top-[14px] bottom-[14px] left-[4px] right-[4px] bg-[repeating-linear-gradient(0deg,rgba(166,136,83,0.65)_0_3px,transparent_3px_8px)_left/2px_100%_no-repeat,repeating-linear-gradient(0deg,rgba(166,136,83,0.65)_0_3px,transparent_3px_8px)_right/2px_100%_no-repeat]" />
@@ -297,20 +296,20 @@ export const TangyDiary = () => {
             </div>
           </div>
 
-          {/* LEFT PAGE STACK DEPTH (LAYER 3 - THIN 14px PAPER EDGE VISIBLE BESIDE SPINE ON LEFT) */}
-          <div className="absolute top-[1.5%] -left-[12px] w-[14px] h-[97%] bg-[repeating-linear-gradient(0deg,#EADFC5_0_1.4px,#E6D8B7_1.4px_2.6px,#DCCDA7_2.6px_3.2px)] shadow-[-2px_0_6px_rgba(0,0,0,0.3),inset_2px_0_3px_rgba(0,0,0,0.2)] rounded-l-xs z-[2]" />
+          {/* LEFT PAGE STACK DEPTH (LAYER 3 - THIN 14px PAPER EDGE ATTACHED DIRECTLY BESIDE SPINE ON LEFT) */}
+          <div className="absolute top-[1.5%] left-[calc(50%-14px-13px)] w-[14px] h-[97%] bg-[repeating-linear-gradient(0deg,#EADFC5_0_1.4px,#E6D8B7_1.4px_2.6px,#DCCDA7_2.6px_3.2px)] shadow-[-2px_0_6px_rgba(0,0,0,0.3),inset_2px_0_3px_rgba(0,0,0,0.2)] rounded-l-xs z-[2]" />
 
-          {/* RIGHT PAGE STACK DEPTH (LAYER 7 - THIN 14px PAPER EDGE ON RIGHT) */}
+          {/* RIGHT PAGE STACK DEPTH (LAYER 15 - THIN 14px PAPER EDGE ON RIGHT) */}
           <div className="absolute top-[1.5%] -right-[12px] w-[14px] h-[97%] bg-[repeating-linear-gradient(0deg,#EADFC5_0_1.4px,#E6D8B7_1.4px_2.6px,#DCCDA7_2.6px_3.2px)] shadow-[2px_0_6px_rgba(0,0,0,0.3),inset_-2px_0_3px_rgba(0,0,0,0.2)] rounded-r-xs z-[15]" />
 
           {/* FABRIC BOOKMARK RIBBON */}
           <div className="absolute left-[44%] -bottom-[28px] w-[11px] h-[40px] bg-gradient-to-b from-[#A44A34] to-[#5A1D13] [clip-path:polygon(0_0,100%_0,100%_78%,50%_100%,0_78%)] opacity-95 z-3 shadow-md" />
 
-          {/* HARDCOVER BASE BOARD (LAYER 2) */}
-          <div className="absolute top-0 left-[2%] w-[46%] h-full z-0 bg-[#4B3529] rounded-l-xs shadow-md border-r border-[#2E221B]" />
+          {/* HARDCOVER BACK BOARD UNDERNEATH LEFT STACK (LAYER 0) */}
+          <div className="absolute top-0 left-0 w-[50%] h-full z-0 bg-[#4B3529] rounded-l-xs shadow-md border-r border-[#2E221B]" />
 
           {/* =================================================================== */}
-          {/* 3D DOUBLE-SIDED SCRAPBOOK LEAVES (HELD ON LEFT HINGE, RIGHT TURNS) */}
+          {/* 3D DOUBLE-SIDED SCRAPBOOK LEAVES (HINGED AT SPINE, ROTATES AROUND SPINE PIVOT) */}
           {/* =================================================================== */}
 
           {/* ------------------------------------------------------------------- */}
