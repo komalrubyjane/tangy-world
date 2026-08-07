@@ -328,7 +328,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 0: FRONT COVER (Front) / SPREAD 1 LEFT (Back - Inside Cover & Title) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 0: HANDCRAFTED LEATHER COVER */}
             <div className="absolute inset-0 [backface-visibility:hidden] rounded-r-xs overflow-visible translate-z-[5px] bg-gradient-to-br from-[#6B4B39] via-[#5A4032] to-[#4B3529] text-[#EADFC5] p-6 shadow-2xl">
               <div className="absolute top-1.5 left-1.5 w-[20px] h-[20px] [clip-path:polygon(0_0,100%_0,0_100%)] bg-gradient-to-br from-[#A68853] to-[#7A5C30]" />
@@ -402,7 +402,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 1: SPREAD 1 RIGHT (Front: Stepwell) / SPREAD 2 LEFT (Back: Stepwell Left) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 1: SPREAD 1 RIGHT (The Beginning / Bansilalpet Stepwell) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs">
               <svg className="absolute -top-2 right-[30px] w-[16px]"><use href="#sym-clip"/></svg>
@@ -451,7 +451,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 2: SPREAD 2 RIGHT (Front: Monsoon) / SPREAD 3 LEFT (Back: Monsoon Left) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 2: SPREAD 2 RIGHT (Monsoon Acoustics / Old City Haveli) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs">
               <div className="flex justify-between font-mono text-[9px] tracking-[0.1em] uppercase text-[#5A4032] mb-1.5">
@@ -489,7 +489,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 3: SPREAD 3 RIGHT (Front: Artists) / SPREAD 4 LEFT (Back: Artists Left) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 3: SPREAD 3 RIGHT (Artists & Performers) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs">
               <div className="flex justify-between font-mono text-[9px] tracking-[0.1em] uppercase text-[#5A4032] mb-1.5">
@@ -524,7 +524,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 4: SPREAD 4 RIGHT (Front: Backstage Notes) / SPREAD 5 LEFT (Back: Backstage Left) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 4: SPREAD 4 RIGHT (Backstage Notes & Hidden Spaces) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs">
               <div className="flex justify-between font-mono text-[9px] tracking-[0.1em] uppercase text-[#5A4032] mb-1.5">
@@ -555,7 +555,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 5: SPREAD 5 RIGHT (Front: Community) / FINAL SPREAD LEFT (Back: Community Left) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 5: SPREAD 5 RIGHT (Community & Volunteers) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs">
               <div className="flex justify-between font-mono text-[9px] tracking-[0.1em] uppercase text-[#5A4032] mb-1.5">
@@ -592,7 +592,7 @@ export const TangyDiary = () => {
           {/* ------------------------------------------------------------------- */}
           {/* LEAF 6: FINAL SPREAD RIGHT (Future of Tangy & Continue Reading →) */}
           {/* ------------------------------------------------------------------- */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+          <div className="diary-leaf absolute top-0 left-1/2 w-[49.5%] h-full [transform-style:preserve-3d]">
             {/* FRONT OF LEAF 6: FINAL SPREAD RIGHT (Future of Tangy & Read More) */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.18),transparent_45%),linear-gradient(180deg,#EADFC5,#E6D8B7_65%,#DCCDA7)] shadow-[inset_0_0_46px_rgba(90,58,42,0.25)] rounded-r-xs flex flex-col justify-between">
               <div>
