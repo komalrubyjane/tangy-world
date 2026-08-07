@@ -11,7 +11,7 @@ export const TangyDiary = () => {
 
   const sectionRef = useGSAPContext((ctx) => {
     const leaves = gsap.utils.toArray('.diary-leaf');
-    const totalLeaves = leaves.length; // 7 physical leaves (Leaf 0 = Front Cover, Leaf 1 = Spread 1 Right/Spread 2 Left, etc.)
+    const totalLeaves = leaves.length; // 7 leaves: Leaf 0 = Front Cover, Leaf 1..6 = Paper leaves
 
     // Master ScrollTrigger timeline pinned to the diary section
     const tl = gsap.timeline({
@@ -39,8 +39,7 @@ export const TangyDiary = () => {
       }
     });
 
-    // INITIAL 3D STATES & PHYSICAL SPINE HINGE (0% 50%)
-    // Every leaf rests on right side with origin anchored precisely along the left spine edge
+    // INITIAL 3D STATES: All leaves hinge directly on the left spine binding edge (transformOrigin: 0% 50%)
     leaves.forEach((leaf, i) => {
       gsap.set(leaf, {
         rotateY: 0,
@@ -55,13 +54,13 @@ export const TangyDiary = () => {
     gsap.set('.read-hint-cover', { opacity: 1 });
 
     // =========================================================================
-    // PHYSICAL JOURNAL ANIMATION SEQUENCE
+    // PHYSICAL HARDCOVER JOURNAL ANIMATION SEQUENCE
     // 1. Front Cover opens ONCE (0% - 8%), then freezes at -180° forever.
-    // 2. Physical pages turn around left spine hinge (transformOrigin: '0% 50%').
-    // 3. Right stack depth shrinks, Left stack depth grows naturally.
+    // 2. Paper leaves turn around binding edge (0% 50%).
+    // 3. Left stack grows naturally (0px -> 14px), Right stack shrinks (14px -> 0px).
     // =========================================================================
 
-    // 0% - 8%: FRONT COVER OPENS ONCE AND RESTS ON LEFT
+    // 0% - 8%: FRONT COVER OPENS ONCE AND FREEZES AT -180°
     tl.to('.strap-layer', {
       opacity: 0,
       x: 35,
@@ -71,7 +70,7 @@ export const TangyDiary = () => {
     }, 0.01)
     .to('.read-hint-cover', { opacity: 0, duration: 0.02 }, 0.01)
 
-    // Front Cover (Leaf 0) opens -180° around spine hinge.
+    // Front Cover (Leaf 0) opens -180° around spine binding edge.
     // Progress > 0.4 sets zIndex: 0 so cover rests permanently underneath the left page stack!
     .to(leaves[0], {
       rotateY: -180,
@@ -88,11 +87,11 @@ export const TangyDiary = () => {
 
     // -------------------------------------------------------------------------
     // SPREAD 1 (8% - 22%):
-    // Left  = Title / Field Diary Stamp (Inside Front Cover / Leaf 0 Back)
+    // Left  = Inside Front Cover & Title / Field Diary Stamp (Leaf 0 Back)
     // Right = The Beginning / Bansilalpet Stepwell (Leaf 1 Front)
     // -------------------------------------------------------------------------
     .to({}, { duration: 0.10 }) // Reading Buffer
-    .to(leaves[1], { // Leaf 1 turns -180° around spine edge
+    .to(leaves[1], { // Leaf 1 turns -180° around binding edge
       rotateY: -180,
       duration: 0.05,
       ease: 'power2.inOut',
@@ -105,7 +104,7 @@ export const TangyDiary = () => {
       }
     }, 0.18)
     // Stack depth update: Grow left stack, shrink right stack
-    .to('.left-stack-depth', { width: '6px', opacity: 1, duration: 0.02 }, 0.20)
+    .to('.left-stack-depth', { width: '4px', opacity: 1, duration: 0.02 }, 0.20)
     .to('.right-stack-depth', { width: '12px', duration: 0.02 }, 0.20)
 
     // -------------------------------------------------------------------------
@@ -126,7 +125,7 @@ export const TangyDiary = () => {
         }
       }
     }, 0.33)
-    .to('.left-stack-depth', { width: '9px', duration: 0.02 }, 0.35)
+    .to('.left-stack-depth', { width: '7px', duration: 0.02 }, 0.35)
     .to('.right-stack-depth', { width: '9px', duration: 0.02 }, 0.35)
 
     // -------------------------------------------------------------------------
@@ -147,7 +146,7 @@ export const TangyDiary = () => {
         }
       }
     }, 0.48)
-    .to('.left-stack-depth', { width: '12px', duration: 0.02 }, 0.50)
+    .to('.left-stack-depth', { width: '10px', duration: 0.02 }, 0.50)
     .to('.right-stack-depth', { width: '6px', duration: 0.02 }, 0.50)
 
     // -------------------------------------------------------------------------
@@ -168,8 +167,8 @@ export const TangyDiary = () => {
         }
       }
     }, 0.63)
-    .to('.left-stack-depth', { width: '14px', duration: 0.02 }, 0.65)
-    .to('.right-stack-depth', { width: '4px', duration: 0.02 }, 0.65)
+    .to('.left-stack-depth', { width: '12px', duration: 0.02 }, 0.65)
+    .to('.right-stack-depth', { width: '3px', duration: 0.02 }, 0.65)
 
     // -------------------------------------------------------------------------
     // SPREAD 5 (68% - 82%):
@@ -189,8 +188,8 @@ export const TangyDiary = () => {
         }
       }
     }, 0.78)
-    .to('.left-stack-depth', { width: '16px', duration: 0.02 }, 0.80)
-    .to('.right-stack-depth', { width: '2px', duration: 0.02 }, 0.80)
+    .to('.left-stack-depth', { width: '14px', duration: 0.02 }, 0.80)
+    .to('.right-stack-depth', { width: '0px', opacity: 0, duration: 0.02 }, 0.80)
 
     // -------------------------------------------------------------------------
     // FINAL SPREAD (83% - 100%):
@@ -301,6 +300,9 @@ export const TangyDiary = () => {
         {/* DIARY CONTAINER - SINGLE CONNECTED OBJECT */}
         <div className="relative w-[min(880px,90vw)] h-[min(650px,76vh)] [transform-style:preserve-3d]">
           
+          {/* PERMANENT FIXED LEATHER BACK COVER BOARD (BASE ARCHITECTURE) */}
+          <div className="absolute top-0 left-0 right-0 bottom-0 z-0 bg-[#4B3529] rounded-sm shadow-2xl border border-[#2E221B]" />
+
           {/* PERMANENT FIXED LEATHER SPINE BAR (ROTATION PIVOT HINGE) */}
           <div className="absolute left-[calc(50%-14px)] -top-[4px] -bottom-[4px] w-[28px] z-[80] rounded-sm bg-[linear-gradient(90deg,#2E221B_0%,#4B3529_12%,#6B4B39_50%,#4B3529_88%,#2E221B_100%)] shadow-[inset_0_0_16px_rgba(0,0,0,0.6),3px_0_8px_rgba(0,0,0,0.5),-3px_0_8px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-0 rounded-sm bg-[repeating-linear-gradient(90deg,rgba(234,223,197,0.04)_0_2px,transparent_2px_7px,rgba(0,0,0,0.15)_7px_9px,transparent_9px_14px)]" />
@@ -310,7 +312,7 @@ export const TangyDiary = () => {
             </div>
           </div>
 
-          {/* LEFT PAGE STACK DEPTH (ATTACHED DIRECTLY BESIDE SPINE ON LEFT - GROWS NATURALLY) */}
+          {/* LEFT PAGE STACK DEPTH (ATTACHED DIRECTLY BESIDE SPINE ON LEFT - MAX 14px VISIBLE EDGE) */}
           <div className="left-stack-depth absolute top-[1.5%] right-[calc(50%+14px)] w-[2px] opacity-0 h-[97%] bg-[repeating-linear-gradient(0deg,#EADFC5_0_1.4px,#E6D8B7_1.4px_2.6px,#DCCDA7_2.6px_3.2px)] shadow-[-2px_0_6px_rgba(0,0,0,0.3),inset_2px_0_3px_rgba(0,0,0,0.2)] rounded-l-xs z-[2]" />
 
           {/* RIGHT PAGE STACK DEPTH (SHRINKS NATURALLY AS PAGES TURN) */}
@@ -319,11 +321,8 @@ export const TangyDiary = () => {
           {/* FABRIC BOOKMARK RIBBON */}
           <div className="absolute left-[44%] -bottom-[28px] w-[11px] h-[40px] bg-gradient-to-b from-[#A44A34] to-[#5A1D13] [clip-path:polygon(0_0,100%_0,100%_78%,50%_100%,0_78%)] opacity-95 z-3 shadow-md" />
 
-          {/* FIXED BACK COVER BOARD UNDERNEATH LEFT STACK */}
-          <div className="absolute top-0 left-[2%] w-[48%] h-full z-0 bg-[#4B3529] rounded-l-xs shadow-md border-r border-[#2E221B]" />
-
           {/* =================================================================== */}
-          {/* 3D DOUBLE-SIDED LEAVES (HINGED AT SPINE, ROTATES AROUND LEFT SPINE EDGE) */}
+          {/* 3D DOUBLE-SIDED LEAVES (HINGED AT SPINE, ROTATES AROUND LEFT SPINE BINDING EDGE 0% 50%) */}
           {/* =================================================================== */}
 
           {/* ------------------------------------------------------------------- */}
