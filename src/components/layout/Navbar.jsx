@@ -11,7 +11,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const leaveTimeoutRef = useRef(null);
 
-  // Core navigation categories in order:
+  // EXACT NAVIGATION ORDER SPECIFIED:
   // About -> Sessions -> Archive -> Crew -> Collaborate -> Private -> Diary -> Inner Circle -> Contact
   const navCategories = [
     {
@@ -146,21 +146,21 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#3A241A]/95 backdrop-blur-md border-b-2 border-[#9E6D35]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#D9C6A0] font-mono text-[10px] md:text-[11px] tracking-widest shadow-archival">
+    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
       {/* LEFT: BRAND LOGO */}
       <div 
         onClick={() => handleNav('/')}
         className="flex items-center gap-2 cursor-pointer group"
       >
-        <span className="w-2.5 h-2.5 rounded-full bg-[#7A2B24] group-hover:scale-125 transition-transform" />
-        <span className="font-poster text-sm md:text-base tracking-wider text-[#D9C6A0] group-hover:text-[#9E6D35] transition-colors uppercase">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#B94717] group-hover:scale-125 transition-transform" />
+        <span className="font-display font-bold text-sm md:text-base tracking-tight text-[#E7D5A4] group-hover:text-[#C99A2E] transition-colors uppercase">
           TANGY SESSIONS
         </span>
       </div>
 
-      {/* CENTER: DESKTOP ARCHIVAL DROPDOWN MENU */}
-      <nav className="hidden xl:flex items-center gap-4 xl:gap-5 text-[#D9C6A0]">
+      {/* CENTER: DESKTOP EDITORIAL DROPDOWN MENU */}
+      <nav className="hidden xl:flex items-center gap-4 xl:gap-5 text-[#E7D5A4]">
         {navCategories.map((cat, idx) => {
           const isOpen = activeDropdown === cat.title;
           const isRightAligned = idx >= navCategories.length - 2;
@@ -175,7 +175,7 @@ export const Navbar = () => {
               {/* Category Header Button */}
               <button 
                 onClick={() => handleNav(cat.path)}
-                className={`py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#9E6D35] ${isOpen ? 'text-[#9E6D35] font-bold' : 'text-[#D9C6A0]/90'}`}
+                className={`py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
                 <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
@@ -183,12 +183,12 @@ export const Navbar = () => {
 
               {/* Cream Paper Dropdown Menu */}
               <div 
-                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#D9C6A0] text-[#35251A] p-3 border-2 border-[#9E6D35]/80 rounded-md shadow-archival z-[150] transition-all duration-200 ease-out origin-top ${
+                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#F5E9C9] text-[#11100C] p-3 border-2 border-[#C99A2E]/80 rounded-md shadow-[0_15px_35px_rgba(17,16,12,0.9)] z-[150] transition-all duration-200 ease-out origin-top ${
                   isOpen ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' : 'opacity-0 translate-y-2 pointer-events-none scale-95'
                 }`}
               >
                 {/* Paper Fiber Noise Overlay */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none rounded-md" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply pointer-events-none rounded-md" />
                 
                 {/* Dropdown Items List */}
                 <div className="relative z-10 flex flex-col gap-1">
@@ -196,10 +196,10 @@ export const Navbar = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNav(item)}
-                      className="group/item flex items-center justify-between p-1.5 rounded-sm hover:bg-[#35251A]/10 text-left font-mono text-[10.5px] font-bold text-[#35251A] hover:text-[#7A2B24] transition-colors"
+                      className="group/item flex items-center justify-between p-1.5 rounded-sm hover:bg-[#11100C]/10 text-left font-mono text-[10.5px] font-bold text-[#11100C] hover:text-[#C2272A] transition-colors"
                     >
                       <span>{item.label}</span>
-                      <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all text-[#7A2B24]">→</span>
+                      <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all text-[#C2272A]">→</span>
                     </button>
                   ))}
                 </div>
@@ -213,7 +213,7 @@ export const Navbar = () => {
       <div className="xl:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="border border-[#9E6D35] text-[#9E6D35] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
+          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
         >
           {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
         </button>
@@ -221,8 +221,8 @@ export const Navbar = () => {
 
       {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#3A241A]/98 text-[#D9C6A0] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#9E6D35]/50 xl:hidden">
-          <div className="font-mono text-xs text-[#9E6D35] font-bold tracking-[0.25em] uppercase border-b border-[#9E6D35]/30 pb-2">
+        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
+          <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
             NAVIGATION MENU
           </div>
 
@@ -231,25 +231,25 @@ export const Navbar = () => {
               const isCatOpen = activeDropdown === cat.title;
 
               return (
-                <div key={cat.title} className="border-b border-[#D9C6A0]/10 pb-2">
+                <div key={cat.title} className="border-b border-[#E7D5A4]/10 pb-2">
                   <button
                     onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
-                    className="w-full flex justify-between items-center font-mono text-sm font-bold text-[#D9C6A0] py-1 uppercase"
+                    className="w-full flex justify-between items-center font-mono text-sm font-bold text-[#E7D5A4] py-1 uppercase"
                   >
                     <span>{cat.title}</span>
-                    <span className="text-xs text-[#9E6D35]">{isCatOpen ? '▲' : '▼'}</span>
+                    <span className="text-xs text-[#C99A2E]">{isCatOpen ? '▲' : '▼'}</span>
                   </button>
 
                   {isCatOpen && (
-                    <div className="mt-2 pl-4 flex flex-col gap-2 bg-[#D9C6A0] text-[#35251A] p-3 rounded-md border border-[#9E6D35]">
+                    <div className="mt-2 pl-4 flex flex-col gap-2 bg-[#F5E9C9] text-[#11100C] p-3 rounded-md border border-[#C99A2E]">
                       {cat.items.map((item) => (
                         <button
                           key={item.label}
                           onClick={() => handleNav(item)}
-                          className="text-left font-mono text-xs font-bold text-[#35251A] hover:text-[#7A2B24] py-1 flex justify-between items-center"
+                          className="text-left font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] py-1 flex justify-between items-center"
                         >
                           <span>{item.label}</span>
-                          <span className="text-[#7A2B24]">→</span>
+                          <span className="text-[#C2272A]">→</span>
                         </button>
                       ))}
                     </div>
