@@ -1,242 +1,197 @@
-import React, { useState, useRef } from 'react';
-import { useGSAPContext } from '../../hooks/useGSAPContext';
+import React, { useRef } from 'react';
 import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+import { useGSAPContext } from '../../hooks/useGSAPContext';
 import { useAudio } from '../../audio/AudioContext';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const TangyDiary = () => {
   const { playSFX } = useAudio();
-  const sectionRef = useRef(null);
-  const dustLayerRef = useRef(null);
-  const [soundOn, setSoundOn] = useState(true);
 
-  // Sound generator
-  const audioCtxRef = useRef(null);
-  const playPageSound = () => {
-    if (!soundOn) return;
-    try {
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-      const dur = 0.35;
-      const bufferSize = ctx.sampleRate * dur;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-      }
-      const src = ctx.createBufferSource();
-      src.buffer = buffer;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 1800;
-      filter.Q.value = 0.7;
-      const gain = ctx.createGain();
-      gain.gain.value = 0.12;
-      src.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-      src.start();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // GSAP ScrollTrigger Integration
-  useGSAPContext(() => {
-    if (!sectionRef.current) return;
-
+  const sectionRef = useGSAPContext((ctx) => {
     const leaves = gsap.utils.toArray('.diary-leaf');
-    const totalLeaves = leaves.length; // 0: cover, 1: leaf1, 2: leaf2, 3: leaf3, 4: leaf4
+    const totalLeaves = leaves.length; // 6 leaves: Leaf 0 (Cover), Leaf 1 (Frontispiece/Page1), Leaf 2, 3, 4, 5 (Final)
 
-    // Initial z-indexes and 3D states
-    leaves.forEach((leaf, idx) => {
-      gsap.set(leaf, {
-        rotateY: 0,
-        transformOrigin: '0% 50%',
-        zIndex: totalLeaves - idx,
-        display: 'block',
-      });
-    });
-
-    gsap.set('.static-frontispiece', { opacity: 0, filter: 'brightness(0.82)' });
-    gsap.set('.strap-wrapper', { opacity: 1, x: 0, scale: 1 });
-    gsap.set('.read-more-cta', { opacity: 0, pointerEvents: 'none', y: 15 });
-
-    // GSAP ScrollTrigger Timeline with Pinned Section
+    // Master ScrollTrigger timeline pinned to the diary section
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=450%',
-        scrub: 0.6,
+        end: '+=800%', // 800vh scroll height ensures comfortable reading distance for all spreads
         pin: true,
+        scrub: 0.8,
         anticipatePin: 1,
-      },
+        onUpdate: (self) => {
+          // Play page turn SFX when crossing leaf boundaries
+          const pageProgress = self.progress;
+          const currentLeafIndex = Math.floor(pageProgress * totalLeaves);
+          if (self.previousLeafIndex !== undefined && self.previousLeafIndex !== currentLeafIndex) {
+            playSFX('pageTurn');
+          }
+          self.previousLeafIndex = currentLeafIndex;
+        }
+      }
     });
 
-    // Pacing Timeline (Total ~100%):
-    // 0.00 - 0.05: Book stage scale & tilt
-    // 0.05 - 0.18: Leather strap release & Cover flip (13% pacing)
-    // 0.18 - 0.33: Leaf 1 flip (Entry #03 Rain & Ragas) (15% pacing)
-    // 0.33 - 0.48: Leaf 2 flip (Entry #07 Golconda Fort) (15% pacing)
-    // 0.48 - 0.63: Leaf 3 flip (Letters & Quotes / Ticket Stubs) (15% pacing)
-    // 0.63 - 0.78: Leaf 4 flip (Memories & End of Volume) (15% pacing)
-    // 0.78 - 1.00: Final Page Conclusion & Read More CTA Fade-In (22% pacing for reading time)
+    // INITIAL STATES
+    // The spine and book container never move, scale, or slide!
+    gsap.set('.book-shadow', { opacity: 0.15 });
 
-    // Stage Entrance
-    tl.to('.book-stage-wrapper', {
-      scale: 1,
-      duration: 0.05,
-      ease: 'power1.out',
-    }, 0);
+    // Set 3D origin on left edge (hinged to spine) for all leaves
+    leaves.forEach((leaf, i) => {
+      gsap.set(leaf, {
+        rotateY: 0,
+        transformOrigin: '0% 50%',
+        zIndex: totalLeaves - i,
+        display: 'block'
+      });
+    });
 
-    // Cover Open & Strap Release
-    tl.to('.strap-wrapper', {
+    gsap.set('.strap-layer', { opacity: 1, x: 0, scale: 1 });
+    gsap.set('.read-more-cta', { opacity: 0, y: 15, pointerEvents: 'none' });
+    gsap.set('.read-hint-1', { opacity: 1 });
+
+    // =========================================================================
+    // SCROLL TIMELINE SEQUENCE: SCROLLING = READING
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // 0% - 10%: LANDING (COVER CLOSED) -> COVER OPENS
+    // -------------------------------------------------------------------------
+    // Strap releases & wax seal splits
+    tl.to('.strap-layer', {
       opacity: 0,
-      x: 50,
-      scale: 0.94,
-      duration: 0.05,
-      ease: 'power2.in',
-    }, 0.05)
-    .to('.static-frontispiece', {
-      opacity: 1,
-      filter: 'brightness(1)',
-      duration: 0.08,
-      ease: 'power2.out',
-    }, 0.09)
+      x: 40,
+      scale: 0.95,
+      duration: 0.04,
+      ease: 'power2.in'
+    }, 0.02)
+    .to('.read-hint-1', { opacity: 0, duration: 0.03 }, 0.02)
+
+    // Cover (Leaf 0) turns open (rotateY -180deg) with paper curl & shadow
     .to(leaves[0], {
       rotateY: -180,
-      duration: 0.13,
+      duration: 0.08,
       ease: 'power2.inOut',
-      onStart: () => {
-        playPageSound();
-        try { playSFX('pageTurn'); } catch (e) {}
-      },
       onUpdate: function () {
         if (this.progress() > 0.5) {
           gsap.set(leaves[0], { zIndex: 1 });
         } else {
           gsap.set(leaves[0], { zIndex: totalLeaves });
         }
-      },
-    }, 0.05);
+      }
+    }, 0.04)
 
-    // Leaf 1 Turn
-    tl.to(leaves[1], {
+    // -------------------------------------------------------------------------
+    // 10% - 22%: SPREAD 1 (THE BEGINNING & BANSILALPET STEPWELL) - READING
+    // -------------------------------------------------------------------------
+    // User reads Spread 1 comfortably during scroll buffer (0.08 -> 0.22)
+    .to({}, { duration: 0.12 })
+
+    // -------------------------------------------------------------------------
+    // 22% - 28%: TURN SPREAD 1 (LEAF 1)
+    // -------------------------------------------------------------------------
+    .to(leaves[1], {
       rotateY: -180,
-      duration: 0.15,
+      duration: 0.06,
       ease: 'power2.inOut',
-      onStart: () => {
-        playPageSound();
-        try { playSFX('pageTurn'); } catch (e) {}
-      },
       onUpdate: function () {
         if (this.progress() > 0.5) {
           gsap.set(leaves[1], { zIndex: 2 });
         } else {
           gsap.set(leaves[1], { zIndex: totalLeaves - 1 });
         }
-      },
-    }, 0.18);
+      }
+    }, 0.22)
 
-    // Leaf 2 Turn
-    tl.to(leaves[2], {
+    // -------------------------------------------------------------------------
+    // 28% - 40%: SPREAD 2 (MONSOON ACOUSTICS & OLD CITY HAVELI) - READING
+    // -------------------------------------------------------------------------
+    // Reading buffer
+    .to({}, { duration: 0.12 })
+
+    // -------------------------------------------------------------------------
+    // 40% - 46%: TURN SPREAD 2 (LEAF 2)
+    // -------------------------------------------------------------------------
+    .to(leaves[2], {
       rotateY: -180,
-      duration: 0.15,
+      duration: 0.06,
       ease: 'power2.inOut',
-      onStart: () => {
-        playPageSound();
-        try { playSFX('pageTurn'); } catch (e) {}
-      },
       onUpdate: function () {
         if (this.progress() > 0.5) {
           gsap.set(leaves[2], { zIndex: 3 });
         } else {
           gsap.set(leaves[2], { zIndex: totalLeaves - 2 });
         }
-      },
-    }, 0.33);
+      }
+    }, 0.40)
 
-    // Leaf 3 Turn
-    tl.to(leaves[3], {
+    // -------------------------------------------------------------------------
+    // 46% - 58%: SPREAD 3 (BEHIND THE MICROPHONES & GOLCONDA FORT) - READING
+    // -------------------------------------------------------------------------
+    // Reading buffer
+    .to({}, { duration: 0.12 })
+
+    // -------------------------------------------------------------------------
+    // 58% - 64%: TURN SPREAD 3 (LEAF 3)
+    // -------------------------------------------------------------------------
+    .to(leaves[3], {
       rotateY: -180,
-      duration: 0.15,
+      duration: 0.06,
       ease: 'power2.inOut',
-      onStart: () => {
-        playPageSound();
-        try { playSFX('pageTurn'); } catch (e) {}
-      },
       onUpdate: function () {
         if (this.progress() > 0.5) {
           gsap.set(leaves[3], { zIndex: 4 });
         } else {
           gsap.set(leaves[3], { zIndex: totalLeaves - 3 });
         }
-      },
-    }, 0.48);
+      }
+    }, 0.58)
 
-    // Leaf 4 Turn (Final Spread)
-    tl.to(leaves[4], {
+    // -------------------------------------------------------------------------
+    // 64% - 76%: SPREAD 4 (ARTISTS & LETTERS) - READING
+    // -------------------------------------------------------------------------
+    // Reading buffer
+    .to({}, { duration: 0.12 })
+
+    // -------------------------------------------------------------------------
+    // 76% - 82%: TURN SPREAD 4 (LEAF 4)
+    // -------------------------------------------------------------------------
+    .to(leaves[4], {
       rotateY: -180,
-      duration: 0.15,
+      duration: 0.06,
       ease: 'power2.inOut',
-      onStart: () => {
-        playPageSound();
-        try { playSFX('pageTurn'); } catch (e) {}
-      },
       onUpdate: function () {
         if (this.progress() > 0.5) {
           gsap.set(leaves[4], { zIndex: 5 });
         } else {
           gsap.set(leaves[4], { zIndex: totalLeaves - 4 });
         }
-      },
-    }, 0.63);
+      }
+    }, 0.76)
 
-    // Final Reading Pacing & Read More CTA Fade-In
-    tl.to('.read-more-cta', {
+    // -------------------------------------------------------------------------
+    // 82% - 100%: FINAL SPREAD (FUTURE & READ MORE CTA) - READING & EXIT
+    // -------------------------------------------------------------------------
+    .to('.read-more-cta', {
       opacity: 1,
       y: 0,
       pointerEvents: 'auto',
-      duration: 0.12,
-      ease: 'power2.out',
-    }, 0.78);
+      duration: 0.08,
+      ease: 'power2.out'
+    }, 0.84)
+    .to({}, { duration: 0.08 }); // Final scroll buffer before unpinning smoothly
 
-  }, []);
-
-  // Floating dust generator
-  React.useEffect(() => {
-    if (!dustLayerRef.current) return;
-    const dustContainer = dustLayerRef.current;
-    dustContainer.innerHTML = '';
-    for (let i = 0; i < 20; i++) {
-      const d = document.createElement('div');
-      d.className = 'dust-particle';
-      const size = 2 + Math.random() * 3;
-      d.style.width = `${size}px`;
-      d.style.height = `${size}px`;
-      d.style.left = `${Math.random() * 100}%`;
-      d.style.top = `${60 + Math.random() * 35}%`;
-      d.style.setProperty('--dx', `${Math.random() * 40 - 20}px`);
-      d.style.setProperty('--dy', `${-(100 + Math.random() * 140)}px`);
-      d.style.setProperty('--dust-op', (0.3 + Math.random() * 0.4).toFixed(2));
-      d.style.animationDuration = `${7 + Math.random() * 8}s`;
-      d.style.animationDelay = `${Math.random() * 6}s`;
-      dustContainer.appendChild(d);
-    }
   }, []);
 
   return (
     <section 
       ref={sectionRef}
       id="diary" 
-      className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1C130C] via-[#120C07] to-[#0C0805] text-[#F3E7C9] overflow-hidden select-none font-serif"
+      className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1C130C] via-[#120C07] to-[#0C0805] text-[#F3E7C9] overflow-hidden select-none font-serif border-t-8 border-[#11100C]"
     >
-      {/* SVG GRAIN & DECOR DEFINITIONS */}
+      {/* SVG NOISE GRAIN & AMBIENT DESK SVG DEFINITIONS */}
       <svg className="fixed inset-0 w-full h-full pointer-events-none z-[900] opacity-[0.045] mix-blend-overlay">
         <filter id="noiseFilter">
           <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
@@ -327,28 +282,6 @@ export const TangyDiary = () => {
         </defs>
       </svg>
 
-      {/* TOP HEADER BRANDING */}
-      <div className="absolute top-6 left-8 right-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 z-20 pointer-events-auto">
-        <div>
-          <div className="font-mono text-[9.5px] md:text-[10.5px] text-[#C8A55A] tracking-[0.3em] font-bold uppercase opacity-80">
-            TANGY SESSIONS // FIELD DIARY ARCHIVE
-          </div>
-          <p className="font-serif italic text-xs text-[#F3E7C9]/90">
-            "Some stories deserve more than a caption."
-          </p>
-        </div>
-      </div>
-
-      {/* SOUND TOGGLE BUTTON */}
-      <button 
-        onClick={() => setSoundOn(!soundOn)} 
-        className="absolute top-5 right-6 z-30 w-9 h-9 rounded-full bg-[#1E1A17]/60 border border-[#C8A24A]/40 text-[#C8A24A] flex items-center justify-center cursor-pointer text-sm transition-opacity hover:opacity-100"
-        aria-label="Toggle page sound"
-        title="Toggle page sound"
-      >
-        {soundOn ? '♪' : '✕'}
-      </button>
-
       {/* VINTAGE DESK BACKGROUND DECORATION */}
       <div className="absolute inset-0 pointer-events-none z-1 opacity-70">
         <svg className="absolute left-[4%] top-[12%] w-[230px] text-black opacity-[0.055]"><use href="#sym-staff"/></svg>
@@ -358,20 +291,29 @@ export const TangyDiary = () => {
         <div className="absolute w-[70px] h-[70px] right-[10%] top-[18%] rounded-full opacity-[0.15] mix-blend-multiply bg-[radial-gradient(circle,transparent_54%,rgba(90,58,42,0.32)_57%,rgba(90,58,42,0.14)_62%,transparent_66%)]" />
       </div>
 
-      {/* DUST PARTICLES LAYER */}
-      <div ref={dustLayerRef} className="absolute inset-0 pointer-events-none z-5" />
+      {/* TOP HEADER SECTION STAMP */}
+      <div className="absolute top-6 left-8 right-8 flex justify-between items-center z-20 pointer-events-auto">
+        <div>
+          <div className="font-mono text-[9.5px] md:text-[10.5px] text-[#C8A55A] tracking-[0.3em] font-bold uppercase opacity-80">
+            TANGY SESSIONS // FIELD JOURNAL ARCHIVE
+          </div>
+          <p className="font-serif italic text-xs text-[#F3E7C9]/90">
+            "Some stories deserve more than a caption."
+          </p>
+        </div>
+      </div>
 
-      {/* 3D BOOK STAGE CONTAINER */}
-      <div className="book-stage-wrapper relative transition-transform duration-1000 [perspective:2200px] [perspective-origin:50%_42%] scale-[0.96]">
+      {/* 3D BOOK STAGE - FIXED & PERFECTLY CENTERED */}
+      <div className="relative [perspective:2200px] [perspective-origin:50%_42%]">
         
-        {/* DESK SHADOW & LIGHTING */}
-        <div className="absolute left-1/2 -bottom-5 w-[60%] h-[44px] -translate-x-1/2 bg-black blur-[50px] opacity-[0.15] z-1" />
+        {/* DESK SHADOW & WARM MUSEUM LIGHTING */}
+        <div className="book-shadow absolute left-1/2 -bottom-5 w-[60%] h-[44px] -translate-x-1/2 bg-black blur-[50px] opacity-[0.15] z-1" />
         <div className="absolute -inset-[30px] pointer-events-none z-[85] bg-[radial-gradient(ellipse_at_18%_8%,rgba(255,238,205,0.16),transparent_55%),linear-gradient(160deg,rgba(255,255,255,0.05),transparent_40%,rgba(0,0,0,0.15)_100%)] mix-blend-soft-light" />
 
-        {/* BOOK CONTAINER */}
+        {/* DIARY CONTAINER */}
         <div className="relative w-[min(880px,90vw)] h-[min(660px,76vh)] [transform-style:preserve-3d]">
           
-          {/* FIXED SPINE HINGE BAR */}
+          {/* PERMANENT FIXED LEATHER SPINE BAR */}
           <div className="absolute left-[calc(50%-14px)] -top-[3px] -bottom-[3px] w-[28px] z-[80] rounded-sm bg-[linear-gradient(90deg,#3a2115_0%,#5A3927_12%,#6b4530_50%,#5A3927_88%,#3a2115_100%)] shadow-[inset_0_0_16px_rgba(0,0,0,0.55),3px_0_8px_rgba(0,0,0,0.45),-3px_0_8px_rgba(0,0,0,0.45),0_10px_26px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-0 rounded-sm bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.05)_0_2px,transparent_2px_7px,rgba(0,0,0,0.14)_7px_9px,transparent_9px_14px)]" />
             <div className="absolute top-[14px] bottom-[14px] left-[4px] right-[4px] bg-[repeating-linear-gradient(0deg,rgba(224,196,140,0.75)_0_3px,transparent_3px_8px)_left/2px_100%_no-repeat,repeating-linear-gradient(0deg,rgba(224,196,140,0.75)_0_3px,transparent_3px_8px)_right/2px_100%_no-repeat]" />
@@ -383,16 +325,14 @@ export const TangyDiary = () => {
           {/* PAGE STACK DEPTH */}
           <div className="absolute top-[1.5%] -right-[11px] w-[13px] h-[97%] bg-[repeating-linear-gradient(0deg,#f2e6c4_0_1.4px,#e2cf9c_1.4px_2.6px,#cdb789_2.6px_3.2px)] shadow-[2px_0_6px_rgba(0,0,0,0.32),inset_-2px_0_3px_rgba(0,0,0,0.18)] rounded-r-sm z-[15]" />
 
-          {/* STATIC FRONTISPIECE (LEFT TITLE PAGE REVEALED WHEN COVER OPENS) */}
-          <div className="static-frontispiece absolute top-0 left-[2%] w-[46%] h-full z-5 transition-opacity duration-300">
+          {/* STATIC FRONTISPIECE (LEFT TITLE PAGE) */}
+          <div className="absolute top-0 left-[2%] w-[46%] h-full z-5">
             <div className="relative w-full h-full p-6 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32),inset_0_0_3px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center text-center text-[#1E1A17]">
-              <div className="absolute w-[100px] h-[100px] bottom-[10px] right-[10px] rounded-full opacity-70 mix-blend-multiply bg-[radial-gradient(circle,transparent_54%,rgba(90,58,42,0.32)_57%,transparent_66%)]" />
               <div className="font-serif italic text-3xl font-normal">Field Diary</div>
               <div className="inline-block font-mono text-[9px] tracking-[0.07em] uppercase text-[#6b4a34] bg-[#e6d5a8] border border-dashed border-[#C8A24A] px-2 py-1 mt-2">
                 Vol. I · 2016 — 2026
               </div>
 
-              {/* ARCHIVE STAMP RING */}
               <svg className="w-[90px] h-[90px] mt-4 opacity-85 text-[#A33828] mix-blend-multiply" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <path id="ft1" d="M14,60 a46,46 0 1,1 92,0"/>
@@ -412,25 +352,23 @@ export const TangyDiary = () => {
             </div>
           </div>
 
+          {/* =================================================================== */}
+          {/* 3D SCRAPBOOK LEAVES - HINGED ON LEFT, RIGHT PAGE TURNS */}
+          {/* =================================================================== */}
+
           {/* LEAF 0 : MUSEUM COVER */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
-            <div className="absolute top-0 left-full w-[12px] h-full [transform-origin:0%_50%] rotate-y-90 [backface-visibility:hidden] bg-[repeating-linear-gradient(0deg,#e9dcb8_0_2px,#cdb789_2px_4px,#b8a06a_4px_5px,#cdb789_5px_6px)] shadow-[inset_0_0_8px_rgba(0,0,0,0.35)] z-2" />
-
-            {/* COVER FRONT */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
             <div className="absolute inset-0 [backface-visibility:hidden] rounded-sm overflow-visible translate-z-[6px] bg-gradient-to-br from-[#6b4530] via-[#5A3927] to-[#3A2418] text-[#F5E7C8] p-6 shadow-2xl">
-              {/* BRASS CORNER CLIPS */}
-              <div className="absolute top-1.5 left-1.5 w-[22px] h-[22px] z-9 [clip-path:polygon(0_0,100%_0,0_100%)] bg-gradient-to-br from-[#c2a06a] to-[#7a5c30] shadow-sm" />
-              <div className="absolute top-1.5 right-1.5 w-[22px] h-[22px] z-9 [clip-path:polygon(100%_0,100%_100%,0_0)] bg-gradient-to-bl from-[#c2a06a] to-[#7a5c30] shadow-sm" />
-              <div className="absolute bottom-1.5 left-1.5 w-[22px] h-[22px] z-9 [clip-path:polygon(0_0,0_100%,100%_100%)] bg-gradient-to-tr from-[#c2a06a] to-[#7a5c30] shadow-sm" />
-              <div className="absolute bottom-1.5 right-1.5 w-[22px] h-[22px] z-9 [clip-path:polygon(100%_100%,0_100%,100%_0)] bg-gradient-to-tl from-[#c2a06a] to-[#7a5c30] shadow-sm" />
+              <div className="absolute top-1.5 left-1.5 w-[22px] h-[22px] [clip-path:polygon(0_0,100%_0,0_100%)] bg-gradient-to-br from-[#c2a06a] to-[#7a5c30]" />
+              <div className="absolute top-1.5 right-1.5 w-[22px] h-[22px] [clip-path:polygon(100%_0,100%_100%,0_0)] bg-gradient-to-bl from-[#c2a06a] to-[#7a5c30]" />
+              <div className="absolute bottom-1.5 left-1.5 w-[22px] h-[22px] [clip-path:polygon(0_0,0_100%,100%_100%)] bg-gradient-to-tr from-[#c2a06a] to-[#7a5c30]" />
+              <div className="absolute bottom-1.5 right-1.5 w-[22px] h-[22px] [clip-path:polygon(100%_100%,0_100%,100%_0)] bg-gradient-to-tl from-[#c2a06a] to-[#7a5c30]" />
 
-              {/* GOLD FILIGREE FRAME */}
-              <div className="absolute inset-[14px] border-[1.5px] border-[#C8A55A]/55 pointer-events-none z-6">
+              <div className="absolute inset-[14px] border-[1.5px] border-[#C8A55A]/55 pointer-events-none">
                 <div className="absolute inset-[5px] border border-[#C8A55A]/28" />
               </div>
 
-              {/* LIBRARY STICKER */}
-              <div className="absolute top-5 left-5 w-[50px] p-1 bg-[#e9dcb8] text-[#3a2416] shadow-md -rotate-4 font-mono text-[6.5px] text-center z-8">
+              <div className="absolute top-5 left-5 w-[50px] p-1 bg-[#e9dcb8] text-[#3a2416] shadow-md -rotate-4 font-mono text-[6.5px] text-center">
                 No. 001
                 <span className="block h-1 mt-0.5 bg-[repeating-linear-gradient(90deg,#2b211b_0_1px,transparent_1px_3px)]" />
               </div>
@@ -439,8 +377,7 @@ export const TangyDiary = () => {
                 Archive No. 001
               </div>
 
-              {/* TITLE BLOCK */}
-              <div className="text-center mt-10 z-6 relative">
+              <div className="text-center mt-10 relative">
                 <div className="font-serif text-4xl md:text-5xl font-bold leading-none tracking-wider text-[#C8A55A] drop-shadow-md">
                   TANGY<br/>DIARY
                 </div>
@@ -449,12 +386,11 @@ export const TangyDiary = () => {
                 <svg className="w-6 h-6 mx-auto mt-2 opacity-60 text-[#C8A55A]"><use href="#sym-compass"/></svg>
               </div>
 
-              {/* LEATHER STRAP & WAX SEAL */}
-              <div className="strap-wrapper absolute -left-[3%] -right-[3%] top-[63%] h-[30px] -translate-y-1/2 -rotate-1 bg-gradient-to-b from-[#6b4024] via-[#4a2c18] to-[#3a2115] shadow-lg border-y border-dashed border-[#C8A55A]/40 z-9">
+              <div className="strap-layer absolute -left-[3%] -right-[3%] top-[63%] h-[30px] -translate-y-1/2 -rotate-1 bg-gradient-to-b from-[#6b4024] via-[#4a2c18] to-[#3a2115] shadow-lg border-y border-dashed border-[#C8A55A]/40">
                 <div className="absolute right-[16%] top-1/2 -translate-y-1/2 w-6 h-6 border-[3px] border-[#9D7A3C] rounded-sm bg-gradient-to-br from-[#c2a06a] to-[#8a6a3a] shadow-md" />
               </div>
 
-              <div className="absolute left-1/2 top-[63%] -translate-x-1/2 -translate-y-1/2 -rotate-4 w-12 h-12 rounded-full bg-radial from-[#9c2b2f] via-[#7A1F24] to-[#5a1216] shadow-2xl flex items-center justify-center text-[#F5E7C8] font-serif font-bold text-sm z-10">
+              <div className="strap-layer absolute left-1/2 top-[63%] -translate-x-1/2 -translate-y-1/2 -rotate-4 w-12 h-12 rounded-full bg-radial from-[#9c2b2f] via-[#7A1F24] to-[#5a1216] shadow-2xl flex items-center justify-center text-[#F5E7C8] font-serif font-bold text-sm">
                 TS
               </div>
 
@@ -463,15 +399,9 @@ export const TangyDiary = () => {
               </div>
               <div className="absolute bottom-8 right-5 font-handwriting text-xs opacity-50">— T.S.</div>
               <svg className="absolute bottom-6 left-4 w-6 opacity-20 text-[#e9dcb8]"><use href="#sym-flower"/></svg>
-              <div className="absolute -right-1.5 bottom-[66px] w-[32px] h-[19px] bg-gradient-to-br from-[#b8895f] to-[#8a5f3a] shadow-md -rotate-6 z-4 rounded-xs" />
-              <div className="absolute left-[44%] -bottom-[22px] w-[11px] h-[36px] bg-gradient-to-b from-[#7A1F24] to-[#5a1216] [clip-path:polygon(0_0,100%_0,100%_78%,50%_100%,0_78%)] opacity-90 z-3" />
             </div>
 
-            {/* COVER BACK (INSIDE FRONT COVER) */}
             <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[6px] bg-[repeating-linear-gradient(45deg,rgba(90,58,42,0.05)_0_3px,transparent_3px_9px),linear-gradient(180deg,#F5E7C8,#e9d9ac_65%,#ddc999)] text-[#2B211B] p-6 flex flex-col items-center justify-center text-center">
-              <div className="absolute left-1/2 bottom-[56px] -translate-x-1/2 w-[120px] h-[64px] bg-gradient-to-b from-[#e2d1a0] to-[#cbb87f] [clip-path:polygon(6%_100%,0_20%,20%_0,80%_0,100%_20%,94%_100%)] shadow-md">
-                <div className="absolute left-1/2 -top-[10px] -translate-x-1/2 w-[84px] h-[30px] bg-[#f5ecd2] border border-[#5A3A2A]/30 shadow-xs" />
-              </div>
               <div className="font-serif italic text-xs text-[#6b4a34] mt-2">
                 This diary belongs to the<br/>Tangy Sessions Archive.
                 <b className="block font-mono text-[9px] tracking-[0.1em] uppercase text-[#7A1F24] mt-1">Ex Libris · Hyderabad</b>
@@ -479,164 +409,122 @@ export const TangyDiary = () => {
             </div>
           </div>
 
-          {/* LEAF 1 : ENTRY #03 */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
+          {/* LEAF 1 : SPREAD 1 (THE BEGINNING & BANSILALPET STEPWELL) */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
-            {/* PAGE 1 FRONT */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <svg className="absolute -top-2 right-[34px] w-[18px] text-[#b9b9b9]"><use href="#sym-clip"/></svg>
               <div className="flex justify-between font-mono text-[9.5px] tracking-[0.12em] uppercase text-[#6b4a34] mb-2">
-                <span>Entry #03</span><span className="text-[#A33828] font-bold">21 Dec, 1974</span>
+                <span>Spread #01</span><span className="text-[#A33828] font-bold">14 Oct, 2024</span>
               </div>
-              <div className="font-serif italic text-xl md:text-2xl leading-none text-[#1E1A17]">The Night of<br/>Rain &amp; Ragas</div>
+              <div className="font-serif italic text-xl md:text-2xl leading-none text-[#1E1A17]">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
               <svg className="w-[120px] h-[8px] my-1" viewBox="0 0 120 8"><path d="M2,5 Q18,1 34,5 T64,5 T94,5 T118,5" stroke="#A33828" strokeWidth="1.6" fill="none"/></svg>
               
-              <div className="flex items-start gap-2 mt-2 font-mono text-[9px] text-[#6b4a34] uppercase tracking-wider">
-                <svg className="w-5 h-5 shrink-0"><use href="#sym-rain"/></svg>
-                <span>Old City Haveli · 7:30 PM</span>
-              </div>
-
               <p className="font-handwriting text-base text-[#3a2416] mt-2 max-w-[190px]">
-                The sky didn't stop us. It poured, and still they came — umbrellas, shawls, laughter echoing off ancient walls.
+                The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.
               </p>
 
-              {/* POLAROID */}
-              <figure className="absolute top-[96px] right-4 w-[100px] bg-[#fbf7ee] p-1.5 pb-5 shadow-lg">
+              <figure className="absolute top-[105px] right-4 w-[100px] bg-[#fbf7ee] p-1.5 pb-5 shadow-lg">
                 <div className="absolute -top-2.5 left-6 w-[40px] h-[16px] bg-[linear-gradient(180deg,rgba(200,162,74,0.85),rgba(168,132,54,0.85))] -rotate-4 opacity-90" />
                 <svg viewBox="0 0 100 118" className="w-full">
                   <rect width="100" height="118" fill="#4a3a2a"/>
-                  <path d="M35,110 L35,75 Q35,66 42,66 Q47,66 47,72 L47,110 Z" fill="#120c07"/>
-                  <circle cx="41" cy="60" r="7" fill="#120c07"/>
+                  <circle cx="50" cy="60" r="14" fill="#120c07"/>
                 </svg>
-                <figcaption className="text-center font-handwriting text-[11px] text-[#4a3016] mt-1">Old City Haveli</figcaption>
+                <figcaption className="text-center font-handwriting text-[11px] text-[#4a3016] mt-1">Bansilalpet Stepwell</figcaption>
               </figure>
 
-              <div className="bg-[#e6d5a8] p-3 shadow-md [clip-path:polygon(0%_3%,6%_0%,13%_4%,21%_1%,29%_5%,38%_0%,47%_4%,56%_1%,65%_5%,74%_0%,83%_4%,92%_1%,100%_3%,100%_96%,93%_100%,85%_95%,76%_100%,67%_96%,58%_100%,49%_95%,40%_100%,31%_96%,22%_100%,13%_95%,6%_99%,0%_96%)] mt-16 max-w-[130px] -rotate-1">
-                <div className="font-handwriting text-sm text-[#3a2416]">300 people.<br/>No tickets.<br/>Just music.</div>
-              </div>
-              <div className="absolute bottom-4 left-5 inline-block font-mono text-[9px] tracking-[0.07em] uppercase text-[#6b4a34] bg-[#e6d5a8] border border-dashed border-[#C8A24A] px-2 py-1">
-                TS-1974-21-12-03
+              <div className="bg-[#e6d5a8] p-3 shadow-md mt-16 max-w-[130px] -rotate-1">
+                <div className="font-handwriting text-sm text-[#3a2416]">Acoustic echo off 350-year-old stone.</div>
               </div>
             </div>
 
-            {/* PAGE 1 BACK */}
             <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
-                Sound Check Notes
+                Sound Check Log
               </div>
               <div className="font-mono text-[10.5px] leading-relaxed text-[#3a2416]">
-                <b>Mic:</b> Ribbon R44<br/><b>Preamp:</b> Tube U47<br/><b>Reel:</b> Studer A80<br/><b>Speed:</b> 15 IPS
+                <b>Mic:</b> Ribbon R44<br/><b>Preamp:</b> Tube U47<br/><b>Echo Delay:</b> 2.4s
               </div>
-              <div className="inline-block font-mono text-[11px] tracking-[0.1em] text-[#A33828] border-2 border-[#A33828] px-2 py-0.5 -rotate-4 opacity-80 mix-blend-multiply mt-2">
-                Unreleased
-              </div>
-
-              <div className="absolute top-5 right-4 w-[118px] bg-[#e6d5a8] p-3 shadow-md [clip-path:polygon(0%_3%,6%_0%,13%_4%,21%_1%,29%_5%,38%_0%,47%_4%,56%_1%,65%_5%,74%_0%,83%_4%,92%_1%,100%_3%,100%_96%,93%_100%,85%_95%,76%_100%,67%_96%,58%_100%,49%_95%,40%_100%,31%_96%,22%_100%,13%_95%,6%_99%,0%_96%)] rotate-2">
-                <div className="font-mono text-[9px] uppercase border-b border-[#6b4a34] mb-1">Setlist</div>
-                <ol className="font-handwriting text-sm text-[#3a2416] list-decimal pl-4 leading-tight">
-                  <li>Raindrops</li><li>Khwaab</li><li>Between The Walls</li><li>The Long Jam</li>
-                </ol>
-              </div>
-
-              <div className="bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2.5 rounded-xs font-mono text-[9px] shadow-md max-w-[150px] mt-10">
-                <b className="font-sans text-xs tracking-wider block">ARTIST PASS</b>
-                Backstage Access<br/>Date: 21/12/74
-              </div>
-
               <p className="font-handwriting text-sm italic text-[#3a2416] mt-4 max-w-[180px]">
-                "We planned an acoustic set. We got a monsoon symphony."
-                <span className="block font-mono text-[9px] text-right text-[#6b4a34] not-italic">— K.</span>
+                "The acoustic echo bounced off limestone steps for 2.4 seconds before fading."
               </p>
-              <div className="text-center font-mono text-[9px] tracking-[0.18em] uppercase text-[#6b4a34] border-t border-[#C8A24A] pt-2 mt-4 opacity-85">
-                Memories, not recorded
-              </div>
             </div>
           </div>
 
-          {/* LEAF 2 : ENTRY #07 */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
+          {/* LEAF 2 : SPREAD 2 (MONSOON ACOUSTICS & OLD CITY HAVELI) */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
-            {/* PAGE 2 FRONT */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="flex justify-between font-mono text-[9.5px] tracking-[0.12em] uppercase text-[#6b4a34] mb-2">
-                <span>Entry #07</span><span className="text-[#A33828] font-bold">14 Mar, 1975</span>
+                <span>Spread #02</span><span className="text-[#A33828] font-bold">21 Dec, 2024</span>
               </div>
-              <div className="font-serif italic text-xl md:text-2xl leading-none text-[#1E1A17]">Behind the<br/>Microphones</div>
-              <div className="font-mono text-[9px] tracking-[0.05em] text-[#6b4a34] uppercase mt-1">Golconda Fort Amphitheatre</div>
+              <div className="font-serif italic text-xl md:text-2xl leading-none text-[#1E1A17]">Monsoon Acoustics &amp;<br/>Old City Haveli</div>
               <p className="font-handwriting text-base text-[#3a2416] mt-2 max-w-[180px]">
-                Dawn soundcheck, no crowd yet. Just him, a mic, and the fort waking up around us.
+                When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air.
               </p>
 
               <div className="absolute top-[118px] right-[18px] w-[70px] -rotate-3">
-                <div className="absolute -top-2 left-5 w-[34px] h-[14px] bg-[linear-gradient(180deg,rgba(200,162,74,0.85),rgba(168,132,54,0.85))]" />
                 <svg className="w-[70px] text-[#3a2416] bg-[#efe4c8] p-2 shadow-md"><use href="#sym-mic"/></svg>
               </div>
 
-              <div className="absolute bottom-[74px] left-[18px] flex items-start gap-2">
-                <svg className="w-[34px] text-[#7a5236]"><use href="#sym-flower"/></svg>
-                <div className="font-handwriting text-xs text-[#3a2416] max-w-[100px]">Found this backstage. Kept it.</div>
-              </div>
-
-              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2 rounded-xs font-mono text-[9px] shadow-md max-w-[120px]">
-                <b className="font-sans text-[11px] block">GOLCONDA LIVE</b>14 MAR 1975
+              <div className="bg-[#e6d5a8] p-3 shadow-md mt-16 max-w-[130px] rotate-2">
+                <div className="font-handwriting text-xs text-[#3a2416]">300 people stayed till sunrise.</div>
               </div>
             </div>
 
-            {/* PAGE 2 BACK */}
             <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
-                Notes
+                Haveli Acoustic Notes
               </div>
               <p className="font-handwriting text-base italic text-[#3a2416] max-w-[170px]">
-                "Some songs aren't written. They're just remembered out loud."
+                "Taramati pavilion was built so voice travels 2 miles without amplifiers."
               </p>
-
-              <div className="absolute top-[74px] right-[18px] w-[66px]">
-                <svg className="w-[66px]"><use href="#sym-cassette"/></svg>
-                <div className="inline-block font-mono text-[9px] tracking-[0.07em] uppercase text-[#6b4a34] bg-[#e6d5a8] border border-dashed border-[#C8A24A] px-2 py-0.5 mt-1 text-center w-full">
-                  B-Side Mix
-                </div>
-              </div>
-
-              <svg className="w-[100px] absolute bottom-[56px] left-[18px]"><use href="#sym-wave"/></svg>
-              <div className="absolute bottom-4 right-4 bg-[#e6d5a8] p-3 shadow-md [clip-path:polygon(0%_3%,6%_0%,13%_4%,21%_1%,29%_5%,38%_0%,47%_4%,56%_1%,65%_5%,74%_0%,83%_4%,92%_1%,100%_3%,100%_96%,93%_100%,85%_95%,76%_100%,67%_96%,58%_100%,49%_95%,40%_100%,31%_96%,22%_100%,13%_95%,6%_99%,0%_96%)] w-[130px] rotate-[1.5deg]">
-                <div className="font-handwriting text-xs text-[#3a2416]">Hands too cold to play. Played anyway.</div>
-              </div>
-              <div className="text-center font-mono text-[9px] tracking-[0.18em] uppercase text-[#6b4a34] border-t border-[#C8A24A] pt-2 mt-20 opacity-85">
-                Golconda Sessions, 1975
-              </div>
             </div>
           </div>
 
-          {/* LEAF 3 : LETTERS & QUOTES */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
+          {/* LEAF 3 : SPREAD 3 (BEHIND THE MICROPHONES & GOLCONDA FORT) */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
-            {/* PAGE 3 FRONT */}
-            <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[repeating-linear-gradient(180deg,transparent_0_27px,rgba(90,58,42,0.16)_27px_28px),radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
-              <svg className="absolute -top-2 left-[60px] w-[18px] text-[#b9b9b9]"><use href="#sym-clip"/></svg>
+            <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
+              <div className="flex justify-between font-mono text-[9.5px] tracking-[0.12em] uppercase text-[#6b4a34] mb-2">
+                <span>Spread #03</span><span className="text-[#A33828] font-bold">05 Jan, 2025</span>
+              </div>
+              <div className="font-serif italic text-xl md:text-2xl leading-none text-[#1E1A17]">Behind The Microphones &amp;<br/>Golconda Fort</div>
+              <p className="font-handwriting text-base text-[#3a2416] mt-2 max-w-[180px]">
+                The artists gathered around the ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant.
+              </p>
+            </div>
+
+            <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
-                Letters &amp; Quotes
+                Behind The Stage
+              </div>
+              <p className="font-handwriting text-base italic text-[#3a2416] max-w-[170px]">
+                "The rain almost ruined the set. Then it became the set."
+              </p>
+            </div>
+          </div>
+
+          {/* LEAF 4 : SPREAD 4 (ARTISTS & LETTERS) */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
+            <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
+            
+            <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[repeating-linear-gradient(180deg,transparent_0_27px,rgba(90,58,42,0.16)_27px_28px),radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
+              <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
+                Artists &amp; Letters
               </div>
               <p className="font-handwriting text-xl italic text-[#3a2416] mt-2 max-w-[200px]">
                 "Music is the strongest form of magic."
               </p>
               <div className="font-mono text-[9px] text-[#6b4a34] mt-1">— Tangy Sessions, field notes</div>
-              <p className="font-handwriting text-base text-[#3a2416] mt-6 max-w-[200px]">
-                Dear diary — real people, real stories, real music. That's all this ever was.
-              </p>
-              <svg className="w-[22px] absolute bottom-[60px] left-[22px] text-[#A33828]"><use href="#sym-heart"/></svg>
-              <div className="absolute bottom-4 right-4 bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2 rounded-xs font-mono text-[9px] shadow-md max-w-[110px] rotate-3">
-                <b className="font-sans text-[11px] block">TARAMATI BARADARI</b>25 OCT 2024
-              </div>
             </div>
 
-            {/* PAGE 3 BACK */}
             <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
-                A Collection of Tickets
+                Ticket Collection
               </div>
               <div className="relative h-[120px] mt-4">
                 <div className="absolute top-0 left-1.5 w-[100px] bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2 font-mono text-[9px] -rotate-6 shadow-md">
@@ -645,77 +533,54 @@ export const TangyDiary = () => {
                 <div className="absolute top-4 left-[70px] w-[100px] bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2 font-mono text-[9px] rotate-4 shadow-md">
                   OLD CITY HAVELI
                 </div>
-                <div className="absolute top-[44px] left-[26px] w-[100px] bg-gradient-to-r from-[#b8895f] to-[#8a5f3a] text-[#F3E7C9] p-2 font-mono text-[9px] -rotate-2 shadow-md">
-                  GOLCONDA FORT
-                </div>
               </div>
-              <svg viewBox="0 0 100 40" className="w-[90px] mt-2 opacity-70">
-                <path d="M4,34 L28,20 L48,30 L74,10 L96,18" fill="none" stroke="#6b4a34" strokeWidth="1.3" strokeDasharray="3 3"/>
-                <circle cx="4" cy="34" r="2" fill="#A33828"/>
-                <circle cx="96" cy="18" r="2" fill="#A33828"/>
-              </svg>
-              <div className="font-handwriting text-base text-[#3a2416] mt-1 max-w-[190px]">Every ticket tells a story.</div>
             </div>
           </div>
 
-          {/* LEAF 4 : MEMORIES & END */}
-          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
+          {/* LEAF 5 : FINAL SPREAD (FUTURE & READ MORE CTA) */}
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
-            {/* PAGE 4 FRONT */}
             <div className="absolute inset-0 [backface-visibility:hidden] translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)]">
               <div className="font-mono text-[11px] tracking-[0.09em] uppercase text-[#1E1A17] border-b border-[#6b4a34] inline-block pb-0.5 mb-2">
-                A Collection of Memories
+                Future &amp; Unwritten Pages
               </div>
-              <figure className="w-[120px] bg-[#fbf7ee] p-1.5 pb-5 shadow-lg mt-3">
-                <div className="absolute -top-2 left-7 w-[40px] h-[14px] bg-[linear-gradient(180deg,rgba(200,162,74,0.85),rgba(168,132,54,0.85))]" />
-                <svg viewBox="0 0 120 96" className="w-full">
-                  <rect width="120" height="96" fill="#c9b78d"/>
-                  <g fill="#241a10" opacity="0.85">
-                    <circle cx="20" cy="80" r="5"/><circle cx="34" cy="82" r="5"/><circle cx="48" cy="78" r="5"/><circle cx="62" cy="82" r="5"/>
-                  </g>
-                </svg>
-                <figcaption className="text-center font-handwriting text-xs text-[#4a3016] mt-1">Still gives me chills</figcaption>
-              </figure>
-              <div className="absolute bottom-[56px] right-4 inline-block font-mono text-xs tracking-[0.1em] text-[#A33828] border-2 border-[#A33828] px-2 py-1 rotate-6 opacity-80 mix-blend-multiply text-center">
-                Archive<br/>Sealed
-              </div>
-              <p className="absolute bottom-4 left-4 font-handwriting text-base text-[#3a2416] max-w-[190px]">
-                Not just a page. It's a memory.
+              <p className="font-handwriting text-base text-[#3a2416] mt-4 max-w-[190px]">
+                Every Tangy Session leaves another page waiting to be written. The story continues with you.
               </p>
             </div>
 
-            {/* PAGE 4 BACK */}
             <div className="absolute inset-0 [backface-visibility:hidden] rotate-y-180 translate-z-[1px] p-5 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32)] flex flex-col items-center justify-center text-center">
-              <svg className="w-[80px] h-[80px] opacity-85 text-[#A33828] mix-blend-multiply" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <path id="et1" d="M14,60 a46,46 0 1,1 92,0"/>
-                  <path id="et2" d="M106,60 a46,46 0 1,1 -92,0"/>
-                </defs>
+              <svg className="w-[70px] h-[70px] opacity-85 text-[#A33828] mix-blend-multiply" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="2"/>
                 <circle cx="60" cy="60" r="42" fill="none" stroke="currentColor" strokeWidth="1.4"/>
-                <text fontSize="10" letterSpacing="2" fill="currentColor"><textPath href="#et1" startOffset="50%" textAnchor="middle">END OF VOLUME</textPath></text>
-                <text fontSize="9" letterSpacing="2.2" fill="currentColor"><textPath href="#et2" startOffset="50%" textAnchor="middle">MORE SOON ★</textPath></text>
               </svg>
-              <div className="font-handwriting text-lg text-[#3a2416] mt-4">To be continued…</div>
+              <div className="font-handwriting text-lg text-[#3a2416] mt-3 font-bold">To be continued…</div>
             </div>
           </div>
 
         </div>
       </div>
 
-      {/* READ MORE CTA AT END OF TIMELINE */}
-      <div className="read-more-cta absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-center flex flex-col items-center gap-2">
-        <p className="font-serif italic text-sm md:text-base text-[#F3E7C9]/90">
-          Continue Reading
+      {/* READ MORE CTA BUTTON (FADES IN ON FINAL SPREAD) */}
+      <div className="read-more-cta absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-center flex flex-col items-center">
+        <p className="font-serif italic text-xs text-[#F3E7C9]/80 mb-2">
+          Every Tangy Session leaves another page waiting to be written.
         </p>
         <a 
           href="/blogs"
-          className="bg-[#C8A55A] text-[#120C07] hover:bg-[#F3E7C9] border-2 border-[#120C07] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#120C07]"
+          className="bg-[#C8A55A] text-[#11100C] hover:bg-[#F3E7C9] border-2 border-[#11100C] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C]"
         >
           Read the Complete Tangy Diary →
         </a>
       </div>
+
+      {/* READ HINT (ONLY VISIBLE ON INITIAL COVER CLOSED) */}
+      <div className="read-hint-1 absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
+        <div className="font-serif italic text-sm tracking-wider text-[#C8A55A]">Scroll to Open Journal</div>
+        <div className="text-xs text-[#C8A55A] opacity-75 my-0.5 animate-bounce">↓</div>
+      </div>
+
     </section>
   );
 };
