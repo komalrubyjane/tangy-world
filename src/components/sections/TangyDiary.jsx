@@ -1,21 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { useGSAPContext } from '../../hooks/useGSAPContext';
+import gsap from 'gsap';
+import { useAudio } from '../../audio/AudioContext';
 
 export const TangyDiary = () => {
+  const { playSFX } = useAudio();
   const sectionRef = useRef(null);
   const dustLayerRef = useRef(null);
-
-  const [currentSpread, setCurrentSpread] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [sectionActive, setSectionActive] = useState(false);
-  const [hasTriggeredOpen, setHasTriggeredOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
 
-  const leavesCount = 5; // Cover (0) + Leaf 1 (1) + Leaf 2 (2) + Leaf 3 (3) + Leaf 4 (4)
-  const maxSpread = leavesCount;
-
-  // Audio synthesis for realistic page turns
+  // Sound generator
   const audioCtxRef = useRef(null);
-
   const playPageSound = () => {
     if (!soundOn) return;
     try {
@@ -50,27 +45,171 @@ export const TangyDiary = () => {
     }
   };
 
-  // IntersectionObserver for active section state
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const isActive = entry.isIntersecting && entry.intersectionRatio > 0.4;
-          setSectionActive(isActive);
-        });
+  // GSAP ScrollTrigger Integration
+  useGSAPContext(() => {
+    if (!sectionRef.current) return;
+
+    const leaves = gsap.utils.toArray('.diary-leaf');
+    const totalLeaves = leaves.length; // 0: cover, 1: leaf1, 2: leaf2, 3: leaf3, 4: leaf4
+
+    // Initial z-indexes and 3D states
+    leaves.forEach((leaf, idx) => {
+      gsap.set(leaf, {
+        rotateY: 0,
+        transformOrigin: '0% 50%',
+        zIndex: totalLeaves - idx,
+        display: 'block',
+      });
+    });
+
+    gsap.set('.static-frontispiece', { opacity: 0, filter: 'brightness(0.82)' });
+    gsap.set('.strap-wrapper', { opacity: 1, x: 0, scale: 1 });
+    gsap.set('.read-more-cta', { opacity: 0, pointerEvents: 'none', y: 15 });
+
+    // GSAP ScrollTrigger Timeline with Pinned Section
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: '+=450%',
+        scrub: 0.6,
+        pin: true,
+        anticipatePin: 1,
       },
-      { threshold: [0, 0.4, 0.8] }
-    );
+    });
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    // Pacing Timeline (Total ~100%):
+    // 0.00 - 0.05: Book stage scale & tilt
+    // 0.05 - 0.18: Leather strap release & Cover flip (13% pacing)
+    // 0.18 - 0.33: Leaf 1 flip (Entry #03 Rain & Ragas) (15% pacing)
+    // 0.33 - 0.48: Leaf 2 flip (Entry #07 Golconda Fort) (15% pacing)
+    // 0.48 - 0.63: Leaf 3 flip (Letters & Quotes / Ticket Stubs) (15% pacing)
+    // 0.63 - 0.78: Leaf 4 flip (Memories & End of Volume) (15% pacing)
+    // 0.78 - 1.00: Final Page Conclusion & Read More CTA Fade-In (22% pacing for reading time)
 
-    return () => observer.disconnect();
+    // Stage Entrance
+    tl.to('.book-stage-wrapper', {
+      scale: 1,
+      duration: 0.05,
+      ease: 'power1.out',
+    }, 0);
+
+    // Cover Open & Strap Release
+    tl.to('.strap-wrapper', {
+      opacity: 0,
+      x: 50,
+      scale: 0.94,
+      duration: 0.05,
+      ease: 'power2.in',
+    }, 0.05)
+    .to('.static-frontispiece', {
+      opacity: 1,
+      filter: 'brightness(1)',
+      duration: 0.08,
+      ease: 'power2.out',
+    }, 0.09)
+    .to(leaves[0], {
+      rotateY: -180,
+      duration: 0.13,
+      ease: 'power2.inOut',
+      onStart: () => {
+        playPageSound();
+        try { playSFX('pageTurn'); } catch (e) {}
+      },
+      onUpdate: function () {
+        if (this.progress() > 0.5) {
+          gsap.set(leaves[0], { zIndex: 1 });
+        } else {
+          gsap.set(leaves[0], { zIndex: totalLeaves });
+        }
+      },
+    }, 0.05);
+
+    // Leaf 1 Turn
+    tl.to(leaves[1], {
+      rotateY: -180,
+      duration: 0.15,
+      ease: 'power2.inOut',
+      onStart: () => {
+        playPageSound();
+        try { playSFX('pageTurn'); } catch (e) {}
+      },
+      onUpdate: function () {
+        if (this.progress() > 0.5) {
+          gsap.set(leaves[1], { zIndex: 2 });
+        } else {
+          gsap.set(leaves[1], { zIndex: totalLeaves - 1 });
+        }
+      },
+    }, 0.18);
+
+    // Leaf 2 Turn
+    tl.to(leaves[2], {
+      rotateY: -180,
+      duration: 0.15,
+      ease: 'power2.inOut',
+      onStart: () => {
+        playPageSound();
+        try { playSFX('pageTurn'); } catch (e) {}
+      },
+      onUpdate: function () {
+        if (this.progress() > 0.5) {
+          gsap.set(leaves[2], { zIndex: 3 });
+        } else {
+          gsap.set(leaves[2], { zIndex: totalLeaves - 2 });
+        }
+      },
+    }, 0.33);
+
+    // Leaf 3 Turn
+    tl.to(leaves[3], {
+      rotateY: -180,
+      duration: 0.15,
+      ease: 'power2.inOut',
+      onStart: () => {
+        playPageSound();
+        try { playSFX('pageTurn'); } catch (e) {}
+      },
+      onUpdate: function () {
+        if (this.progress() > 0.5) {
+          gsap.set(leaves[3], { zIndex: 4 });
+        } else {
+          gsap.set(leaves[3], { zIndex: totalLeaves - 3 });
+        }
+      },
+    }, 0.48);
+
+    // Leaf 4 Turn (Final Spread)
+    tl.to(leaves[4], {
+      rotateY: -180,
+      duration: 0.15,
+      ease: 'power2.inOut',
+      onStart: () => {
+        playPageSound();
+        try { playSFX('pageTurn'); } catch (e) {}
+      },
+      onUpdate: function () {
+        if (this.progress() > 0.5) {
+          gsap.set(leaves[4], { zIndex: 5 });
+        } else {
+          gsap.set(leaves[4], { zIndex: totalLeaves - 4 });
+        }
+      },
+    }, 0.63);
+
+    // Final Reading Pacing & Read More CTA Fade-In
+    tl.to('.read-more-cta', {
+      opacity: 1,
+      y: 0,
+      pointerEvents: 'auto',
+      duration: 0.12,
+      ease: 'power2.out',
+    }, 0.78);
+
   }, []);
 
-  // Floating dust animation creation
-  useEffect(() => {
+  // Floating dust generator
+  React.useEffect(() => {
     if (!dustLayerRef.current) return;
     const dustContainer = dustLayerRef.current;
     dustContainer.innerHTML = '';
@@ -91,112 +230,11 @@ export const TangyDiary = () => {
     }
   }, []);
 
-  // Wheel and Touch interactions
-  const wheelAccumRef = useRef(0);
-  const THRESHOLD = 45;
-
-  const goForward = () => {
-    if (isAnimating || currentSpread >= maxSpread) return;
-    setIsAnimating(true);
-    playPageSound();
-
-    if (currentSpread === 0) {
-      setHasTriggeredOpen(true);
-      setTimeout(() => {
-        setCurrentSpread(1);
-        setIsAnimating(false);
-      }, 1200);
-    } else {
-      setTimeout(() => {
-        setCurrentSpread((prev) => Math.min(prev + 1, maxSpread));
-        setIsAnimating(false);
-      }, 750);
-    }
-  };
-
-  const goBackward = () => {
-    if (isAnimating || currentSpread <= 0) return;
-    setIsAnimating(true);
-    playPageSound();
-
-    setTimeout(() => {
-      setCurrentSpread((prev) => Math.max(prev - 1, 0));
-      setIsAnimating(false);
-    }, 750);
-  };
-
-  useEffect(() => {
-    const handleWheel = (e) => {
-      if (!sectionActive) return;
-
-      const down = e.deltaY > 0;
-      if (currentSpread === 0 && !down) return;
-      if (currentSpread === maxSpread && down) return;
-
-      e.preventDefault();
-      if (isAnimating) return;
-
-      wheelAccumRef.current += e.deltaY;
-      if (wheelAccumRef.current > THRESHOLD) {
-        wheelAccumRef.current = 0;
-        goForward();
-      } else if (wheelAccumRef.current < -THRESHOLD) {
-        wheelAccumRef.current = 0;
-        goBackward();
-      }
-    };
-
-    let touchStartY = null;
-    const handleTouchStart = (e) => {
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e) => {
-      if (!sectionActive || touchStartY === null) return;
-      const currentY = e.touches[0].clientY;
-      const delta = touchStartY - currentY;
-      const down = delta > 0;
-
-      if (currentSpread === 0 && !down) return;
-      if (currentSpread === maxSpread && down) return;
-
-      e.preventDefault();
-      if (isAnimating) return;
-
-      if (Math.abs(delta) > 40) {
-        if (delta > 0) goForward();
-        else goBackward();
-        touchStartY = currentY;
-      }
-    };
-
-    const currentSec = sectionRef.current;
-    if (currentSec) {
-      currentSec.addEventListener('wheel', handleWheel, { passive: false });
-      currentSec.addEventListener('touchstart', handleTouchStart, { passive: true });
-      currentSec.addEventListener('touchmove', handleTouchMove, { passive: false });
-    }
-
-    return () => {
-      if (currentSec) {
-        currentSec.removeEventListener('wheel', handleWheel);
-        currentSec.removeEventListener('touchstart', handleTouchStart);
-        currentSec.removeEventListener('touchmove', handleTouchMove);
-      }
-    };
-  }, [sectionActive, isAnimating, currentSpread]);
-
-  // Z-Index calculation helper for 3D stacks
-  const getZIndex = (idx) => {
-    if (idx < currentSpread) return leavesCount + idx;
-    return leavesCount - idx;
-  };
-
   return (
     <section 
       ref={sectionRef}
       id="diary" 
-      className={`relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1C130C] via-[#120C07] to-[#0C0805] text-[#F3E7C9] overflow-hidden select-none font-serif ${sectionActive ? 'active' : ''}`}
+      className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1C130C] via-[#120C07] to-[#0C0805] text-[#F3E7C9] overflow-hidden select-none font-serif"
     >
       {/* SVG GRAIN & DECOR DEFINITIONS */}
       <svg className="fixed inset-0 w-full h-full pointer-events-none z-[900] opacity-[0.045] mix-blend-overlay">
@@ -289,7 +327,19 @@ export const TangyDiary = () => {
         </defs>
       </svg>
 
-      {/* SOUND TOGGLE */}
+      {/* TOP HEADER BRANDING */}
+      <div className="absolute top-6 left-8 right-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 z-20 pointer-events-auto">
+        <div>
+          <div className="font-mono text-[9.5px] md:text-[10.5px] text-[#C8A55A] tracking-[0.3em] font-bold uppercase opacity-80">
+            TANGY SESSIONS // FIELD DIARY ARCHIVE
+          </div>
+          <p className="font-serif italic text-xs text-[#F3E7C9]/90">
+            "Some stories deserve more than a caption."
+          </p>
+        </div>
+      </div>
+
+      {/* SOUND TOGGLE BUTTON */}
       <button 
         onClick={() => setSoundOn(!soundOn)} 
         className="absolute top-5 right-6 z-30 w-9 h-9 rounded-full bg-[#1E1A17]/60 border border-[#C8A24A]/40 text-[#C8A24A] flex items-center justify-center cursor-pointer text-sm transition-opacity hover:opacity-100"
@@ -311,17 +361,17 @@ export const TangyDiary = () => {
       {/* DUST PARTICLES LAYER */}
       <div ref={dustLayerRef} className="absolute inset-0 pointer-events-none z-5" />
 
-      {/* 3D BOOK STAGE */}
-      <div className={`relative transition-transform duration-1000 [perspective:2200px] [perspective-origin:50%_42%] ${sectionActive ? 'scale-100' : 'scale-[0.93]'}`}>
+      {/* 3D BOOK STAGE CONTAINER */}
+      <div className="book-stage-wrapper relative transition-transform duration-1000 [perspective:2200px] [perspective-origin:50%_42%] scale-[0.96]">
         
         {/* DESK SHADOW & LIGHTING */}
         <div className="absolute left-1/2 -bottom-5 w-[60%] h-[44px] -translate-x-1/2 bg-black blur-[50px] opacity-[0.15] z-1" />
         <div className="absolute -inset-[30px] pointer-events-none z-[85] bg-[radial-gradient(ellipse_at_18%_8%,rgba(255,238,205,0.16),transparent_55%),linear-gradient(160deg,rgba(255,255,255,0.05),transparent_40%,rgba(0,0,0,0.15)_100%)] mix-blend-soft-light" />
 
         {/* BOOK CONTAINER */}
-        <div className={`relative w-[min(880px,90vw)] h-[min(660px,76vh)] [transform-style:preserve-3d] ${currentSpread > 0 ? 'book-opening' : ''}`}>
+        <div className="relative w-[min(880px,90vw)] h-[min(660px,76vh)] [transform-style:preserve-3d]">
           
-          {/* SPINE HINGE BAR */}
+          {/* FIXED SPINE HINGE BAR */}
           <div className="absolute left-[calc(50%-14px)] -top-[3px] -bottom-[3px] w-[28px] z-[80] rounded-sm bg-[linear-gradient(90deg,#3a2115_0%,#5A3927_12%,#6b4530_50%,#5A3927_88%,#3a2115_100%)] shadow-[inset_0_0_16px_rgba(0,0,0,0.55),3px_0_8px_rgba(0,0,0,0.45),-3px_0_8px_rgba(0,0,0,0.45),0_10px_26px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-0 rounded-sm bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.05)_0_2px,transparent_2px_7px,rgba(0,0,0,0.14)_7px_9px,transparent_9px_14px)]" />
             <div className="absolute top-[14px] bottom-[14px] left-[4px] right-[4px] bg-[repeating-linear-gradient(0deg,rgba(224,196,140,0.75)_0_3px,transparent_3px_8px)_left/2px_100%_no-repeat,repeating-linear-gradient(0deg,rgba(224,196,140,0.75)_0_3px,transparent_3px_8px)_right/2px_100%_no-repeat]" />
@@ -333,11 +383,8 @@ export const TangyDiary = () => {
           {/* PAGE STACK DEPTH */}
           <div className="absolute top-[1.5%] -right-[11px] w-[13px] h-[97%] bg-[repeating-linear-gradient(0deg,#f2e6c4_0_1.4px,#e2cf9c_1.4px_2.6px,#cdb789_2.6px_3.2px)] shadow-[2px_0_6px_rgba(0,0,0,0.32),inset_-2px_0_3px_rgba(0,0,0,0.18)] rounded-r-sm z-[15]" />
 
-          {/* COVER CAST SHADOW */}
-          <div className={`absolute left-[2%] top-0 w-[46%] h-full bg-gradient-to-r from-black/50 to-transparent pointer-events-none z-6 transition-opacity duration-500 ${currentSpread > 0 ? 'opacity-55' : 'opacity-0'}`} />
-
           {/* STATIC FRONTISPIECE (LEFT TITLE PAGE REVEALED WHEN COVER OPENS) */}
-          <div className={`absolute top-0 left-[2%] w-[46%] h-full z-5 transition-all duration-500 ${currentSpread >= 1 ? 'opacity-100 filter-none' : 'opacity-0 brightness-[0.82]'}`}>
+          <div className="static-frontispiece absolute top-0 left-[2%] w-[46%] h-full z-5 transition-opacity duration-300">
             <div className="relative w-full h-full p-6 bg-[radial-gradient(ellipse_at_25%_0%,rgba(255,255,255,0.22),transparent_45%),linear-gradient(180deg,#F3E7C9,#e6d5a8_65%,#ddc999)] shadow-[inset_0_0_46px_rgba(90,58,42,0.32),inset_0_0_3px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center text-center text-[#1E1A17]">
               <div className="absolute w-[100px] h-[100px] bottom-[10px] right-[10px] rounded-full opacity-70 mix-blend-multiply bg-[radial-gradient(circle,transparent_54%,rgba(90,58,42,0.32)_57%,transparent_66%)]" />
               <div className="font-serif italic text-3xl font-normal">Field Diary</div>
@@ -366,10 +413,7 @@ export const TangyDiary = () => {
           </div>
 
           {/* LEAF 0 : MUSEUM COVER */}
-          <div 
-            className={`absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%] transition-transform duration-1000 ease-in-out ${currentSpread >= 1 ? '-rotate-y-180' : 'rotate-y-0'}`}
-            style={{ zIndex: getZIndex(0) }}
-          >
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
             <div className="absolute top-0 left-full w-[12px] h-full [transform-origin:0%_50%] rotate-y-90 [backface-visibility:hidden] bg-[repeating-linear-gradient(0deg,#e9dcb8_0_2px,#cdb789_2px_4px,#b8a06a_4px_5px,#cdb789_5px_6px)] shadow-[inset_0_0_8px_rgba(0,0,0,0.35)] z-2" />
 
             {/* COVER FRONT */}
@@ -406,7 +450,7 @@ export const TangyDiary = () => {
               </div>
 
               {/* LEATHER STRAP & WAX SEAL */}
-              <div className={`absolute -left-[3%] -right-[3%] top-[63%] h-[30px] -translate-y-1/2 -rotate-1 bg-gradient-to-b from-[#6b4024] via-[#4a2c18] to-[#3a2115] shadow-lg border-y border-dashed border-[#C8A55A]/40 z-9 transition-all duration-350 ${hasTriggeredOpen ? 'opacity-0 translate-x-12 scale-95' : 'opacity-100'}`}>
+              <div className="strap-wrapper absolute -left-[3%] -right-[3%] top-[63%] h-[30px] -translate-y-1/2 -rotate-1 bg-gradient-to-b from-[#6b4024] via-[#4a2c18] to-[#3a2115] shadow-lg border-y border-dashed border-[#C8A55A]/40 z-9">
                 <div className="absolute right-[16%] top-1/2 -translate-y-1/2 w-6 h-6 border-[3px] border-[#9D7A3C] rounded-sm bg-gradient-to-br from-[#c2a06a] to-[#8a6a3a] shadow-md" />
               </div>
 
@@ -436,10 +480,7 @@ export const TangyDiary = () => {
           </div>
 
           {/* LEAF 1 : ENTRY #03 */}
-          <div 
-            className={`absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%] transition-transform duration-1000 ease-in-out ${currentSpread >= 2 ? '-rotate-y-180' : 'rotate-y-0'} ${currentSpread >= 1 ? 'opacity-100 filter-none' : 'opacity-0 brightness-[0.82]'}`}
-            style={{ zIndex: getZIndex(1) }}
-          >
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
             {/* PAGE 1 FRONT */}
@@ -514,10 +555,7 @@ export const TangyDiary = () => {
           </div>
 
           {/* LEAF 2 : ENTRY #07 */}
-          <div 
-            className={`absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%] transition-transform duration-1000 ease-in-out ${currentSpread >= 3 ? '-rotate-y-180' : 'rotate-y-0'}`}
-            style={{ zIndex: getZIndex(2) }}
-          >
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
             {/* PAGE 2 FRONT */}
@@ -573,10 +611,7 @@ export const TangyDiary = () => {
           </div>
 
           {/* LEAF 3 : LETTERS & QUOTES */}
-          <div 
-            className={`absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%] transition-transform duration-1000 ease-in-out ${currentSpread >= 4 ? '-rotate-y-180' : 'rotate-y-0'}`}
-            style={{ zIndex: getZIndex(3) }}
-          >
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
             {/* PAGE 3 FRONT */}
@@ -624,10 +659,7 @@ export const TangyDiary = () => {
           </div>
 
           {/* LEAF 4 : MEMORIES & END */}
-          <div 
-            className={`absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%] transition-transform duration-1000 ease-in-out ${currentSpread >= 5 ? '-rotate-y-180' : 'rotate-y-0'}`}
-            style={{ zIndex: getZIndex(4) }}
-          >
+          <div className="diary-leaf absolute top-0 left-1/2 w-[46%] h-full [transform-style:preserve-3d] [transform-origin:0%_50%]">
             <div className="absolute top-[2%] -right-[5px] w-[9px] h-[96%] bg-[repeating-linear-gradient(0deg,#ecdfb6_0_2px,#d8c48f_2px_4px,#c2a86e_4px_5px)] shadow-md rounded-r-xs" />
             
             {/* PAGE 4 FRONT */}
@@ -672,29 +704,17 @@ export const TangyDiary = () => {
         </div>
       </div>
 
-      {/* SCROLL HINT */}
-      <div 
-        onClick={currentSpread === maxSpread ? () => window.location.assign('/blogs') : goForward}
-        className={`absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-center cursor-pointer transition-opacity duration-600 ${sectionActive ? 'opacity-85' : 'opacity-0'}`}
-      >
-        {currentSpread === 0 && (
-          <>
-            <div className="font-serif italic text-base tracking-wider text-[#C8A55A]">Open the Archive</div>
-            <div className="text-xs text-[#C8A55A] opacity-75 my-0.5 animate-bounce">↓</div>
-            <div className="font-serif italic text-[10px] tracking-widest text-[#F5E7C8]/55">Scroll to unlock the memories</div>
-          </>
-        )}
-        {currentSpread > 0 && currentSpread < maxSpread && (
-          <>
-            <div className="font-serif italic text-sm tracking-wider text-[#C8A55A]">Scroll to Turn Page</div>
-            <div className="text-xs text-[#C8A55A] opacity-75 my-0.5 animate-bounce">↓</div>
-          </>
-        )}
-        {currentSpread === maxSpread && (
-          <a href="/blogs" className="font-serif italic text-base tracking-wider text-[#C8A55A] hover:underline flex items-center gap-1">
-            Read More →
-          </a>
-        )}
+      {/* READ MORE CTA AT END OF TIMELINE */}
+      <div className="read-more-cta absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-center flex flex-col items-center gap-2">
+        <p className="font-serif italic text-sm md:text-base text-[#F3E7C9]/90">
+          Continue Reading
+        </p>
+        <a 
+          href="/blogs"
+          className="bg-[#C8A55A] text-[#120C07] hover:bg-[#F3E7C9] border-2 border-[#120C07] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#120C07]"
+        >
+          Read the Complete Tangy Diary →
+        </a>
       </div>
     </section>
   );
