@@ -3,13 +3,15 @@ import gsap from 'gsap';
 
 export const BaodiSangam = () => {
   const sectionRef = useGSAPContext((ctx) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=150%',
+        start: isMobile ? 'top 80%' : 'top top',
+        end: isMobile ? '+=50%' : '+=150%',
         scrub: 1,
-        pin: true
+        pin: !isMobile
       }
     });
 

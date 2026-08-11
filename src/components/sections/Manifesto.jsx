@@ -11,14 +11,16 @@ import {
 
 export const Manifesto = () => {
   const sectionRef = useGSAPContext((ctx) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=250%',
+        start: isMobile ? 'top 80%' : 'top top',
+        end: isMobile ? '+=50%' : '+=250%',
         scrub: 0.5,
-        pin: true,
-        anticipatePin: 1
+        pin: !isMobile,
+        anticipatePin: isMobile ? 0 : 1
       }
     });
 

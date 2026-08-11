@@ -8,14 +8,16 @@ export const MicDrop = () => {
   const micRef = useRef(null);
 
   const sectionRef = useGSAPContext((ctx) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=160%',
+        start: isMobile ? 'top 80%' : 'top top',
+        end: isMobile ? '+=50%' : '+=160%',
         scrub: 1,
-        pin: true,
-        anticipatePin: 1
+        pin: !isMobile,
+        anticipatePin: isMobile ? 0 : 1
       }
     });
 

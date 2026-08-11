@@ -3,14 +3,16 @@ import gsap from 'gsap';
 
 export const Spaces = () => {
   const sectionRef = useGSAPContext((ctx) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=300%',
+        start: isMobile ? 'top 80%' : 'top top',
+        end: isMobile ? '+=50%' : '+=300%',
         scrub: 0.5,
-        pin: true,
-        anticipatePin: 1
+        pin: !isMobile,
+        anticipatePin: isMobile ? 0 : 1
       }
     });
 

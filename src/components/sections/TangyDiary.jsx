@@ -90,15 +90,17 @@ export const TangyDiary = () => {
     gsap.set('.read-hint',         { opacity: 1,         immediateRender: true });
     gsap.set('.read-more-cta',     { opacity: 0, y: 14, pointerEvents: 'none', immediateRender: true });
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
     // Master scroll-pinned timeline
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=900%',
-        pin: true,
+        start: isMobile ? 'top 80%' : 'top top',
+        end: isMobile ? '+=50%' : '+=900%',
+        pin: !isMobile,
         scrub: 0.8,
-        anticipatePin: 1,
+        anticipatePin: isMobile ? 0 : 1,
         onUpdate(self) {
           gsap.to('.diary-mic-wire', {
             rotate: Math.sin(self.progress * Math.PI * 10) * 2,
