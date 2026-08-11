@@ -85,8 +85,7 @@ export const Hero = () => {
       .to('.portrait-wrap-center', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
       .to('.portrait-wrap-inner-right', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
       .to('.portrait-wrap-far-right', { y: -16, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2)
-      .to('.mic', { rotation: 3, duration: 0.4 }, 0.1);
+      .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2);
 
   }, []);
 
@@ -103,7 +102,6 @@ export const Hero = () => {
       gsap.to('.portrait-wrap-center', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
       gsap.to('.portrait-wrap-inner-right', { x: moveX * 0.21, y: moveY * 0.21, duration: 1.2, ease: 'power2.out' });
       gsap.to('.portrait-wrap-far-right', { x: moveX * 0.17, y: moveY * 0.17, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.mic', { x: moveX * 0.35, y: moveY * 0.35, duration: 1.2, ease: 'power2.out' });
       gsap.to('.hero-ticket', { x: moveX * 0.15, y: moveY * 0.15, duration: 1.2, ease: 'power2.out' });
       gsap.to('.headline', { x: moveX * 0.08, y: moveY * 0.08, duration: 1.2, ease: 'power2.out' });
     };
