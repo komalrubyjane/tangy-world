@@ -145,8 +145,20 @@ export const Navbar = () => {
     }, 180);
   };
 
+  // Lock body overflow only while mobile menu is open, and restore on close/unmount
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
       {/* LEFT: BRAND LOGO */}
       <div 
@@ -183,7 +195,7 @@ export const Navbar = () => {
 
               {/* Cream Paper Dropdown Menu */}
               <div 
-                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#F5E9C9] text-[#11100C] p-3 border-2 border-[#C99A2E]/80 rounded-md shadow-[0_15px_35px_rgba(17,16,12,0.9)] z-[150] transition-all duration-200 ease-out origin-top ${
+                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#F5E9C9] text-[#11100C] p-3 border-2 border-[#C99A2E]/80 rounded-md shadow-[0_15px_35px_rgba(17,16,12,0.9)] z-[10001] transition-all duration-200 ease-out origin-top ${
                   isOpen ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' : 'opacity-0 translate-y-2 pointer-events-none scale-95'
                 }`}
               >
@@ -213,7 +225,7 @@ export const Navbar = () => {
       <div className="xl:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest"
+          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95"
         >
           {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
         </button>
@@ -221,7 +233,7 @@ export const Navbar = () => {
 
       {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[130] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
+        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
           <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
             NAVIGATION MENU
           </div>
@@ -232,13 +244,20 @@ export const Navbar = () => {
 
               return (
                 <div key={cat.title} className="border-b border-[#E7D5A4]/10 pb-2">
-                  <button
-                    onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
-                    className="w-full flex justify-between items-center font-mono text-sm font-bold text-[#E7D5A4] py-1 uppercase"
-                  >
-                    <span>{cat.title}</span>
-                    <span className="text-xs text-[#C99A2E]">{isCatOpen ? '▲' : '▼'}</span>
-                  </button>
+                  <div className="w-full flex justify-between items-center py-1">
+                    <button
+                      onClick={() => handleNav(cat.path)}
+                      className="font-mono text-sm font-bold text-[#E7D5A4] hover:text-[#C99A2E] uppercase text-left flex-1"
+                    >
+                      {cat.title}
+                    </button>
+                    <button
+                      onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
+                      className="text-xs text-[#C99A2E] px-2 py-1"
+                    >
+                      {isCatOpen ? '▲' : '▼'}
+                    </button>
+                  </div>
 
                   {isCatOpen && (
                     <div className="mt-2 pl-4 flex flex-col gap-2 bg-[#F5E9C9] text-[#11100C] p-3 rounded-md border border-[#C99A2E]">

@@ -11,15 +11,16 @@ export const Hero = () => {
 
   const sectionRef = useGSAPContext((ctx) => {
     let impactTriggered = false;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=75%',
+        end: isMobile ? '+=30%' : '+=75%',
         scrub: 0.5,
-        pin: true,
-        anticipatePin: 1,
+        pin: !isMobile,
+        anticipatePin: isMobile ? 0 : 1,
         onUpdate: (self) => {
           setFilterCutoff(400 + self.progress * 12000);
 
