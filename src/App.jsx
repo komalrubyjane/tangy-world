@@ -202,7 +202,7 @@ function MainWorld() {
            />
         </div>
 
-        <div className="tangy-world pt-12">
+        <div className="tangy-world pt-0 md:pt-12">
           <main>
             {/* 01 — LANDING PAGE (HERO) */}
             <Hero />

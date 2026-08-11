@@ -18,14 +18,17 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
 
     // 1. Build Single Continuous Smooth Cubic Bézier SVG Cable across full document
     const updatePath = () => {
-      const fullH = Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight
-      );
+      const isMobile = window.innerWidth < 1024;
+      const fullH = isMobile
+        ? window.innerHeight
+        : Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight
+          );
       const fullW = window.innerWidth;
 
       if (containerRef.current) {
-        containerRef.current.style.height = `${fullH}px`;
+        containerRef.current.style.height = isMobile ? '100dvh' : `${fullH}px`;
       }
 
       if (svgRef.current) {
@@ -33,8 +36,6 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         svgRef.current.setAttribute('height', fullH);
         svgRef.current.setAttribute('viewBox', `0 0 ${fullW} ${fullH}`);
       }
-
-      const isMobile = fullW < 768;
 
       // Stroke thickness: 3.2px on desktop, 2.0px on mobile
       pathEl.setAttribute('stroke-width', isMobile ? '2.0' : '3.2');
