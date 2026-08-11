@@ -144,7 +144,7 @@ export const Hero = () => {
     <section 
       ref={sectionRef} 
       id="hero" 
-      className="hero relative w-screen h-screen min-h-[680px] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate"
+      className="hero relative w-full h-[100dvh] max-h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate"
     >
       {/* SVG ROUGHEN FILTER */}
       <svg className="absolute width-0 height-0 overflow-hidden pointer-events-none z-0">
@@ -159,16 +159,16 @@ export const Hero = () => {
         className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
       >
         {/* CORNER CROSSHAIRS (z-30) */}
-        <div className="absolute z-30 w-[2.8cqw] h-[2.8cqw] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none">
+        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none">
           <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
         </div>
-        <div className="absolute z-30 w-[2.8cqw] h-[2.8cqw] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none">
+        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none">
           <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
         </div>
-        <div className="absolute z-30 w-[2.8cqw] h-[2.8cqw] opacity-85 bottom-[1.4cqw] left-[1.4cqw] pointer-events-none">
+        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 bottom-[1.4cqw] left-[1.4cqw] pointer-events-none">
           <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
         </div>
-        <div className="absolute z-30 w-[2.8cqw] h-[2.8cqw] opacity-85 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none">
+        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none">
           <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
         </div>
 
@@ -177,39 +177,39 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         <div className="absolute z-40 top-[2.2cqw] left-[5cqw] right-[5cqw] flex items-start justify-between pointer-events-none">
           {/* TOP LEFT */}
-          <div className="text-[1.05cqw] leading-tight text-left font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
+          <div className="text-[clamp(7px,1.05cqw,16px)] leading-tight text-left font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
             <div>HYDERABAD, INDIA</div>
             <div className="flex items-center gap-[0.4cqw] mt-[0.2cqw]">
               <span>EST. 2016</span>
-              <svg className="w-[1cqw] h-[1cqw] opacity-90 inline" viewBox="0 0 24 24" fill="none" stroke="#ecdcaf" strokeWidth="1.4"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+              <svg className="w-[1cqw] min-w-[7px] h-[1cqw] min-h-[7px] opacity-90 inline" viewBox="0 0 24 24" fill="none" stroke="#ecdcaf" strokeWidth="1.4"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
             </div>
-            <div className="w-[2.4cqw] h-[2px] bg-[#ecdcaf] opacity-70 mt-[0.3cqw]" />
+            <div className="w-[2.4cqw] min-w-[14px] h-[2px] bg-[#ecdcaf] opacity-70 mt-[0.3cqw]" />
           </div>
 
           {/* TOP CENTER */}
           <div className="text-center">
-            <div className="font-mono font-semibold text-[1.4cqw] tracking-[0.22em] text-[#ecdcaf] uppercase">
+            <div className="font-mono font-semibold text-[clamp(7.5px,1.4cqw,20px)] tracking-[0.22em] text-[#ecdcaf] uppercase">
               LIVE MUSIC • HERITAGE • CULTURE
             </div>
             <div className="flex items-center justify-center gap-[0.5cqw] mt-[0.4cqw]">
-              <span className="w-[8cqw] h-[2px] bg-[#d1a437] opacity-80" />
-              <svg className="w-[1cqw] h-[1cqw]" viewBox="0 0 24 24" fill="none" stroke="#d1a437" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <span className="w-[8cqw] min-w-[24px] h-[2px] bg-[#d1a437] opacity-80" />
+              <svg className="w-[1cqw] min-w-[7px] h-[1cqw] min-h-[7px]" viewBox="0 0 24 24" fill="none" stroke="#d1a437" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </div>
           </div>
 
           {/* TOP RIGHT */}
-          <div className="text-[1.05cqw] leading-tight text-right font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
+          <div className="text-[clamp(7px,1.05cqw,16px)] leading-tight text-right font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
             <div className="flex items-center justify-end gap-[0.4cqw]">
               <span>LIVE ARCHIVE</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ecdcaf" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ecdcaf" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
             </div>
             <div className="mt-[0.2cqw]">ISSUE 001 · SIDE A</div>
-            <div className="w-[2.4cqw] h-[2px] bg-[#ecdcaf] opacity-70 mt-[0.3cqw] ml-auto" />
+            <div className="w-[2.4cqw] min-w-[14px] h-[2px] bg-[#ecdcaf] opacity-70 mt-[0.3cqw] ml-auto" />
           </div>
         </div>
 
         {/* STEPWELL SILHOUETTE (z-2) */}
-        <svg className="absolute z-2 left-0 bottom-0 w-[34cqw] h-[36cqw] opacity-55 mix-blend-multiply pointer-events-none" viewBox="0 0 400 420" preserveAspectRatio="xMinYMax meet">
+        <svg className="absolute z-2 left-0 bottom-0 w-[34cqw] min-w-[120px] h-[36cqw] min-h-[140px] opacity-55 mix-blend-multiply pointer-events-none" viewBox="0 0 400 420" preserveAspectRatio="xMinYMax meet">
           <g fill="#3c0f0e">
             <rect x="0" y="360" width="400" height="60"/>
             <rect x="0" y="300" width="360" height="60"/>
@@ -235,13 +235,13 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         <div className="headline absolute z-15 top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none">
           <span 
-            className="word tangy block font-poster text-[clamp(5.5rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410] before:[-webkit-text-stroke:0]" 
+            className="word tangy block font-poster text-[clamp(2.5rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410] before:[-webkit-text-stroke:0]" 
             data-text="TANGY"
           >
             TANGY
           </span>
           <span 
-            className="word sessions block font-poster text-[clamp(4.8rem,14.5cqw,16.5rem)] leading-[0.80] tracking-[-0.01em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative -mt-[0.2cqw] before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410] before:[-webkit-text-stroke:0]" 
+            className="word sessions block font-poster text-[clamp(2.2rem,14.5cqw,16.5rem)] leading-[0.80] tracking-[-0.01em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative -mt-[0.2cqw] before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410] before:[-webkit-text-stroke:0]" 
             data-text="SESSIONS"
           >
             SESSIONS
@@ -256,7 +256,7 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
 
         {/* FAR LEFT: Violinist Girl in White Dress */}
-        <div className="portrait-wrap-far-left absolute z-[18] left-[8%] sm:left-[13%] md:left-[15%] top-[33%] sm:top-[34%] -translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[290px] h-[37vh] sm:h-[41vh] md:h-[39cqw] max-h-[540px] pointer-events-none">
+        <div className="portrait-wrap-far-left absolute z-[18] left-[15%] top-[34%] -translate-x-1/2 w-[15cqw] min-w-[65px] max-w-[290px] h-[39cqw] min-h-[170px] max-h-[540px] pointer-events-none">
           <img 
             src="/media/hero-performer-1-violinist.png" 
             alt="Violinist Performer" 
@@ -265,7 +265,7 @@ export const Hero = () => {
         </div>
 
         {/* INNER LEFT: Kathak Classical Dancer in Orange */}
-        <div className="portrait-wrap-inner-left absolute z-[19] left-[26%] sm:left-[29%] md:left-[31%] top-[32%] sm:top-[33%] -translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[300px] h-[38vh] sm:h-[42vh] md:h-[40cqw] max-h-[550px] pointer-events-none">
+        <div className="portrait-wrap-inner-left absolute z-[19] left-[31%] top-[33%] -translate-x-1/2 w-[15cqw] min-w-[70px] max-w-[300px] h-[40cqw] min-h-[180px] max-h-[550px] pointer-events-none">
           <img 
             src="/media/hero-performer-4-kathak.png" 
             alt="Kathak Classical Dancer Performer" 
@@ -274,7 +274,7 @@ export const Hero = () => {
         </div>
 
         {/* CENTER: Afro Rock Guitarist Guy in Red Jacket */}
-        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[32%] -translate-x-1/2 w-[26vw] sm:w-[22vw] md:w-[19cqw] max-w-[380px] h-[44vh] sm:h-[45vh] md:h-[44cqw] max-h-[620px] pointer-events-none">
+        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[32%] -translate-x-1/2 w-[19cqw] min-w-[95px] max-w-[380px] h-[44cqw] min-h-[200px] max-h-[620px] pointer-events-none">
           <img 
             src="/media/hero-performer-2-guitarist.png" 
             alt="Tangy Afro Rock Guitarist Performer" 
@@ -283,7 +283,7 @@ export const Hero = () => {
         </div>
 
         {/* INNER RIGHT: Veena Classical Musician in Green Saree */}
-        <div className="portrait-wrap-inner-right absolute z-[19] right-[25%] sm:right-[28%] md:right-[30%] top-[33%] sm:top-[34%] translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[300px] h-[37vh] sm:h-[41vh] md:h-[39cqw] max-h-[540px] pointer-events-none">
+        <div className="portrait-wrap-inner-right absolute z-[19] right-[30%] top-[34%] translate-x-1/2 w-[15cqw] min-w-[70px] max-w-[300px] h-[39cqw] min-h-[175px] max-h-[540px] pointer-events-none">
           <img 
             src="/media/hero-performer-3-veena.png" 
             alt="Veena Classical Musician Performer" 
@@ -292,7 +292,7 @@ export const Hero = () => {
         </div>
 
         {/* FAR RIGHT: Hip-Hop Dancer Guy in Blue Sweatshirt */}
-        <div className="portrait-wrap-far-right absolute z-[18] right-[7%] sm:right-[12%] md:right-[14%] top-[33%] sm:top-[34%] translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[290px] h-[38vh] sm:h-[41vh] md:h-[40cqw] max-h-[550px] pointer-events-none">
+        <div className="portrait-wrap-far-right absolute z-[18] right-[14%] top-[34%] translate-x-1/2 w-[15cqw] min-w-[65px] max-w-[290px] h-[40cqw] min-h-[180px] max-h-[550px] pointer-events-none">
           <img 
             src="/media/hero-performer-5-hiphop.png" 
             alt="Hip-Hop Dancer Performer" 
@@ -305,49 +305,49 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         <div 
           ref={ticketRef} 
-          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[75%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[85vw] sm:w-[42cqw] md:w-[34cqw] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:h-[1.5cqw] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:h-[1.5cqw] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
+          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[75%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[38cqw] min-w-[280px] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:min-w-[8px] before:h-[1.5cqw] before:min-h-[8px] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:min-w-[8px] after:h-[1.5cqw] after:min-h-[8px] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
         >
           {/* Masking Tape Overlay (z-61) */}
-          <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] h-[1.8cqw] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
+          <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] min-w-[28px] h-[1.8cqw] min-h-[10px] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
           
-          <div className="w-[3.4cqw] flex items-center justify-center border-r-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[0.85cqw] tracking-[0.08em] text-[#241a12] opacity-75">
+          <div className="w-[3.4cqw] min-w-[16px] flex items-center justify-center border-r-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[clamp(6.5px,0.85cqw,12px)] tracking-[0.08em] text-[#241a12] opacity-75">
             TS-2016-001
           </div>
 
-          <div className="flex-1 p-[1cqw_1.2cqw] flex flex-col justify-between">
-            <div className="flex justify-between items-center font-mono font-semibold text-[0.82cqw] tracking-[0.06em] uppercase opacity-80 border-b-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pb-[0.5cqw]">
+          <div className="flex-1 p-[0.8cqw_1cqw] flex flex-col justify-between">
+            <div className="flex justify-between items-center font-mono font-semibold text-[clamp(6.5px,0.82cqw,12px)] tracking-[0.06em] uppercase opacity-80 border-b-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pb-[0.4cqw]">
               <span>Admit One</span>
               <span>Vol. 01</span>
               <span>Archive No. 001</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-[0.6cqw] my-[0.6cqw]">
+            <div className="flex items-center justify-between gap-[0.6cqw] my-[0.4cqw]">
               <button 
                 type="button"
                 onClick={handleExploreClick}
                 onTouchEnd={(e) => { e.preventDefault(); handleExploreClick(e); }}
-                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[2.2cqw] tracking-[0.01em] flex items-center gap-[0.4cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
+                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[clamp(13px,2.2cqw,28px)] tracking-[0.01em] flex items-center gap-[0.4cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
               >
                 Enter Tangy
-                <svg className="w-[1.4cqw] h-[1.4cqw] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                <svg className="w-[1.4cqw] min-w-[12px] h-[1.4cqw] min-h-[12px] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </button>
 
               <button
                 type="button"
                 onClick={handleBookTicketsClick}
                 onTouchEnd={(e) => { e.preventDefault(); handleBookTicketsClick(e); }}
-                className="book-tickets-hero relative z-[70] pointer-events-auto touch-manipulation font-mono text-[0.8cqw] min-text-[10px] font-bold tracking-[0.1em] uppercase px-[0.8cqw] py-[0.35cqw] bg-[#c2272a] text-[#ecdcaf] border border-[#191410] shadow-[0.18cqw_0.18cqw_0px_#191410] hover:bg-[#191410] hover:text-[#ecdcaf] active:scale-95 transition-all"
+                className="book-tickets-hero relative z-[70] pointer-events-auto touch-manipulation font-mono text-[clamp(7.5px,0.8cqw,12px)] font-bold tracking-[0.1em] uppercase px-[0.8cqw] py-[0.35cqw] bg-[#c2272a] text-[#ecdcaf] border border-[#191410] shadow-[0.18cqw_0.18cqw_0px_#191410] hover:bg-[#191410] hover:text-[#ecdcaf] active:scale-95 transition-all text-nowrap"
               >
                 BOOK TICKETS →
               </button>
             </div>
 
-            <div className="font-mono font-medium text-[0.75cqw] tracking-[0.1em] uppercase text-center opacity-75 border-t-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pt-[0.5cqw]">
+            <div className="font-mono font-medium text-[clamp(6px,0.75cqw,11px)] tracking-[0.1em] uppercase text-center opacity-75 border-t-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pt-[0.4cqw]">
               Live Music · Community · Heritage
             </div>
           </div>
 
-          <div className="w-[3.4cqw] flex items-center justify-center border-l-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[1cqw] tracking-[0.05em] text-[#c2272a]">
+          <div className="w-[3.4cqw] min-w-[16px] flex items-center justify-center border-l-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[clamp(7px,1cqw,13px)] tracking-[0.05em] text-[#c2272a]">
             09100
           </div>
         </div>
@@ -355,9 +355,9 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         {/* SCROLL TO VIEW INDICATOR (z-40)                                */}
         {/* ------------------------------------------------------------- */}
-        <div className="absolute z-40 bottom-[1.8cqw] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 font-mono text-[0.7cqw] min-text-[10px] font-bold tracking-[0.25em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
+        <div className="absolute z-40 bottom-[1.8cqw] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 font-mono text-[clamp(6.5px,0.7cqw,11px)] font-bold tracking-[0.25em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
           <span>SCROLL TO VIEW</span>
-          <svg className="w-[1.1cqw] h-[1.1cqw] min-w-[12px] min-h-[12px] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <svg className="w-[1.1cqw] min-w-[10px] h-[1.1cqw] min-h-[10px] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M12 5v14M19 12l-7 7-7-7" />
           </svg>
         </div>
@@ -366,58 +366,58 @@ export const Hero = () => {
         {/* LABELS & STICKERS (z-40)                                      */}
         {/* ------------------------------------------------------------- */}
         {/* LEFT COLUMN: 33⅓ RPM BADGE */}
-        <div className="badge absolute z-40 left-[2.5cqw] top-[18%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
-          <div className="font-poster text-[2.5cqw] leading-[0.9]">33<span className="text-[1.1cqw] align-super">⅓</span></div>
-          <div className="font-mono font-bold text-[1.1cqw] tracking-[0.08em] mt-[0.1cqw]">RPM</div>
-          <svg className="w-[0.85cqw] h-[0.85cqw] mt-[0.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
-          <div className="font-mono font-semibold text-[0.9cqw] tracking-[0.15em] mt-[0.25cqw]">STEREO</div>
+        <div className="badge absolute z-40 left-[2.5cqw] top-[18%] w-[11cqw] min-w-[50px] max-w-[11cqw] h-[11cqw] min-h-[50px] max-h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
+          <div className="font-poster text-[clamp(9px,2.5cqw,36px)] leading-[0.9]">33<span className="text-[clamp(5px,1.1cqw,16px)] align-super">⅓</span></div>
+          <div className="font-mono font-bold text-[clamp(5px,1.1cqw,14px)] tracking-[0.08em] mt-[0.1cqw]">RPM</div>
+          <svg className="w-[0.85cqw] min-w-[6px] h-[0.85cqw] min-h-[6px] mt-[0.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
+          <div className="font-mono font-semibold text-[clamp(4px,0.9cqw,12px)] tracking-[0.15em] mt-[0.25cqw]">STEREO</div>
         </div>
 
         {/* LEFT COLUMN: LIVE AND REAL TAPE STICKER */}
-        <div className="badge absolute z-40 left-[16.5%] top-[20%] bg-[#191410] text-[#ecdcaf] p-[0.8cqw_1.2cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
-          <div className="absolute -top-[0.8cqw] left-1/2 -translate-x-1/2 -rotate-3 w-[4cqw] h-[1.5cqw] bg-[rgba(230,220,190,0.55)] border border-[rgba(255,255,255,0.3)]" />
-          <div className="font-mono font-bold text-[1.45cqw] tracking-[0.04em]">LIVE</div>
-          <div className="font-mono font-medium text-[0.9cqw] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>
+        <div className="badge absolute z-40 left-[16.5%] top-[20%] bg-[#191410] text-[#ecdcaf] p-[0.6cqw_1cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
+          <div className="absolute -top-[0.8cqw] left-1/2 -translate-x-1/2 -rotate-3 w-[4cqw] min-w-[16px] h-[1.5cqw] min-h-[6px] bg-[rgba(230,220,190,0.55)] border border-[rgba(255,255,255,0.3)]" />
+          <div className="font-mono font-bold text-[clamp(6.5px,1.45cqw,18px)] tracking-[0.04em]">LIVE</div>
+          <div className="font-mono font-medium text-[clamp(4.5px,0.9cqw,12px)] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>
         </div>
 
         {/* LEFT COLUMN: BANSILALPET STEPWELL TAG */}
         <div className="badge absolute z-40 left-[3cqw] bottom-[16%] bg-[#191410] text-[#ecdcaf] -rotate-4 p-[0.8cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.45)] pointer-events-none">
-          <div className="font-mono font-bold text-[1.1cqw] tracking-[0.03em] leading-[1.2]">BANSILALPET</div>
-          <div className="font-mono font-bold text-[1.1cqw] tracking-[0.03em] leading-[1.2]">STEPWELL ★</div>
+          <div className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.03em] leading-[1.2]">BANSILALPET</div>
+          <div className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.03em] leading-[1.2]">STEPWELL ★</div>
         </div>
 
         {/* RIGHT COLUMN: RECORDED LIVE STAMP */}
-        <div className="badge absolute z-40 right-[2.5cqw] top-[38%] w-[9cqw] h-[9cqw] rounded-full border-[0.2cqw] border-dashed border-[#ecdcaf] outline-[0.05cqw] outline-solid outline-[#c2272a] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.4)] pointer-events-none">
+        <div className="badge absolute z-40 right-[2.5cqw] top-[38%] w-[9cqw] min-w-[45px] max-w-[9cqw] h-[9cqw] min-h-[45px] max-h-[9cqw] rounded-full border-[0.2cqw] border-dashed border-[#ecdcaf] outline-[0.05cqw] outline-solid outline-[#c2272a] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.4)] pointer-events-none">
           <div className="text-center">
-            <div className="font-mono font-semibold text-[0.7cqw] tracking-[0.1em] text-[#ecdcaf]">RECORDED</div>
-            <div className="font-poster text-[2cqw] text-[#c2272a] leading-none my-[0.1cqw]">LIVE</div>
-            <div className="font-mono font-semibold text-[0.6cqw] tracking-[0.08em] text-[#ecdcaf]">AT STEPWELL</div>
+            <div className="font-mono font-semibold text-[clamp(4px,0.7cqw,10px)] tracking-[0.1em] text-[#ecdcaf]">RECORDED</div>
+            <div className="font-poster text-[clamp(8px,2cqw,26px)] text-[#c2272a] leading-none my-[0.1cqw]">LIVE</div>
+            <div className="font-mono font-semibold text-[clamp(3.5px,0.6cqw,9px)] tracking-[0.08em] text-[#ecdcaf]">AT STEPWELL</div>
           </div>
         </div>
 
         {/* RIGHT COLUMN: INHERIT THE PAST TAG */}
         <div className="badge absolute z-40 right-[11%] top-[74%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.6cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)] text-center pointer-events-none">
-          <div className="font-mono font-bold text-[1cqw] tracking-[0.2em]">INHERIT THE PAST</div>
-          <div className="font-mono font-bold text-[1cqw] tracking-[0.2em]">CREATE THE FUTURE</div>
+          <div className="font-mono font-bold text-[clamp(5.5px,1cqw,13px)] tracking-[0.2em]">INHERIT THE PAST</div>
+          <div className="font-mono font-bold text-[clamp(5.5px,1cqw,13px)] tracking-[0.2em]">CREATE THE FUTURE</div>
         </div>
 
         {/* RIGHT COLUMN: REC TAG */}
         <div className="badge absolute z-40 right-[3.5cqw] top-[78%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.4)] pointer-events-none">
-          <span className="font-mono font-bold text-[1.1cqw] tracking-[0.06em]">REC</span>
-          <div className="w-[0.8cqw] h-[0.8cqw] rounded-full bg-[#c2272a] shadow-[0_0_0.4cqw_#c2272a]" />
+          <span className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.06em]">REC</span>
+          <div className="w-[0.8cqw] min-w-[5px] h-[0.8cqw] min-h-[5px] rounded-full bg-[#c2272a] shadow-[0_0_0.4cqw_#c2272a]" />
         </div>
 
         {/* RIGHT COLUMN: KEEP THE CULTURE ALIVE + SIGNATURE */}
         <div className="badge absolute z-40 right-[5.5cqw] bottom-[10%] text-left text-[#ecdcaf] pointer-events-none">
-          <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">KEEP</div>
-          <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">THE CULTURE</div>
-          <div className="font-mono font-semibold text-[1.4cqw] leading-[1.12] tracking-[0.01em]">ALIVE ★</div>
+          <div className="font-mono font-semibold text-[clamp(7.5px,1.4cqw,18px)] leading-[1.12] tracking-[0.01em]">KEEP</div>
+          <div className="font-mono font-semibold text-[clamp(7.5px,1.4cqw,18px)] leading-[1.12] tracking-[0.01em]">THE CULTURE</div>
+          <div className="font-mono font-semibold text-[clamp(7.5px,1.4cqw,18px)] leading-[1.12] tracking-[0.01em]">ALIVE ★</div>
           <div className="flex items-center gap-[0.4cqw] mt-[0.3cqw]">
-            <svg className="w-[1.2cqw] h-[1.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
+            <svg className="w-[1.2cqw] min-w-[8px] h-[1.2cqw] min-h-[8px]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
             <span className="flex-1 h-[1px] bg-[#d1a437] opacity-70 max-w-[2.8cqw]" />
           </div>
         </div>
-        <div className="badge absolute z-40 right-[3cqw] bottom-[4%] font-serif italic font-bold text-[3cqw] text-[#d1a437] -rotate-6 drop-shadow-[0.08cqw_0.1cqw_0_rgba(0,0,0,0.3)] pointer-events-none">
+        <div className="badge absolute z-40 right-[3cqw] bottom-[4%] font-serif italic font-bold text-[clamp(16px,3cqw,42px)] text-[#d1a437] -rotate-6 drop-shadow-[0.08cqw_0.1cqw_0_rgba(0,0,0,0.3)] pointer-events-none">
           Tangy
         </div>
 

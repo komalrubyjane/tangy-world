@@ -189,11 +189,6 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
             alt="Tangy Vintage Suspended Microphone" 
             className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] contrast-125 block"
           />
-
-          {/* Audio Micro-Pulse Glow when Sound is ON */}
-          {isAudioEnabled && !isMuted && (
-            <div className="absolute inset-0 bg-[#C99A2E]/15 rounded-full blur-xs animate-pulse pointer-events-none" />
-          )}
         </div>
       </div>
     </div>

@@ -164,104 +164,78 @@ function MainWorld() {
         onOpenPostcard={() => setIsPostcardOpen(true)}
       />
 
-      {/* DEDICATED HANDCRAFTED MOBILE LAYOUT (<1024px) */}
-      {isMobile ? (
-        <>
-          {/* Theatre Curtain Opening for Mobile */}
-          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+      {/* UNIFIED SINGLE MASTER SITE EXPERIENCE FOR ALL SCREEN SIZES */}
+      <>
+        {/* Temporary Theatre Curtain Opening Overlay */}
+        <CurtainOverlay onComplete={() => setShowUiControls(true)} />
 
-          {/* Cinematic Deep Space Intro for Mobile */}
-          {isIntroActive && (
-            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
-          )}
+        {/* Global Continuous Hanging Microphone Experience */}
+        <GlobalMicrophoneJourney active={showUiControls} />
 
-          <MobileLayout 
-            onSelectBooking={handleNavigateBooking}
-            onArtistSubmit={handleNavigateCrew}
-            onRequestPrivate={handleNavigatePrivate}
-            onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-            onOpenVinyl={() => setIsVinylOpen(true)}
-            onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-            onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-            onOpenShop={() => setIsShopOpen(true)}
-            onOpenPassport={() => setIsPassportOpen(true)}
-            onOpenPostcard={() => setIsPostcardOpen(true)}
-          />
-        </>
-      ) : (
-        /* DESKTOP EXPERIENCE (>=1024px) */
-        <>
-          {/* Temporary Theatre Curtain Opening Overlay */}
-          <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+        {/* Cinematic Deep Space Intro */}
+        {isIntroActive && (
+          <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
+        )}
 
-          {/* Global Continuous Hanging Microphone Experience */}
-          <GlobalMicrophoneJourney active={showUiControls} />
+        {/* Floating Retro Sound Control */}
+        {showUiControls && <SoundControl />}
+        
+        {/* Fixed 1970s Printed Navbar */}
+        {showUiControls && (
+          <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
+        )}
+        
+        {/* Vintage Concert Programme Overlay */}
+        <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
+        
+        {/* Lightweight Grain Texture */}
+        <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+        
+        {/* Vignette */}
+        <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
 
-          {/* Cinematic Deep Space Intro */}
-          {isIntroActive && (
-            <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
-          )}
+        {/* Scroll Progress Rail */}
+        <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
+           <div 
+             className="w-full bg-tangy-mustard"
+             style={{ height: `${progress}%` }}
+           />
+        </div>
 
-          {/* Floating Retro Sound Control */}
-          {showUiControls && <SoundControl />}
+        <div className="tangy-world pt-12">
+          <main>
+            {/* 01 — LANDING PAGE (HERO) */}
+            <Hero />
+
+            {/* 02 — WHY TANGY */}
+            <Manifesto />
+
+            {/* 03 — SESSIONS */}
+            <UpcomingEvents onSelectBooking={handleNavigateBooking} />
+
+            {/* 04 — ARCHIVE */}
+            <Archive />
+
+            {/* 05 — JOIN THE CREW & 06 — LET'S BUILD THIS WORLD TOGETHER */}
+            <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
+
+            {/* 07 — PRIVATE SESSIONS */}
+            <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
+
+            {/* 08 — TANGY DIARY */}
+            <TangyDiary />
+
+            {/* 09 — INNER CIRCLE */}
+            <Newsletter />
+
+            {/* 10 — COME FIND US */}
+            <Closing />
+          </main>
           
-          {/* Fixed 1970s Printed Navbar */}
-          {showUiControls && (
-            <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
-          )}
-          
-          {/* Vintage Concert Programme Overlay */}
-          <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
-          
-          {/* Lightweight Grain Texture */}
-          <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
-          
-          {/* Vignette */}
-          <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
-
-          {/* Scroll Progress Rail */}
-          <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
-             <div 
-               className="w-full bg-tangy-mustard"
-               style={{ height: `${progress}%` }}
-             />
-          </div>
-
-          <div className="tangy-world pt-12">
-            <main>
-              {/* 01 — LANDING PAGE (HERO) */}
-              <Hero />
-
-              {/* 02 — WHY TANGY */}
-              <Manifesto />
-
-              {/* 03 — SESSIONS */}
-              <UpcomingEvents onSelectBooking={handleNavigateBooking} />
-
-              {/* 04 — ARCHIVE */}
-              <Archive />
-
-              {/* 05 — JOIN THE CREW & 06 — LET'S BUILD THIS WORLD TOGETHER */}
-              <Volunteer onApplyVolunteer={handleNavigateCrew} onApplyArtist={handleNavigateArtist} />
-
-              {/* 07 — PRIVATE SESSIONS */}
-              <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
-
-              {/* 08 — TANGY DIARY */}
-              <TangyDiary />
-
-              {/* 09 — INNER CIRCLE */}
-              <Newsletter />
-
-              {/* 10 — COME FIND US */}
-              <Closing />
-            </main>
-            
-            {/* 11 — FOOTER */}
-            <Footer />
-          </div>
-        </>
-      )}
+          {/* 11 — FOOTER */}
+          <Footer />
+        </div>
+      </>
     </>
   );
 }

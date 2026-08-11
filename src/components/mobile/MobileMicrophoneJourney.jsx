@@ -133,9 +133,6 @@ export const MobileMicrophoneJourney = () => {
             <rect x="-20" y="86" width="40" height="14" rx="4" fill="#3a3d3f" stroke="#141110" strokeWidth="2.2" />
             <rect x="-8" y="100" width="16" height="28" fill="#2a2d30" stroke="#141110" strokeWidth="2" />
           </g>
-
-          {/* Warm Acoustic Spotlight Glow Ring */}
-          <circle cx="50" cy="65" r="48" fill="none" stroke="#d1a437" strokeWidth="1" opacity="0.25" strokeDasharray="3 3" />
         </svg>
       </div>
 
