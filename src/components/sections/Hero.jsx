@@ -43,13 +43,20 @@ export const Hero = () => {
       ease: 'power3.out'
     });
 
-    gsap.from('.portrait-wrap', {
+    // All 5 Performer Cutouts Fade Up One By One in Sequence
+    gsap.from([
+      '.portrait-wrap-far-left',
+      '.portrait-wrap-inner-left',
+      '.portrait-wrap-center',
+      '.portrait-wrap-inner-right',
+      '.portrait-wrap-far-right'
+    ], {
       opacity: 0,
-      scale: 0.85,
-      y: 40,
-      duration: 1.1,
-      delay: 0.2,
-      ease: 'back.out(1.2)'
+      y: 50,
+      duration: 1.0,
+      stagger: 0.15,
+      delay: 0.25,
+      ease: 'power3.out'
     });
 
     gsap.from('.hero-ticket', {
@@ -72,7 +79,11 @@ export const Hero = () => {
     // Scroll Scrub Movement Sync
     tl.to('.headline .word.tangy', { y: -15, duration: 0.3 }, 0.1)
       .to('.headline .word.sessions', { y: 15, duration: 0.3 }, 0.1)
-      .to('.portrait-wrap', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
+      .to('.portrait-wrap-far-left', { y: -16, scale: 1.01, duration: 0.4 }, 0.2)
+      .to('.portrait-wrap-inner-left', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
+      .to('.portrait-wrap-center', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
+      .to('.portrait-wrap-inner-right', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
+      .to('.portrait-wrap-far-right', { y: -16, scale: 1.01, duration: 0.4 }, 0.2)
       .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2)
       .to('.mic', { rotation: 3, duration: 0.4 }, 0.1);
 
@@ -86,7 +97,11 @@ export const Hero = () => {
       const moveX = (clientX / window.innerWidth - 0.5) * 16;
       const moveY = (clientY / window.innerHeight - 0.5) * 16;
 
-      gsap.to('.portrait-wrap', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.portrait-wrap-far-left', { x: moveX * 0.16, y: moveY * 0.16, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.portrait-wrap-inner-left', { x: moveX * 0.20, y: moveY * 0.20, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.portrait-wrap-center', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.portrait-wrap-inner-right', { x: moveX * 0.21, y: moveY * 0.21, duration: 1.2, ease: 'power2.out' });
+      gsap.to('.portrait-wrap-far-right', { x: moveX * 0.17, y: moveY * 0.17, duration: 1.2, ease: 'power2.out' });
       gsap.to('.mic', { x: moveX * 0.35, y: moveY * 0.35, duration: 1.2, ease: 'power2.out' });
       gsap.to('.hero-ticket', { x: moveX * 0.15, y: moveY * 0.15, duration: 1.2, ease: 'power2.out' });
       gsap.to('.headline', { x: moveX * 0.08, y: moveY * 0.08, duration: 1.2, ease: 'power2.out' });
@@ -234,13 +249,54 @@ export const Hero = () => {
         </div>
 
         {/* ------------------------------------------------------------- */}
-        {/* 1970S PERFORMER CUTOUT IMAGE (z-20)                            */}
+        {/* 5-PERFORMER ENSEMBLE COMPOSITION                               */}
+        {/* Center: Afro Guitarist (z-20)                                  */}
+        {/* Inner Left: Kathak Dancer (z-19), Inner Right: Veena (z-19)     */}
+        {/* Far Left: Violinist (z-18), Far Right: Hip-hop Dancer (z-18)   */}
         {/* ------------------------------------------------------------- */}
-        <div className="portrait-wrap absolute z-20 left-[50%] top-[34%] -translate-x-1/2 w-[22cqw] max-w-[420px] h-[44cqw] max-h-[640px] pointer-events-none">
+
+        {/* FAR LEFT: Violinist Girl in White Dress */}
+        <div className="portrait-wrap-far-left absolute z-[18] left-[8%] sm:left-[13%] md:left-[15%] top-[33%] sm:top-[34%] -translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[290px] h-[37vh] sm:h-[41vh] md:h-[39cqw] max-h-[540px] pointer-events-none">
           <img 
-            src="/media/hero-performer.png" 
-            alt="Tangy 1970s Performer Cutout" 
-            className="relative w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)] z-2" 
+            src="/media/hero-performer-1-violinist.png" 
+            alt="Violinist Performer" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" 
+          />
+        </div>
+
+        {/* INNER LEFT: Kathak Classical Dancer in Orange */}
+        <div className="portrait-wrap-inner-left absolute z-[19] left-[26%] sm:left-[29%] md:left-[31%] top-[32%] sm:top-[33%] -translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[300px] h-[38vh] sm:h-[42vh] md:h-[40cqw] max-h-[550px] pointer-events-none">
+          <img 
+            src="/media/hero-performer-4-kathak.png" 
+            alt="Kathak Classical Dancer Performer" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_14px_26px_rgba(0,0,0,0.6)]" 
+          />
+        </div>
+
+        {/* CENTER: Afro Rock Guitarist Guy in Red Jacket */}
+        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[32%] -translate-x-1/2 w-[26vw] sm:w-[22vw] md:w-[19cqw] max-w-[380px] h-[44vh] sm:h-[45vh] md:h-[44cqw] max-h-[620px] pointer-events-none">
+          <img 
+            src="/media/hero-performer-2-guitarist.png" 
+            alt="Tangy Afro Rock Guitarist Performer" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.7)] z-2" 
+          />
+        </div>
+
+        {/* INNER RIGHT: Veena Classical Musician in Green Saree */}
+        <div className="portrait-wrap-inner-right absolute z-[19] right-[25%] sm:right-[28%] md:right-[30%] top-[33%] sm:top-[34%] translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[300px] h-[37vh] sm:h-[41vh] md:h-[39cqw] max-h-[540px] pointer-events-none">
+          <img 
+            src="/media/hero-performer-3-veena.png" 
+            alt="Veena Classical Musician Performer" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_14px_26px_rgba(0,0,0,0.6)]" 
+          />
+        </div>
+
+        {/* FAR RIGHT: Hip-Hop Dancer Guy in Blue Sweatshirt */}
+        <div className="portrait-wrap-far-right absolute z-[18] right-[7%] sm:right-[12%] md:right-[14%] top-[33%] sm:top-[34%] translate-x-1/2 w-[24vw] sm:w-[18vw] md:w-[15cqw] max-w-[290px] h-[38vh] sm:h-[41vh] md:h-[40cqw] max-h-[550px] pointer-events-none">
+          <img 
+            src="/media/hero-performer-5-hiphop.png" 
+            alt="Hip-Hop Dancer Performer" 
+            className="relative w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" 
           />
         </div>
 
@@ -310,7 +366,7 @@ export const Hero = () => {
         {/* LABELS & STICKERS (z-40)                                      */}
         {/* ------------------------------------------------------------- */}
         {/* LEFT COLUMN: 33⅓ RPM BADGE */}
-        <div className="badge absolute z-40 left-[2.5cqw] top-[40%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
+        <div className="badge absolute z-40 left-[2.5cqw] top-[18%] w-[11cqw] h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
           <div className="font-poster text-[2.5cqw] leading-[0.9]">33<span className="text-[1.1cqw] align-super">⅓</span></div>
           <div className="font-mono font-bold text-[1.1cqw] tracking-[0.08em] mt-[0.1cqw]">RPM</div>
           <svg className="w-[0.85cqw] h-[0.85cqw] mt-[0.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
@@ -318,7 +374,7 @@ export const Hero = () => {
         </div>
 
         {/* LEFT COLUMN: LIVE AND REAL TAPE STICKER */}
-        <div className="badge absolute z-40 left-[16.5%] top-[42%] bg-[#191410] text-[#ecdcaf] p-[0.8cqw_1.2cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
+        <div className="badge absolute z-40 left-[16.5%] top-[20%] bg-[#191410] text-[#ecdcaf] p-[0.8cqw_1.2cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
           <div className="absolute -top-[0.8cqw] left-1/2 -translate-x-1/2 -rotate-3 w-[4cqw] h-[1.5cqw] bg-[rgba(230,220,190,0.55)] border border-[rgba(255,255,255,0.3)]" />
           <div className="font-mono font-bold text-[1.45cqw] tracking-[0.04em]">LIVE</div>
           <div className="font-mono font-medium text-[0.9cqw] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>

@@ -70,7 +70,7 @@ export const MuseumQuickDock = ({
 
       <span className="text-[#C99A2E]/40 font-mono text-xs font-bold">|</span>
 
-      {/* 3. STORE (WITH COMING SOON BADGE) */}
+      {/* 3. KIRANA (WITH COMING SOON BADGE) */}
       <div 
         className="relative group flex items-center"
         onMouseEnter={() => setActiveTooltip('store')}
@@ -81,14 +81,14 @@ export const MuseumQuickDock = ({
           className="px-2.5 py-1 font-mono text-[9.5px] md:text-[10.5px] font-bold tracking-wider text-[#E7D5A4] hover:text-[#C99A2E] flex items-center gap-1 hover:scale-105 active:scale-95 transition-all text-nowrap"
         >
           <span className="text-xs">🛍️</span>
-          <span>STORE</span>
+          <span>KIRANA</span>
           <span className="bg-[#C2272A] text-white text-[7px] px-1 py-0.5 rounded font-mono font-bold tracking-tighter ml-0.5 animate-pulse">
             COMING SOON
           </span>
         </button>
         {activeTooltip === 'store' && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
-            Official Tangy Merchandise [Coming Soon]
+            Tangy Kirana Store [Coming Soon]
           </div>
         )}
       </div>

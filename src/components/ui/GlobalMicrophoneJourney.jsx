@@ -117,9 +117,10 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         const vh = window.innerHeight;
         const isMobile = window.innerWidth < 768;
         
-        // Microphone display width & top connector X offset (58.5% of width)
+        // Microphone display dimensions & top metal connector offset (59.8% X, 0px Y)
         const micWidth = isMobile ? 48 : 56;
-        const connectorXOffset = micWidth * 0.585;
+        const micHeight = isMobile ? 101 : 118;
+        const connectorXOffset = micWidth * 0.598;
 
         // Position microphone suspended near ~55% of user's active viewport
         const targetDocY = currentScrollY.current + (vh * 0.55);
@@ -137,7 +138,7 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         let angleDeg = (angleRad * (180 / Math.PI)) - 90;
         angleDeg = Math.min(6, Math.max(-6, angleDeg)); // Natural subtle pendulum sway (-6deg to +6deg)
 
-        // Translate so top metal connector (58.5%, 0px) meets (pt.x, pt.y) exactly with 0 gap
+        // Translate so top metal connector hole (59.8%, 0px) meets (pt.x, pt.y) with 0 gap
         micObj.style.transform = `translate3d(${pt.x - connectorXOffset}px, ${pt.y}px, 0px) rotate(${angleDeg}deg)`;
       }
 
@@ -176,11 +177,11 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         />
       </svg>
 
-      {/* 2. SUSPENDED MICROPHONE HEAD (Tightly cropped asset starting at metal connector top pixel) */}
+      {/* 2. SUSPENDED MICROPHONE HEAD (Top connector at 59.8% X, 0px Y) */}
       <div 
         ref={micHeadRef}
-        className="absolute top-0 left-0 w-[48px] h-[114px] md:w-[56px] md:h-[133px] pointer-events-none z-[86] flex flex-col items-center will-change-transform"
-        style={{ transformOrigin: '58.5% 0px' }}
+        className="absolute top-0 left-0 w-[48px] h-[101px] md:w-[56px] md:h-[118px] pointer-events-none z-[86] flex flex-col items-center will-change-transform"
+        style={{ transformOrigin: '59.8% 0px' }}
       >
         <div className="relative w-full h-full">
           <img 

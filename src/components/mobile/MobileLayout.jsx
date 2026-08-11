@@ -88,7 +88,7 @@ export const MobileLayout = ({
     { label: "13 VINYL TURNTABLE", action: onOpenVinyl },
     { label: "14 SOUND ARCHIVE", action: onOpenSoundArchive },
     { label: "15 TODAY'S PROGRAMME", action: onOpenProgramme },
-    { label: "16 GENERAL STORE", action: onOpenShop },
+    { label: "16 TANGY KIRANA", action: onOpenShop },
     { label: "17 MEMBER PASSPORT", action: onOpenPassport },
     { label: "18 POSTCARD MAILBOX", action: onOpenPostcard }
   ];
@@ -284,12 +284,49 @@ export const MobileLayout = ({
             </span>
           </div>
 
-          {/* 1970S SCREEN-PRINTED PERFORMER CUTOUT IMAGE (z-20) */}
-          <div className="portrait-wrap absolute z-20 left-1/2 -translate-x-1/2 top-[32%] w-[72vw] max-w-[310px] h-[55vh] max-h-[460px] pointer-events-none opacity-98">
+          {/* 5-PERFORMER ENSEMBLE COMPOSITION */}
+          {/* FAR LEFT: Violinist Girl */}
+          <div className="portrait-wrap-far-left absolute z-[17] left-[7%] top-[34%] -translate-x-1/2 w-[28vw] max-w-[130px] h-[36vh] max-h-[290px] pointer-events-none opacity-85">
             <img 
-              src="/media/hero-performer.png" 
-              alt="Tangy 1970s Performer Cutout" 
+              src="/media/hero-performer-1-violinist.png" 
+              alt="Violinist Performer" 
+              className="relative w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]" 
+            />
+          </div>
+
+          {/* INNER LEFT: Kathak Classical Dancer */}
+          <div className="portrait-wrap-inner-left absolute z-[18] left-[25%] top-[33%] -translate-x-1/2 w-[30vw] max-w-[145px] h-[38vh] max-h-[310px] pointer-events-none opacity-90">
+            <img 
+              src="/media/hero-performer-4-kathak.png" 
+              alt="Kathak Classical Dancer Performer" 
+              className="relative w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" 
+            />
+          </div>
+
+          {/* CENTER: Afro Rock Guitarist Guy */}
+          <div className="portrait-wrap-center absolute z-20 left-1/2 -translate-x-1/2 top-[31%] w-[66vw] max-w-[290px] h-[52vh] max-h-[440px] pointer-events-none opacity-98">
+            <img 
+              src="/media/hero-performer-2-guitarist.png" 
+              alt="Tangy Afro Rock Guitarist Performer" 
               className="relative w-full h-full object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.7)] z-2" 
+            />
+          </div>
+
+          {/* INNER RIGHT: Veena Classical Musician */}
+          <div className="portrait-wrap-inner-right absolute z-[18] right-[24%] top-[34%] translate-x-1/2 w-[30vw] max-w-[145px] h-[37vh] max-h-[300px] pointer-events-none opacity-90">
+            <img 
+              src="/media/hero-performer-3-veena.png" 
+              alt="Veena Classical Musician Performer" 
+              className="relative w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" 
+            />
+          </div>
+
+          {/* FAR RIGHT: Hip-Hop Dancer Guy */}
+          <div className="portrait-wrap-far-right absolute z-[17] right-[6%] top-[34%] translate-x-1/2 w-[28vw] max-w-[130px] h-[37vh] max-h-[290px] pointer-events-none opacity-85">
+            <img 
+              src="/media/hero-performer-5-hiphop.png" 
+              alt="Hip-Hop Dancer Performer" 
+              className="relative w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]" 
             />
           </div>
 
@@ -347,7 +384,7 @@ export const MobileLayout = ({
           {/* BALANCED BADGES & EPHEMERA (z-40) */}
           
           {/* LEFT SIDE BADGES */}
-          <div className="badge absolute z-40 left-2 top-[34%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
+          <div className="badge absolute z-40 left-2 top-[18%] w-16 h-16 rounded-full bg-[#ecdcaf] border-2 border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-md -rotate-6 pointer-events-none">
             <div className="font-poster text-xs leading-none">33⅓</div>
             <div className="font-mono font-bold text-[7px] tracking-widest">RPM</div>
             <div className="font-mono text-[6px] tracking-widest">STEREO</div>

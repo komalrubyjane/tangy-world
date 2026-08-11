@@ -28,7 +28,7 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
         {/* HEADER */}
         <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-3">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#d1a437] tracking-[0.3em]">🛒 VINTAGE GENERAL STORE // MERCHANDISE</span>
+            <span className="font-mono text-xs font-bold text-[#d1a437] tracking-[0.3em]">🛒 VINTAGE TANGY KIRANA // MERCHANDISE</span>
             <span className="font-mono text-[9px] text-[#ecdcaf]/70">LIMITED PRESSINGS</span>
           </div>
           <button 
