@@ -192,7 +192,7 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         {/* CENTERED TYPOGRAPHY "TANGY SESSIONS" (z-15)                    */}
         {/* ------------------------------------------------------------- */}
-        <div className="headline absolute z-15 top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none">
+        <div className="headline absolute z-15 top-[12cqw] lg:top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none">
           <span 
             className="word tangy block font-poster text-[clamp(2.5rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410] before:[-webkit-text-stroke:0]" 
             data-text="TANGY"

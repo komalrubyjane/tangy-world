@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -9,15 +9,20 @@ const PAPER_BG = 'linear-gradient(170deg, #F5EEE0 0%, #EADFC5 45%, #E3D4AC 100%)
 const SH_R = 'inset -8px 0 20px rgba(90,64,50,0.18), 8px 10px 32px rgba(0,0,0,0.48)';
 const SH_L = 'inset  8px 0 20px rgba(90,64,50,0.18), -8px 10px 32px rgba(0,0,0,0.48)';
 
-const leafStyle = (i) => ({
-  position: 'absolute',
-  top: 0, right: 0, bottom: 0,
-  width: '50%',
-  transformOrigin: 'left center',
-  transformStyle: 'preserve-3d',
-  zIndex: 10 - i,
-  willChange: 'transform',
-});
+const leafStyle = (i, mobileTurnedState) => {
+  const isTurned = mobileTurnedState !== undefined ? mobileTurnedState : false;
+  return {
+    position: 'absolute',
+    top: 0, right: 0, bottom: 0,
+    width: '50%',
+    transformOrigin: 'left center',
+    transformStyle: 'preserve-3d',
+    zIndex: isTurned ? 10 + i : 10 - i,
+    transform: isTurned ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+    transition: 'transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+    willChange: 'transform',
+  };
+};
 
 const frontFace = (extra = {}) => ({
   position: 'absolute', inset: 0,
@@ -36,379 +41,26 @@ const backFace = (extra = {}) => ({
   ...extra,
 });
 
-// Mobile Interactive Touch Swipe-To-Turn-Pages Diary Component
-const MobileSwipeDiary = () => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [flipDirection, setFlipDirection] = useState('next');
-  
+export const TangyDiary = () => {
+  const sectionRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [currentMobileLeaf, setCurrentMobileLeaf] = useState(0);
+
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isHorizontalSwipe = useRef(false);
 
-  const pages = [
-    // Page 0: Cover
-    {
-      id: 'cover',
-      type: 'cover',
-      title: 'TANGY DIARY',
-      subtitle: 'Field Notes · Vol. I',
-      date: 'Hyderabad · Since 2016',
-      number: 'Archive No. 001',
-    },
-    // Page 1: Stepwell
-    {
-      id: 'spread1',
-      spread: 'Spread #01',
-      date: '14 Oct, 2024',
-      title: 'The Beginning & Bansilalpet Stepwell',
-      location: 'BANSILALPET STEPWELL',
-      content: 'The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.',
-      note: 'Echo off 350-year-old stone.',
-      botanical: 'stem',
-    },
-    // Page 2: Monsoon
-    {
-      id: 'spread2',
-      spread: 'Spread #02',
-      date: '21 Dec, 2024',
-      title: 'Monsoon Acoustics & Old City Haveli',
-      tag: '300 AUDIENCE // MIDNIGHT',
-      content: 'When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air.',
-      note: '300 people stayed till sunrise.',
-      botanical: 'wildflower',
-    },
-    // Page 3: Performers
-    {
-      id: 'spread3',
-      spread: 'Spread #03',
-      date: '05 Jan, 2025',
-      title: 'Artists & Performers',
-      content: 'The artists gathered around ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant.',
-      badge: 'PERFORMER PASS // BACKSTAGE',
-      botanical: 'daisy',
-    },
-    // Page 4: Backstage
-    {
-      id: 'spread4',
-      spread: 'Spread #04',
-      date: 'Backstage',
-      title: 'Backstage Notes & Hidden Spaces',
-      content: 'A 300-year-old sanctuary tucked behind stone arches. We mapped the acoustics by hand, with no digital tools.',
-      box: '[ NORTH WALL: REVERB 1.8s ]\n[ SOUTHERN ARCH: BASS TRAP ]',
-    },
-    // Page 5: Handwritten Note Card
-    {
-      id: 'spread5',
-      spread: 'Spread #05',
-      date: 'Community',
-      type: 'letter',
-      title: 'Dear You,',
-      content: 'Every gathering leaves something behind.\n\nA song.\nA conversation.\nA place.\nA memory.\n\nAnd somehow, we carry it with us.',
-      author: '— Tangy',
-    },
-    // Page 6: Final Page
-    {
-      id: 'spread6',
-      type: 'end',
-      label: 'Continue Reading',
-      title: 'More stories are waiting.',
-      content: 'The diary continues with every new Tangy Session.',
-      footer: 'TANGY DIARY · FIELD NOTES · VOL. I',
-    }
-  ];
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-  const handleNext = () => {
-    if (currentPage < pages.length - 1 && !isFlipping) {
-      setFlipDirection('next');
-      setIsFlipping(true);
-      setTimeout(() => {
-        setCurrentPage((prev) => prev + 1);
-        setIsFlipping(false);
-      }, 250);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentPage > 0 && !isFlipping) {
-      setFlipDirection('prev');
-      setIsFlipping(true);
-      setTimeout(() => {
-        setCurrentPage((prev) => prev - 1);
-        setIsFlipping(false);
-      }, 250);
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isHorizontalSwipe.current = false;
-  };
-
-  const handleTouchMove = (e) => {
-    const deltaX = e.touches[0].clientX - touchStartX.current;
-    const deltaY = e.touches[0].clientY - touchStartY.current;
-
-    // Determine if user is swiping horizontally
-    if (!isHorizontalSwipe.current && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-      isHorizontalSwipe.current = true;
-    }
-  };
-
-  const handleTouchEnd = (e) => {
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    if (isHorizontalSwipe.current && Math.abs(deltaX) > 35) {
-      if (deltaX < 0) {
-        handleNext();
-      } else {
-        handlePrev();
-      }
-    }
-  };
-
-  const page = pages[currentPage];
-
-  return (
-    <div className="mobile-diary-wrap lg:hidden w-full px-4 pt-28 pb-16 flex flex-col items-center select-none"
-      style={{ background: 'linear-gradient(180deg, #241A14 0%, #1F1713 100%)', touchAction: 'pan-y' }}>
-
-      {/* Archival Section Label */}
-      <div className="font-mono text-[9px] text-[#A68853] tracking-[0.25em] font-bold uppercase mb-4 text-center">
-        SWIPE DIARY // PAGE {currentPage + 1} OF {pages.length}
-      </div>
-
-      {/* 3D Physical Book Card Container */}
-      <div 
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="relative w-full max-w-[360px] min-h-[460px] cursor-grab active:cursor-grabbing transition-transform duration-300"
-        style={{ perspective: '1000px' }}
-      >
-        {/* Leather spine background shadow */}
-        <div className="absolute -left-2 top-0 bottom-0 w-4 bg-[#140D08] z-30 rounded-l shadow-2xl opacity-80" />
-
-        {/* Page Content with Curl Flip Transition */}
-        <div 
-          className={`w-full min-h-[460px] p-6 rounded-sm shadow-[0_12px_30px_rgba(0,0,0,0.6)] border border-[#5A4032]/40 relative overflow-hidden transition-all duration-300 ${
-            isFlipping 
-              ? (flipDirection === 'next' ? 'rotate-y-[-18deg] scale-95 opacity-80' : 'rotate-y-[18deg] scale-95 opacity-80') 
-              : 'rotate-y-0 scale-100 opacity-100'
-          }`}
-          style={{
-            background: page.type === 'cover' 
-              ? 'linear-gradient(145deg,#6B4B39 0%,#5A4032 45%,#4B3529 100%)'
-              : 'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 45%,#E3D4AC 100%)',
-            color: page.type === 'cover' ? '#EADFC5' : '#2E221B',
-            boxShadow: 'inset 0 0 25px rgba(90,64,50,0.15), 0 12px 35px rgba(0,0,0,0.65)'
-          }}
-        >
-          {/* Masking Tape Decor */}
-          <div className="absolute -top-2 left-1/3 w-16 h-4 bg-[rgba(201,168,83,0.4)] rotate-[-1deg] border border-black/20 z-20 pointer-events-none" />
-
-          {/* PAGE 0: COVER */}
-          {page.type === 'cover' && (
-            <div className="flex flex-col items-center justify-center text-center h-full py-8">
-              <div className="font-mono text-[8px] tracking-[0.22em] uppercase text-[#EADFC5]/55 mb-4">
-                {page.number}
-              </div>
-              <div className="font-serif font-bold text-[#A68853] leading-none mb-2" style={{ fontSize: 38 }}>
-                TANGY<br/>DIARY
-              </div>
-              <div className="font-mono text-[10px] tracking-[0.35em] text-[#EADFC5]/75 mb-1 uppercase">
-                {page.subtitle}
-              </div>
-              <div className="font-serif italic text-xs text-[#EADFC5]/50 mb-6">
-                {page.date}
-              </div>
-              
-              <svg width="48" height="48" viewBox="0 0 52 52" fill="none" stroke="#A68853" strokeWidth="1.1" strokeLinecap="round" className="opacity-45 my-2">
-                <line x1="26" y1="52" x2="26" y2="28"/>
-                <path d="M26,42 Q16,36 14,26 Q24,28 26,42"/>
-                <path d="M26,36 Q36,30 38,20 Q28,22 26,36"/>
-                <circle cx="26" cy="22" r="5" fill="none"/>
-                <circle cx="26" cy="22" r="2" fill="#A68853"/>
-              </svg>
-
-              <div className="font-mono text-[7px] tracking-[0.14em] uppercase text-[#EADFC5]/40 mt-8">
-                Swipe left to open journal →
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 1-4: JOURNAL SPREADS */}
-          {!page.type && (
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-2 pb-1 border-b border-[#5A4032]/20">
-                  <span>{page.spread}</span>
-                  <span className="text-[#A44A34] font-bold">{page.date}</span>
-                </div>
-                
-                <h3 className="font-serif italic text-xl text-[#2E221B] leading-tight mb-2">
-                  {page.title}
-                </h3>
-                
-                {page.location && (
-                  <div className="font-mono text-[8px] text-[#A44A34] uppercase tracking-wider mb-3">
-                    LOCATION: {page.location}
-                  </div>
-                )}
-                {page.tag && (
-                  <div className="font-mono text-[8px] text-[#5A4032] uppercase tracking-wider mb-3">
-                    {page.tag}
-                  </div>
-                )}
-
-                <p style={{ fontFamily: 'Caveat, cursive', fontSize: '17px', lineHeight: '1.5' }} className="mt-3 text-[#2E221B] opacity-95">
-                  {page.content}
-                </p>
-
-                {/* Botanical doodle */}
-                <svg className="my-4 opacity-30 mx-auto" width="32" height="48" viewBox="0 0 32 60" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
-                  <line x1="16" y1="60" x2="16" y2="30"/>
-                  <path d="M16,48 Q8,42 6,34 Q14,36 16,48"/>
-                  <path d="M16,38 Q24,32 26,24 Q18,26 16,38"/>
-                  <circle cx="16" cy="26" r="4"/>
-                </svg>
-
-                {page.note && (
-                  <div className="bg-[#E6D8B7] p-2.5 -rotate-1 shadow-xs border border-[rgba(166,136,83,0.32)] max-w-[220px]">
-                    <div style={{ fontFamily: 'Caveat, cursive', fontSize: '14px', color: '#2E221B' }}>
-                      {page.note}
-                    </div>
-                  </div>
-                )}
-
-                {page.badge && (
-                  <div className="inline-block text-[#EADFC5] font-mono text-[8px] rotate-1 px-2.5 py-1.5 bg-[#A44A34] shadow-sm">
-                    {page.badge}
-                  </div>
-                )}
-
-                {page.box && (
-                  <div className="font-mono text-[8px] text-[#5A4032] p-2 border border-dashed border-[#5A4032]/40 whitespace-pre-line">
-                    {page.box}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 5: HANDWRITTEN LETTER CARD */}
-          {page.type === 'letter' && (
-            <div className="relative h-full flex flex-col justify-between p-2">
-              <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-3">
-                <span>{page.spread}</span>
-                <span className="text-[#A44A34] font-bold">{page.date}</span>
-              </div>
-
-              <div 
-                className="relative p-5 shadow-md -rotate-1 border border-[#5A4032]/15"
-                style={{
-                  background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
-                  clipPath: 'polygon(0% 2%, 3% 0%, 97% 1%, 100% 0%, 100% 98%, 96% 100%, 3% 99%, 0% 100%)',
-                }}
-              >
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-[rgba(201,168,83,0.45)] -rotate-1 border border-[#A07814]/30 pointer-events-none" />
-
-                <p style={{ fontFamily: 'Caveat, cursive', fontSize: '18px', lineHeight: '1.55', color: '#2E221B' }}>
-                  {page.title}
-                  <br/><br/>
-                  {page.content}
-                </p>
-                <p style={{ fontFamily: 'Caveat, cursive', fontSize: '17px', color: '#A44A34', textAlign: 'right', marginTop: 12 }}>
-                  {page.author}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* PAGE 6: END PAGE */}
-          {page.type === 'end' && (
-            <div className="flex flex-col items-center justify-center text-center h-full py-8">
-              <div className="font-mono text-[9px] tracking-widest uppercase text-[#5A4032] mb-3 pb-1 border-b border-[#5A4032]/40">
-                {page.label}
-              </div>
-              <h3 className="font-serif italic text-2xl text-[#2E221B] mb-2">
-                {page.title}
-              </h3>
-              <p style={{ fontFamily: 'Caveat, cursive', fontSize: '15px', color: '#5A4032' }} className="mb-6">
-                {page.content}
-              </p>
-
-              <svg className="my-2 opacity-35" width="56" height="56" viewBox="0 0 64 64" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
-                <line x1="32" y1="64" x2="32" y2="32"/><path d="M32,52 Q20,44 16,32 Q28,36 32,52"/>
-                <path d="M32,42 Q44,34 48,22 Q36,26 32,42"/><circle cx="32" cy="26" r="6"/>
-              </svg>
-
-              <div style={{ fontFamily: 'Caveat, cursive', fontSize: '18px', fontWeight: 700, color: '#2E221B', opacity: 0.6 }}>
-                To be continued…
-              </div>
-              <div className="font-mono text-[7px] tracking-[0.2em] uppercase text-[#A44A34] mt-4 opacity-70">
-                {page.footer}
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* Swipe Controls & Pagination Dots */}
-      <div className="flex items-center justify-between w-full max-w-[360px] mt-4 px-2">
-        <button
-          onClick={handlePrev}
-          disabled={currentPage === 0}
-          className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 disabled:border-transparent active:scale-95 transition-all"
-        >
-          ← PREV
-        </button>
-
-        {/* Pagination Dots */}
-        <div className="flex items-center gap-1.5">
-          {pages.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentPage(idx)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                idx === currentPage ? 'bg-[#A68853] w-4' : 'bg-[#EADFC5]/30'
-              }`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={handleNext}
-          disabled={currentPage === pages.length - 1}
-          className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 disabled:border-transparent active:scale-95 transition-all"
-        >
-          NEXT →
-        </button>
-      </div>
-
-      <div className="font-serif italic text-xs text-[#EADFC5]/60 mt-3 text-center">
-        💡 Touch &amp; swipe left/right across paper to turn pages
-      </div>
-
-      {/* Read Complete Diary CTA */}
-      <div className="flex flex-col items-center gap-2 mt-6">
-        <a 
-          href="/blogs"
-          className="bg-[#A68853] text-[#1F1713] border-2 border-[#1F1713] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase shadow-[4px_4px_0px_#2E221B] active:scale-95"
-        >
-          Read the Complete Tangy Diary →
-        </a>
-      </div>
-
-    </div>
-  );
-};
-
-export const TangyDiary = () => {
-  const sectionRef = useGSAPContext((ctx) => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    if (isMobile) return;
+  useGSAPContext((ctx) => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -428,25 +80,62 @@ export const TangyDiary = () => {
       }
     });
 
-    // Leaf 0 flip
+    // Desktop GSAP Leaf Flipping Timeline
     tl.to('.diary-left-base', { opacity: 1, duration: 0.25 }, 0.05)
-      .to('.diary-leaf:nth-child(5)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 0);
-    // Leaf 1 flip
-    tl.to('.diary-leaf:nth-child(6)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 1);
-    // Leaf 2 flip
-    tl.to('.diary-leaf:nth-child(7)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 2);
-    // Leaf 3 flip
-    tl.to('.diary-leaf:nth-child(8)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 3);
-    // Leaf 4 flip
-    tl.to('.diary-leaf:nth-child(9)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 4);
-    // Leaf 5 flip
-    tl.to('.diary-leaf:nth-child(10)', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 5);
+      .to('.desktop-leaf-0', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 0)
+      .to('.desktop-leaf-1', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 1)
+      .to('.desktop-leaf-2', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 2)
+      .to('.desktop-leaf-3', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 3)
+      .to('.desktop-leaf-4', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 4)
+      .to('.desktop-leaf-5', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 5);
   }, []);
+
+  // Mobile Touch Swipe Handlers
+  const handleNextLeaf = () => {
+    if (currentMobileLeaf < 6) {
+      setCurrentMobileLeaf((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevLeaf = () => {
+    if (currentMobileLeaf > 0) {
+      setCurrentMobileLeaf((prev) => prev - 1);
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isHorizontalSwipe.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isMobile) return;
+    const deltaX = e.touches[0].clientX - touchStartX.current;
+    const deltaY = e.touches[0].clientY - touchStartY.current;
+
+    if (!isHorizontalSwipe.current && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+      isHorizontalSwipe.current = true;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!isMobile) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    if (isHorizontalSwipe.current && Math.abs(deltaX) > 30) {
+      if (deltaX < 0) {
+        handleNextLeaf();
+      } else {
+        handlePrevLeaf();
+      }
+    }
+  };
 
   return (
     <section ref={sectionRef} id="diary"
       className="relative w-full bg-[#241A14] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#4A3529]"
-      style={{ minHeight: '100svh' }}>
+      style={{ minHeight: isMobile ? 'auto' : '100svh', paddingBottom: isMobile ? '80px' : '0' }}>
 
       {/* Leather/Parchment noise overlay */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.14] pointer-events-none mix-blend-overlay" />
@@ -475,8 +164,16 @@ export const TangyDiary = () => {
         </defs>
       </svg>
 
-      {/* Archive header */}
-      <div className="absolute top-5 left-10 right-10 flex justify-between items-center z-20 pointer-events-none hidden lg:flex">
+      {/* Hanging microphone wire */}
+      <div className="diary-mic-wire absolute top-0 left-[4%] z-[100] pointer-events-none origin-top flex flex-col items-center hidden md:flex">
+        <div className="w-[1.5px] h-[360px] md:h-[430px] bg-[#1F1713] border-r border-[#5A4032]/40"/>
+        <div className="w-4 h-7 bg-[#2E221B] rounded-sm border border-[#A68853]/60 shadow-md flex items-center justify-center -mt-0.5">
+          <div className="w-2.5 h-4 bg-[#A68853]/30 rounded-xs"/>
+        </div>
+      </div>
+
+      {/* Section Header */}
+      <div className="pt-20 lg:pt-0 lg:absolute lg:top-5 left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-6 lg:mb-0">
         <div>
           <div className="font-mono text-[9px] md:text-[10px] text-[#A68853] tracking-[0.25em] font-bold uppercase opacity-85">
             ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
@@ -485,179 +182,460 @@ export const TangyDiary = () => {
         </div>
       </div>
 
-      {/* MOBILE INTERACTIVE TOUCH SWIPE DIARY */}
-      <MobileSwipeDiary />
+      {/* ================================================================= */}
+      {/* ORIGINAL 3D DIARY BOOK (RESPONSIVE FOR BOTH MOBILE & DESKTOP)     */}
+      {/* ================================================================= */}
+      <div 
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="w-full flex flex-col items-center justify-center select-none"
+        style={{ touchAction: 'pan-y' }}
+      >
+        <div 
+          style={{ 
+            perspective: '2200px', 
+            perspectiveOrigin: '50% 40%', 
+            position: 'relative',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            transform: isMobile ? 'scale(0.85)' : 'scale(1)',
+            transformOrigin: 'center center',
+            margin: isMobile ? '-40px 0' : '0'
+          }}
+        >
+          {/* Desk shadow */}
+          <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 bg-black blur-[55px] opacity-[0.22]"
+            style={{ width: '72%', height: '54px' }}/>
 
-      {/* DESKTOP 3D BOOK STAGE */}
-      <div className="hidden lg:block" style={{ perspective: '2200px', perspectiveOrigin: '50% 40%', position: 'relative' }}>
-        <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 bg-black blur-[55px] opacity-[0.22]"
-          style={{ width: '72%', height: '54px' }}/>
-
-        <div id="diary-book" style={{ position: 'relative', width: 'min(880px, 92vw)', height: 'min(620px, 74vh)', transformStyle: 'preserve-3d' }}>
-          <div style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%',
-            zIndex: 0, borderRadius: '0 2px 2px 0',
-            background: 'linear-gradient(155deg,#2E1E14 0%,#3A2718 14%,#4B3529 34%,#5A4032 50%,#4B3529 66%,#3A2718 86%,#2E1E14 100%)',
-            boxShadow: '8px 10px 40px rgba(0,0,0,0.6)', border: '1px solid #1F1310', borderLeft: 'none',
-          }}>
-            <div style={{ position:'absolute', inset:0, opacity:0.17, borderRadius:'0 2px 2px 0',
-              background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.22) 0 1px,transparent 1px 6px)' }}/>
-          </div>
-
-          <div className="diary-left-base" style={{
-            position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%',
-            zIndex: 0, borderRadius: '2px 0 0 2px', opacity: 0,
-            background: 'linear-gradient(155deg,#2E1E14 0%,#3A2718 14%,#4B3529 34%,#5A4032 50%,#4B3529 66%,#3A2718 86%,#2E1E14 100%)',
-            boxShadow: '-8px 10px 40px rgba(0,0,0,0.6)', border: '1px solid #1F1310', borderRight: 'none',
-          }}>
-            <div style={{ position:'absolute', inset:0, opacity:0.17, borderRadius:'2px 0 0 2px',
-              background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.22) 0 1px,transparent 1px 6px)' }}/>
-          </div>
-
-          <div style={{
-            position: 'absolute', left: 'calc(50% - 14px)', width: '28px', top: '-5px', bottom: '-5px',
-            zIndex: 99, borderRadius: '2px',
-            background: 'linear-gradient(90deg,#140D08 0%,#2E1E14 10%,#4B3529 28%,#6B4B39 50%,#4B3529 72%,#2E1E14 90%,#140D08 100%)',
-            boxShadow: 'inset 0 0 16px rgba(0,0,0,0.75)',
-          }}>
-            <div className="font-mono text-[9.5px] tracking-[0.18em] text-[#A68853] opacity-90 whitespace-nowrap select-none"
-              style={{ position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%) rotate(90deg)' }}>
-              TANGY DIARY · VOL. I · 2016–2026
+          {/* Book Container */}
+          <div
+            id="diary-book"
+            style={{
+              position: 'relative',
+              width: 'min(880px, 94vw)',
+              height: 'min(620px, 70vh)',
+              minHeight: isMobile ? '480px' : '580px',
+              transformStyle: 'preserve-3d',
+            }}
+          >
+            {/* RIGHT BACK-COVER BOARD (z:0) */}
+            <div style={{
+              position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%',
+              zIndex: 0, borderRadius: '0 2px 2px 0',
+              background: 'linear-gradient(155deg,#2E1E14 0%,#3A2718 14%,#4B3529 34%,#5A4032 50%,#4B3529 66%,#3A2718 86%,#2E1E14 100%)',
+              boxShadow: '8px 10px 40px rgba(0,0,0,0.6), inset -4px 0 20px rgba(0,0,0,0.3)',
+              border: '1px solid #1F1310', borderLeft: 'none',
+            }}>
+              <div style={{ position:'absolute', inset:0, opacity:0.17, borderRadius:'0 2px 2px 0',
+                background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.22) 0 1px,transparent 1px 6px)' }}/>
+              <div style={{ position:'absolute', inset:'8px', border:'1px solid rgba(166,136,83,0.1)', borderRadius:'0 1px 1px 0' }}/>
             </div>
-          </div>
 
-          {/* LEAF 0: Front Cover */}
-          <div className="diary-leaf" style={leafStyle(0)}>
-            <div style={frontFace({ background: 'linear-gradient(145deg,#6B4B39 0%,#5A4032 45%,#4B3529 100%)' })}>
-              <div style={{ position:'absolute', inset:0, padding:24, display:'flex', flexDirection:'column' }} className="text-[#EADFC5]">
-                <div className="font-mono text-[7px] tracking-[0.22em] uppercase text-[#EADFC5]/55 text-center mt-3">Archive No. 001</div>
-                <div className="flex-1 flex flex-col items-center justify-center text-center">
-                  <div className="font-serif font-bold leading-none tracking-wide text-[#A68853]" style={{ fontSize:'min(50px,5vw)' }}>TANGY<br/>DIARY</div>
-                  <div className="font-mono text-[10px] tracking-[0.42em] text-[#EADFC5]/72 mt-3 uppercase">Field Notes</div>
-                  <div className="font-serif italic text-xs text-[#EADFC5]/50 mt-1">Hyderabad · Since 2016</div>
-                  <svg className="w-6 h-6 mx-auto mt-3 opacity-45 text-[#A68853]"><use href="#sym-compass"/></svg>
+            {/* LEFT BASE BOARD (z:0) */}
+            <div 
+              className="diary-left-base" 
+              style={{
+                position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%',
+                zIndex: 0, borderRadius: '2px 0 0 2px',
+                opacity: isMobile ? (currentMobileLeaf > 0 ? 1 : 0) : 0,
+                transition: 'opacity 0.3s ease',
+                background: 'linear-gradient(155deg,#2E1E14 0%,#3A2718 14%,#4B3529 34%,#5A4032 50%,#4B3529 66%,#3A2718 86%,#2E1E14 100%)',
+                boxShadow: '-8px 10px 40px rgba(0,0,0,0.6), inset 4px 0 20px rgba(0,0,0,0.3)',
+                border: '1px solid #1F1310', borderRight: 'none',
+              }}
+            >
+              <div style={{ position:'absolute', inset:0, opacity:0.17, borderRadius:'2px 0 0 2px',
+                background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.22) 0 1px,transparent 1px 6px)' }}/>
+              <div style={{ position:'absolute', inset:'8px', border:'1px solid rgba(166,136,83,0.1)', borderRadius:'1px 0 0 1px' }}/>
+            </div>
+
+            {/* Spine */}
+            <div style={{
+              position: 'absolute',
+              left: 'calc(50% - 14px)', width: '28px',
+              top: '-5px', bottom: '-5px',
+              zIndex: 99, borderRadius: '2px',
+              background: 'linear-gradient(90deg,#140D08 0%,#2E1E14 10%,#4B3529 28%,#6B4B39 50%,#4B3529 72%,#2E1E14 90%,#140D08 100%)',
+              boxShadow: 'inset 0 0 16px rgba(0,0,0,0.75), 5px 0 14px rgba(0,0,0,0.55), -5px 0 14px rgba(0,0,0,0.55)',
+            }}>
+              <div style={{ position:'absolute', inset:0, opacity:0.5,
+                background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.6) 0 2px,transparent 2px 8px)' }}/>
+              <div className="font-mono text-[8.5px] md:text-[9.5px] tracking-[0.18em] text-[#A68853] opacity-90 whitespace-nowrap select-none"
+                style={{ position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%) rotate(90deg)' }}>
+                TANGY DIARY · VOL. I · 2016–2026
+              </div>
+            </div>
+
+            {/* Fabric bookmark */}
+            <div style={{
+              position:'absolute', left:'calc(50% - 5px)', width:11, height:40,
+              bottom:-28, zIndex:3,
+              background:'linear-gradient(to bottom,#A44A34,#5A1D13)',
+              clipPath:'polygon(0 0,100% 0,100% 78%,50% 100%,0 78%)',
+              boxShadow:'0 4px 8px rgba(0,0,0,0.4)',
+            }}/>
+
+            {/* ── LEAF 0: Front Cover / Inside Cover ─────────────────────── */}
+            <div 
+              className="diary-leaf desktop-leaf-0" 
+              style={leafStyle(0, isMobile ? currentMobileLeaf >= 1 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 1 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({
+                background: 'linear-gradient(145deg,#6B4B39 0%,#5A4032 45%,#4B3529 100%)',
+                boxShadow: 'inset -8px 0 22px rgba(0,0,0,0.38)',
+              })}>
+                <div style={{ position:'absolute', inset:0, opacity:0.12,
+                  background:'repeating-linear-gradient(140deg,rgba(0,0,0,0.35) 0 1px,transparent 1px 4px)' }}/>
+                <div style={{ position:'absolute', inset:13, border:'1.5px solid rgba(166,136,83,0.45)' }}>
+                  <div style={{ position:'absolute', inset:5, border:'1px solid rgba(166,136,83,0.22)' }}/>
+                </div>
+                {[
+                  { top:8,   left:8,   borderTop:'2px solid',    borderLeft:'2px solid' },
+                  { top:8,   right:8,  borderTop:'2px solid',    borderRight:'2px solid' },
+                  { bottom:8,left:8,   borderBottom:'2px solid', borderLeft:'2px solid' },
+                  { bottom:8,right:8,  borderBottom:'2px solid', borderRight:'2px solid' },
+                ].map((s, k) => (
+                  <div key={k} style={{ position:'absolute', width:16, height:16,
+                    borderColor:'rgba(166,136,83,0.75)', ...s }}/>
+                ))}
+                <div style={{ position:'absolute', inset:0, padding:18, display:'flex', flexDirection:'column' }}
+                  className="text-[#EADFC5]">
+                  <div className="font-mono text-[7px] tracking-[0.22em] uppercase text-[#EADFC5]/55 text-center mt-2">
+                    Archive No. 001
+                  </div>
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <div className="font-serif font-bold leading-none tracking-wide text-[#A68853]"
+                      style={{ fontSize:'min(46px,4.5vw)' }}>
+                      TANGY<br/>DIARY
+                    </div>
+                    <div className="font-mono text-[9px] tracking-[0.38em] text-[#EADFC5]/72 mt-2 uppercase">Field Notes</div>
+                    <div className="font-serif italic text-[11px] text-[#EADFC5]/50 mt-1">Hyderabad · Since 2016</div>
+                    <svg className="w-5 h-5 mx-auto mt-2 opacity-45 text-[#A68853]"><use href="#sym-compass"/></svg>
+                    <svg className="mt-3 opacity-40" width="42" height="42" viewBox="0 0 52 52" fill="none" stroke="#A68853" strokeWidth="1.1" strokeLinecap="round">
+                      <line x1="26" y1="52" x2="26" y2="28"/>
+                      <path d="M26,42 Q16,36 14,26 Q24,28 26,42"/>
+                      <path d="M26,36 Q36,30 38,20 Q28,22 26,36"/>
+                      <circle cx="26" cy="22" r="5" fill="none"/>
+                      <circle cx="26" cy="22" r="2" fill="#A68853"/>
+                    </svg>
+                  </div>
+                  {/* Closure strap */}
+                  <div className="diary-strap" style={{
+                    position:'absolute', left:-8, right:-4, height:22,
+                    top:'61%', transform:'translateY(-50%) rotate(-0.8deg)',
+                    background:'linear-gradient(to bottom,#4B3529,#2E1E14)',
+                    borderTop:'1px dashed rgba(166,136,83,0.32)',
+                    borderBottom:'1px dashed rgba(166,136,83,0.32)',
+                  }}>
+                    <div style={{ position:'absolute', right:'13%', top:'50%', transform:'translateY(-50%)',
+                      width:16, height:16, border:'2px solid #A68853', borderRadius:2,
+                      background:'linear-gradient(135deg,#A68853,#7A5C30)' }}/>
+                  </div>
+                  <div className="diary-strap font-serif font-bold text-xs text-[#EADFC5]" style={{
+                    position:'absolute', left:'34%', top:'61%',
+                    transform:'translateX(-50%) translateY(-50%) rotate(-4deg)',
+                    width:32, height:32, borderRadius:'50%',
+                    background:'radial-gradient(circle,#A44A34,#5A1D13)',
+                    display:'flex', itemsCenter:'center', justifyContent:'center',
+                    boxShadow:'0 4px 12px rgba(0,0,0,0.55)',
+                  }}>TS</div>
+                  <div className="font-mono text-[6.5px] tracking-[0.14em] uppercase text-[#EADFC5]/42 text-center mt-auto mb-2 leading-relaxed">
+                    Field Journal · Property of Tangy Sessions
+                  </div>
+                </div>
+              </div>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }}
+                  className="flex flex-col items-center justify-center text-center text-[#2E221B]">
+                  <div className="font-serif italic text-lg">Field Journal</div>
+                  <div className="font-mono text-[8px] tracking-[0.1em] uppercase text-[#5A4032] mt-1.5"
+                    style={{ border:'1px dashed rgba(166,136,83,0.55)', padding:'3px 8px' }}>
+                    Vol. I · 2016 — 2026
+                  </div>
+                  <svg className="opacity-70 text-[#A44A34] mt-3" style={{ width:54, height:54 }} viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="1.8"/>
+                    <circle cx="60" cy="60" r="42" fill="none" stroke="currentColor" strokeWidth="1.1"/>
+                  </svg>
+                  <div className="mt-3" style={{ border:'1px dashed rgba(166,136,83,0.48)', padding:8, maxWidth:140 }}>
+                    <div className="font-serif italic text-[10px] text-[#5A4032]">
+                      Property of the Archive.<br/>Handle with care.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="flex flex-col items-center justify-center text-center text-[#2E221B]">
-                <div className="font-serif italic text-[22px]">Field Journal</div>
-                <div className="font-mono text-[8px] tracking-[0.1em] uppercase text-[#5A4032] mt-2">Vol. I · 2016 — 2026</div>
-              </div>
-            </div>
-          </div>
 
-          {/* LEAF 1: Stepwell */}
-          <div className="diary-leaf" style={leafStyle(1)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1.5">
-                  <span>Spread #01</span><span className="text-[#A44A34] font-bold">14 Oct, 2024</span>
+            {/* ── LEAF 1: Spread 1 Right (Stepwell) / Spread 2 Left (Log) ── */}
+            <div 
+              className="diary-leaf desktop-leaf-1" 
+              style={leafStyle(1, isMobile ? currentMobileLeaf >= 2 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 2 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+                    <span>Spread #01</span>
+                    <span className="text-[#A44A34] font-bold">14 Oct, 2024</span>
+                  </div>
+                  <div className="font-serif italic text-lg leading-tight">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
+                  <div className="font-mono text-[7.5px] text-[#A44A34] uppercase tracking-wider mt-0.5">LOCATION: BANSILALPET STEPWELL</div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                    The stepwell echoes before the crowd arrives. Water dripping against
+                    350-year-old stone, acoustic instruments humming without amplification.
+                  </p>
+                  <figure className="absolute top-[90px] right-2 w-[72px] bg-[#FBF7EE] shadow-md rotate-2" style={{ padding:'4px 4px 12px' }}>
+                    <div className="absolute -top-1 left-3 bg-[#A68853]/50 -rotate-2" style={{ width:24, height:9 }}/>
+                    <svg viewBox="0 0 100 110" className="w-full">
+                      <rect width="100" height="110" fill="#3D2B1F"/>
+                      <circle cx="50" cy="55" r="13" fill="#1F1713"/>
+                    </svg>
+                    <figcaption className="text-center font-serif text-[8.5px] text-[#2E221B] mt-0.5">Stepwell Echoes</figcaption>
+                  </figure>
+                  <div className="absolute bottom-3 left-3 bg-[#E6D8B7] shadow-xs -rotate-1"
+                    style={{ padding:6, maxWidth:110, border:'1px solid rgba(166,136,83,0.32)' }}>
+                    <div style={{ fontFamily:'Caveat, cursive', fontSize:'11px' }}>Echo off 350-year-old stone.</div>
+                  </div>
                 </div>
-                <div className="font-serif italic text-xl leading-tight">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
-                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 leading-relaxed opacity-90 text-[#2E221B]">
-                  The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.
-                </p>
               </div>
-            </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="font-mono text-[9px] uppercase mb-2">Spread #02 — Left</div>
-                <p className="font-serif italic text-[13px] opacity-80">"The acoustic echo bounced off limestone steps."</p>
-              </div>
-            </div>
-          </div>
-
-          {/* LEAF 2: Monsoon */}
-          <div className="diary-leaf" style={leafStyle(2)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="flex justify-between font-mono text-[9px] uppercase text-[#5A4032] mb-1.5">
-                  <span>Spread #02</span><span className="text-[#A44A34] font-bold">21 Dec, 2024</span>
-                </div>
-                <div className="font-serif italic text-xl leading-tight">Monsoon Acoustics</div>
-                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 opacity-90 text-[#2E221B]">
-                  When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches.
-                </p>
-              </div>
-            </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="font-mono text-[9px] uppercase mb-2">Spread #03 — Left</div>
-              </div>
-            </div>
-          </div>
-
-          {/* LEAF 3: Performers */}
-          <div className="diary-leaf" style={leafStyle(3)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="flex justify-between font-mono text-[9px] uppercase text-[#5A4032] mb-1.5">
-                  <span>Spread #03</span><span className="text-[#A44A34] font-bold">05 Jan, 2025</span>
-                </div>
-                <div className="font-serif italic text-xl leading-tight">Artists &amp; Performers</div>
-                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 opacity-90 text-[#2E221B]">
-                  The artists gathered around ribbon microphones for an unscripted acoustic jam.
-                </p>
-              </div>
-            </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="font-mono text-[9px] uppercase mb-2">Spread #04 — Left</div>
-              </div>
-            </div>
-          </div>
-
-          {/* LEAF 4: Backstage */}
-          <div className="diary-leaf" style={leafStyle(4)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="font-serif italic text-xl">Backstage Notes</div>
-              </div>
-            </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="font-mono text-[9px] uppercase mb-2">Spread #05 — Left</div>
-              </div>
-            </div>
-          </div>
-
-          {/* LEAF 5: Community Note */}
-          <div className="diary-leaf" style={leafStyle(5)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
-                <div className="relative mx-auto p-4 -rotate-1 shadow-sm" style={{ background: 'linear-gradient(170deg,#FDFAF4 0%,#F8F3E8 60%,#F2EBD8 100%)' }}>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'16px' }}>Dear You,<br/><br/>Every gathering leaves something behind.<br/><br/>— Tangy</p>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                    Spread #02 — Left
+                  </div>
+                  <div className="font-serif italic text-base">Bansilalpet Stepwell Log</div>
+                  <div className="font-mono text-[8px] leading-relaxed text-[#5A4032] mt-1">
+                    <b>Mic:</b> Ribbon R44<br/><b>Echo Delay:</b> 2.4s
+                  </div>
+                  <p className="font-serif italic text-[11.5px] mt-2 opacity-80">
+                    "The acoustic echo bounced off limestone steps for 2.4 seconds before fading."
+                  </p>
                 </div>
               </div>
             </div>
-            <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="flex flex-col items-center justify-center text-center text-[#2E221B]">
-                <div className="font-serif italic text-lg">The story continues.</div>
+
+            {/* ── LEAF 2: Spread 2 Right (Monsoon) / Spread 3 Left (Log) ── */}
+            <div 
+              className="diary-leaf desktop-leaf-2" 
+              style={leafStyle(2, isMobile ? currentMobileLeaf >= 3 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 3 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
+                    <span>Spread #02</span>
+                    <span className="text-[#A44A34] font-bold">21 Dec, 2024</span>
+                  </div>
+                  <div className="font-serif italic text-lg leading-tight">Monsoon Acoustics &amp;<br/>Old City Haveli</div>
+                  <div className="flex items-center gap-1 font-mono text-[7.5px] text-[#5A4032] uppercase mt-0.5">
+                    <svg className="w-3.5 h-3.5"><use href="#sym-rain"/></svg>
+                    <span>300 AUDIENCE // MIDNIGHT</span>
+                  </div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                    When the lights dropped at midnight, 300 people stood completely still
+                    under rain-soaked arches. No phones in the air.
+                  </p>
+                  <div className="absolute bottom-3 left-3 bg-[#E6D8B7] rotate-1 shadow-xs"
+                    style={{ padding:6, maxWidth:115, border:'1px solid rgba(166,136,83,0.32)' }}>
+                    <div style={{ fontFamily:'Caveat, cursive', fontSize:'11px' }}>300 people stayed till sunrise.</div>
+                  </div>
+                </div>
+              </div>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                    Spread #03 — Left
+                  </div>
+                  <p className="font-serif italic text-[11.5px] mt-2 opacity-85">
+                    "Taramati pavilion was built so a voice travels 2 miles without amplifiers."
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* LEAF 6: End */}
-          <div className="diary-leaf" style={leafStyle(6)}>
-            <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:22 }} className="flex flex-col items-center justify-center text-center text-[#2E221B]">
-                <div className="font-serif italic text-2xl">More stories<br/>are waiting.</div>
-                <div style={{ fontFamily:'Caveat, cursive', fontSize:'18px', fontWeight:700 }} className="mt-4 opacity-60">To be continued…</div>
+            {/* ── LEAF 3: Spread 3 Right (Artists) / Spread 4 Left (Log) ── */}
+            <div 
+              className="diary-leaf desktop-leaf-3" 
+              style={leafStyle(3, isMobile ? currentMobileLeaf >= 4 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 4 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
+                    <span>Spread #03</span>
+                    <span className="text-[#A44A34] font-bold">05 Jan, 2025</span>
+                  </div>
+                  <div className="font-serif italic text-lg leading-tight">Artists &amp;<br/>Performers</div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                    The artists gathered around ribbon microphones for an unscripted acoustic jam.
+                    Someone pulled out a tanpura, another started a vocal chant.
+                  </p>
+                  <div className="absolute bottom-3 left-3 text-[#EADFC5] font-mono text-[7.5px] rotate-1 shadow-sm"
+                    style={{ background:'#A44A34', padding:'5px 8px', maxWidth:115 }}>
+                    PERFORMER PASS // BACKSTAGE
+                  </div>
+                </div>
+              </div>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                    Spread #04 — Left
+                  </div>
+                  <div className="font-serif italic text-base">Artist Jam Log</div>
+                  <p className="font-serif italic text-[11.5px] mt-2 opacity-80">
+                    "Unscripted, unplugged, and raw. The night decided what to play."
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-        </div>
+            {/* ── LEAF 4: Spread 4 Right (Backstage) / Spread 5 Left (Log) */}
+            <div 
+              className="diary-leaf desktop-leaf-4" 
+              style={leafStyle(4, isMobile ? currentMobileLeaf >= 5 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 5 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
+                    <span>Spread #04</span>
+                    <span className="text-[#A44A34] font-bold">Backstage</span>
+                  </div>
+                  <div className="font-serif italic text-lg leading-tight">Backstage Notes &amp;<br/>Hidden Spaces</div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 opacity-88">
+                    A 300-year-old sanctuary tucked behind stone arches. We mapped the acoustics
+                    by hand, with no digital tools.
+                  </p>
+                  <div className="font-mono text-[7.5px] text-[#5A4032] mt-2"
+                    style={{ border:'1px dashed rgba(90,64,50,0.4)', padding:6 }}>
+                    [ NORTH WALL: REVERB 1.8s ]<br/>
+                    [ SOUTHERN ARCH: BASS TRAP ]
+                  </div>
+                </div>
+              </div>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                    Spread #05 — Left
+                  </div>
+                  <p className="font-serif italic text-[11.5px] mt-2 opacity-80">"No speaker stacks. The stone speaks."</p>
+                </div>
+              </div>
+            </div>
+
+            {/* ── LEAF 5: Spread 5 Right (Community) / Final Left (Log) ─── */}
+            <div 
+              className="diary-leaf desktop-leaf-5" 
+              style={leafStyle(5, isMobile ? currentMobileLeaf >= 6 : undefined)}
+              onClick={() => isMobile && (currentMobileLeaf >= 6 ? handlePrevLeaf() : handleNextLeaf())}
+            >
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:12 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
+                    <span>Spread #05</span>
+                    <span className="text-[#A44A34] font-bold">Community</span>
+                  </div>
+
+                  {/* Handwritten torn-paper note */}
+                  <div className="relative mx-auto" style={{
+                    background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
+                    border: '1px solid rgba(90,64,50,0.15)',
+                    boxShadow: '3px 4px 12px rgba(60,40,20,0.25)',
+                    padding: '10px 12px',
+                    transform: 'rotate(-1.2deg)',
+                    clipPath: 'polygon(0% 2%, 3% 0%, 97% 1%, 100% 0%, 100% 98%, 96% 100%, 3% 99%, 0% 100%)',
+                  }}>
+                    <div style={{
+                      position:'absolute', top:-8, left:'50%', transform:'translateX(-50%) rotate(-1deg)',
+                      width:42, height:11,
+                      background:'rgba(201,168,83,0.45)', border:'1px solid rgba(160,120,20,0.25)',
+                    }}/>
+                    <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px', lineHeight:'1.45', color:'#2E221B' }}>
+                      Dear You,<br/><br/>
+                      Every gathering leaves something behind.<br/><br/>
+                      A song. A conversation. A place. A memory.<br/><br/>
+                      And somehow, we carry it with us.
+                    </p>
+                    <p style={{ fontFamily:'Caveat, cursive', fontSize:'13px', color:'#A44A34', textAlign:'right', marginTop:4 }}>— Tangy</p>
+                  </div>
+                </div>
+              </div>
+              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }}
+                  className="text-[#2E221B] flex flex-col items-center justify-center text-center">
+                  <div className="font-serif italic text-base">The story continues.</div>
+                  <p className="font-serif text-[11px] text-[#5A4032] mt-2 opacity-80">
+                    Every Tangy Session leaves another page waiting to be written.
+                  </p>
+                  <div className="font-serif italic text-sm mt-3 font-bold">To be continued…</div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── LEAF 6: Static final right page ──────────── */}
+            <div className="diary-leaf" style={leafStyle(6)}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+                <div style={{ position:'absolute', inset:0, padding:16 }}
+                  className="text-[#2E221B] flex flex-col items-center justify-center text-center">
+                  <div className="font-mono text-[8px] uppercase text-[#5A4032] mb-2 border-b border-[#5A4032]/40 pb-0.5">
+                    Continue Reading
+                  </div>
+                  <div className="font-serif italic text-xl">More stories<br/>are waiting.</div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'13px', color:'#5A4032', marginTop:6, opacity:0.85 }}>
+                    The diary continues with every new Tangy Session.
+                  </p>
+                  <div style={{ fontFamily:'Caveat, cursive', fontSize:'16px', fontWeight:700, marginTop:8, opacity:0.55 }}>To be continued…</div>
+                  <div className="font-mono text-[6.5px] tracking-[0.18em] uppercase text-[#A44A34] mt-2 opacity-70">TANGY DIARY · FIELD NOTES · VOL. I</div>
+                </div>
+              </div>
+            </div>
+
+          </div>{/* /book container */}
+        </div>{/* /3d stage */}
+
+        {/* Mobile Page Turn Controls & Touch Hint */}
+        {isMobile && (
+          <div className="flex flex-col items-center gap-2 mt-4 z-30">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handlePrevLeaf}
+                disabled={currentMobileLeaf === 0}
+                className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14]"
+              >
+                ← PREV PAGE
+              </button>
+
+              <span className="font-mono text-[10px] text-[#A68853] font-bold">
+                LEAF {currentMobileLeaf} / 6
+              </span>
+
+              <button
+                onClick={handleNextLeaf}
+                disabled={currentMobileLeaf === 6}
+                className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14]"
+              >
+                NEXT PAGE →
+              </button>
+            </div>
+            <div className="font-serif italic text-[11px] text-[#EADFC5]/65 text-center">
+              👈 Swipe left/right on book to turn 3D pages 👉
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Desktop Read More CTA */}
-      <div className="read-more-cta hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex-col items-center">
-        <p className="font-serif italic text-xs text-[#EADFC5]/70 mb-2">
+      {/* Read More CTA */}
+      <div className="read-more-cta mt-6 lg:mt-0 lg:absolute lg:bottom-8 left-1/2 lg:-translate-x-1/2 z-30 flex flex-col items-center">
+        <p className="font-serif italic text-xs text-[#EADFC5]/70 mb-2 text-center">
           Every Tangy Session leaves another page waiting to be written.
         </p>
-        <a href="/blogs"
-          className="bg-[#A68853] text-[#1F1713] hover:bg-[#EADFC5] border-2 border-[#1F1713] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#2E221B]">
+        <a
+          href="/blogs"
+          className="bg-[#A68853] text-[#1F1713] hover:bg-[#EADFC5] border-2 border-[#1F1713] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#2E221B]"
+        >
           Read the Complete Tangy Diary →
         </a>
       </div>
