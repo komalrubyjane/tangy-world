@@ -16,19 +16,20 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
     const pathEl = pathRef.current;
     if (!pathEl) return;
 
-    // 1. Build Single Continuous Smooth Cubic Bézier SVG Cable across full document
+    // 1. Build Single Continuous Smooth Cubic Bézier SVG Cable across full document height
     const updatePath = () => {
       const isMobile = window.innerWidth < 1024;
-      const fullH = isMobile
-        ? window.innerHeight
-        : Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight
-          );
+      
+      // Calculate true full document height for both mobile and desktop
+      const fullH = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        window.innerHeight * 4
+      );
       const fullW = window.innerWidth;
 
       if (containerRef.current) {
-        containerRef.current.style.height = isMobile ? '100dvh' : `${fullH}px`;
+        containerRef.current.style.height = `${fullH}px`;
       }
 
       if (svgRef.current) {
@@ -40,18 +41,18 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       // Stroke thickness: 3.2px on desktop, 2.0px on mobile
       pathEl.setAttribute('stroke-width', isMobile ? '2.0' : '3.2');
 
-      // Section Landmark Waypoints (Gutter & Edge Aligned)
+      // Section Landmark Waypoints (Gutter & Edge Aligned, contained within viewport)
       const points = [
         { x: fullW * 0.50, y: 0 },
-        { x: fullW * (isMobile ? 0.76 : 0.82), y: fullH * 0.08 }, // Hero
-        { x: fullW * (isMobile ? 0.18 : 0.12), y: fullH * 0.18 }, // Manifesto
-        { x: fullW * (isMobile ? 0.82 : 0.86), y: fullH * 0.28 }, // Sessions
-        { x: fullW * (isMobile ? 0.15 : 0.10), y: fullH * 0.38 }, // History
-        { x: fullW * (isMobile ? 0.85 : 0.88), y: fullH * 0.48 }, // Archive
-        { x: fullW * (isMobile ? 0.16 : 0.12), y: fullH * 0.58 }, // Diary
-        { x: fullW * (isMobile ? 0.82 : 0.86), y: fullH * 0.68 }, // Artists
-        { x: fullW * (isMobile ? 0.15 : 0.11), y: fullH * 0.78 }, // Crew
-        { x: fullW * (isMobile ? 0.84 : 0.87), y: fullH * 0.88 }, // Private Sessions
+        { x: fullW * (isMobile ? 0.72 : 0.82), y: fullH * 0.08 }, // Hero
+        { x: fullW * (isMobile ? 0.22 : 0.12), y: fullH * 0.18 }, // Manifesto
+        { x: fullW * (isMobile ? 0.74 : 0.86), y: fullH * 0.28 }, // Sessions
+        { x: fullW * (isMobile ? 0.20 : 0.10), y: fullH * 0.38 }, // History
+        { x: fullW * (isMobile ? 0.76 : 0.88), y: fullH * 0.48 }, // Archive
+        { x: fullW * (isMobile ? 0.22 : 0.12), y: fullH * 0.58 }, // Diary
+        { x: fullW * (isMobile ? 0.74 : 0.86), y: fullH * 0.68 }, // Artists
+        { x: fullW * (isMobile ? 0.20 : 0.11), y: fullH * 0.78 }, // Crew
+        { x: fullW * (isMobile ? 0.76 : 0.87), y: fullH * 0.88 }, // Private Sessions
         { x: fullW * 0.50, y: fullH * 0.995 }                     // Footer
       ];
 
@@ -119,8 +120,8 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         const isMobile = window.innerWidth < 768;
         
         // Microphone display dimensions & top metal connector offset (59.8% X, 0px Y)
-        const micWidth = isMobile ? 48 : 56;
-        const micHeight = isMobile ? 101 : 118;
+        const micWidth = isMobile ? 40 : 56;
+        const micHeight = isMobile ? 86 : 118;
         const connectorXOffset = micWidth * 0.598;
 
         // Position microphone suspended near ~55% of user's active viewport
@@ -139,7 +140,7 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         let angleDeg = (angleRad * (180 / Math.PI)) - 90;
         angleDeg = Math.min(6, Math.max(-6, angleDeg)); // Natural subtle pendulum sway (-6deg to +6deg)
 
-        // Translate so top metal connector hole (59.8%, 0px) meets (pt.x, pt.y) with 0 gap
+        // Translate so top metal connector hole meets (pt.x, pt.y) with 0 gap
         micObj.style.transform = `translate3d(${pt.x - connectorXOffset}px, ${pt.y}px, 0px) rotate(${angleDeg}deg)`;
       }
 
@@ -181,7 +182,7 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       {/* 2. SUSPENDED MICROPHONE HEAD (Top connector at 59.8% X, 0px Y) */}
       <div 
         ref={micHeadRef}
-        className="absolute top-0 left-0 w-[48px] h-[101px] md:w-[56px] md:h-[118px] pointer-events-none z-[86] flex flex-col items-center will-change-transform"
+        className="absolute top-0 left-0 w-[40px] h-[86px] md:w-[56px] md:h-[118px] pointer-events-none z-[86] flex flex-col items-center will-change-transform"
         style={{ transformOrigin: '59.8% 0px' }}
       >
         <div className="relative w-full h-full">

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
+import { UserAuthProvider } from './context/UserAuthContext';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Navbar } from './components/layout/Navbar';
 import { Menu } from './components/sections/Menu';
@@ -10,7 +11,6 @@ import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
 import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
 import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
-import { MobileLayout } from './components/mobile/MobileLayout';
 
 // Museum Interactive Modals & Dock
 import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
@@ -20,6 +20,7 @@ import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
 import { MerchShopModal } from './components/museum/MerchShopModal';
 import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
+import { UserLoginModal } from './components/museum/UserLoginModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
 // Dedicated Standalone Pages
@@ -35,6 +36,7 @@ import { VenueHostApplyPage } from './pages/VenueHostApplyPage';
 import { BlogsPage } from './pages/BlogsPage';
 import { InnerCirclePage } from './pages/InnerCirclePage';
 import { ContactPage } from './pages/ContactPage';
+import { AdminPage } from './pages/AdminPage';
 
 // Artist Portal Migration Imports
 import { ArtistLayout } from './artist/layouts/ArtistLayout';
@@ -52,13 +54,8 @@ import { SettingsPage } from './artist/pages/SettingsPage';
 // Homepage Sections
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
-import { History } from './components/sections/History';
 import { Archive } from './components/sections/Archive';
-import { Spaces } from './components/sections/Spaces';
-import { FrontCamera } from './components/sections/FrontCamera';
 import { TangyDiary } from './components/sections/TangyDiary';
-import { Artists } from './components/sections/Artists';
-import { Founders } from './components/sections/Founders';
 import { UpcomingEvents } from './components/sections/UpcomingEvents';
 import { Volunteer } from './components/sections/Volunteer';
 import { PrivateSessions } from './components/sections/PrivateSessions';
@@ -153,6 +150,9 @@ function MainWorld() {
         onClose={() => setIsPostcardOpen(false)} 
       />
 
+      {/* USER LOGIN MODAL (CUSTOMER/PATRON AUTH) */}
+      <UserLoginModal />
+
       {/* FLOATING QUICK DOCK TOOLBAR */}
       <MuseumQuickDock 
         onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
@@ -202,7 +202,7 @@ function MainWorld() {
            />
         </div>
 
-        <div className="tangy-world pt-0 md:pt-12">
+        <div className="tangy-world pt-0 md:pt-12 overflow-x-hidden">
           <main>
             {/* 01 — LANDING PAGE (HERO) */}
             <Hero />
@@ -243,90 +243,91 @@ function MainWorld() {
 export default function App() {
   return (
     <AudioProvider>
-      <LenisProvider>
-        <CursorProvider>
-          <CustomCursor />
-          <BrowserRouter>
-            <Routes>
-              {/* PUBLIC WEBSITE HOMEPAGE */}
-              <Route path="/" element={<MainWorld />} />
+      <UserAuthProvider>
+        <LenisProvider>
+          <CursorProvider>
+            <CustomCursor />
+            <BrowserRouter>
+              <Routes>
+                {/* PUBLIC WEBSITE HOMEPAGE */}
+                <Route path="/" element={<MainWorld />} />
 
-              {/* DEDICATED STANDALONE PAGES */}
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/sessions" element={<SessionsPage />} />
-              <Route path="/archive" element={<ArchivePage />} />
-              <Route path="/crew" element={<CrewPage />} />
-              <Route path="/apply/crew" element={<CrewPage />} />
-              <Route path="/volunteer" element={<CrewPage />} />
-              <Route path="/apply/vendors" element={<VendorApplyPage />} />
-              <Route path="/apply/sponsors" element={<SponsorApplyPage />} />
-              <Route path="/apply/venue-host" element={<VenueHostApplyPage />} />
-              <Route path="/apply/host" element={<VenueHostApplyPage />} />
-              <Route path="/private-sessions" element={<PrivateSessionsPage />} />
-              <Route path="/blogs" element={<BlogsPage />} />
-              <Route path="/diary" element={<BlogsPage />} />
-              <Route path="/inner-circle" element={<InnerCirclePage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/book/:sessionId" element={<BookingPage />} />
+                {/* DEDICATED STANDALONE PAGES */}
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/sessions" element={<SessionsPage />} />
+                <Route path="/archive" element={<ArchivePage />} />
+                <Route path="/crew" element={<CrewPage />} />
+                <Route path="/apply/crew" element={<CrewPage />} />
+                <Route path="/volunteer" element={<CrewPage />} />
+                <Route path="/apply/vendors" element={<VendorApplyPage />} />
+                <Route path="/apply/sponsors" element={<SponsorApplyPage />} />
+                <Route path="/apply/venue-host" element={<VenueHostApplyPage />} />
+                <Route path="/apply/host" element={<VenueHostApplyPage />} />
+                <Route path="/private-sessions" element={<PrivateSessionsPage />} />
+                <Route path="/blogs" element={<BlogsPage />} />
+                <Route path="/diary" element={<BlogsPage />} />
+                <Route path="/inner-circle" element={<InnerCirclePage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/book/:sessionId" element={<BookingPage />} />
 
-              {/* REDIRECT ALIASES */}
-              <Route path="/artists" element={<Navigate to="/artist" replace />} />
-              <Route path="/artists/*" element={<Navigate to="/artist" replace />} />
+                {/* ADMIN DASHBOARD DEDICATED ROUTE */}
+                <Route path="/admin" element={<AdminPage />} />
 
-              {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
-              <Route path="/artist" element={<ArtistLayout />}>
-                <Route index element={<ArtistsDirectoryPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
-                <Route path="profile/:id" element={<ArtistDetailsPage />} />
-                <Route 
-                  path="dashboard" 
-                  element={
-                    <ArtistProtectedRoute>
-                      <DashboardPage />
-                    </ArtistProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="profile" 
-                  element={
-                    <ArtistProtectedRoute>
-                      <ProfilePage />
-                    </ArtistProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="calendar" 
-                  element={
-                    <ArtistProtectedRoute>
-                      <CalendarPage />
-                    </ArtistProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="media" 
-                  element={
-                    <ArtistProtectedRoute>
-                      <MediaPage />
-                    </ArtistProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="settings" 
-                  element={
-                    <ArtistProtectedRoute>
-                      <SettingsPage />
-                    </ArtistProtectedRoute>
-                  } 
-                />
-              </Route>
+                {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
+                <Route path="/artist" element={<ArtistLayout />}>
+                  <Route index element={<ArtistsDirectoryPage />} />
+                  <Route path="login" element={<LoginPage />} />
+                  <Route path="register" element={<RegisterPage />} />
+                  <Route path="profile/:id" element={<ArtistDetailsPage />} />
+                  <Route 
+                    path="dashboard" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <DashboardPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="profile" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <ProfilePage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="calendar" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <CalendarPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="media" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <MediaPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="settings" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <SettingsPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                </Route>
 
-              {/* FALLBACK REDIRECT */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </CursorProvider>
-      </LenisProvider>
+                {/* FALLBACK REDIRECT */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </CursorProvider>
+        </LenisProvider>
+      </UserAuthProvider>
     </AudioProvider>
   );
 }

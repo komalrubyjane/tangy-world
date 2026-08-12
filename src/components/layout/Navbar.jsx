@@ -11,8 +11,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const leaveTimeoutRef = useRef(null);
 
-  // EXACT NAVIGATION ORDER SPECIFIED:
-  // About -> Sessions -> Archive -> Crew -> Collaborate -> Private -> Diary -> Inner Circle -> Contact
+  // NAVIGATION CATEGORIES (Includes ARTISTS section with distinct Artist Portal links)
   const navCategories = [
     {
       title: 'About',
@@ -21,7 +20,6 @@ export const Navbar = () => {
         { label: 'Why Tangy', path: '/about#manifesto' },
         { label: 'Chronology', path: '/about#history' },
         { label: 'Tangy Team', path: '/about#founders' },
-        { label: 'Media Highlights', path: '/media' },
         { label: 'Full Story', path: '/about' }
       ]
     },
@@ -43,6 +41,16 @@ export const Navbar = () => {
         { label: 'Museum Timeline', path: '/archive' },
         { label: 'Past Memories', path: '/archive' },
         { label: '35mm Contact Sheets', path: '/archive' }
+      ]
+    },
+    {
+      title: 'Artists',
+      path: '/artist',
+      items: [
+        { label: 'Artists Directory', path: '/artist' },
+        { label: 'Apply as an Artist', path: '/artist#apply' },
+        { label: 'Artist Login', path: '/artist/login' },
+        { label: 'Artist Portal', path: '/artist/dashboard' }
       ]
     },
     {
@@ -81,18 +89,7 @@ export const Navbar = () => {
       items: [
         { label: 'Museum Journal', path: '/blogs' },
         { label: 'Recent Stories', path: '/blogs' },
-        { label: 'Music Launches', path: '/blogs' },
         { label: 'Behind the Scenes', path: '/blogs' }
-      ]
-    },
-    {
-      title: 'Inner Circle',
-      path: '/inner-circle',
-      items: [
-        { label: 'Membership Benefits', path: '/inner-circle' },
-        { label: 'Early Access', path: '/inner-circle' },
-        { label: 'Secret Events', path: '/inner-circle' },
-        { label: 'Join Now', path: '/inner-circle' }
       ]
     },
     {
@@ -101,8 +98,7 @@ export const Navbar = () => {
       items: [
         { label: 'Location & Map', path: '/contact' },
         { label: 'Email Dispatch', path: 'mailto:hello@tangysessions.com', external: true },
-        { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true },
-        { label: 'Visit Tangy', path: '/contact' }
+        { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true }
       ]
     }
   ];
@@ -225,7 +221,7 @@ export const Navbar = () => {
       <div className="xl:hidden">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95"
+          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95 z-[10002] relative"
         >
           {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
         </button>
@@ -233,12 +229,12 @@ export const Navbar = () => {
 
       {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 top-[49px] bottom-0 bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
+        <div className="fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
           <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
             NAVIGATION MENU
           </div>
 
-          <div className="flex flex-col gap-3 mt-2">
+          <div className="flex flex-col gap-3 mt-2 pb-12">
             {navCategories.map((cat) => {
               const isCatOpen = activeDropdown === cat.title;
 
@@ -253,7 +249,7 @@ export const Navbar = () => {
                     </button>
                     <button
                       onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
-                      className="text-xs text-[#C99A2E] px-2 py-1"
+                      className="text-xs text-[#C99A2E] px-3 py-1 font-bold"
                     >
                       {isCatOpen ? '▲' : '▼'}
                     </button>
@@ -265,7 +261,7 @@ export const Navbar = () => {
                         <button
                           key={item.label}
                           onClick={() => handleNav(item)}
-                          className="text-left font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] py-1 flex justify-between items-center"
+                          className="text-left font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] py-1.5 flex justify-between items-center border-b border-[#11100C]/10 last:border-0"
                         >
                           <span>{item.label}</span>
                           <span className="text-[#C2272A]">→</span>

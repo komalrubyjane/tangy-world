@@ -1,0 +1,136 @@
+import { useState } from 'react';
+import { useUserAuth } from '../../context/UserAuthContext';
+import { useAudio } from '../../audio/AudioContext';
+
+export const UserLoginModal = () => {
+  const { isLoginModalOpen, closeLoginModal, login, isLoggedIn, user, logout } = useUserAuth();
+  const { playSFX } = useAudio();
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (!isLoginModalOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    playSFX('ticketClick');
+    setIsSubmitting(true);
+    setTimeout(() => {
+      login({ name: name || 'Tangy Listener', email: email || 'listener@tangy.com' });
+      setIsSubmitting(false);
+    }, 600);
+  };
+
+  const handleLogout = () => {
+    playSFX('ticketClick');
+    logout();
+    closeLoginModal();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
+      <div 
+        className="relative w-full max-w-md bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]"
+        style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
+      >
+        {/* Masking tape at top */}
+        <div className="absolute -top-3 left-1/3 w-24 h-5 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-20 pointer-events-none" />
+
+        {/* Close Button */}
+        <button 
+          onClick={closeLoginModal}
+          className="absolute top-3 right-3 font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] p-1"
+        >
+          ✕ CLOSE
+        </button>
+
+        {/* Header */}
+        <div className="border-b-2 border-[#11100C] pb-3 mb-4">
+          <div className="font-mono text-[9px] font-bold text-[#B94717] tracking-[0.2em] uppercase mb-1">
+            ✦ TANGY PATRON PORTAL
+          </div>
+          <h2 className="display text-3xl font-bold leading-tight">
+            {isLoggedIn ? 'PATRON PROFILE' : 'USER LOGIN'}
+          </h2>
+          <p className="font-serif italic text-xs text-[#2A1A0E] opacity-80 mt-1">
+            {isLoggedIn 
+              ? 'Access your digital passport, concert stamps & member perks.' 
+              : 'Sign in as a Tangy Listener to unlock your Digital Passport & Stamps.'}
+          </p>
+        </div>
+
+        {isLoggedIn ? (
+          <div className="flex flex-col gap-4">
+            <div className="bg-[#E3D4AC] p-4 border-2 border-[#11100C] font-mono text-xs">
+              <div className="flex justify-between items-center mb-2 pb-2 border-b border-[#11100C]/20">
+                <span className="opacity-70">STATUS:</span>
+                <span className="text-[#B94717] font-bold">ACTIVE MEMBER 🛂</span>
+              </div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="opacity-70">NAME:</span>
+                <span className="font-bold">{user.name}</span>
+              </div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="opacity-70">PASSPORT ID:</span>
+                <span className="font-bold">{user.passportId}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="opacity-70">STAMPS COLLECTED:</span>
+                <span className="font-bold text-[#B94717]">{user.stampsCount} Sessions</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="w-full font-mono text-xs font-bold uppercase tracking-widest bg-[#11100C] text-[#E7D5A4] hover:bg-[#C2272A] hover:text-white py-2.5 transition-colors shadow-[3px_3px_0px_#11100C]"
+            >
+              LOG OUT OF PASSPORT
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label className="block font-mono text-[10px] font-bold tracking-wider text-[#11100C] uppercase mb-1">
+                Your Name
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Arjuna Rao"
+                className="w-full bg-[#F5E9C9] border-2 border-[#11100C] px-3 py-2 font-serif text-sm text-[#11100C] focus:outline-none focus:border-[#B94717]"
+              />
+            </div>
+
+            <div>
+              <label className="block font-mono text-[10px] font-bold tracking-wider text-[#11100C] uppercase mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="listener@tangysessions.com"
+                className="w-full bg-[#F5E9C9] border-2 border-[#11100C] px-3 py-2 font-mono text-xs text-[#11100C] focus:outline-none focus:border-[#B94717]"
+              />
+            </div>
+
+            <div className="font-mono text-[9px] opacity-70 bg-[#E3D4AC] p-2 border border-[#11100C]/30">
+              ℹ️ Customer/Listener Login. (Artists please use the Artist Portal from the main menu).
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full font-mono text-xs font-bold uppercase tracking-widest bg-[#c2272a] text-[#ecdcaf] hover:bg-[#11100C] border-2 border-[#11100C] py-3 transition-colors shadow-[3px_3px_0px_#11100C] active:scale-95 disabled:opacity-50"
+            >
+              {isSubmitting ? 'UNLOCKING PASSPORT...' : 'ENTER & UNLOCK PASSPORT →'}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
