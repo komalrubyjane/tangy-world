@@ -40,4 +40,14 @@ export const AudioProvider = ({ children }) => {
   );
 };
 
-export const useAudio = () => useContext(AudioContext);
+const AUDIO_FALLBACK = {
+  isAudioEnabled: false,
+  isMuted: true,
+  toggleMute: () => {},
+  playSFX: () => {},
+  setFilterCutoff: () => {},
+  crossfadeSection: () => {},
+};
+
+export const useAudio = () => useContext(AudioContext) ?? AUDIO_FALLBACK;
+
