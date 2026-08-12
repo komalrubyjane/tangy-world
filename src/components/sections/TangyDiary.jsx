@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { useAudio } from '../../audio/AudioContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,7 +10,7 @@ const PAPER_BG = 'linear-gradient(170deg, #F5EEE0 0%, #EADFC5 45%, #E3D4AC 100%)
 const SH_R = 'inset -8px 0 20px rgba(90,64,50,0.18), 8px 10px 32px rgba(0,0,0,0.48)';
 const SH_L = 'inset  8px 0 20px rgba(90,64,50,0.18), -8px 10px 32px rgba(0,0,0,0.48)';
 
-const leafStyle = (i, mobileTurnedState) => {
+const leafStyle = (i, isMobile, mobileTurnedState) => {
   const isTurned = mobileTurnedState !== undefined ? mobileTurnedState : false;
   return {
     position: 'absolute',
@@ -17,10 +18,11 @@ const leafStyle = (i, mobileTurnedState) => {
     width: '50%',
     transformOrigin: 'left center',
     transformStyle: 'preserve-3d',
-    zIndex: isTurned ? 10 + i : 10 - i,
-    transform: isTurned ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-    transition: 'transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000)',
+    zIndex: isMobile ? (isTurned ? 20 + i : 20 - i) : (20 - i),
+    transform: isMobile ? (isTurned ? 'rotateY(-180deg)' : 'rotateY(0deg)') : 'rotateY(0deg)',
+    transition: isMobile ? 'transform 0.65s cubic-bezier(0.645, 0.045, 0.355, 1.000)' : 'none',
     willChange: 'transform',
+    cursor: 'pointer'
   };
 };
 
@@ -43,6 +45,7 @@ const backFace = (extra = {}) => ({
 
 export const TangyDiary = () => {
   const sectionRef = useRef(null);
+  const { playSFX } = useAudio();
   const [isMobile, setIsMobile] = useState(false);
   const [currentMobileLeaf, setCurrentMobileLeaf] = useState(0);
 
@@ -62,42 +65,60 @@ export const TangyDiary = () => {
   useGSAPContext((ctx) => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
 
+    // Desktop 3D Page Flipping Timeline on Scroll
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=900%',
+        end: '+=700%',
         pin: true,
-        scrub: 0.8,
+        scrub: 0.7,
         anticipatePin: 1,
-        onUpdate(self) {
-          gsap.to('.diary-mic-wire', {
-            rotate: Math.sin(self.progress * Math.PI * 10) * 2,
-            duration: 0.4,
-            ease: 'power1.out'
-          });
-        }
       }
     });
 
-    // Desktop GSAP Leaf Flipping Timeline
-    tl.to('.diary-left-base', { opacity: 1, duration: 0.25 }, 0.05)
-      .to('.desktop-leaf-0', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 0)
-      .to('.desktop-leaf-1', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 1)
-      .to('.desktop-leaf-2', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 2)
-      .to('.desktop-leaf-3', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 3)
-      .to('.desktop-leaf-4', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 4)
-      .to('.desktop-leaf-5', { rotateY: -180, duration: 1, ease: 'power2.inOut' }, 5);
+    // 1. Reveal left base cover
+    tl.to('.diary-left-base', { opacity: 1, duration: 0.3 }, 0);
+
+    // 2. Flip each leaf with exact 3D zIndex stacking
+    const numLeaves = 6;
+    for (let i = 0; i < numLeaves; i++) {
+      const startTime = i * 1;
+      const midTime = startTime + 0.5;
+
+      // Rotate from 0deg to -180deg
+      tl.to(`.desktop-leaf-${i}`, {
+        rotateY: -180,
+        duration: 1,
+        ease: 'power1.inOut',
+      }, startTime);
+
+      // At mid-flip (-90deg), switch zIndex so turned leaf sits ON TOP of left stack
+      tl.set(`.desktop-leaf-${i}`, { zIndex: 20 + i }, midTime);
+    }
   }, []);
 
-  // Mobile Touch Swipe Handlers
+  // Mobile & Desktop Manual Leaf Click/Turn
+  const handleLeafClick = (leafIndex) => {
+    playSFX('ticketClick');
+    if (isMobile) {
+      if (currentMobileLeaf >= leafIndex + 1) {
+        setCurrentMobileLeaf(leafIndex);
+      } else {
+        setCurrentMobileLeaf(leafIndex + 1);
+      }
+    }
+  };
+
   const handleNextLeaf = () => {
+    playSFX('ticketClick');
     if (currentMobileLeaf < 6) {
       setCurrentMobileLeaf((prev) => prev + 1);
     }
   };
 
   const handlePrevLeaf = () => {
+    playSFX('ticketClick');
     if (currentMobileLeaf > 0) {
       setCurrentMobileLeaf((prev) => prev - 1);
     }
@@ -154,13 +175,6 @@ export const TangyDiary = () => {
               <circle cx="20" cy="20" r="2.2" fill="currentColor" stroke="none"/>
             </g>
           </symbol>
-          <symbol id="sym-rain" viewBox="0 0 26 26">
-            <path d="M6,12 a5,5 0 0 1 9.5,-2 a4,4 0 0 1 1,7.9 h-11 a3.8,3.8 0 0 1 0.5,-5.9 z"
-              fill="none" stroke="#5A4032" strokeWidth="1.3"/>
-            <line x1="9" y1="21" x2="7"  y2="24" stroke="#5A4032" strokeWidth="1.3" strokeLinecap="round"/>
-            <line x1="13" y1="21" x2="12" y2="25" stroke="#5A4032" strokeWidth="1.3" strokeLinecap="round"/>
-            <line x1="17" y1="21" x2="16" y2="24" stroke="#5A4032" strokeWidth="1.3" strokeLinecap="round"/>
-          </symbol>
         </defs>
       </svg>
 
@@ -175,7 +189,7 @@ export const TangyDiary = () => {
       </div>
 
       {/* ================================================================= */}
-      {/* 3D DIARY BOOK (ZOOMED OUT ON MOBILE TO FIT PERFECTLY IN VIEW)     */}
+      {/* 3D DIARY BOOK (ZOOMED OUT ON MOBILE, 3D PAGE FLIP ON DESKTOP & MOBILE) */}
       {/* ================================================================= */}
       <div 
         onTouchStart={handleTouchStart}
@@ -273,8 +287,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 0: Front Cover / Inside Cover ─────────────────────── */}
             <div 
               className="diary-leaf desktop-leaf-0" 
-              style={leafStyle(0, isMobile ? currentMobileLeaf >= 1 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 1 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(0, isMobile, currentMobileLeaf >= 1)}
+              onClick={() => handleLeafClick(0)}
             >
               <div style={frontFace({
                 background: 'linear-gradient(145deg,#6B4B39 0%,#5A4032 45%,#4B3529 100%)',
@@ -330,8 +344,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 1: Stepwell ── */}
             <div 
               className="diary-leaf desktop-leaf-1" 
-              style={leafStyle(1, isMobile ? currentMobileLeaf >= 2 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 2 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(1, isMobile, currentMobileLeaf >= 2)}
+              onClick={() => handleLeafClick(1)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
@@ -371,8 +385,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 2: Monsoon ── */}
             <div 
               className="diary-leaf desktop-leaf-2" 
-              style={leafStyle(2, isMobile ? currentMobileLeaf >= 3 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 3 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(2, isMobile, currentMobileLeaf >= 3)}
+              onClick={() => handleLeafClick(2)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
@@ -399,8 +413,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 3: Performers ── */}
             <div 
               className="diary-leaf desktop-leaf-3" 
-              style={leafStyle(3, isMobile ? currentMobileLeaf >= 4 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 4 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(3, isMobile, currentMobileLeaf >= 4)}
+              onClick={() => handleLeafClick(3)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
@@ -430,8 +444,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 4: Backstage ── */}
             <div 
               className="diary-leaf desktop-leaf-4" 
-              style={leafStyle(4, isMobile ? currentMobileLeaf >= 5 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 5 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(4, isMobile, currentMobileLeaf >= 5)}
+              onClick={() => handleLeafClick(4)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
@@ -454,8 +468,8 @@ export const TangyDiary = () => {
             {/* ── LEAF 5: Community Note ── */}
             <div 
               className="diary-leaf desktop-leaf-5" 
-              style={leafStyle(5, isMobile ? currentMobileLeaf >= 6 : undefined)}
-              onClick={() => isMobile && (currentMobileLeaf >= 6 ? handlePrevLeaf() : handleNextLeaf())}
+              style={leafStyle(5, isMobile, currentMobileLeaf >= 6)}
+              onClick={() => handleLeafClick(5)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:12 }} className="text-[#2E221B]">
@@ -485,7 +499,7 @@ export const TangyDiary = () => {
             </div>
 
             {/* ── LEAF 6: Static final right page ──────────── */}
-            <div className="diary-leaf" style={leafStyle(6)}>
+            <div className="diary-leaf" style={leafStyle(6, isMobile, false)}>
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
@@ -498,35 +512,33 @@ export const TangyDiary = () => {
           </div>{/* /book container */}
         </div>{/* /3d stage */}
 
-        {/* Mobile Page Turn Controls & Touch Hint */}
-        {isMobile && (
-          <div className="flex flex-col items-center gap-2 z-30 -mt-10">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handlePrevLeaf}
-                disabled={currentMobileLeaf === 0}
-                className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14]"
-              >
-                ← PREV PAGE
-              </button>
+        {/* Page Turn Controls & Touch Hint (Visible on all screen sizes) */}
+        <div className="flex flex-col items-center gap-2 z-30 mt-4 lg:mt-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePrevLeaf}
+              disabled={currentMobileLeaf === 0}
+              className="font-mono text-[10px] sm:text-xs font-bold text-[#EADFC5] border border-[#A68853] px-3.5 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
+            >
+              ← PREV PAGE
+            </button>
 
-              <span className="font-mono text-[10px] text-[#A68853] font-bold">
-                LEAF {currentMobileLeaf} / 6
-              </span>
+            <span className="font-mono text-[10px] sm:text-xs text-[#A68853] font-bold">
+              LEAF {currentMobileLeaf} / 6
+            </span>
 
-              <button
-                onClick={handleNextLeaf}
-                disabled={currentMobileLeaf === 6}
-                className="font-mono text-[10px] font-bold text-[#EADFC5] border border-[#A68853] px-3 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14]"
-              >
-                NEXT PAGE →
-              </button>
-            </div>
-            <div className="font-serif italic text-[11px] text-[#EADFC5]/65 text-center">
-              👈 Swipe left/right on book to turn pages 👉
-            </div>
+            <button
+              onClick={handleNextLeaf}
+              disabled={currentMobileLeaf === 6}
+              className="font-mono text-[10px] sm:text-xs font-bold text-[#EADFC5] border border-[#A68853] px-3.5 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
+            >
+              NEXT PAGE →
+            </button>
           </div>
-        )}
+          <div className="font-serif italic text-[11px] text-[#EADFC5]/65 text-center">
+            {isMobile ? '👈 Swipe left/right on book to turn pages 👉' : 'Scroll down to flip pages, or click Next / Prev buttons above!'}
+          </div>
+        </div>
       </div>
 
       {/* Read More CTA */}
