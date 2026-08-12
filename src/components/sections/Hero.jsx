@@ -242,7 +242,7 @@ export const Hero = () => {
         </div>
 
         {/* INNER RIGHT: Veena Classical Musician in Green Saree */}
-        <div className="portrait-wrap-inner-right absolute z-[19] right-[30%] top-[34%] translate-x-1/2 w-[15cqw] min-w-[70px] max-w-[300px] h-[39cqw] min-h-[175px] max-h-[540px] pointer-events-none">
+        <div className="portrait-wrap-inner-right absolute z-[19] left-[69%] top-[34%] -translate-x-1/2 w-[15cqw] min-w-[70px] max-w-[300px] h-[39cqw] min-h-[175px] max-h-[540px] pointer-events-none">
           <img 
             src="/media/hero-performer-3-veena.png" 
             alt="Veena Classical Musician Performer" 
@@ -251,7 +251,7 @@ export const Hero = () => {
         </div>
 
         {/* FAR RIGHT: Hip-Hop Dancer Guy in Blue Sweatshirt */}
-        <div className="portrait-wrap-far-right absolute z-[18] right-[14%] top-[34%] translate-x-1/2 w-[15cqw] min-w-[65px] max-w-[290px] h-[40cqw] min-h-[180px] max-h-[550px] pointer-events-none">
+        <div className="portrait-wrap-far-right absolute z-[18] left-[85%] top-[34%] -translate-x-1/2 w-[15cqw] min-w-[65px] max-w-[290px] h-[40cqw] min-h-[180px] max-h-[550px] pointer-events-none">
           <img 
             src="/media/hero-performer-5-hiphop.png" 
             alt="Hip-Hop Dancer Performer" 
