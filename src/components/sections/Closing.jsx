@@ -16,7 +16,7 @@ export const Closing = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} id="contact" className="relative w-full py-32 bg-[#11100C] text-[#E7D5A4] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#5A120D]">
+    <section ref={sectionRef} id="contact" className="relative w-full py-20 sm:py-32 bg-[#11100C] text-[#E7D5A4] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#5A120D]">
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
@@ -30,7 +30,7 @@ export const Closing = () => {
           CONTACT // MAGAZINE BACK PAGE
         </span>
         
-        <h2 className="display text-6xl md:text-9xl text-[#E7D5A4] mb-3 leading-none ink-bleed">
+        <h2 className="display text-4xl sm:text-7xl md:text-9xl text-[#E7D5A4] mb-3 leading-tight sm:leading-none ink-bleed">
           COME<br/>
           <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
         </h2>
@@ -40,18 +40,18 @@ export const Closing = () => {
         </p>
 
         {/* Contact Info Cards & Contact Us CTA */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-6 border-t-2 border-[#E7D5A4]/30 pt-8">
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-6 border-t-2 border-[#E7D5A4]/30 pt-6 sm:pt-8">
+          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">LOCATION</span>
             <span>HYDERABAD · TELANGANA<br/>INDIA</span>
           </div>
 
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
+          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">DISPATCH</span>
-            <span>HELLO@TANGYSESSIONS.COM</span>
+            <span className="break-all">HELLO@TANGYSESSIONS.COM</span>
           </div>
 
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-6 backdrop-blur-xs">
+          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
             <span className="text-[#C99A2E] font-bold block mb-2 uppercase">ARCHIVE</span>
             <span>INSTAGRAM: @TANGYSESSIONS</span>
           </div>

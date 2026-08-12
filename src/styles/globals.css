@@ -56,6 +56,36 @@
     min-height: 100%;
     overflow-x: hidden;
   }
+
+  /* ==================================
+     GLOBAL MOBILE BREATHING ROOM
+     Keeps all sections from feeling
+     congested on small screens.
+   ================================== */
+  @media (max-width: 640px) {
+    /* Universal safe horizontal padding */
+    .mobile-px {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    /* Reduce heavy box-shadows on mobile */
+    .shadow-\[20px_20px_0px_\#11100C\] {
+      box-shadow: 8px 8px 0px #11100C;
+    }
+    .shadow-\[15px_15px_0px_\#11100C\] {
+      box-shadow: 6px 6px 0px #11100C;
+    }
+    .shadow-\[25px_25px_0px_\#11100C\] {
+      box-shadow: 10px 10px 0px #11100C;
+    }
+
+    /* Breathable section vertical spacing */
+    .section-py-mobile {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+  }
 }
 
 /* Custom 1970s Vintage Poster Typography Classes */

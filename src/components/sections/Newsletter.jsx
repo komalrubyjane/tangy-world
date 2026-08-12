@@ -17,7 +17,7 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="relative w-full py-24 bg-[#694323] border-t-8 border-[#11100C] text-center flex flex-col items-center justify-center">
+    <section className="relative w-full py-16 sm:py-24 bg-[#694323] border-t-8 border-[#11100C] text-center flex flex-col items-center justify-center">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
       
       <div className="relative z-10 max-w-xl w-full px-4">

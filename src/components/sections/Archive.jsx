@@ -120,11 +120,11 @@ export const Archive = () => {
       </div>
 
       {/* MOBILE: 2-column photo grid */}
-      <div className="mobile-archive-grid lg:hidden w-full px-4 pt-4 pb-16 max-w-[460px] mx-auto">
-        <p className="font-serif italic text-xs text-[#E7D5A4]/80 mb-6">
+      <div className="mobile-archive-grid lg:hidden w-full px-5 pt-4 pb-16 max-w-[480px] mx-auto">
+        <p className="font-serif italic text-xs text-[#E7D5A4]/80 mb-8">
           "Every gathering leaves behind more than photographs."
         </p>
-        <div className="grid grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 gap-5 sm:gap-7">
           {gallery.map((photo, i) => (
             <div key={photo.id} className="mobile-archive-photo">
               <PhotoCard photo={photo} i={i} isLast={false} />
