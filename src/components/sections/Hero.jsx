@@ -274,19 +274,23 @@ export const Hero = () => {
         {/* ------------------------------------------------------------- */}
         {/* LABELS & STICKERS (z-40)                                      */}
         {/* ------------------------------------------------------------- */}
-        {/* LEFT COLUMN: 33⅓ RPM BADGE */}
-        <div className="badge absolute z-40 left-[2.5cqw] top-[18%] w-[11cqw] min-w-[50px] max-w-[11cqw] h-[11cqw] min-h-[50px] max-h-[11cqw] rounded-full bg-[#ecdcaf] border-[0.35cqw] border-[#c2272a] flex flex-col items-center justify-center text-center text-[#c2272a] shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.45)] -rotate-6 pointer-events-none">
-          <div className="font-poster text-[clamp(9px,2.5cqw,36px)] leading-[0.9]">33<span className="text-[clamp(5px,1.1cqw,16px)] align-super">⅓</span></div>
-          <div className="font-mono font-bold text-[clamp(5px,1.1cqw,14px)] tracking-[0.08em] mt-[0.1cqw]">RPM</div>
-          <svg className="w-[0.85cqw] min-w-[6px] h-[0.85cqw] min-h-[6px] mt-[0.2cqw]" viewBox="0 0 24 24" fill="#c2272a"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.3 7-6.3-3.6L5.7 21l1.3-7-5-4.9 7.1-.7z"/></svg>
-          <div className="font-mono font-semibold text-[clamp(4px,0.9cqw,12px)] tracking-[0.15em] mt-[0.25cqw]">STEREO</div>
+        {/* LEFT COLUMN: 33⅓ RPM BADGE - real photo asset */}
+        <div className="badge absolute z-40 left-[2.5cqw] top-[18%] w-[11cqw] min-w-[50px] max-w-[130px] aspect-square -rotate-6 pointer-events-none drop-shadow-[0_0.6cqw_1.2cqw_rgba(0,0,0,0.55)]">
+          <img
+            src="/media/33-rpm-stereo.png"
+            alt="33⅓ RPM Stereo vinyl badge"
+            className="w-full h-full object-contain"
+          />
         </div>
 
-        {/* LEFT COLUMN: LIVE AND REAL TAPE STICKER */}
-        <div className="badge absolute z-40 left-[16.5%] top-[20%] bg-[#191410] text-[#ecdcaf] p-[0.6cqw_1cqw] -rotate-6 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.45)] text-center pointer-events-none">
-          <div className="absolute -top-[0.8cqw] left-1/2 -translate-x-1/2 -rotate-3 w-[4cqw] min-w-[16px] h-[1.5cqw] min-h-[6px] bg-[rgba(230,220,190,0.55)] border border-[rgba(255,255,255,0.3)]" />
-          <div className="font-mono font-bold text-[clamp(6.5px,1.45cqw,18px)] tracking-[0.04em]">LIVE</div>
-          <div className="font-mono font-medium text-[clamp(4.5px,0.9cqw,12px)] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>
+        {/* LEFT COLUMN: LIVE AND REAL TAPE STICKER - real photo asset */}
+        <div className="badge absolute z-40 left-[16.5%] top-[18%] w-[12cqw] min-w-[55px] max-w-[150px] -rotate-6 pointer-events-none"
+          style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,0,0,0.7))' }}>
+          <img
+            src="/media/live-and-real.png"
+            alt="Live and Real tape sticker"
+            className="w-full h-full object-contain"
+          />
         </div>
 
 
