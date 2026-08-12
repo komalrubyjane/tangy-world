@@ -92,15 +92,44 @@ export const TangyDiary = () => {
 
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
-    // Master scroll-pinned timeline
+    if (isMobile) {
+      // Mobile: simple fade-up per journal card — no pin, no scrub, no 3D
+      gsap.from('.mobile-diary-card', {
+        opacity: 0,
+        y: 50,
+        duration: 0.7,
+        stagger: 0.12,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.mobile-diary-wrap',
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+      });
+      gsap.from('.mobile-diary-cta', {
+        opacity: 0,
+        y: 20,
+        duration: 0.6,
+        ease: 'power2.out',
+        delay: 0.8,
+        scrollTrigger: {
+          trigger: '.mobile-diary-wrap',
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+      });
+      return;
+    }
+
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: isMobile ? 'top 80%' : 'top top',
-        end: isMobile ? '+=50%' : '+=900%',
-        pin: !isMobile,
+        start: 'top top',
+        end: '+=900%',
+        pin: true,
         scrub: 0.8,
-        anticipatePin: isMobile ? 0 : 1,
+        anticipatePin: 1,
         onUpdate(self) {
           gsap.to('.diary-mic-wire', {
             rotate: Math.sin(self.progress * Math.PI * 10) * 2,
@@ -234,8 +263,143 @@ export const TangyDiary = () => {
         </div>
       </div>
 
-      {/* 3D Stage */}
-      <div style={{ perspective: '2200px', perspectiveOrigin: '50% 40%', position: 'relative' }}>
+      {/* ====================================================== */}
+      {/* MOBILE JOURNAL LAYOUT (shown only < lg)                 */}
+      {/* ====================================================== */}
+      <div className="mobile-diary-wrap lg:hidden w-full px-4 pt-28 pb-16 flex flex-col gap-6"
+        style={{ background: 'linear-gradient(180deg, #241A14 0%, #1F1713 100%)' }}>
+
+        {/* Cover card */}
+        <div className="mobile-diary-card rounded-sm"
+          style={{
+            background: 'linear-gradient(145deg,#6B4B39 0%,#5A4032 45%,#4B3529 100%)',
+            border: '2px solid #A68853',
+            padding: '24px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          }}>
+          <div className="font-mono text-[8px] tracking-[0.22em] uppercase text-[#EADFC5]/55 mb-3">Archive No. 001</div>
+          <div className="font-serif font-bold text-[#A68853] leading-none mb-1" style={{fontSize:36}}>TANGY<br/>DIARY</div>
+          <div className="font-mono text-[10px] tracking-[0.35em] text-[#EADFC5]/70 mb-1 uppercase">Field Notes</div>
+          <div className="font-serif italic text-xs text-[#EADFC5]/50 mb-4">Hyderabad · Since 2016</div>
+          <svg width="44" height="44" viewBox="0 0 52 52" fill="none" stroke="#A68853" strokeWidth="1.1" strokeLinecap="round" className="opacity-40">
+            <line x1="26" y1="52" x2="26" y2="28"/><path d="M26,42 Q16,36 14,26 Q24,28 26,42"/>
+            <path d="M26,36 Q36,30 38,20 Q28,22 26,36"/><circle cx="26" cy="22" r="5" fill="none"/>
+            <circle cx="26" cy="22" r="2" fill="#A68853"/>
+          </svg>
+          <div className="font-mono text-[7px] tracking-[0.14em] uppercase text-[#EADFC5]/40 mt-4">Field Journal · Property of Tangy Sessions</div>
+        </div>
+
+        {/* Spread 1 — Stepwell */}
+        <div className="mobile-diary-card" style={{ background:'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 100%)', border:'1px solid rgba(90,64,50,0.3)', padding:18, boxShadow:'0 6px 20px rgba(0,0,0,0.35)', borderRadius:1 }}>
+          <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+            <span>Spread #01</span><span className="text-[#A44A34] font-bold">14 Oct, 2024</span>
+          </div>
+          <div className="font-serif italic text-lg text-[#2E221B] leading-tight mb-1">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
+          <div className="font-mono text-[8px] text-[#A44A34] uppercase tracking-wider mb-2">LOCATION: BANSILALPET STEPWELL</div>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:16, color:'#2E221B', lineHeight:1.5}}>
+            The stepwell echoes before the crowd arrives. Water dripping against 350-year-old stone, acoustic instruments humming without amplification.
+          </p>
+          <div className="mt-3 p-2 -rotate-1" style={{background:'#E6D8B7', border:'1px solid rgba(166,136,83,0.32)', maxWidth:200}}>
+            <div style={{fontFamily:'Caveat, cursive', fontSize:13, color:'#2E221B'}}>Echo off 350-year-old stone.</div>
+          </div>
+        </div>
+
+        {/* Spread 2 — Monsoon */}
+        <div className="mobile-diary-card" style={{ background:'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 100%)', border:'1px solid rgba(90,64,50,0.3)', padding:18, boxShadow:'0 6px 20px rgba(0,0,0,0.35)', borderRadius:1 }}>
+          <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+            <span>Spread #02</span><span className="text-[#A44A34] font-bold">21 Dec, 2024</span>
+          </div>
+          <div className="font-serif italic text-lg text-[#2E221B] leading-tight mb-1">Monsoon Acoustics &amp;<br/>Old City Haveli</div>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:16, color:'#2E221B', lineHeight:1.5}}>
+            When the lights dropped at midnight, 300 people stood completely still under rain-soaked arches. No phones in the air.
+          </p>
+          <div className="mt-3 p-2 rotate-1" style={{background:'#E6D8B7', border:'1px solid rgba(166,136,83,0.32)', maxWidth:200}}>
+            <div style={{fontFamily:'Caveat, cursive', fontSize:13, color:'#2E221B'}}>300 people stayed till sunrise.</div>
+          </div>
+        </div>
+
+        {/* Spread 3 — Artists */}
+        <div className="mobile-diary-card" style={{ background:'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 100%)', border:'1px solid rgba(90,64,50,0.3)', padding:18, boxShadow:'0 6px 20px rgba(0,0,0,0.35)', borderRadius:1 }}>
+          <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+            <span>Spread #03</span><span className="text-[#A44A34] font-bold">05 Jan, 2025</span>
+          </div>
+          <div className="font-serif italic text-lg text-[#2E221B] leading-tight mb-1">Artists &amp;<br/>Performers</div>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:16, color:'#2E221B', lineHeight:1.5}}>
+            The artists gathered around ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant.
+          </p>
+          <div className="mt-3 inline-block text-[#EADFC5] font-mono text-[8px] rotate-1" style={{background:'#A44A34', padding:'6px 10px'}}>
+            PERFORMER PASS // BACKSTAGE
+          </div>
+        </div>
+
+        {/* Spread 4 — Backstage */}
+        <div className="mobile-diary-card" style={{ background:'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 100%)', border:'1px solid rgba(90,64,50,0.3)', padding:18, boxShadow:'0 6px 20px rgba(0,0,0,0.35)', borderRadius:1 }}>
+          <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+            <span>Spread #04</span><span className="text-[#A44A34] font-bold">Backstage</span>
+          </div>
+          <div className="font-serif italic text-lg text-[#2E221B] leading-tight mb-1">Backstage Notes &amp;<br/>Hidden Spaces</div>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:16, color:'#2E221B', lineHeight:1.5}}>
+            A 300-year-old sanctuary tucked behind stone arches. We mapped the acoustics by hand, with no digital tools.
+          </p>
+          <div className="mt-3 font-mono text-[8px] text-[#5A4032]" style={{border:'1px dashed rgba(90,64,50,0.4)', padding:8}}>
+            [ NORTH WALL: REVERB 1.8s ]<br/>[ SOUTHERN ARCH: NATURAL BASS TRAP ]
+          </div>
+        </div>
+
+        {/* Handwritten note card — Community / Dear You */}
+        <div className="mobile-diary-card relative" style={{
+          background: 'linear-gradient(170deg,#FDFAF4 0%,#F8F3E8 60%,#F2EBD8 100%)',
+          border: '1px solid rgba(90,64,50,0.15)',
+          boxShadow: '4px 6px 18px rgba(60,40,20,0.3)',
+          padding: '18px 16px 20px',
+          transform: 'rotate(-1.2deg)',
+          clipPath: 'polygon(0% 2%, 3% 0%, 97% 1%, 100% 0%, 100% 98%, 96% 100%, 3% 99%, 0% 100%)',
+        }}>
+          <div className="absolute -top-[12px] left-1/2 -translate-x-1/2 w-14 h-4 -rotate-1 pointer-events-none"
+            style={{background:'rgba(201,168,83,0.45)', border:'1px solid rgba(160,120,20,0.25)'}}/>
+          {/* Botanical doodles */}
+          <svg className="absolute top-4 right-4 opacity-25" width="28" height="38" viewBox="0 0 30 40" fill="none" stroke="#5A4032" strokeWidth="1" strokeLinecap="round">
+            <line x1="15" y1="40" x2="15" y2="20"/><path d="M15,34 Q8,28 6,20 Q13,22 15,34"/>
+            <path d="M15,26 Q22,20 24,12 Q17,14 15,26"/><circle cx="15" cy="14" r="4"/>
+          </svg>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:18, lineHeight:1.6, color:'#2E221B'}}>
+            Dear You,<br/><br/>
+            Every gathering leaves something behind.<br/><br/>
+            A song.<br/>A conversation.<br/>A place.<br/>A memory.<br/><br/>
+            And somehow, we carry it with us.
+          </p>
+          <p style={{fontFamily:'Caveat, cursive', fontSize:17, color:'#A44A34', textAlign:'right', marginTop:10}}>— Tangy</p>
+        </div>
+
+        {/* Final page card */}
+        <div className="mobile-diary-card text-center" style={{ background:'linear-gradient(170deg,#F5EEE0 0%,#EADFC5 100%)', border:'1px solid rgba(90,64,50,0.3)', padding:24, boxShadow:'0 6px 20px rgba(0,0,0,0.35)', borderRadius:1 }}>
+          <div className="font-mono text-[9px] tracking-widest uppercase text-[#5A4032] mb-3" style={{borderBottom:'1px solid rgba(90,64,50,0.4)', display:'inline-block', paddingBottom:4}}>Continue Reading</div>
+          <div className="font-serif italic text-2xl text-[#2E221B] mb-2">More stories<br/>are waiting.</div>
+          <svg className="mx-auto my-3 opacity-30" width="52" height="52" viewBox="0 0 64 64" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
+            <line x1="32" y1="64" x2="32" y2="32"/><path d="M32,52 Q20,44 16,32 Q28,36 32,52"/>
+            <path d="M32,42 Q44,34 48,22 Q36,26 32,42"/><circle cx="32" cy="26" r="6"/>
+            <circle cx="32" cy="26" r="2.5" fill="#5A4032"/>
+          </svg>
+          <div style={{fontFamily:'Caveat, cursive', fontSize:18, fontWeight:700, color:'#2E221B', opacity:0.55}}>To be continued…</div>
+          <div className="font-mono text-[7px] tracking-[0.2em] uppercase text-[#A44A34] mt-3 opacity-70">TANGY DIARY · FIELD NOTES · VOL. I</div>
+        </div>
+
+        {/* Mobile CTA */}
+        <div className="mobile-diary-cta flex flex-col items-center gap-3 pt-2">
+          <p className="font-serif italic text-xs text-[#EADFC5]/70 text-center">Every Tangy Session leaves another page waiting to be written.</p>
+          <a href="/blogs"
+            className="bg-[#A68853] text-[#1F1713] border-2 border-[#1F1713] px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase transition-colors active:scale-95"
+            style={{boxShadow:'4px 4px 0px #2E221B'}}>
+            Read the Complete Tangy Diary →
+          </a>
+        </div>
+      </div>
+      {/* ====================================================== */}
+      {/* END MOBILE JOURNAL LAYOUT                              */}
+      {/* ====================================================== */}
+
+      {/* 3D Stage — Desktop only */}
+      <div className="hidden lg:block" style={{ perspective: '2200px', perspectiveOrigin: '50% 40%', position: 'relative' }}>
 
         {/* Desk shadow */}
         <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 bg-black blur-[55px] opacity-[0.22]"
@@ -708,10 +872,10 @@ export const TangyDiary = () => {
           </div>
 
         </div>{/* /book container */}
-      </div>{/* /3d stage */}
+      </div>{/* /3d stage (desktop only) */}
 
-      {/* Read More CTA */}
-      <div className="read-more-cta absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-center flex flex-col items-center">
+      {/* Read More CTA — desktop only (mobile has its own inside mobile-diary-wrap) */}
+      <div className="read-more-cta hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-center flex-col items-center">
         <p className="font-serif italic text-xs text-[#EADFC5]/70 mb-2">
           Every Tangy Session leaves another page waiting to be written.
         </p>
@@ -724,8 +888,8 @@ export const TangyDiary = () => {
         </a>
       </div>
 
-      {/* Scroll hint */}
-      <div className="read-hint absolute bottom-6 left-1/2 -translate-x-1/2 text-center pointer-events-none"
+      {/* Scroll hint — desktop only */}
+      <div className="read-hint hidden lg:block absolute bottom-6 left-1/2 -translate-x-1/2 text-center pointer-events-none"
         style={{ zIndex: 10000 }}>
         <div className="font-serif italic text-sm tracking-wider text-[#A68853]">Scroll to Open Journal</div>
         <div className="text-xs text-[#A68853] opacity-75 mt-0.5 animate-bounce">↓</div>
