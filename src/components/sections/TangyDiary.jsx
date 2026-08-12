@@ -44,7 +44,6 @@ const backFace = (extra = {}) => ({
 });
 
 export const TangyDiary = () => {
-  const sectionRef = useRef(null);
   const { playSFX } = useAudio();
   const [isMobile, setIsMobile] = useState(false);
   const [currentMobileLeaf, setCurrentMobileLeaf] = useState(0);
@@ -62,31 +61,39 @@ export const TangyDiary = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useGSAPContext((ctx) => {
+  // Desktop 3D Page Flipping Timeline attached via useGSAPContext
+  const sectionRef = useGSAPContext((ctx) => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
 
-    // Desktop 3D Page Flipping Timeline on Scroll
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=700%',
+        end: '+=600%',
         pin: true,
-        scrub: 0.7,
+        scrub: 0.6,
         anticipatePin: 1,
+        onUpdate: (self) => {
+          // Fade out scroll hint when scrolling starts
+          if (self.progress > 0.05) {
+            gsap.to('.read-hint', { opacity: 0, duration: 0.3 });
+          } else {
+            gsap.to('.read-hint', { opacity: 1, duration: 0.3 });
+          }
+        }
       }
     });
 
-    // 1. Reveal left base cover
+    // 1. Fade in left base cover board as book opens
     tl.to('.diary-left-base', { opacity: 1, duration: 0.3 }, 0);
 
-    // 2. Flip each leaf with exact 3D zIndex stacking
+    // 2. Flip each leaf sequentially from 0deg to -180deg with 3D zIndex stacking
     const numLeaves = 6;
     for (let i = 0; i < numLeaves; i++) {
       const startTime = i * 1;
       const midTime = startTime + 0.5;
 
-      // Rotate from 0deg to -180deg
+      // Rotate leaf from 0 to -180 degrees
       tl.to(`.desktop-leaf-${i}`, {
         rotateY: -180,
         duration: 1,
@@ -96,7 +103,7 @@ export const TangyDiary = () => {
       // At mid-flip (-90deg), switch zIndex so turned leaf sits ON TOP of left stack
       tl.set(`.desktop-leaf-${i}`, { zIndex: 20 + i }, midTime);
     }
-  }, []);
+  }, [isMobile]);
 
   // Mobile & Desktop Manual Leaf Click/Turn
   const handleLeafClick = (leafIndex) => {
@@ -189,7 +196,7 @@ export const TangyDiary = () => {
       </div>
 
       {/* ================================================================= */}
-      {/* 3D DIARY BOOK (ZOOMED OUT ON MOBILE, 3D PAGE FLIP ON DESKTOP & MOBILE) */}
+      {/* 3D DIARY BOOK (ZOOMED OUT ON MOBILE, SCROLL & CLICK 3D PAGE FLIP)  */}
       {/* ================================================================= */}
       <div 
         onTouchStart={handleTouchStart}
@@ -512,7 +519,7 @@ export const TangyDiary = () => {
           </div>{/* /book container */}
         </div>{/* /3d stage */}
 
-        {/* Page Turn Controls & Touch Hint (Visible on all screen sizes) */}
+        {/* Page Turn Controls & Touch Hint (Visible on mobile or as controls) */}
         <div className="flex flex-col items-center gap-2 z-30 mt-4 lg:mt-6">
           <div className="flex items-center gap-3">
             <button
@@ -536,7 +543,7 @@ export const TangyDiary = () => {
             </button>
           </div>
           <div className="font-serif italic text-[11px] text-[#EADFC5]/65 text-center">
-            {isMobile ? '👈 Swipe left/right on book to turn pages 👉' : 'Scroll down to flip pages, or click Next / Prev buttons above!'}
+            {isMobile ? '👈 Swipe left/right on book to turn pages 👉' : 'Scroll down to flip pages in 3D, or use the buttons above!'}
           </div>
         </div>
       </div>
