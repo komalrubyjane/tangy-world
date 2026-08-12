@@ -122,7 +122,12 @@ export const Navbar = () => {
       if (window.location.pathname !== targetRoute) {
         navigate(pathStr);
       } else {
-        document.querySelector(`#${hashTag}`)?.scrollIntoView({ behavior: 'smooth' });
+        try {
+          const el = document.getElementById(hashTag) || document.querySelector(`#${hashTag}`);
+          el?.scrollIntoView({ behavior: 'smooth' });
+        } catch (e) {
+          document.getElementById(hashTag)?.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     } else {
       navigate(pathStr);
