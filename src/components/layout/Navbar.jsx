@@ -108,23 +108,24 @@ export const Navbar = () => {
     setActiveDropdown(null);
     setIsMobileMenuOpen(false);
 
-    if (item.external) {
+    if (typeof item === 'object' && item.external) {
       window.open(item.path, '_blank', 'noopener,noreferrer');
       return;
     }
 
-    const path = item.path || item;
-    if (typeof path === 'string' && path.startsWith('#')) {
-      if (window.location.pathname !== '/') {
-        navigate('/');
-        setTimeout(() => {
-          document.querySelector(path)?.scrollIntoView({ behavior: 'smooth' });
-        }, 150);
+    const pathStr = typeof item === 'string' ? item : item.path;
+    if (!pathStr) return;
+
+    if (pathStr.includes('#')) {
+      const [routePath, hashTag] = pathStr.split('#');
+      const targetRoute = routePath || '/';
+      if (window.location.pathname !== targetRoute) {
+        navigate(pathStr);
       } else {
-        document.querySelector(path)?.scrollIntoView({ behavior: 'smooth' });
+        document.querySelector(`#${hashTag}`)?.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (typeof path === 'string') {
-      navigate(path);
+    } else {
+      navigate(pathStr);
     }
   };
 

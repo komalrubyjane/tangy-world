@@ -88,7 +88,7 @@ export const Founders = () => {
     <section 
       ref={sectionRef} 
       id="founders" 
-      className="relative w-full py-28 md:py-36 bg-[#1C140E] text-[#EAD9A6] overflow-hidden border-t-8 border-[#D19A24]"
+      className="relative w-full py-16 md:py-28 lg:py-36 bg-[#1C140E] text-[#EAD9A6] overflow-hidden border-t-8 border-[#D19A24]"
     >
       
       {/* WOODEN DESK & NOISE TEXTURE */}
@@ -126,13 +126,13 @@ export const Founders = () => {
       </div>
 
       {/* 2 VINTAGE DOSSIER FOLDER CARDS (ARJUNA & DEEPA) */}
-      <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 relative z-20 items-stretch">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 relative z-20 items-stretch">
         
         {foundersData.map((founder, idx) => (
           <div 
             key={founder.id}
-            className={`founder-dossier-${idx + 1} group bg-[#EAD9A6] text-[#15120D] p-6 md:p-12 border-4 border-[#15120D] shadow-[20px_20px_0px_#15120D] hover:shadow-[28px_28px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
-            style={{ transform: `rotate(${founder.rotation})` }}
+            className={`founder-dossier-${idx + 1} group bg-[#EAD9A6] text-[#15120D] p-5 md:p-8 lg:p-12 border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[20px_20px_0px_#15120D] hover:shadow-[12px_12px_0px_#15120D] md:hover:shadow-[28px_28px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
+            style={{ transform: window.innerWidth >= 768 ? `rotate(${founder.rotation})` : 'none' }}
           >
             
             {/* MANILA TAB */}
@@ -166,7 +166,7 @@ export const Founders = () => {
               </span>
 
               {/* POLAROID PHOTO */}
-              <div className="relative w-[180px] md:w-[230px] bg-[#F5E9C9] p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
+              <div className="relative w-[140px] sm:w-[180px] md:w-[230px] bg-[#F5E9C9] p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
                 <img src={founder.image} alt={founder.name} className="w-full aspect-[3/4] object-cover filter grayscale contrast-130 border border-[#15120D]" />
                 <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-2">✎ FOUNDER ARCHIVE // {founder.year}</p>
               </div>

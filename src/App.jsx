@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
@@ -248,6 +249,7 @@ export default function App() {
           <CursorProvider>
             <CustomCursor />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 {/* PUBLIC WEBSITE HOMEPAGE */}
                 <Route path="/" element={<MainWorld />} />

@@ -68,6 +68,63 @@ export const events = [
       "02. Telangana Folk Lullaby",
       "03. Open Jam & Chants"
     ]
+  },
+  {
+    id: 'vol-3',
+    slug: 'vol-3',
+    title: 'Tangy Sessions Vol. 3',
+    artist: 'Priya K & Tabla Collective',
+    date: 'Feb 14, 2026',
+    time: '7:30 PM',
+    venue: 'Bansilalpet Stepwell',
+    city: 'HYDERABAD',
+    description: 'Experimental vocal ambient loops, tabla rhythms, and ancient stone resonance on Valentine\'s eve.',
+    image: '/media/gallery/tangy8.jpg',
+    ticketUrl: '#book',
+    status: 'AVAILABLE',
+    price: '₹899',
+    tags: ['Vocal', 'Ambient', 'Tabla'],
+    capacity: 200,
+    story: 'A love letter to the forgotten stones of Hyderabad — intimate, raw, and unscripted.',
+    setlist: ['01. Drone Prelude', '02. Tabla & Breath', '03. Stone Echo Improvisation', '04. Silent Raga Finale']
+  },
+  {
+    id: 'solstice-2026',
+    slug: 'solstice-2026',
+    title: 'Tangy Sessions: Summer Solstice',
+    artist: 'Damini Bhatla & Ensemble',
+    date: 'Jun 21, 2026',
+    time: '7:00 PM',
+    venue: 'Taramati Baradari',
+    city: 'HYDERABAD',
+    description: 'A summer solstice celebration — the longest day, the most resonant night at the greatest acoustic pavilion.',
+    image: '/media/gallery/tangy1.jpg',
+    ticketUrl: '#book',
+    status: 'AVAILABLE',
+    price: '₹1499',
+    tags: ['Sufi', 'Acoustic', 'Solstice'],
+    capacity: 250,
+    story: 'Under twelve arches built to carry a voice two miles, we gather for the longest night of 2026.',
+    setlist: ['01. Solstice Dawn', '02. Sufi Kafi', '03. Valley Echo Raga']
+  },
+  {
+    id: 'monsoon-2026',
+    slug: 'monsoon-2026',
+    title: 'Tangy Sessions: Monsoon Ritual',
+    artist: 'Nikhil & Acoustic Collective',
+    date: 'Jul 25, 2026',
+    time: '6:00 PM',
+    venue: 'Old City Courtyard',
+    city: 'HYDERABAD',
+    description: 'Unamplified folk music in a Nizam-era courtyard as the monsoon rains fall on ancient neem trees.',
+    image: '/media/gallery/tangy3.jpg',
+    ticketUrl: '#book',
+    status: 'AVAILABLE',
+    price: '₹799',
+    tags: ['Folk', 'Monsoon', 'Heritage'],
+    capacity: 180,
+    story: 'The most honest recording is rain on clay pots and a flute in a 130-year-old courtyard.',
+    setlist: ['01. Monsoon Overture', '02. Telangana Rain Song', '03. Open Jam']
   }
 ];
 
@@ -306,6 +363,42 @@ export const diaryEntries = [
     location: "OLD CITY HAVELI",
     image: "/media/gallery/tangy9.jpg",
     content: "3:00 AM. The artists gathered around the ribbon microphones for an unscripted acoustic jam. Someone pulled out a tanpura, another started a vocal chant."
+  },
+  {
+    id: 4,
+    title: 'THE NIGHT THE ELECTRICITY FAILED',
+    date: 'FEB 20, 2025',
+    location: 'TARAMATI BARADARI',
+    image: '/media/gallery/tangy4.jpg',
+    excerpt: 'Halfway through the second set, the power went out. What happened next became the most-talked-about moment in Tangy history.',
+    content: 'The crowd gasped. The amplifiers clicked dead. Varun Rao picked up his violin, unplugged, and began to play in the darkness. Within ten seconds, 250 people were completely silent. We collectively held our breath for forty minutes. No recordings exist.'
+  },
+  {
+    id: 5,
+    title: 'HOW WE CHOOSE OUR VENUES',
+    date: 'MAR 10, 2025',
+    location: 'HYDERABAD',
+    image: '/media/gallery/tangy5.jpg',
+    excerpt: 'We have turned down stadiums, auditoriums, and modern arenas. Here is exactly what we look for when scouting a Tangy Sessions space.',
+    content: 'Three rules: the walls must be at least 100 years old. The acoustics must work without amplification. And there must be a story buried in the stone — a story the music can excavate and bring back to life.'
+  },
+  {
+    id: 6,
+    title: 'FIELD NOTES: BEFORE THE SHOW',
+    date: 'APR 01, 2025',
+    location: 'BANSILALPET STEPWELL',
+    image: '/media/gallery/tangy9.jpg',
+    excerpt: 'A documentation of the five hours before the gates open — from chai setup to microphone placement to the last acoustic checks.',
+    content: '4:30 PM: Clay chai stalls are assembled at the stepwell entrance. 5:00 PM: Two ribbon microphones suspended from ropes above the ancient water basin. 6:00 PM: Sound check — we drop a glass bottle and listen to it echo for three full seconds inside the stone chamber.'
+  },
+  {
+    id: 7,
+    title: 'WHAT A TANGY TICKET ACTUALLY IS',
+    date: 'MAY 15, 2025',
+    location: 'HYDERABAD',
+    image: '/media/gallery/tangy10.jpg',
+    excerpt: 'A hand-screenprinted rectangle of 300gsm cotton paper. Not a QR code, not a PDF. Here is why we still print physical tickets.',
+    content: 'A ticket is a physical artefact. You keep it. You put it on your shelf. Years later, you hold it and remember the specific echo of that stepwell on that night. That is what we are making — not events, but objects of memory that outlast the music.'
   }
 ];
 
