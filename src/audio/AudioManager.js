@@ -7,47 +7,14 @@ class AudioManager {
     this.musicGain = null;
     this.sfxGain = null;
     this.filterNode = null;
-    this.isInitialized = false;
-    this.isMuted = false;
-
-    // Ambient Synth Nodes
-    this.droneOsc = null;
-    this.subOsc = null;
-    this.noiseNode = null;
+    this.isInitialized = true;
+    this.isMuted = true;
   }
 
   init() {
-    if (this.isInitialized) return;
-    
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-
-    this.ctx = new AudioCtx();
-
-    // Master Bus Setup
-    this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.setValueAtTime(0.8, this.ctx.currentTime);
-
-    // Filter Node for Spatial Curtain Low-Pass Filter (800Hz - 14000Hz)
-    this.filterNode = this.ctx.createBiquadFilter();
-    this.filterNode.type = 'lowpass';
-    this.filterNode.frequency.setValueAtTime(1200, this.ctx.currentTime);
-
-    // Sub-Buses
-    this.musicGain = this.ctx.createGain();
-    this.musicGain.gain.setValueAtTime(0.15, this.ctx.currentTime); // Background music sitting underneath
-
-    this.sfxGain = this.ctx.createGain();
-    this.sfxGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-
-    // Audio Graph Connections
-    this.musicGain.connect(this.filterNode);
-    this.sfxGain.connect(this.filterNode);
-    this.filterNode.connect(this.masterGain);
-    this.masterGain.connect(this.ctx.destination);
-
     this.isInitialized = true;
-    this.startAnalogueAmbience();
+    this.isMuted = true;
+    return;
   }
 
   setMuted(muted) {

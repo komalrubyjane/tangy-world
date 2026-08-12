@@ -7,7 +7,6 @@ import { useAudio } from '../../audio/AudioContext';
 export const Hero = () => {
   const navigate = useNavigate();
   const { setFilterCutoff, playSFX } = useAudio();
-  const ticketRef = useRef(null);
 
   const sectionRef = useGSAPContext((ctx) => {
     let impactTriggered = false;
@@ -16,7 +15,7 @@ export const Hero = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top top',
+        start: isMobile ? 'top 80%' : 'top top',
         end: isMobile ? '+=30%' : '+=75%',
         scrub: 0.5,
         pin: !isMobile,
@@ -60,14 +59,6 @@ export const Hero = () => {
       ease: 'power3.out'
     });
 
-    gsap.from('.hero-ticket', {
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      delay: 0.45,
-      ease: 'power3.out'
-    });
-
     gsap.from('.badge', {
       opacity: 0,
       scale: 0.75,
@@ -84,8 +75,7 @@ export const Hero = () => {
       .to('.portrait-wrap-inner-left', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
       .to('.portrait-wrap-center', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
       .to('.portrait-wrap-inner-right', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.portrait-wrap-far-right', { y: -16, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.hero-ticket', { y: -10, rotation: -2, duration: 0.4 }, 0.2);
+      .to('.portrait-wrap-far-right', { y: -16, scale: 1.01, duration: 0.4 }, 0.2);
 
   }, []);
 
@@ -102,42 +92,12 @@ export const Hero = () => {
       gsap.to('.portrait-wrap-center', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
       gsap.to('.portrait-wrap-inner-right', { x: moveX * 0.21, y: moveY * 0.21, duration: 1.2, ease: 'power2.out' });
       gsap.to('.portrait-wrap-far-right', { x: moveX * 0.17, y: moveY * 0.17, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.hero-ticket', { x: moveX * 0.15, y: moveY * 0.15, duration: 1.2, ease: 'power2.out' });
       gsap.to('.headline', { x: moveX * 0.08, y: moveY * 0.08, duration: 1.2, ease: 'power2.out' });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
-
-  const handleExploreClick = (e) => {
-    if (e && e.stopPropagation) {
-      e.stopPropagation();
-    }
-    playSFX('ticketClick');
-    if (ticketRef.current) {
-      ticketRef.current.animate(
-        [
-          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(1)' },
-          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(0.97)' },
-          { transform: 'translate(-50%, -50%) rotate(-3deg) scale(1)' }
-        ],
-        { duration: 220 }
-      );
-    }
-    const manifestoEl = document.querySelector('#manifesto') || document.querySelector('#m-manifesto');
-    if (manifestoEl) {
-      manifestoEl.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleBookTicketsClick = (e) => {
-    if (e && e.stopPropagation) {
-      e.stopPropagation();
-    }
-    playSFX('ticketClick');
-    navigate('/book/vol-1');
-  };
 
   return (
     <section 
@@ -299,57 +259,7 @@ export const Hero = () => {
           />
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* ADMISSION TICKET (z-60) AT TOP: 75%                            */}
-        {/* ------------------------------------------------------------- */}
-        <div 
-          ref={ticketRef} 
-          className="hero-ticket ticket absolute z-[60] pointer-events-auto left-1/2 top-[75%] -translate-x-1/2 -translate-y-1/2 -rotate-3 w-[38cqw] min-w-[280px] max-w-xl min-h-[14cqw] bg-[#e9decb] text-[#241a12] shadow-[0_1cqw_2.5cqw_rgba(0,0,0,0.65)] flex relative origin-center transition-transform before:content-[''] before:absolute before:top-1/2 before:w-[1.5cqw] before:min-w-[8px] before:h-[1.5cqw] before:min-h-[8px] before:bg-[#4c1210] before:rounded-full before:-translate-y-1/2 before:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] before:z-5 before:-left-[0.75cqw] after:content-[''] after:absolute after:top-1/2 after:w-[1.5cqw] after:min-w-[8px] after:h-[1.5cqw] after:min-h-[8px] after:bg-[#4c1210] after:rounded-full after:-translate-y-1/2 after:shadow-[inset_0_0.15cqw_0.3cqw_rgba(0,0,0,0.4)] after:z-5 after:-right-[0.75cqw]"
-        >
-          {/* Masking Tape Overlay (z-61) */}
-          <div className="absolute -top-[1cqw] left-[36%] -rotate-4 w-[6cqw] min-w-[28px] h-[1.8cqw] min-h-[10px] bg-[rgba(255,255,255,0.4)] border border-[rgba(255,255,255,0.45)] z-[61] pointer-events-none" />
-          
-          <div className="w-[3.4cqw] min-w-[16px] flex items-center justify-center border-r-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[clamp(6.5px,0.85cqw,12px)] tracking-[0.08em] text-[#241a12] opacity-75">
-            TS-2016-001
-          </div>
 
-          <div className="flex-1 p-[0.8cqw_1cqw] flex flex-col justify-between">
-            <div className="flex justify-between items-center font-mono font-semibold text-[clamp(6.5px,0.82cqw,12px)] tracking-[0.06em] uppercase opacity-80 border-b-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pb-[0.4cqw]">
-              <span>Admit One</span>
-              <span>Vol. 01</span>
-              <span>Archive No. 001</span>
-            </div>
-
-            <div className="flex items-center justify-between gap-[0.6cqw] my-[0.4cqw]">
-              <button 
-                type="button"
-                onClick={handleExploreClick}
-                onTouchEnd={(e) => { e.preventDefault(); handleExploreClick(e); }}
-                className="enter relative z-[70] pointer-events-auto touch-manipulation font-poster text-[clamp(13px,2.2cqw,28px)] tracking-[0.01em] flex items-center gap-[0.4cqw] cursor-pointer bg-transparent border-none text-[#241a12] p-0 hover:text-[#c2272a] transition-all"
-              >
-                Enter Tangy
-                <svg className="w-[1.4cqw] min-w-[12px] h-[1.4cqw] min-h-[12px] transition-transform hover:translate-x-[0.3cqw]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleBookTicketsClick}
-                onTouchEnd={(e) => { e.preventDefault(); handleBookTicketsClick(e); }}
-                className="book-tickets-hero relative z-[70] pointer-events-auto touch-manipulation font-mono text-[clamp(7.5px,0.8cqw,12px)] font-bold tracking-[0.1em] uppercase px-[0.8cqw] py-[0.35cqw] bg-[#c2272a] text-[#ecdcaf] border border-[#191410] shadow-[0.18cqw_0.18cqw_0px_#191410] hover:bg-[#191410] hover:text-[#ecdcaf] active:scale-95 transition-all text-nowrap"
-              >
-                BOOK TICKETS →
-              </button>
-            </div>
-
-            <div className="font-mono font-medium text-[clamp(6px,0.75cqw,11px)] tracking-[0.1em] uppercase text-center opacity-75 border-t-[0.12cqw] border-dashed border-[rgba(36,26,18,0.35)] pt-[0.4cqw]">
-              Live Music · Community · Heritage
-            </div>
-          </div>
-
-          <div className="w-[3.4cqw] min-w-[16px] flex items-center justify-center border-l-[0.14cqw] border-dashed border-[rgba(36,26,18,0.35)] [writing-mode:vertical-rl] font-mono text-[clamp(7px,1cqw,13px)] tracking-[0.05em] text-[#c2272a]">
-            09100
-          </div>
-        </div>
 
         {/* ------------------------------------------------------------- */}
         {/* SCROLL TO VIEW INDICATOR (z-40)                                */}
@@ -379,11 +289,7 @@ export const Hero = () => {
           <div className="font-mono font-medium text-[clamp(4.5px,0.9cqw,12px)] tracking-[0.1em] mt-[0.1cqw]">AND REAL</div>
         </div>
 
-        {/* LEFT COLUMN: BANSILALPET STEPWELL TAG */}
-        <div className="badge absolute z-40 left-[3cqw] bottom-[16%] bg-[#191410] text-[#ecdcaf] -rotate-4 p-[0.8cqw_1cqw] shadow-[0_0.4cqw_0.8cqw_rgba(0,0,0,0.45)] pointer-events-none">
-          <div className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.03em] leading-[1.2]">BANSILALPET</div>
-          <div className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.03em] leading-[1.2]">STEPWELL ★</div>
-        </div>
+
 
         {/* RIGHT COLUMN: RECORDED LIVE STAMP */}
         <div className="badge absolute z-40 right-[2.5cqw] top-[38%] w-[9cqw] min-w-[45px] max-w-[9cqw] h-[9cqw] min-h-[45px] max-h-[9cqw] rounded-full border-[0.2cqw] border-dashed border-[#ecdcaf] outline-[0.05cqw] outline-solid outline-[#c2272a] bg-[radial-gradient(circle,rgba(194,39,42,0.12),transparent_70%)] flex items-center justify-center rotate-8 shadow-[0_0.5cqw_1cqw_rgba(0,0,0,0.4)] pointer-events-none">
