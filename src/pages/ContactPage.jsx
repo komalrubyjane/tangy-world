@@ -38,8 +38,8 @@ export const ContactPage = () => {
         </div>
       </section>
 
-      {/* CONTACT INFO CARDS */}
-      <section className="py-8 sm:py-12 max-w-5xl mx-auto px-4 sm:px-6">
+      {/* CONTACT INFO CARDS & LOCATION MAP */}
+      <section id="location" className="py-8 sm:py-12 max-w-5xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-14">
           {[
             {
@@ -51,9 +51,9 @@ export const ContactPage = () => {
             },
             {
               icon: '📍',
-              label: 'LOCATION',
+              label: 'LOCATION & MAP',
               value: 'Hyderabad · Telangana · India',
-              sub: 'OPEN TO REMOTE COLLABORATION',
+              sub: 'BANSILALPET / TARAMATI / HAVELI',
               href: null
             },
             {
@@ -77,12 +77,17 @@ export const ContactPage = () => {
           ))}
         </div>
 
-        {/* CONTACT FORM */}
-        <div className="bg-[#E7D5A4] text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] relative">
-          {/* Masking tape accent */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-[rgba(201,154,46,0.7)] rotate-[-1deg] border border-[#11100C]/20 pointer-events-none hidden sm:block" />
+        {/* MAP LOCATION DISPLAY */}
+        <div className="bg-[#1C0E08] border-4 border-[#C99A2E] p-4 sm:p-8 mb-10 text-center">
+          <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
+            PRIMARY HERITAGE SANCTUARY
+          </span>
+          <h3 className="display text-2xl sm:text-4xl text-[#E7D5A4] mb-2">BANSILALPET STEPWELL</h3>
+          <p className="font-mono text-xs text-[#E7D5A4]/70">Bansilalpet, Secunderabad, Hyderabad, Telangana 500003</p>
+        </div>
 
-          {/* Newspaper header */}
+        {/* CONTACT FORM / EMAIL DISPATCH */}
+        <div id="dispatch" className="bg-[#E7D5A4] text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] relative">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center font-mono text-[9px] sm:text-xs font-bold text-[#B94717] border-b-2 border-[#11100C] pb-3 mb-5 sm:mb-6 uppercase gap-1">
             <span>TANGY SESSIONS // CORRESPONDENCE FORM</span>
             <span className="hidden sm:block">DISPATCH DESK · HYDERABAD</span>
@@ -98,7 +103,6 @@ export const ContactPage = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              {/* Inquiry type selector */}
               <div>
                 <label className="font-bold text-[#B94717] block mb-2 uppercase text-[10px]">INQUIRY TYPE</label>
                 <div className="flex gap-1.5 flex-wrap">
@@ -152,16 +156,16 @@ export const ContactPage = () => {
       </section>
 
       {/* SOCIAL LINKS STRIP */}
-      <section className="bg-[#1C0E08] border-t-4 border-[#C99A2E]/30 py-10 sm:py-12 px-4 sm:px-6 text-center">
+      <section id="instagram" className="bg-[#1C0E08] border-t-4 border-[#C99A2E]/30 py-10 sm:py-12 px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-4">
-          FIND US ONLINE
+          FIND US ONLINE // INSTAGRAM &amp; MEDIA DISPATCHES
         </span>
         <div className="flex justify-center flex-wrap gap-3 sm:gap-4">
           {[
-            { label: 'INSTAGRAM', href: 'https://instagram.com/tangysessions', icon: '📷' },
-            { label: 'YOUTUBE', href: '#', icon: '🎬' },
-            { label: 'SPOTIFY', href: '#', icon: '🎵' },
-            { label: 'EMAIL', href: 'mailto:hello@tangysessions.com', icon: '✉' }
+            { label: 'INSTAGRAM: @TANGYSESSIONS', href: 'https://instagram.com/tangysessions', icon: '📷' },
+            { label: 'YOUTUBE ARCHIVE', href: '#', icon: '🎬' },
+            { label: 'SPOTIFY PLAYLIST', href: '#', icon: '🎵' },
+            { label: 'EMAIL DESK', href: 'mailto:hello@tangysessions.com', icon: '✉' }
           ].map((s) => (
             <a
               key={s.label}

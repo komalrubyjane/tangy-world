@@ -46,7 +46,7 @@ export const CrewPage = () => {
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {/* HERO BANNER */}
-        <div className="w-full bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="volunteer" className="w-full bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">
               JOIN THE TANGY CREW // RECRUITMENT DESK
@@ -62,6 +62,24 @@ export const CrewPage = () => {
           <div className="bg-[#c2272a] text-[#ecdcaf] p-3 font-mono text-xs font-bold border border-[#ecdcaf] shadow-md -rotate-2">
             SEASON 2026 RECRUITMENT OPEN
           </div>
+        </div>
+
+        {/* Quick Section Anchors */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {[
+            { label: 'VOLUNTEER OPPORTUNITIES', hash: '#volunteer' },
+            { label: 'PRODUCTION TEAM', hash: '#production' },
+            { label: 'STAGE OPERATIONS', hash: '#stage' },
+            { label: 'APPLY NOW', hash: '#apply' }
+          ].map((link) => (
+            <a
+              key={link.hash}
+              href={link.hash}
+              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#191410] text-[#ecdcaf] hover:bg-[#ecdcaf] hover:text-[#191410] transition-colors"
+            >
+              {link.label} ↓
+            </a>
+          ))}
         </div>
 
         {/* VOLUNTEER ROLES GRID */}
@@ -94,151 +112,76 @@ export const CrewPage = () => {
           </div>
         </div>
 
-        {/* VOLUNTEER BENEFITS & GALLERY */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 items-stretch">
-          
-          {/* BENEFITS CARD */}
-          <div className="bg-[#191410] border-2 border-[#ecdcaf]/40 p-6 shadow-[8px_8px_0px_#191410] text-left flex flex-col gap-4">
-            <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">02 // CREW PERKS & BENEFITS</span>
-            <h3 className="font-poster text-2xl text-[#ecdcaf]">WHY JOIN THE MOVEMENT</h3>
-            
-            <ul className="flex flex-col gap-3 font-mono text-xs text-[#ecdcaf]/90">
-              <li className="flex items-start gap-2">
-                <span className="text-[#c2272a]">✓</span>
-                <span>Access to post-midnight artist jam sessions and private acoustic soundchecks.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#c2272a]">✓</span>
-                <span>Official Tangy Crew screenprinted vintage apparel and limited edition badges.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#c2272a]">✓</span>
-                <span>Exclusive member passport stamps and priority tickets for future pop-ups.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#c2272a]">✓</span>
-                <span>Hands-on production training with industry audio engineers and stage managers.</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* APPLICATION TIMELINE */}
-          <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[8px_8px_0px_#191410] text-left flex flex-col gap-4">
-            <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">03 // RECRUITMENT TIMELINE</span>
-            <h3 className="font-poster text-2xl text-[#191410]">HOW TO JOIN</h3>
-
-            <div className="flex flex-col gap-3 font-mono text-xs">
-              <div className="p-2.5 bg-[#ecdcaf] border border-[#191410]">
-                <strong>STEP 1: SUBMIT APPLICATION</strong> — Fill out the crew application form below.
-              </div>
-              <div className="p-2.5 bg-[#ecdcaf] border border-[#191410]">
-                <strong>STEP 2: CREW ORIENTATION</strong> — Attend a 30-minute orientation session at the stepwell.
-              </div>
-              <div className="p-2.5 bg-[#ecdcaf] border border-[#191410]">
-                <strong>STEP 3: TAKE THE STAGE</strong> — Join the crew on session night!
-              </div>
+        {/* PRODUCTION TEAM SECTION */}
+        <div id="production" className="mb-12 bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase block mb-1">
+            02 // PRODUCTION TEAM
+          </span>
+          <h2 className="font-poster text-3xl text-[#ecdcaf] mb-4">ANALOG AUDIO &amp; LIGHTING CREW</h2>
+          <p className="font-mono text-xs text-[#ecdcaf]/80 leading-relaxed mb-4 max-w-3xl">
+            Our production team handles vintage ribbon microphones, custom subwoofer rigs, acoustic baffling, and warm tungsten lighting setups tailored for ancient stone monuments.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+              <span className="text-[#c2272a] font-bold block mb-1">AUDIO ENGINEERING</span>
+              <span className="text-[#ecdcaf]/70">Sub-bass calibration &amp; room acoustic resonance mapping.</span>
+            </div>
+            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+              <span className="text-[#c2272a] font-bold block mb-1">LIGHTING DIRECTION</span>
+              <span className="text-[#ecdcaf]/70">Warm vintage candlelight and low-voltage architectural spots.</span>
+            </div>
+            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+              <span className="text-[#c2272a] font-bold block mb-1">TAPE RECORDING</span>
+              <span className="text-[#ecdcaf]/70">Live 2-track analogue magnetic tape capture.</span>
             </div>
           </div>
-
         </div>
 
-        {/* APPLICATION FORM SECTION */}
-        <div className="w-full max-w-3xl mx-auto bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[12px_12px_0px_#191410] text-left flex flex-col gap-6">
-          <div className="border-b-2 border-[#191410] pb-3">
-            <span className="font-mono text-[10px] font-bold text-[#c2272a] uppercase tracking-widest">OFFICIAL APPLICATION FORM</span>
-            <h2 className="font-poster text-3xl text-[#191410]">CREW RECRUITMENT APPLICATION</h2>
+        {/* STAGE OPERATIONS SECTION */}
+        <div id="stage" className="mb-12 bg-[#ecdcaf] text-[#191410] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+          <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase block mb-1">
+            03 // STAGE OPERATIONS
+          </span>
+          <h2 className="font-poster text-3xl text-[#191410] mb-4">HERITAGE STAGE LOGISTICS</h2>
+          <p className="font-mono text-xs text-[#191410]/80 leading-relaxed mb-4 max-w-3xl">
+            Operating inside 350-year-old stepwells requires zero structural impact. Our stage crew ensures instrument safety, artist hospitality, and seamless show flow.
+          </p>
+        </div>
+
+        {/* APPLY NOW FORM */}
+        <div id="apply" className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+          <div className="mb-6">
+            <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">04 // CREW APPLICATION FORM</span>
+            <h2 className="font-poster text-3xl text-[#ecdcaf]">SUBMIT YOUR APPLICATION</h2>
           </div>
 
           {submitted ? (
-            <div className="py-8 text-center flex flex-col items-center gap-3 animate-bounce">
-              <div className="w-16 h-16 rounded-full bg-[#c2272a] text-[#ecdcaf] flex items-center justify-center font-poster text-2xl">✓</div>
-              <h3 className="font-poster text-2xl text-[#191410]">APPLICATION SUBMITTED!</h3>
-              <p className="font-mono text-xs text-[#241a12]/80">OUR CREW COORDINATOR WILL REACH OUT TO YOU VIA EMAIL WITHIN 48 HOURS.</p>
+            <div className="bg-[#241a12] border-2 border-[#ecdcaf] p-8 text-center">
+              <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">APPLICATION TRANSMITTED!</h3>
+              <p className="font-mono text-xs text-[#ecdcaf]/80">Our crew desk will review your submission and contact you via phone/email within 48 hours.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-mono text-xs font-bold text-[#191410] block mb-1">FULL NAME *</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={volName}
-                    onChange={(e) => setVolName(e.target.value)}
-                    placeholder="YOUR NAME"
-                    className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="font-mono text-xs font-bold text-[#191410] block mb-1">PHONE NUMBER *</label>
-                  <input 
-                    type="tel" 
-                    required
-                    value={volPhone}
-                    onChange={(e) => setVolPhone(e.target.value)}
-                    placeholder="+91 XXXXX XXXXX"
-                    className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input required type="text" placeholder="YOUR FULL NAME *" value={volName} onChange={(e) => setVolName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                <input required type="email" placeholder="YOUR EMAIL ADDRESS *" value={volEmail} onChange={(e) => setVolEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-mono text-xs font-bold text-[#191410] block mb-1">EMAIL ADDRESS *</label>
-                  <input 
-                    type="email" 
-                    required
-                    value={volEmail}
-                    onChange={(e) => setVolEmail(e.target.value)}
-                    placeholder="YOUR EMAIL"
-                    className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="font-mono text-xs font-bold text-[#191410] block mb-1">COLLEGE / ORGANIZATION</label>
-                  <input 
-                    type="text" 
-                    value={volCollege}
-                    onChange={(e) => setVolCollege(e.target.value)}
-                    placeholder="COLLEGE / WORKPLACE"
-                    className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input required type="tel" placeholder="PHONE NUMBER *" value={volPhone} onChange={(e) => setVolPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                <input type="text" placeholder="COLLEGE / INSTITUTION (OPTIONAL)" value={volCollege} onChange={(e) => setVolCollege(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
               </div>
-
               <div>
-                <label className="font-mono text-xs font-bold text-[#191410] block mb-1">PREFERRED CREW ROLE *</label>
-                <select 
-                  value={volRole} 
-                  onChange={(e) => setVolRole(e.target.value)}
-                  className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                >
-                  {volunteerRoles.map((r, i) => (
-                    <option key={i} value={r.title}>{r.title}</option>
-                  ))}
+                <label className="font-bold text-[#c2272a] block mb-2 uppercase text-[10px]">PREFERRED CREW ROLE *</label>
+                <select value={volRole} onChange={(e) => setVolRole(e.target.value)} className="w-full p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
+                  {volunteerRoles.map(r => <option key={r.title} value={r.title}>{r.title}</option>)}
                 </select>
               </div>
-
-              <div>
-                <label className="font-mono text-xs font-bold text-[#191410] block mb-1">PAST EXPERIENCE / SKILLS</label>
-                <textarea 
-                  rows={3}
-                  value={volExperience}
-                  onChange={(e) => setVolExperience(e.target.value)}
-                  placeholder="Tell us briefly about past events, photography, audio, or volunteering..."
-                  className="w-full p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs text-[#191410] outline-none"
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                className="w-full py-4 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all mt-2"
-              >
+              <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
+              <button type="submit" className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410]">
                 SUBMIT CREW APPLICATION →
               </button>
             </form>
           )}
-
         </div>
 
       </main>

@@ -23,7 +23,7 @@ export const BlogsPage = () => {
       <Navbar />
 
       {/* PAGE HERO */}
-      <section className="relative pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
+      <section id="journal" className="relative pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none" />
         <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 block">
           TANGY EDITORIALS // SHOW STORIES & MUSIC LAUNCHES
@@ -35,8 +35,8 @@ export const BlogsPage = () => {
           HANDWRITTEN DIARY ENTRIES, UNRELEASED RECORDING LOGS, SHOW STORIES, AND BEHIND THE SCENES EDITORIALS.
         </p>
 
-        {/* CATEGORY FILTERS — horizontally scrollable on mobile */}
-        <div className="flex gap-2 sm:gap-3 mt-6 sm:mt-8 overflow-x-auto pb-1 sm:justify-center sm:flex-wrap scrollbar-none">
+        {/* CATEGORY FILTERS */}
+        <div id="stories" className="flex gap-2 sm:gap-3 mt-6 sm:mt-8 overflow-x-auto pb-1 sm:justify-center sm:flex-wrap scrollbar-none">
           {Object.keys(CATEGORY_TAGS).map((cat) => (
             <button
               key={cat}
@@ -52,7 +52,7 @@ export const BlogsPage = () => {
       </section>
 
       {/* BLOG ENTRIES */}
-      <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 flex flex-col gap-8 sm:gap-12">
+      <section id="behind-the-scenes" className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 flex flex-col gap-8 sm:gap-12">
         {filteredEntries.length === 0 && (
           <div className="text-center py-20">
             <p className="font-mono text-xs text-[#E7D5A4]/50 uppercase tracking-widest">NO ENTRIES IN THIS CATEGORY YET.</p>
@@ -65,14 +65,12 @@ export const BlogsPage = () => {
               key={entry.id}
               className="bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
             >
-              {/* ENTRY HEADER */}
               <div className="flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
                 <span>ENTRY #00{idx+1} · {entry.date}</span>
                 <span className="hidden sm:block">{entry.location || 'HYDERABAD ARCHIVE'}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-0">
-                {/* IMAGE */}
                 <div className="sm:col-span-1 w-full h-48 sm:h-auto overflow-hidden border-b-4 sm:border-b-0 sm:border-r-4 border-[#11100C]">
                   <img
                     src={entry.image}
@@ -81,10 +79,8 @@ export const BlogsPage = () => {
                   />
                 </div>
 
-                {/* CONTENT */}
                 <div className="sm:col-span-2 p-4 sm:p-8 flex flex-col justify-between">
                   <div>
-                    {/* Location tag on mobile */}
                     <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase block mb-2 sm:hidden">
                       {entry.location || 'HYDERABAD ARCHIVE'}
                     </span>
@@ -97,7 +93,6 @@ export const BlogsPage = () => {
                       {entry.excerpt || entry.content?.substring(0, 160) + '...'}
                     </p>
 
-                    {/* Expanded full content */}
                     {isExpanded && (
                       <p className="font-body text-sm text-[#11100C]/90 leading-relaxed mb-4 pt-3 border-t border-[#11100C]/20">
                         {entry.content}

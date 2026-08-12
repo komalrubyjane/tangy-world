@@ -27,20 +27,20 @@ export const Navbar = () => {
       title: 'Sessions',
       path: '/sessions',
       items: [
-        { label: 'Upcoming Sessions', path: '/sessions' },
-        { label: 'Concert Culture', path: '/sessions' },
-        { label: 'Session Calendar', path: '/sessions' },
-        { label: 'Join Waitlist', path: '/sessions' }
+        { label: 'Upcoming Sessions', path: '/sessions#upcoming' },
+        { label: 'Concert Culture', path: '/sessions#culture' },
+        { label: 'Session Calendar', path: '/sessions#calendar' },
+        { label: 'Join Waitlist', path: '/sessions#waitlist' }
       ]
     },
     {
       title: 'Archive',
       path: '/archive',
       items: [
-        { label: 'Session Archive', path: '/archive' },
-        { label: 'Museum Timeline', path: '/archive' },
-        { label: 'Past Memories', path: '/archive' },
-        { label: '35mm Contact Sheets', path: '/archive' }
+        { label: 'Session Archive', path: '/archive#session-archive' },
+        { label: 'Museum Timeline', path: '/archive#museum-timeline' },
+        { label: 'Past Memories', path: '/archive#past-memories' },
+        { label: '35mm Contact Sheets', path: '/archive#contact-sheets' }
       ]
     },
     {
@@ -48,56 +48,56 @@ export const Navbar = () => {
       path: '/artist',
       items: [
         { label: 'Artists Directory', path: '/artist' },
-        { label: 'Apply as an Artist', path: '/artist#apply' },
+        { label: 'Apply as an Artist', path: '/artist/register' },
         { label: 'Artist Login', path: '/artist/login' },
         { label: 'Artist Portal', path: '/artist/dashboard' }
       ]
     },
     {
       title: 'Crew',
-      path: '/apply/crew',
+      path: '/crew',
       items: [
-        { label: 'Volunteer Opportunities', path: '/apply/crew' },
-        { label: 'Production Team', path: '/crew' },
-        { label: 'Stage Operations', path: '/crew' },
+        { label: 'Volunteer Opportunities', path: '/crew#volunteer' },
+        { label: 'Production Team', path: '/crew#production' },
+        { label: 'Stage Operations', path: '/crew#stage' },
         { label: 'Apply Now', path: '/apply/crew' }
       ]
     },
     {
       title: 'Collaborate',
-      path: '/apply/vendors',
+      path: '/collaborate',
       items: [
         { label: 'Vendors', path: '/apply/vendors' },
         { label: 'Sponsors', path: '/apply/sponsors' },
         { label: 'Venue / Host', path: '/apply/venue-host' },
-        { label: 'Explore Opportunities', path: '/apply/vendors' }
+        { label: 'Explore Opportunities', path: '/collaborate' }
       ]
     },
     {
       title: 'Private',
       path: '/private-sessions',
       items: [
-        { label: 'Private Gatherings', path: '/private-sessions' },
-        { label: 'Corporate Events', path: '/private-sessions' },
-        { label: 'Weddings', path: '/private-sessions' },
-        { label: 'Heritage Experiences', path: '/private-sessions' }
+        { label: 'Private Gatherings', path: '/private-sessions#gatherings' },
+        { label: 'Corporate Events', path: '/private-sessions#corporate' },
+        { label: 'Weddings', path: '/private-sessions#weddings' },
+        { label: 'Heritage Experiences', path: '/private-sessions#heritage' }
       ]
     },
     {
       title: 'Diary',
       path: '/blogs',
       items: [
-        { label: 'Museum Journal', path: '/blogs' },
-        { label: 'Recent Stories', path: '/blogs' },
-        { label: 'Behind the Scenes', path: '/blogs' }
+        { label: 'Museum Journal', path: '/blogs#journal' },
+        { label: 'Recent Stories', path: '/blogs#stories' },
+        { label: 'Behind the Scenes', path: '/blogs#behind-the-scenes' }
       ]
     },
     {
       title: 'Contact',
       path: '/contact',
       items: [
-        { label: 'Location & Map', path: '/contact' },
-        { label: 'Email Dispatch', path: 'mailto:hello@tangysessions.com', external: true },
+        { label: 'Location & Map', path: '/contact#location' },
+        { label: 'Email Dispatch', path: '/contact#dispatch' },
         { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true }
       ]
     }

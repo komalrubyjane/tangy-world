@@ -25,6 +25,7 @@ import { UserLoginModal } from './components/museum/UserLoginModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
 // Dedicated Standalone Pages
+import { CollaboratePage } from './pages/CollaboratePage';
 import { BookingPage } from './pages/BookingPage';
 import { CrewPage } from './pages/CrewPage';
 import { PrivateSessionsPage } from './pages/PrivateSessionsPage';
@@ -256,17 +257,22 @@ export default function App() {
 
                 {/* DEDICATED STANDALONE PAGES */}
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/about/*" element={<AboutPage />} />
                 <Route path="/sessions" element={<SessionsPage />} />
+                <Route path="/sessions/*" element={<SessionsPage />} />
                 <Route path="/archive" element={<ArchivePage />} />
+                <Route path="/archive/*" element={<ArchivePage />} />
                 <Route path="/crew" element={<CrewPage />} />
                 <Route path="/apply/crew" element={<CrewPage />} />
                 <Route path="/volunteer" element={<CrewPage />} />
+                <Route path="/collaborate" element={<CollaboratePage />} />
                 <Route path="/apply/vendors" element={<VendorApplyPage />} />
                 <Route path="/apply/sponsors" element={<SponsorApplyPage />} />
                 <Route path="/apply/venue-host" element={<VenueHostApplyPage />} />
                 <Route path="/apply/host" element={<VenueHostApplyPage />} />
                 <Route path="/private-sessions" element={<PrivateSessionsPage />} />
                 <Route path="/blogs" element={<BlogsPage />} />
+                <Route path="/blogs/*" element={<BlogsPage />} />
                 <Route path="/diary" element={<BlogsPage />} />
                 <Route path="/inner-circle" element={<InnerCirclePage />} />
                 <Route path="/contact" element={<ContactPage />} />
