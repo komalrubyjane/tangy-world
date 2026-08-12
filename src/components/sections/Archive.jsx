@@ -12,10 +12,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* --- Shared photo card --- */
 const PhotoCard = ({ photo, i, isLast }) => (
-  <div className={`relative bg-[#E3D4AC] p-3 pb-12 shadow-2xl border-2 border-[#11100C] ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
-    style={{ transform: `rotate(${(i % 3 - 1) * 4}deg)` }}>
-    <div className="absolute -top-3 left-1/3 w-16 h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
-    <div className="flex justify-between font-mono text-[8px] text-[#11100C] font-bold px-1 mb-1">
+  <div className={`relative bg-[#E3D4AC] p-2.5 sm:p-3 pb-8 sm:pb-12 shadow-xl border-2 border-[#11100C] ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
+    style={{ transform: `rotate(${(i % 3 - 1) * 3}deg)` }}>
+    <div className="absolute -top-3 left-1/3 w-14 sm:w-16 h-3.5 sm:h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
+    <div className="flex justify-between font-mono text-[7.5px] sm:text-[8px] text-[#11100C] font-bold px-0.5 mb-1">
       <span>{String(i + 1).padStart(2, '0')}A</span>
       <span>EASTMAN 5247</span>
       <span>▲ {i + 1}</span>
@@ -24,9 +24,9 @@ const PhotoCard = ({ photo, i, isLast }) => (
       <img src={photo.src} alt={photo.label} loading="lazy" decoding="async"
         className="w-full h-full object-cover filter grayscale sepia-[0.35] contrast-125" />
     </div>
-    <div className="mt-3 flex justify-between items-baseline font-mono text-[10px] text-[#11100C]">
-      <span className="font-bold tracking-wider">{photo.label.toUpperCase()}</span>
-      <span className="opacity-70">HYD · 2025</span>
+    <div className="mt-2.5 flex justify-between items-baseline font-mono text-[9px] sm:text-[10px] text-[#11100C]">
+      <span className="font-bold tracking-wider truncate mr-1">{photo.label.toUpperCase()}</span>
+      <span className="opacity-70 shrink-0">HYD · 2025</span>
     </div>
 
     {/* VIEW MORE ARCHIVE overlay — desktop only on last photo */}
@@ -60,11 +60,10 @@ export const Archive = () => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     if (isMobile) {
-      // Mobile: simple fade-in per photo, no scrub, no pin
       gsap.from('.mobile-archive-photo', {
         opacity: 0,
-        y: 40,
-        duration: 0.6,
+        y: 35,
+        duration: 0.55,
         stagger: 0.08,
         ease: 'power2.out',
         scrollTrigger: {
@@ -76,7 +75,6 @@ export const Archive = () => {
       return;
     }
 
-    // Desktop: pinned horizontal scrub + zoom on last photo
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
@@ -98,42 +96,22 @@ export const Archive = () => {
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
       <TornPaperEdgeTop fill="#11100C" />
 
-      <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0">
+      <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0 hidden md:block">
         <NotebookGridPattern opacity={0.5} />
       </div>
 
-      <PushPin className="top-8 left-1/3" />
-      <PushPin className="top-12 right-1/4" />
+      <PushPin className="top-8 left-1/3 hidden md:block" />
+      <PushPin className="top-12 right-1/4 hidden md:block" />
 
       <div className="absolute bottom-16 right-16 z-20 pointer-events-none border-2 border-[#C2272A] text-[#C2272A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.3em] uppercase rotate-[-8deg] opacity-75 hidden md:block">
         CLASSIFIED // ARCHIVAL RECORD ✦
       </div>
 
-      <div className="absolute top-16 right-5 md:right-20 w-20 md:w-40 pointer-events-auto z-20 group cursor-pointer animate-[bounce_5s_ease-in-out_infinite]">
-        <img src="/media/vinyl.png" alt="Spinning Vinyl Record"
-          className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.9)] transition-transform duration-700 group-hover:rotate-180" />
-        <span className="font-mono text-[7px] text-[#C99A2E] bg-[#11100C] px-1.5 py-0.5 border border-[#C99A2E] absolute -bottom-2 left-2 uppercase hidden md:block">33⅓ RPM STEREO</span>
-      </div>
-
-      <div className="absolute bottom-12 left-4 md:left-16 w-24 md:w-48 pointer-events-none z-20 opacity-80 hidden md:block">
-        <img src="/media/gramophone.png" alt="Vintage Gramophone" className="w-full h-full object-contain filter drop-shadow-2xl" />
-      </div>
-
-      <div className="absolute top-6 left-6 font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] pointer-events-none uppercase hidden md:block">
-        ✦ KODAK SAFETY FILM 5063 // 35MM ✦ REC • LIVE • HYDERABAD
-      </div>
-      <div className="absolute bottom-6 left-6 font-mono text-[9px] text-[#E7D5A4]/40 tracking-[0.3em] pointer-events-none uppercase hidden md:block">
-        REGISTRATION: [ ✚ ] CROSS-MARK // SIDE A
-      </div>
-
-      {/* Section header */}
-      <div className="absolute top-10 left-5 right-5 md:left-12 md:right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      {/* Section Header */}
+      <div className="pt-24 lg:pt-0 lg:absolute lg:top-10 left-5 right-5 md:left-12 md:right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4 lg:px-0">
         <div>
-          <p className="font-mono text-[#C99A2E] text-[10px] tracking-[0.3em] uppercase font-bold">ANALOGUE CONTACT SHEET // FILE 35MM</p>
+          <p className="font-mono text-[#C99A2E] text-[9px] sm:text-[10px] tracking-[0.3em] uppercase font-bold">ANALOGUE CONTACT SHEET // FILE 35MM</p>
           <h2 className="display text-4xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">THE ARCHIVE</h2>
-          <p className="font-serif italic text-xs md:text-sm text-[#E7D5A4]/90 mt-1 max-w-xl hidden md:block">
-            "Every gathering leaves behind more than photographs. It leaves behind history."
-          </p>
         </div>
         <a href="/archive"
           className="hidden md:block bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0">
@@ -142,17 +120,18 @@ export const Archive = () => {
       </div>
 
       {/* MOBILE: 2-column photo grid */}
-      <div className="mobile-archive-grid lg:hidden w-full px-4 pt-36 pb-16">
+      <div className="mobile-archive-grid lg:hidden w-full px-4 pt-4 pb-16 max-w-[460px] mx-auto">
         <p className="font-serif italic text-xs text-[#E7D5A4]/80 mb-6">
           "Every gathering leaves behind more than photographs."
         </p>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6">
           {gallery.map((photo, i) => (
             <div key={photo.id} className="mobile-archive-photo">
               <PhotoCard photo={photo} i={i} isLast={false} />
             </div>
           ))}
         </div>
+
         {/* VIEW MORE ARCHIVE card — mobile standalone card at bottom */}
         <div className="mobile-archive-photo mt-10 mx-auto max-w-[260px] -rotate-1"
           style={{
