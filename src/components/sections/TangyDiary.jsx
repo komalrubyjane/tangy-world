@@ -135,9 +135,9 @@ export const TangyDiary = () => {
   return (
     <section ref={sectionRef} id="diary"
       className="relative w-full bg-[#241A14] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#4A3529]"
-      style={{ minHeight: isMobile ? 'auto' : '100svh', paddingBottom: isMobile ? '80px' : '0' }}>
+      style={{ minHeight: isMobile ? 'auto' : '100svh', padding: isMobile ? '80px 0 40px' : '0' }}>
 
-      {/* Leather/Parchment noise overlay */}
+      {/* Parchment noise overlay */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.14] pointer-events-none mix-blend-overlay" />
       <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_120px_rgba(0,0,0,0.7)]" />
 
@@ -164,16 +164,8 @@ export const TangyDiary = () => {
         </defs>
       </svg>
 
-      {/* Hanging microphone wire */}
-      <div className="diary-mic-wire absolute top-0 left-[4%] z-[100] pointer-events-none origin-top flex flex-col items-center hidden md:flex">
-        <div className="w-[1.5px] h-[360px] md:h-[430px] bg-[#1F1713] border-r border-[#5A4032]/40"/>
-        <div className="w-4 h-7 bg-[#2E221B] rounded-sm border border-[#A68853]/60 shadow-md flex items-center justify-center -mt-0.5">
-          <div className="w-2.5 h-4 bg-[#A68853]/30 rounded-xs"/>
-        </div>
-      </div>
-
       {/* Section Header */}
-      <div className="pt-20 lg:pt-0 lg:absolute lg:top-5 left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-6 lg:mb-0">
+      <div className="pt-4 lg:pt-0 lg:absolute lg:top-5 left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-4 lg:mb-0">
         <div>
           <div className="font-mono text-[9px] md:text-[10px] text-[#A68853] tracking-[0.25em] font-bold uppercase opacity-85">
             ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
@@ -183,7 +175,7 @@ export const TangyDiary = () => {
       </div>
 
       {/* ================================================================= */}
-      {/* ORIGINAL 3D DIARY BOOK (RESPONSIVE FOR BOTH MOBILE & DESKTOP)     */}
+      {/* 3D DIARY BOOK (ZOOMED OUT ON MOBILE TO FIT PERFECTLY IN VIEW)     */}
       {/* ================================================================= */}
       <div 
         onTouchStart={handleTouchStart}
@@ -201,9 +193,9 @@ export const TangyDiary = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            transform: isMobile ? 'scale(0.85)' : 'scale(1)',
+            transform: isMobile ? 'scale(0.55)' : 'scale(1)',
             transformOrigin: 'center center',
-            margin: isMobile ? '-40px 0' : '0'
+            margin: isMobile ? '-110px 0 -90px' : '0'
           }}
         >
           {/* Desk shadow */}
@@ -217,7 +209,7 @@ export const TangyDiary = () => {
               position: 'relative',
               width: 'min(880px, 94vw)',
               height: 'min(620px, 70vh)',
-              minHeight: isMobile ? '480px' : '580px',
+              minHeight: '520px',
               transformStyle: 'preserve-3d',
             }}
           >
@@ -315,36 +307,6 @@ export const TangyDiary = () => {
                     <div className="font-mono text-[9px] tracking-[0.38em] text-[#EADFC5]/72 mt-2 uppercase">Field Notes</div>
                     <div className="font-serif italic text-[11px] text-[#EADFC5]/50 mt-1">Hyderabad · Since 2016</div>
                     <svg className="w-5 h-5 mx-auto mt-2 opacity-45 text-[#A68853]"><use href="#sym-compass"/></svg>
-                    <svg className="mt-3 opacity-40" width="42" height="42" viewBox="0 0 52 52" fill="none" stroke="#A68853" strokeWidth="1.1" strokeLinecap="round">
-                      <line x1="26" y1="52" x2="26" y2="28"/>
-                      <path d="M26,42 Q16,36 14,26 Q24,28 26,42"/>
-                      <path d="M26,36 Q36,30 38,20 Q28,22 26,36"/>
-                      <circle cx="26" cy="22" r="5" fill="none"/>
-                      <circle cx="26" cy="22" r="2" fill="#A68853"/>
-                    </svg>
-                  </div>
-                  {/* Closure strap */}
-                  <div className="diary-strap" style={{
-                    position:'absolute', left:-8, right:-4, height:22,
-                    top:'61%', transform:'translateY(-50%) rotate(-0.8deg)',
-                    background:'linear-gradient(to bottom,#4B3529,#2E1E14)',
-                    borderTop:'1px dashed rgba(166,136,83,0.32)',
-                    borderBottom:'1px dashed rgba(166,136,83,0.32)',
-                  }}>
-                    <div style={{ position:'absolute', right:'13%', top:'50%', transform:'translateY(-50%)',
-                      width:16, height:16, border:'2px solid #A68853', borderRadius:2,
-                      background:'linear-gradient(135deg,#A68853,#7A5C30)' }}/>
-                  </div>
-                  <div className="diary-strap font-serif font-bold text-xs text-[#EADFC5]" style={{
-                    position:'absolute', left:'34%', top:'61%',
-                    transform:'translateX(-50%) translateY(-50%) rotate(-4deg)',
-                    width:32, height:32, borderRadius:'50%',
-                    background:'radial-gradient(circle,#A44A34,#5A1D13)',
-                    display:'flex', itemsCenter:'center', justifyContent:'center',
-                    boxShadow:'0 4px 12px rgba(0,0,0,0.55)',
-                  }}>TS</div>
-                  <div className="font-mono text-[6.5px] tracking-[0.14em] uppercase text-[#EADFC5]/42 text-center mt-auto mb-2 leading-relaxed">
-                    Field Journal · Property of Tangy Sessions
                   </div>
                 </div>
               </div>
@@ -356,10 +318,6 @@ export const TangyDiary = () => {
                     style={{ border:'1px dashed rgba(166,136,83,0.55)', padding:'3px 8px' }}>
                     Vol. I · 2016 — 2026
                   </div>
-                  <svg className="opacity-70 text-[#A44A34] mt-3" style={{ width:54, height:54 }} viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="1.8"/>
-                    <circle cx="60" cy="60" r="42" fill="none" stroke="currentColor" strokeWidth="1.1"/>
-                  </svg>
                   <div className="mt-3" style={{ border:'1px dashed rgba(166,136,83,0.48)', padding:8, maxWidth:140 }}>
                     <div className="font-serif italic text-[10px] text-[#5A4032]">
                       Property of the Archive.<br/>Handle with care.
@@ -369,7 +327,7 @@ export const TangyDiary = () => {
               </div>
             </div>
 
-            {/* ── LEAF 1: Spread 1 Right (Stepwell) / Spread 2 Left (Log) ── */}
+            {/* ── LEAF 1: Stepwell ── */}
             <div 
               className="diary-leaf desktop-leaf-1" 
               style={leafStyle(1, isMobile ? currentMobileLeaf >= 2 : undefined)}
@@ -395,10 +353,6 @@ export const TangyDiary = () => {
                     </svg>
                     <figcaption className="text-center font-serif text-[8.5px] text-[#2E221B] mt-0.5">Stepwell Echoes</figcaption>
                   </figure>
-                  <div className="absolute bottom-3 left-3 bg-[#E6D8B7] shadow-xs -rotate-1"
-                    style={{ padding:6, maxWidth:110, border:'1px solid rgba(166,136,83,0.32)' }}>
-                    <div style={{ fontFamily:'Caveat, cursive', fontSize:'11px' }}>Echo off 350-year-old stone.</div>
-                  </div>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
@@ -407,9 +361,6 @@ export const TangyDiary = () => {
                     Spread #02 — Left
                   </div>
                   <div className="font-serif italic text-base">Bansilalpet Stepwell Log</div>
-                  <div className="font-mono text-[8px] leading-relaxed text-[#5A4032] mt-1">
-                    <b>Mic:</b> Ribbon R44<br/><b>Echo Delay:</b> 2.4s
-                  </div>
                   <p className="font-serif italic text-[11.5px] mt-2 opacity-80">
                     "The acoustic echo bounced off limestone steps for 2.4 seconds before fading."
                   </p>
@@ -417,7 +368,7 @@ export const TangyDiary = () => {
               </div>
             </div>
 
-            {/* ── LEAF 2: Spread 2 Right (Monsoon) / Spread 3 Left (Log) ── */}
+            {/* ── LEAF 2: Monsoon ── */}
             <div 
               className="diary-leaf desktop-leaf-2" 
               style={leafStyle(2, isMobile ? currentMobileLeaf >= 3 : undefined)}
@@ -430,18 +381,10 @@ export const TangyDiary = () => {
                     <span className="text-[#A44A34] font-bold">21 Dec, 2024</span>
                   </div>
                   <div className="font-serif italic text-lg leading-tight">Monsoon Acoustics &amp;<br/>Old City Haveli</div>
-                  <div className="flex items-center gap-1 font-mono text-[7.5px] text-[#5A4032] uppercase mt-0.5">
-                    <svg className="w-3.5 h-3.5"><use href="#sym-rain"/></svg>
-                    <span>300 AUDIENCE // MIDNIGHT</span>
-                  </div>
                   <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
                     When the lights dropped at midnight, 300 people stood completely still
                     under rain-soaked arches. No phones in the air.
                   </p>
-                  <div className="absolute bottom-3 left-3 bg-[#E6D8B7] rotate-1 shadow-xs"
-                    style={{ padding:6, maxWidth:115, border:'1px solid rgba(166,136,83,0.32)' }}>
-                    <div style={{ fontFamily:'Caveat, cursive', fontSize:'11px' }}>300 people stayed till sunrise.</div>
-                  </div>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
@@ -449,14 +392,11 @@ export const TangyDiary = () => {
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #03 — Left
                   </div>
-                  <p className="font-serif italic text-[11.5px] mt-2 opacity-85">
-                    "Taramati pavilion was built so a voice travels 2 miles without amplifiers."
-                  </p>
                 </div>
               </div>
             </div>
 
-            {/* ── LEAF 3: Spread 3 Right (Artists) / Spread 4 Left (Log) ── */}
+            {/* ── LEAF 3: Performers ── */}
             <div 
               className="diary-leaf desktop-leaf-3" 
               style={leafStyle(3, isMobile ? currentMobileLeaf >= 4 : undefined)}
@@ -471,7 +411,6 @@ export const TangyDiary = () => {
                   <div className="font-serif italic text-lg leading-tight">Artists &amp;<br/>Performers</div>
                   <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
                     The artists gathered around ribbon microphones for an unscripted acoustic jam.
-                    Someone pulled out a tanpura, another started a vocal chant.
                   </p>
                   <div className="absolute bottom-3 left-3 text-[#EADFC5] font-mono text-[7.5px] rotate-1 shadow-sm"
                     style={{ background:'#A44A34', padding:'5px 8px', maxWidth:115 }}>
@@ -484,15 +423,11 @@ export const TangyDiary = () => {
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #04 — Left
                   </div>
-                  <div className="font-serif italic text-base">Artist Jam Log</div>
-                  <p className="font-serif italic text-[11.5px] mt-2 opacity-80">
-                    "Unscripted, unplugged, and raw. The night decided what to play."
-                  </p>
                 </div>
               </div>
             </div>
 
-            {/* ── LEAF 4: Spread 4 Right (Backstage) / Spread 5 Left (Log) */}
+            {/* ── LEAF 4: Backstage ── */}
             <div 
               className="diary-leaf desktop-leaf-4" 
               style={leafStyle(4, isMobile ? currentMobileLeaf >= 5 : undefined)}
@@ -500,20 +435,11 @@ export const TangyDiary = () => {
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
-                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
-                    <span>Spread #04</span>
-                    <span className="text-[#A44A34] font-bold">Backstage</span>
-                  </div>
                   <div className="font-serif italic text-lg leading-tight">Backstage Notes &amp;<br/>Hidden Spaces</div>
                   <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 opacity-88">
                     A 300-year-old sanctuary tucked behind stone arches. We mapped the acoustics
                     by hand, with no digital tools.
                   </p>
-                  <div className="font-mono text-[7.5px] text-[#5A4032] mt-2"
-                    style={{ border:'1px dashed rgba(90,64,50,0.4)', padding:6 }}>
-                    [ NORTH WALL: REVERB 1.8s ]<br/>
-                    [ SOUTHERN ARCH: BASS TRAP ]
-                  </div>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
@@ -521,12 +447,11 @@ export const TangyDiary = () => {
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #05 — Left
                   </div>
-                  <p className="font-serif italic text-[11.5px] mt-2 opacity-80">"No speaker stacks. The stone speaks."</p>
                 </div>
               </div>
             </div>
 
-            {/* ── LEAF 5: Spread 5 Right (Community) / Final Left (Log) ─── */}
+            {/* ── LEAF 5: Community Note ── */}
             <div 
               className="diary-leaf desktop-leaf-5" 
               style={leafStyle(5, isMobile ? currentMobileLeaf >= 6 : undefined)}
@@ -534,25 +459,13 @@ export const TangyDiary = () => {
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:12 }} className="text-[#2E221B]">
-                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
-                    <span>Spread #05</span>
-                    <span className="text-[#A44A34] font-bold">Community</span>
-                  </div>
-
-                  {/* Handwritten torn-paper note */}
                   <div className="relative mx-auto" style={{
                     background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
                     border: '1px solid rgba(90,64,50,0.15)',
                     boxShadow: '3px 4px 12px rgba(60,40,20,0.25)',
                     padding: '10px 12px',
                     transform: 'rotate(-1.2deg)',
-                    clipPath: 'polygon(0% 2%, 3% 0%, 97% 1%, 100% 0%, 100% 98%, 96% 100%, 3% 99%, 0% 100%)',
                   }}>
-                    <div style={{
-                      position:'absolute', top:-8, left:'50%', transform:'translateX(-50%) rotate(-1deg)',
-                      width:42, height:11,
-                      background:'rgba(201,168,83,0.45)', border:'1px solid rgba(160,120,20,0.25)',
-                    }}/>
                     <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px', lineHeight:'1.45', color:'#2E221B' }}>
                       Dear You,<br/><br/>
                       Every gathering leaves something behind.<br/><br/>
@@ -567,10 +480,6 @@ export const TangyDiary = () => {
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                   <div className="font-serif italic text-base">The story continues.</div>
-                  <p className="font-serif text-[11px] text-[#5A4032] mt-2 opacity-80">
-                    Every Tangy Session leaves another page waiting to be written.
-                  </p>
-                  <div className="font-serif italic text-sm mt-3 font-bold">To be continued…</div>
                 </div>
               </div>
             </div>
@@ -580,15 +489,8 @@ export const TangyDiary = () => {
               <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
-                  <div className="font-mono text-[8px] uppercase text-[#5A4032] mb-2 border-b border-[#5A4032]/40 pb-0.5">
-                    Continue Reading
-                  </div>
                   <div className="font-serif italic text-xl">More stories<br/>are waiting.</div>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'13px', color:'#5A4032', marginTop:6, opacity:0.85 }}>
-                    The diary continues with every new Tangy Session.
-                  </p>
-                  <div style={{ fontFamily:'Caveat, cursive', fontSize:'16px', fontWeight:700, marginTop:8, opacity:0.55 }}>To be continued…</div>
-                  <div className="font-mono text-[6.5px] tracking-[0.18em] uppercase text-[#A44A34] mt-2 opacity-70">TANGY DIARY · FIELD NOTES · VOL. I</div>
+                  <div style={{ fontFamily:'Caveat, cursive', fontSize:'16px', fontWeight:700 }} className="mt-3 opacity-60">To be continued…</div>
                 </div>
               </div>
             </div>
@@ -598,7 +500,7 @@ export const TangyDiary = () => {
 
         {/* Mobile Page Turn Controls & Touch Hint */}
         {isMobile && (
-          <div className="flex flex-col items-center gap-2 mt-4 z-30">
+          <div className="flex flex-col items-center gap-2 z-30 -mt-10">
             <div className="flex items-center gap-3">
               <button
                 onClick={handlePrevLeaf}
@@ -621,7 +523,7 @@ export const TangyDiary = () => {
               </button>
             </div>
             <div className="font-serif italic text-[11px] text-[#EADFC5]/65 text-center">
-              👈 Swipe left/right on book to turn 3D pages 👉
+              👈 Swipe left/right on book to turn pages 👉
             </div>
           </div>
         )}
