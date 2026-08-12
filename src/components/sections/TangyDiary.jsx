@@ -345,6 +345,18 @@ export const TangyDiary = () => {
                   <div className="font-mono text-[10px] tracking-[0.42em] text-[#EADFC5]/72 mt-3 uppercase">Field Notes</div>
                   <div className="font-serif italic text-xs text-[#EADFC5]/50 mt-1">Hyderabad · Since 2016</div>
                   <svg className="w-6 h-6 mx-auto mt-3 opacity-45 text-[#A68853]"><use href="#sym-compass"/></svg>
+                  {/* Botanical flower on cover */}
+                  <svg className="mt-4 opacity-40" width="52" height="52" viewBox="0 0 52 52" fill="none" stroke="#A68853" strokeWidth="1.1" strokeLinecap="round">
+                    <line x1="26" y1="52" x2="26" y2="28"/>
+                    <path d="M26,42 Q16,36 14,26 Q24,28 26,42"/>
+                    <path d="M26,36 Q36,30 38,20 Q28,22 26,36"/>
+                    <circle cx="26" cy="22" r="5" fill="none"/>
+                    <circle cx="26" cy="22" r="2" fill="#A68853"/>
+                    <path d="M21,17 Q18,10 22,6"/>
+                    <path d="M31,17 Q34,10 30,6"/>
+                    <path d="M18,22 Q11,19 10,14"/>
+                    <path d="M34,22 Q41,19 42,14"/>
+                  </svg>
                 </div>
                 {/* Closure strap */}
                 <div className="diary-strap" style={{
@@ -415,10 +427,18 @@ export const TangyDiary = () => {
                 </div>
                 <div className="font-serif italic text-xl leading-tight">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
                 <div className="font-mono text-[8px] text-[#A44A34] uppercase tracking-wider mt-1">LOCATION: BANSILALPET STEPWELL</div>
-                <p className="font-serif text-[13px] mt-2 leading-relaxed opacity-88">
+                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 leading-relaxed opacity-90 text-[#2E221B]">
                   The stepwell echoes before the crowd arrives. Water dripping against
                   350-year-old stone, acoustic instruments humming without amplification.
                 </p>
+                {/* Small botanical doodle — stem with leaves */}
+                <svg className="absolute top-[108px] left-3 opacity-30" width="28" height="55" viewBox="0 0 28 55" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
+                  <line x1="14" y1="55" x2="14" y2="20"/>
+                  <path d="M14,42 Q6,36 4,28 Q12,30 14,42"/>
+                  <path d="M14,32 Q22,26 24,18 Q16,20 14,32"/>
+                  <circle cx="14" cy="18" r="4"/>
+                  <circle cx="14" cy="18" r="1.5" fill="#5A4032"/>
+                </svg>
                 <figure className="absolute top-[106px] right-3 w-[86px] bg-[#FBF7EE] shadow-md rotate-2" style={{ padding:'6px 6px 16px' }}>
                   <div className="absolute -top-1.5 left-4 bg-[#A68853]/50 -rotate-2" style={{ width:30, height:11 }}/>
                   <svg viewBox="0 0 100 110" className="w-full">
@@ -429,7 +449,7 @@ export const TangyDiary = () => {
                 </figure>
                 <div className="absolute bottom-5 left-4 bg-[#E6D8B7] shadow-xs -rotate-1"
                   style={{ padding:8, maxWidth:115, border:'1px solid rgba(166,136,83,0.32)' }}>
-                  <div className="font-serif text-[10px]">Echo off 350-year-old stone.</div>
+                  <div style={{ fontFamily:'Caveat, cursive', fontSize:'12px' }}>Echo off 350-year-old stone.</div>
                 </div>
               </div>
             </div>
@@ -465,13 +485,24 @@ export const TangyDiary = () => {
                   <svg className="w-4 h-4"><use href="#sym-rain"/></svg>
                   <span>300 AUDIENCE // MIDNIGHT</span>
                 </div>
-                <p className="font-serif text-[13px] mt-2 leading-relaxed opacity-88">
+                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 leading-relaxed opacity-90 text-[#2E221B]">
                   When the lights dropped at midnight, 300 people stood completely still
                   under rain-soaked arches. No phones in the air.
                 </p>
+                {/* Botanical doodle — wildflower */}
+                <svg className="absolute bottom-20 right-4 opacity-25" width="32" height="60" viewBox="0 0 32 60" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
+                  <line x1="16" y1="60" x2="16" y2="30"/>
+                  <path d="M16,48 Q8,42 6,34 Q14,36 16,48"/>
+                  <path d="M16,38 Q24,32 26,24 Q18,26 16,38"/>
+                  <circle cx="16" cy="26" r="5"/>
+                  <line x1="16" y1="21" x2="16" y2="15"/>
+                  <circle cx="16" cy="13" r="3"/>
+                  <line x1="13" y1="16" x2="10" y2="12"/>
+                  <line x1="19" y1="16" x2="22" y2="12"/>
+                </svg>
                 <div className="absolute bottom-5 left-4 bg-[#E6D8B7] rotate-1 shadow-xs"
                   style={{ padding:8, maxWidth:120, border:'1px solid rgba(166,136,83,0.32)' }}>
-                  <div className="font-serif text-[10px]">300 people stayed till sunrise.</div>
+                  <div style={{ fontFamily:'Caveat, cursive', fontSize:'12px' }}>300 people stayed till sunrise.</div>
                 </div>
               </div>
             </div>
@@ -501,10 +532,22 @@ export const TangyDiary = () => {
                   <span className="text-[#A44A34] font-bold">05 Jan, 2025</span>
                 </div>
                 <div className="font-serif italic text-xl leading-tight">Artists &amp;<br/>Performers</div>
-                <p className="font-serif text-[13px] mt-2 leading-relaxed opacity-88">
+                <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-2 leading-relaxed opacity-90 text-[#2E221B]">
                   The artists gathered around ribbon microphones for an unscripted acoustic jam.
                   Someone pulled out a tanpura, another started a vocal chant.
                 </p>
+                {/* Daisy botanical doodle */}
+                <svg className="absolute top-[130px] right-4 opacity-25" width="38" height="38" viewBox="0 0 38 38" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
+                  <circle cx="19" cy="19" r="4"/>
+                  <line x1="19" y1="1" x2="19" y2="9"/>
+                  <line x1="19" y1="29" x2="19" y2="37"/>
+                  <line x1="1" y1="19" x2="9" y2="19"/>
+                  <line x1="29" y1="19" x2="37" y2="19"/>
+                  <line x1="6" y1="6" x2="12" y2="12"/>
+                  <line x1="26" y1="26" x2="32" y2="32"/>
+                  <line x1="32" y1="6" x2="26" y2="12"/>
+                  <line x1="6" y1="32" x2="12" y2="26"/>
+                </svg>
                 <div className="absolute bottom-5 left-4 text-[#EADFC5] font-mono text-[8px] rotate-1 shadow-sm"
                   style={{ background:'#A44A34', padding:8, maxWidth:122 }}>
                   PERFORMER PASS // BACKSTAGE
@@ -559,20 +602,62 @@ export const TangyDiary = () => {
           {/* ── LEAF 5: Spread 5 Right (Community) / Final Left (Log) ─── */}
           <div className="diary-leaf" style={leafStyle(5)}>
             <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }} className="text-[#2E221B]">
-                <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-1.5">
+              <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                <div className="flex justify-between font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-2">
                   <span>Spread #05</span>
                   <span className="text-[#A44A34] font-bold">Community</span>
                 </div>
-                <div className="font-serif italic text-xl leading-tight">Community &amp;<br/>Crew Letters</div>
-                <p className="font-serif text-[13px] mt-2 leading-relaxed opacity-88">
-                  Great experiences are built by passionate people behind the scenes.
-                  Sound crews, chai makers, and listeners who stayed till dawn.
-                </p>
-                <div className="bg-[#E6D8B7] -rotate-1 shadow-xs mt-4"
-                  style={{ padding:8, maxWidth:140, border:'1px solid rgba(166,136,83,0.4)' }}>
-                  <div className="font-mono text-[8px] text-[#A44A34] font-bold">VOLUNTEER DOSSIER</div>
-                  <div className="font-serif italic text-[11px] mt-1">Built with love by 40+ crew.</div>
+
+                {/* Handwritten torn-paper note — inspired by reference image */}
+                <div className="relative mx-auto" style={{
+                  background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
+                  border: '1px solid rgba(90,64,50,0.15)',
+                  boxShadow: '3px 4px 12px rgba(60,40,20,0.25), inset 0 0 20px rgba(180,140,80,0.04)',
+                  padding: '14px 14px 16px',
+                  transform: 'rotate(-1.2deg)',
+                  maxWidth: '100%',
+                  clipPath: 'polygon(0% 2%, 3% 0%, 97% 1%, 100% 0%, 100% 98%, 96% 100%, 3% 99%, 0% 100%)',
+                }}>
+                  {/* Tape strip at top */}
+                  <div style={{
+                    position:'absolute', top:-10, left:'50%', transform:'translateX(-50%) rotate(-1deg)',
+                    width:52, height:14,
+                    background:'rgba(201,168,83,0.45)',
+                    border:'1px solid rgba(160,120,20,0.25)',
+                  }}/>
+
+                  {/* Small botanical corner doodle */}
+                  <svg className="absolute top-3 right-3 opacity-30" width="30" height="40" viewBox="0 0 30 40" fill="none" stroke="#5A4032" strokeWidth="1" strokeLinecap="round">
+                    <line x1="15" y1="40" x2="15" y2="20"/>
+                    <path d="M15,34 Q8,28 6,20 Q13,22 15,34"/>
+                    <path d="M15,26 Q22,20 24,12 Q17,14 15,26"/>
+                    <circle cx="15" cy="14" r="4"/>
+                    <circle cx="15" cy="14" r="1.5" fill="#5A4032"/>
+                    <line x1="11" y1="10" x2="8" y2="6"/>
+                    <line x1="19" y1="10" x2="22" y2="6"/>
+                  </svg>
+
+                  {/* Second botanical — bottom left */}
+                  <svg className="absolute bottom-3 left-3 opacity-25" width="22" height="32" viewBox="0 0 22 32" fill="none" stroke="#5A4032" strokeWidth="1" strokeLinecap="round">
+                    <line x1="11" y1="32" x2="11" y2="16"/>
+                    <path d="M11,26 Q5,22 4,16 Q10,18 11,26"/>
+                    <path d="M11,20 Q17,16 18,10 Q12,12 11,20"/>
+                    <circle cx="11" cy="10" r="3"/>
+                  </svg>
+
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'16px', lineHeight:'1.55', color:'#2E221B' }}>
+                    Dear You,
+                    <br/><br/>
+                    Every gathering leaves something behind.
+                    <br/><br/>
+                    A song.<br/>
+                    A conversation.<br/>
+                    A place.<br/>
+                    A memory.
+                    <br/><br/>
+                    And somehow, we carry it with us.
+                  </p>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px', color:'#A44A34', textAlign:'right', marginTop:8 }}>— Tangy</p>
                 </div>
               </div>
             </div>
@@ -591,17 +676,33 @@ export const TangyDiary = () => {
           {/* ── LEAF 6: Static final right page (never flips) ──────────── */}
           <div className="diary-leaf" style={leafStyle(6)}>
             <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
-              <div style={{ position:'absolute', inset:0, padding:20 }}
+              <div style={{ position:'absolute', inset:0, padding:22 }}
                 className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                 <div className="font-mono text-[9px] tracking-[0.09em] uppercase text-[#5A4032] mb-4"
                   style={{ borderBottom:'1px solid rgba(90,64,50,0.5)', display:'inline-block', paddingBottom:2 }}>
                   Continue Reading
                 </div>
                 <div className="font-serif italic text-2xl">More stories<br/>are waiting.</div>
-                <p className="font-serif text-[13px] text-[#5A4032] mt-3 opacity-80" style={{ maxWidth:158 }}>
+                <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px', color:'#5A4032', marginTop:10, maxWidth:158, opacity:0.85 }}>
                   The diary continues with every new Tangy Session.
                 </p>
-                <div className="font-serif italic text-base font-bold opacity-65 mt-5">To be continued…</div>
+                {/* Botanical corner illustration */}
+                <svg className="mt-5 opacity-35" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#5A4032" strokeWidth="1.1" strokeLinecap="round">
+                  <line x1="32" y1="64" x2="32" y2="32"/>
+                  <path d="M32,52 Q20,44 16,32 Q28,36 32,52"/>
+                  <path d="M32,42 Q44,34 48,22 Q36,26 32,42"/>
+                  <circle cx="32" cy="26" r="6"/>
+                  <circle cx="32" cy="26" r="2.5" fill="#5A4032"/>
+                  <path d="M26,20 Q22,12 26,6"/>
+                  <path d="M38,20 Q42,12 38,6"/>
+                  <path d="M20,26 Q12,22 10,14"/>
+                  <path d="M44,26 Q52,22 54,14"/>
+                  <path d="M22,38 Q14,38 10,32"/>
+                  <path d="M42,38 Q50,38 54,32"/>
+                </svg>
+                <div style={{ fontFamily:'Caveat, cursive', fontSize:'18px', fontWeight:700, marginTop:12, opacity:0.55 }}>To be continued…</div>
+                <div className="font-mono text-[7px] tracking-[0.2em] uppercase text-[#A44A34] mt-3 opacity-70">TANGY DIARY · FIELD NOTES · VOL. I</div>
+                <div className="absolute bottom-4 right-4 font-mono text-[7px] text-[#5A4032]/40 tracking-wider">PROPERTY OF TANGY SESSIONS</div>
               </div>
             </div>
           </div>

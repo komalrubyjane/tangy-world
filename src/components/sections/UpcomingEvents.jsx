@@ -136,6 +136,72 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
             </div>
           </div>
         ))}
+
+        {/* ── EDITORIAL INFO CARD ── archival document placed with the ticket collection */}
+        <div className="shrink-0 w-[85vw] md:w-[450px] h-[68vh] md:h-[660px] relative group">
+          {/* Same physical ticket container language */}
+          <div className="w-full h-full bg-[#EDE0C0] p-5 shadow-[25px_25px_0px_#11100C] border-4 border-[#11100C] flex flex-col relative transition-transform duration-300 group-hover:-translate-y-2 group-hover:rotate-[1deg]"
+            style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}>
+
+            {/* Same perforated tear-off details */}
+            <div className="absolute -top-3 right-16 w-8 h-3 bg-[#B94717] border-b-2 border-x-2 border-[#11100C] rounded-b-full z-20" />
+            <div className="absolute -bottom-3 right-16 w-8 h-3 bg-[#B94717] border-t-2 border-x-2 border-[#11100C] rounded-t-full z-20" />
+            <div className="absolute top-0 bottom-0 right-20 w-[2px] border-r-2 border-dashed border-[#11100C]/40 z-20 pointer-events-none" />
+
+            {/* Masking tape — slightly different angle for character */}
+            <div className="absolute -top-3 left-1/4 w-24 h-5 bg-[rgba(231,213,164,0.75)] rotate-[1.5deg] border border-black/20 z-30 pointer-events-none" />
+
+            {/* Paper imperfection — subtle aged stain */}
+            <div className="absolute top-1/3 right-8 w-24 h-20 rounded-full opacity-[0.06] pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse, #7A4A28 0%, transparent 70%)' }} />
+
+            {/* Top Header — same mono label system */}
+            <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#11100C] border-b-2 border-[#11100C] pb-2 mb-5">
+              <span>TANGY SESSIONS</span>
+              <span className="text-[#B94717]">EST. 2016 · HYD</span>
+            </div>
+
+            {/* Small archival label */}
+            <div className="font-mono text-[10px] text-[#B94717] font-bold tracking-[0.25em] uppercase mb-3">
+              ✦ About This Series
+            </div>
+
+            {/* Main heading — display font matching session cards */}
+            <h3 className="display font-bold text-4xl md:text-5xl text-[#11100C] leading-[0.92] mb-4 ink-bleed">
+              Music.<br/>Heritage.<br/>Culture.
+            </h3>
+
+            {/* Description — serif italic matching section tone */}
+            <p className="font-serif italic text-sm text-[#2A1A0E] leading-relaxed opacity-90 mb-4">
+              "Live sessions, intimate gatherings and cultural experiences rooted in the soul of Hyderabad."
+            </p>
+
+            {/* Secondary archival info strip */}
+            <div className="font-mono text-[9px] tracking-widest text-[#11100C] border-y border-[#11100C]/30 py-2 mb-auto">
+              HYDERABAD • LIVE • INDEPENDENT
+            </div>
+
+            {/* Botanical doodle — inline SVG for tactile feel */}
+            <svg className="absolute bottom-20 right-6 opacity-20 pointer-events-none" width="60" height="80" viewBox="0 0 60 80" fill="none" stroke="#2A1A0E" strokeWidth="1.2" strokeLinecap="round">
+              <line x1="30" y1="80" x2="30" y2="30"/>
+              <path d="M30,50 Q18,42 14,30 Q26,32 30,50"/>
+              <path d="M30,40 Q42,32 46,20 Q34,22 30,40"/>
+              <path d="M30,32 Q22,18 24,8 Q34,14 30,32"/>
+              <ellipse cx="30" cy="7" rx="5" ry="7" strokeWidth="1"/>
+              <line x1="14" y1="30" x2="8" y2="24"/>
+              <line x1="46" y1="20" x2="52" y2="14"/>
+            </svg>
+
+            {/* CTA Button — matches BOOK TICKETS exactly */}
+            <a
+              href="/sessions"
+              className="mt-4 w-full text-center flex items-center justify-center gap-2 font-mono text-xs font-bold uppercase tracking-widest bg-[#c2272a] text-[#ecdcaf] hover:bg-[#11100C] border-2 border-[#11100C] py-2.5 px-3 transition-colors shadow-[3px_3px_0px_#11100C] active:scale-95"
+            >
+              <span>VIEW OUR SESSIONS</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
       </div>
 
     </section>

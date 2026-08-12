@@ -102,7 +102,7 @@ export const Archive = () => {
         {gallery.map((photo, i) => (
           <div 
             key={photo.id}
-            className={`shrink-0 w-[280px] md:w-[400px] bg-[#E3D4AC] p-3 pb-12 shadow-2xl border-2 border-[#11100C] rotate-[${(i % 3 - 1) * 4}deg] ${i === gallery.length - 1 ? 'heritage-expand-photo origin-center' : ''}`}
+            className={`shrink-0 w-[280px] md:w-[400px] bg-[#E3D4AC] p-3 pb-12 shadow-2xl border-2 border-[#11100C] rotate-[${(i % 3 - 1) * 4}deg] ${i === gallery.length - 1 ? 'heritage-expand-photo origin-center' : ''} relative`}
           >
             {/* Masking Tape Overlay */}
             <div className="absolute -top-3 left-1/3 w-16 h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
@@ -123,6 +123,43 @@ export const Archive = () => {
               <span className="font-bold tracking-wider">{photo.label.toUpperCase()}</span>
               <span className="opacity-70">HYD · 2025</span>
             </div>
+
+            {/* VIEW MORE ARCHIVE card — only on the final photo */}
+            {i === gallery.length - 1 && (
+              <div className="absolute z-40 bottom-[-16px] right-[-12px] sm:bottom-[-20px] sm:right-[-16px] w-[160px] sm:w-[190px] -rotate-2 pointer-events-auto"
+                style={{
+                  background: 'linear-gradient(150deg, #EEE4C8 0%, #E3D4AC 60%, #D8C99A 100%)',
+                  border: '1.5px solid #11100C',
+                  boxShadow: '6px 6px 0px rgba(17,16,12,0.65), inset 0 0 30px rgba(120,80,30,0.05)',
+                  padding: '10px 12px 12px',
+                }}>
+                {/* Tape strip at top */}
+                <div className="absolute -top-[10px] left-1/2 -translate-x-1/2 w-16 h-[13px] rotate-[-1.5deg] pointer-events-none"
+                  style={{ background: 'rgba(201,154,46,0.45)', border: '1px solid rgba(160,120,20,0.3)' }} />
+
+                {/* Archival label */}
+                <div className="font-mono text-[8px] font-bold text-[#C99A2E] tracking-[0.2em] uppercase mb-1.5 mt-1">
+                  THE ARCHIVE
+                </div>
+
+                {/* Thin rule */}
+                <div className="border-t border-[#11100C]/25 mb-2" />
+
+                {/* Supporting text */}
+                <p className="font-serif italic text-[10px] text-[#2A1A0E] leading-snug opacity-90 mb-3">
+                  More stories, photographs and memories from Tangy Sessions.
+                </p>
+
+                {/* CTA */}
+                <a
+                  href="/archive"
+                  className="block w-full text-center font-mono text-[9px] font-bold tracking-[0.18em] uppercase bg-[#C99A2E] text-[#11100C] hover:bg-[#11100C] hover:text-[#C99A2E] border border-[#11100C] py-1.5 transition-colors"
+                  style={{ boxShadow: '2px 2px 0px #11100C' }}
+                >
+                  VIEW MORE ARCHIVE →
+                </a>
+              </div>
+            )}
           </div>
         ))}
       </div>
