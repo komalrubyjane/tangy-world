@@ -11,7 +11,20 @@ export const CurtainOverlay = ({ onComplete }) => {
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setIsFinished(true);
+      if (onComplete) onComplete();
+      return;
+    }
+
     const isMobile = window.innerWidth < 768;
+
+    const restoreScroll = () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
 
     // Lock scroll during curtain open
     document.body.style.overflow = 'hidden';
@@ -20,9 +33,7 @@ export const CurtainOverlay = ({ onComplete }) => {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
+        restoreScroll();
         setIsFinished(true);
         if (onComplete) onComplete();
       }
@@ -66,6 +77,10 @@ export const CurtainOverlay = ({ onComplete }) => {
       ease: 'power2.out'
     }, isMobile ? 1.55 : 1.8);
 
+    return () => {
+      tl.kill();
+      restoreScroll();
+    };
   }, [onComplete, playSFX]);
 
   if (isFinished) return null;

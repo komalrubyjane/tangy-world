@@ -163,20 +163,32 @@ export const ContactPage = () => {
         <div className="flex justify-center flex-wrap gap-3 sm:gap-4">
           {[
             { label: 'INSTAGRAM: @TANGYSESSIONS', href: 'https://instagram.com/tangysessions', icon: '📷' },
-            { label: 'YOUTUBE ARCHIVE', href: '#', icon: '🎬' },
-            { label: 'SPOTIFY PLAYLIST', href: '#', icon: '🎵' },
+            { label: 'YOUTUBE ARCHIVE', href: null, icon: '🎬' },
+            { label: 'SPOTIFY PLAYLIST', href: null, icon: '🎵' },
             { label: 'EMAIL DESK', href: 'mailto:hello@tangysessions.com', icon: '✉' }
           ].map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#E7D5A4] text-[#11100C] font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C] hover:bg-[#C99A2E] hover:border-[#C99A2E] transition-colors shadow-[3px_3px_0px_#11100C]"
-            >
-              <span>{s.icon}</span>
-              <span>{s.label}</span>
-            </a>
+            s.href ? (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-[#E7D5A4] text-[#11100C] font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C] hover:bg-[#C99A2E] hover:border-[#C99A2E] transition-colors shadow-[3px_3px_0px_#11100C]"
+              >
+                <span>{s.icon}</span>
+                <span>{s.label}</span>
+              </a>
+            ) : (
+              <span
+                key={s.label}
+                title="Channel launching soon"
+                className="flex items-center gap-2 bg-[#E7D5A4]/40 text-[#11100C]/50 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C]/30 cursor-default select-none"
+              >
+                <span className="opacity-60">{s.icon}</span>
+                <span>{s.label}</span>
+                <span className="text-[8px] font-normal normal-case opacity-70">(soon)</span>
+              </span>
+            )
           ))}
         </div>
       </section>

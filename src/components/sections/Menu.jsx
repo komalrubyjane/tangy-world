@@ -38,7 +38,7 @@ export const Menu = ({ isOpen, onClose }) => {
     { num: "05", label: "HERITAGE SPACES", href: "#spaces" },
     { num: "06", label: "RAW FOOTAGE", href: "#front-camera" },
     { num: "07", label: "PRIVATE DIARY", href: "#diary" },
-    { num: "08", label: "ARTIST PORTAL ✦", route: "/artists" },
+    { num: "08", label: "ARTIST PORTAL ✦", route: "/artist" },
     { num: "09", label: "ARCHITECTS", href: "#founders" },
     { num: "10", label: "SESSIONS & TICKETS", href: "#sessions" },
     { num: "11", label: "VOLUNTEER CREW ✦", route: "/crew" },

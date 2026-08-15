@@ -13,6 +13,11 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
   const targetScrollY = useRef(0);
 
   useEffect(() => {
+    if (!active) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     const pathEl = pathRef.current;
     if (!pathEl) return;
 

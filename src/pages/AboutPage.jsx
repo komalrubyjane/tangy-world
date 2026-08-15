@@ -36,7 +36,7 @@ export const AboutPage = () => {
               { label: 'WHY TANGY', hash: '#manifesto' },
               { label: 'CHRONOLOGY', hash: '#history' },
               { label: 'OUR SPACES', hash: '#spaces' },
-              { label: 'FOUNDERS', hash: '#founders' }
+              { label: 'TANGY TEAM', hash: '#founders' }
             ].map((link) => (
               <a
                 key={link.hash}

@@ -21,7 +21,7 @@ export const VinylRecordPlayerModal = ({ isOpen, onClose }) => {
       <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* 33⅓ RPM TURNTABLE MODAL */}
-      <div className="relative w-full max-w-3xl bg-[#191410] text-[#ecdcaf] border-4 border-[#c2272a] p-6 shadow-[12px_12px_0px_#4c1210] flex flex-col gap-6 z-10 overflow-hidden">
+      <div className="relative w-full max-w-3xl max-h-[90dvh] bg-[#191410] text-[#ecdcaf] border-4 border-[#c2272a] p-6 shadow-[12px_12px_0px_#4c1210] flex flex-col gap-6 z-10 overflow-y-auto overflow-x-hidden">
         
         {/* HEADER */}
         <div className="flex justify-between items-center border-b-2 border-[#c2272a]/40 pb-3">

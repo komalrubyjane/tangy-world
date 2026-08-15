@@ -27,7 +27,7 @@ export const PostcardContactModal = ({ isOpen, onClose }) => {
       <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* VINTAGE POSTCARD CONTACT FORM */}
-      <div className="relative w-full max-w-2xl bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[14px_14px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-hidden">
+      <div className="relative w-full max-w-2xl max-h-[90dvh] bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[14px_14px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-y-auto overflow-x-hidden">
         
         {/* POSTCARD HEADER */}
         <div className="flex justify-between items-center border-b-2 border-[#191410] pb-3">

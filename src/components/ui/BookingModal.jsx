@@ -19,7 +19,7 @@ export const BookingModal = ({ event, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="relative w-full max-w-xl bg-[#E7D5A4] border-4 border-[#11100C] p-6 md:p-10 shadow-[20px_20px_0px_#11100C] text-[#11100C]">
+      <div className="relative w-full max-w-xl max-h-[90dvh] overflow-y-auto bg-[#E7D5A4] border-4 border-[#11100C] p-6 md:p-10 shadow-[20px_20px_0px_#11100C] text-[#11100C]">
         
         {/* Perforated Stub Edge Visual */}
         <div className="absolute -top-3 left-0 right-0 h-2 border-b-2 border-dashed border-[#11100C]" />

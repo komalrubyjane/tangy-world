@@ -30,7 +30,7 @@ export const UserLoginModal = () => {
   return (
     <div className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
       <div 
-        className="relative w-full max-w-md bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]"
+        className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]"
         style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
       >
         {/* Masking tape at top */}
