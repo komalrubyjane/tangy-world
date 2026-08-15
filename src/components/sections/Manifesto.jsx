@@ -49,7 +49,7 @@ export const Manifesto = () => {
       className="relative w-full min-h-screen lg:h-screen bg-[#E7D5A4] text-[#11100C] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-4 sm:p-8 md:p-12 py-20 lg:py-0">
       
       {/* NOISE & AGED HANDMADE PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-multiply pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-multiply pointer-events-none z-10" />
 
       {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
       <NotebookGridPattern opacity={0.07} />

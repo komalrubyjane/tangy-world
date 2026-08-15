@@ -89,7 +89,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
     >
       
       {/* INK GRAIN OVERLAY */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-10" />
 
       {/* TECHNICAL BACKSTAGE BLUEPRINT GRID PATTERN */}
       <BlueprintGridPattern opacity={0.08} />

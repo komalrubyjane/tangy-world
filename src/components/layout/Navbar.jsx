@@ -202,7 +202,7 @@ export const Navbar = () => {
                 }`}
               >
                 {/* Paper Fiber Noise Overlay */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply pointer-events-none rounded-md" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply pointer-events-none rounded-md" />
                 
                 {/* Dropdown Items List */}
                 <div className="relative z-10 flex flex-col gap-1">

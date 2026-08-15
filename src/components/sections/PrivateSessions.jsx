@@ -61,7 +61,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
     >
       
       {/* SOFT NOISE & PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-0" />
 
       {/* ANALOG SOUND WAVE FREQUENCY GRAPHIC */}
       <SoundWaveGraphic color="#E7D7AC" opacity={0.15} className="absolute left-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />

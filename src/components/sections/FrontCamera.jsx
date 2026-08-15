@@ -93,7 +93,7 @@ export const FrontCamera = () => {
     <section ref={sectionRef} id="front-camera" className="relative w-full h-screen bg-[#0D0A07] text-[#E7D7AC] overflow-hidden flex flex-col justify-between border-t-8 border-[#5A120D] perspective-[1200px]">
       
       {/* SOFT ANALOGUE GRAIN & DUST */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none" />
 
       {/* CROP MARKS & KODAK FILM MARKS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">

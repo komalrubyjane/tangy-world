@@ -12,7 +12,7 @@ export const VintageDiaryShell = ({
 
       {/* RIPPED/DECKLE PAPER STACK DEPTH UNDERNEATH (TOP, RIGHT, BOTTOM EDGES) */}
       <div className="absolute -top-3 -right-4 -bottom-3 -left-3 bg-[#E7D5A4] rounded-lg border-2 border-[#120A06] shadow-2xl opacity-90 pointer-events-none z-0 rotate-[-0.5deg]">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply" />
         <div className="absolute top-0 right-0 bottom-0 w-5 bg-[repeating-linear-gradient(180deg,#D6C19A_0px,#D6C19A_3px,#B8A37C_3px,#B8A37C_6px)] border-l border-[#120A06]/40" />
       </div>
 
@@ -20,7 +20,7 @@ export const VintageDiaryShell = ({
       <div className="absolute inset-0 bg-[#25140C] rounded-xl border-4 border-[#120A06] shadow-[45px_45px_120px_rgba(0,0,0,0.98)] z-10 flex flex-col justify-center preserve-3d">
         
         {/* Aged Leather Scratches & Fiber Texture */}
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-35 mix-blend-overlay pointer-events-none rounded-xl" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-16 mix-blend-overlay pointer-events-none rounded-xl" />
 
         {/* Center Leather Spine & Stitched Binding Threads (Left Edge) */}
         <div className="absolute top-0 bottom-0 left-0 w-8 md:w-12 bg-[linear-gradient(90deg,#140a05,#2d170d_60%,#140a05)] border-r-2 border-[#120A06] z-30 pointer-events-none flex flex-col justify-between py-8 items-center">
@@ -54,7 +54,7 @@ export const VintageDiaryShell = ({
 
         {/* CLOSED LEATHER FRONT COVER (VINTAGE DIARY SHELL) */}
         <div className={`book-cover-front absolute inset-0 bg-gradient-to-br from-[#4A2F1F] via-[#25140C] to-[#1A0D07] rounded-xl border-4 border-[#120A06] border-r-[16px] border-b-[16px] border-r-[#D6C19A] border-b-[#C2B08B] shadow-[45px_45px_120px_rgba(0,0,0,0.98)] z-40 origin-left flex flex-col items-center justify-between p-6 md:p-8 text-center preserve-3d transition-transform duration-700 ${isCoverOpen ? 'rotate-y-[-140deg] opacity-0 pointer-events-none' : 'rotate-y-0 opacity-100'}`}>
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-40 mix-blend-overlay pointer-events-none rounded-xl" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-18 mix-blend-overlay pointer-events-none rounded-xl" />
 
           {/* BRASS CORNER ACCENTS */}
           <div className="absolute top-2 left-2 w-7 h-7 bg-gradient-to-br from-[#C99A2E] to-[#7A5C30] [clip-path:polygon(0_0,100%_0,0_100%)] shadow-md pointer-events-none z-10" />

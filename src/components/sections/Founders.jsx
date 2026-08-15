@@ -92,7 +92,7 @@ export const Founders = () => {
     >
       
       {/* WOODEN DESK & NOISE TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-30 mix-blend-overlay pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none z-10" />
 
       {/* OVERSIZED DESK WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-5 z-5">

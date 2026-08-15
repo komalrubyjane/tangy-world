@@ -24,7 +24,7 @@ export const BlogsPage = () => {
 
       {/* PAGE HERO */}
       <section id="journal" className="relative pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 block">
           TANGY EDITORIALS // SHOW STORIES & MUSIC LAUNCHES
         </span>

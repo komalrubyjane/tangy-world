@@ -5,7 +5,7 @@ export const Footer = () => {
     <footer className="relative w-full bg-[#5A120D] text-[#E7D5A4] border-t-8 border-[#11100C] py-20 px-8 md:px-16 overflow-hidden">
       
       {/* NOISE & AGED RECORD SLEEVE TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-multiply pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply pointer-events-none z-0" />
 
       {/* CROP MARKS & ARCHIVE CATALOG NO. */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#D19A24] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">

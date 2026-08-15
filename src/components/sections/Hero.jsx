@@ -247,7 +247,7 @@ export const Hero = () => {
         </div>
 
         {/* TEXTURE OVERLAYS */}
-        <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-25 mix-blend-overlay pointer-events-none" />
+        <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none" />
         <div className="vignette absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
 
       </div>
