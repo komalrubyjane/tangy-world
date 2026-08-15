@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
 import { useAudio } from '../../audio/AudioContext';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
+  const { login, loading, authError } = useAuth();
   const { playSFX } = useAudio();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export const LoginPage = () => {
     if (ok) {
       navigate('/artist/dashboard');
     } else {
-      setError('AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
+      setError(authError || 'AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
     }
   };
 
@@ -85,6 +87,12 @@ export const LoginPage = () => {
             </div>
           )}
 
+          {resetSent && (
+            <div className="p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
+              ✓ PASSWORD RESET LINK SENT — CHECK YOUR EMAIL.
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">EMAIL ADDRESS *</label>
@@ -121,9 +129,22 @@ export const LoginPage = () => {
                 <span>REMEMBER ME</span>
               </label>
 
-              <button 
-                type="button" 
-                onClick={() => setError('Use 123456 as testing OTP or reset password.')}
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!email) {
+                    setError('Enter your email above first, then tap Forgot Password.');
+                    return;
+                  }
+                  playSFX('ticketClick');
+                  const res = await authService.requestPasswordReset(email);
+                  if (res.success) {
+                    setError('');
+                    setResetSent(true);
+                  } else {
+                    setError(res.error || 'Could not send reset email.');
+                  }
+                }}
                 className="text-[#c2272a] underline font-bold"
               >
                 FORGOT PASSWORD?

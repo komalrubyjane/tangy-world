@@ -1,71 +1,78 @@
-import { profileService } from './profileService';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
-const SESSION_KEY = 'tangy_mock_session';
-const OTP_MOCK = '123456';
+const NOT_CONFIGURED = { success: false, error: 'The artist portal is not connected yet — please try again shortly.' };
 
 export const authService = {
-  getCurrentUser: () => {
-    try {
-      const user = localStorage.getItem(SESSION_KEY);
-      return user ? JSON.parse(user) : null;
-    } catch (e) {
-      return null;
-    }
+  getSession: async () => {
+    if (!isSupabaseConfigured) return null;
+    const { data } = await supabase.auth.getSession();
+    return data.session;
   },
 
-  signInWithEmail: async (email) => {
-    await new Promise(r => setTimeout(r, 400));
-    return { success: true, method: 'email', id: email };
+  getArtistByUserId: async (userId) => {
+    if (!isSupabaseConfigured) return null;
+    const { data } = await supabase.from('artists').select('*').eq('user_id', userId).maybeSingle();
+    return data;
   },
 
-  signInWithPhone: async (phone) => {
-    await new Promise(r => setTimeout(r, 400));
-    return { success: true, method: 'phone', id: phone };
+  signIn: async (email, password) => {
+    if (!isSupabaseConfigured) return NOT_CONFIGURED;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { success: false, error: error.message };
+    return { success: true, user: data.user };
   },
 
-  verifyOtp: async (method, id, otp) => {
-    await new Promise(r => setTimeout(r, 600));
-    if (otp === OTP_MOCK) {
-      const userId = `mock_${id.replace(/[^a-zA-Z0-9]/g, '')}`;
-      let profile = await profileService.getProfile(userId);
-      
-      if (!profile) {
-        profile = await profileService.createProfile(userId, { [method]: id });
-      }
-
-      const user = {
-        id: userId,
-        [method]: id,
-        name: profile.fullName || (method === 'email' ? id.split('@')[0] : 'Artist Member'),
-        memberSince: new Date(profile.createdAt).getFullYear(),
-        profileCompleted: profile.profileCompleted,
-        role: 'artist'
-      };
-      
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      return { success: true, user };
-    }
-    return { success: false, error: 'Invalid OTP. Use 123456 for testing.' };
+  requestPasswordReset: async (email) => {
+    if (!isSupabaseConfigured) return NOT_CONFIGURED;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/artist/login`,
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
   },
 
-  loginDirect: async (email, password) => {
-    await new Promise(r => setTimeout(r, 600));
-    const user = {
-      id: `mock_${email.replace(/[^a-zA-Z0-9]/g, '')}`,
+  // Creates the auth account + the artist application row in one step.
+  applyAsArtist: async ({ email, password, name, genre, city, bio, instagram, soundcloud, experienceLevel }) => {
+    if (!isSupabaseConfigured) return NOT_CONFIGURED;
+
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
-      name: email.split('@')[0].toUpperCase(),
-      role: 'artist',
-      genre: 'Techno / Deep House',
-      city: 'Hyderabad',
-      profileComplete: 85
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    return { success: true, user };
+      password,
+      options: { data: { full_name: name } },
+    });
+    if (signUpError) return { success: false, error: signUpError.message };
+
+    const userId = signUpData.user?.id;
+    if (!userId) {
+      return { success: false, error: 'Could not create your account. Please try again.' };
+    }
+
+    const { error: insertError } = await supabase.from('artists').insert({
+      user_id: userId,
+      name,
+      email,
+      genre,
+      city,
+      bio,
+      instagram,
+      soundcloud,
+      experience_level: experienceLevel,
+      status: 'pending',
+    });
+    if (insertError) return { success: false, error: insertError.message };
+
+    return { success: true };
+  },
+
+  updateArtist: async (artistId, updates) => {
+    if (!isSupabaseConfigured) return NOT_CONFIGURED;
+    const { data, error } = await supabase.from('artists').update(updates).eq('id', artistId).select().single();
+    if (error) return { success: false, error: error.message };
+    return { success: true, artist: data };
   },
 
   logout: async () => {
-    await new Promise(r => setTimeout(r, 300));
-    localStorage.removeItem(SESSION_KEY);
+    if (isSupabaseConfigured) await supabase.auth.signOut();
     return { success: true };
-  }
+  },
 };

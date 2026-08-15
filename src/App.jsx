@@ -39,6 +39,7 @@ import { BlogsPage } from './pages/BlogsPage';
 import { InnerCirclePage } from './pages/InnerCirclePage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminPage } from './pages/AdminPage';
+import { TangyWorldCheckInPage } from './admin/TangyWorldCheckInPage';
 
 // Artist Portal Migration Imports
 import { ArtistLayout } from './artist/layouts/ArtistLayout';
@@ -280,6 +281,12 @@ export default function App() {
 
                 {/* ADMIN DASHBOARD DEDICATED ROUTE */}
                 <Route path="/admin" element={<AdminPage />} />
+
+                {/* TANGY WORLD / EVENT CHECK-IN (STAFF ONLY) */}
+                {/* Note: intentionally not "/tangy-world" — that collides with the
+                    legacy static tangy-world.html at the project root, which Vite's
+                    dev server resolves in preference to the SPA route. */}
+                <Route path="/check-in" element={<TangyWorldCheckInPage />} />
 
                 {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
                 <Route path="/artist" element={<ArtistLayout />}>

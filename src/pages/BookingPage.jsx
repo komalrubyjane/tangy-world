@@ -1,7 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { events, artists, gallery } from '../data/mockData';
+import { artists, gallery } from '../data/mockData';
+import { useEvents } from '../hooks/useEvents';
+import { useUserAuth } from '../context/UserAuthContext';
+import { bookingService } from '../lib/bookingService';
+import { generateQrDataUrl } from '../lib/qr';
 import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -10,17 +14,23 @@ export const BookingPage = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const { events, loading: eventsLoading } = useEvents();
+  const { user, isLoggedIn, openLoginModal } = useUserAuth();
 
   // Dynamically load event data based on sessionId parameter (slug or id)
   const session = useMemo(() => {
-    return events.find(e => e.slug === sessionId || e.id === sessionId) || events[0];
-  }, [sessionId]);
+    return events.find(e => e.slug === sessionId || e.id === sessionId) || null;
+  }, [events, sessionId]);
+
+  const isSoldOut = session?.status === 'SOLD OUT';
+  const isPast = session?.dbStatus === 'past';
 
   // Ticket Tiers
+  const basePrice = session ? (parseInt(session.price.replace(/[^\d]/g, '')) || 799) : 799;
   const ticketTiers = [
-    { id: 'gen', name: 'General Admission', price: parseInt(session.price.replace(/[^\d]/g, '')) || 799, desc: 'Entry to stepwell acoustic sanctuary & main stage performance.' },
-    { id: 'vip', name: 'VIP Heritage Pass', price: (parseInt(session.price.replace(/[^\d]/g, '')) || 799) + 500, desc: 'Reserved front-tier seating, complimentary filter coffee & vintage poster print.' },
-    { id: 'premium', name: 'Backstage Collective Pass', price: (parseInt(session.price.replace(/[^\d]/g, '')) || 799) + 1200, desc: 'Access to post-midnight artist jam session, vinyl record & signed ticket stub.' }
+    { id: 'gen', name: 'General Admission', price: basePrice, desc: 'Entry to stepwell acoustic sanctuary & main stage performance.' },
+    { id: 'vip', name: 'VIP Heritage Pass', price: basePrice + 500, desc: 'Reserved front-tier seating, complimentary filter coffee & vintage poster print.' },
+    { id: 'premium', name: 'Backstage Collective Pass', price: basePrice + 1200, desc: 'Access to post-midnight artist jam session, vinyl record & signed ticket stub.' }
   ];
 
   const [selectedTier, setSelectedTier] = useState(ticketTiers[0]);
@@ -29,17 +39,56 @@ export const BookingPage = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+  const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+
+  useEffect(() => {
+    setSelectedTier(ticketTiers[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.id]);
+
+  useEffect(() => {
+    if (user) {
+      setFullName((n) => n || user.full_name || '');
+      setEmail((e) => e || user.email || '');
+    }
+  }, [user]);
 
   // Price Calculations
   const subtotal = selectedTier.price * ticketQuantity;
   const taxes = Math.round(subtotal * 0.18);
   const totalAmount = subtotal + taxes;
 
-  const handleProceedPayment = (e) => {
+  const handleProceedPayment = async (e) => {
     e.preventDefault();
-    if (!fullName || !phone || !email) return;
+    if (!fullName || !phone || !email || !session) return;
+    setBookingError('');
     playSFX('ticketClick');
+    setIsSubmitting(true);
+
+    const res = await bookingService.createBooking({
+      userId: user.id,
+      eventId: session.id,
+      attendeeName: fullName,
+      attendeeEmail: email,
+      attendeePhone: phone,
+      quantity: ticketQuantity,
+      amount: totalAmount,
+    });
+
+    setIsSubmitting(false);
+
+    if (!res.success) {
+      setBookingError(res.error || 'Something went wrong creating your booking.');
+      return;
+    }
+
+    setConfirmedBooking(res.booking);
     setIsSubmitted(true);
+    const qr = await generateQrDataUrl(res.booking.registration_code);
+    setQrDataUrl(qr);
   };
 
   const handleQuantityChange = (delta) => {
@@ -51,6 +100,28 @@ export const BookingPage = () => {
     playSFX('ticketClick');
     setSelectedTier(tier);
   };
+
+  if (eventsLoading) {
+    return (
+      <div className="w-full min-h-[100dvh] bg-[#3c0f0e] text-[#ecdcaf] flex items-center justify-center font-mono text-xs font-bold">
+        LOADING SESSION...
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="w-full min-h-[100dvh] bg-[#3c0f0e] text-[#ecdcaf] flex flex-col items-center justify-center gap-4 font-mono text-xs font-bold p-8 text-center">
+        <span>SESSION NOT FOUND.</span>
+        <button
+          onClick={() => navigate('/sessions')}
+          className="px-4 py-2 bg-[#c2272a] text-[#ecdcaf] border-2 border-[#ecdcaf] uppercase"
+        >
+          ← BACK TO SESSIONS
+        </button>
+      </div>
+    );
+  }
 
   return (
     <motion.div 
@@ -223,13 +294,58 @@ export const BookingPage = () => {
               <div className="flex justify-between items-center border-b-2 border-dashed border-[#191410]/40 pb-3">
                 <div>
                   <span className="font-mono text-[9px] font-bold text-[#c2272a] uppercase tracking-widest">BOX OFFICE ADMIT</span>
-                  <h3 className="font-poster text-2xl text-[#191410] leading-none">SELECT TICKET TIER</h3>
+                  <h3 className="font-poster text-2xl text-[#191410] leading-none">
+                    {isSubmitted ? 'YOUR TICKET' : 'SELECT TICKET TIER'}
+                  </h3>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#c2272a] text-[#ecdcaf] flex items-center justify-center font-poster text-sm shadow-md">
                   1974
                 </div>
               </div>
 
+              {isSubmitted && confirmedBooking ? (
+                <div className="flex flex-col items-center gap-4 text-center py-2">
+                  {qrDataUrl && (
+                    <img src={qrDataUrl} alt="Ticket QR code" className="w-48 h-48 border-4 border-[#191410]" />
+                  )}
+                  <div className="font-mono text-lg font-bold tracking-widest text-[#191410]">
+                    {confirmedBooking.registration_code}
+                  </div>
+                  <p className="font-mono text-[10px] text-[#241a12]/70 uppercase leading-relaxed">
+                    Show this QR code at check-in. A copy is saved to your Passport.
+                  </p>
+                  <div className="w-full p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border-2 border-[#191410]">
+                    ✓ BOOKING CONFIRMED — {ticketQuantity}x {selectedTier.name}
+                  </div>
+                  <button
+                    onClick={() => { playSFX('ticketClick'); navigate('/sessions'); }}
+                    className="w-full py-3 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410]"
+                  >
+                    BACK TO SESSIONS →
+                  </button>
+                </div>
+              ) : !isLoggedIn ? (
+                <div className="flex flex-col items-center gap-4 text-center py-6">
+                  <p className="font-mono text-xs text-[#241a12]/80 leading-relaxed">
+                    Sign in to your Tangy Passport to book tickets for this session.
+                  </p>
+                  <button
+                    onClick={() => { playSFX('ticketClick'); openLoginModal(); }}
+                    className="w-full py-3 bg-[#c2272a] text-[#ecdcaf] hover:bg-[#191410] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410]"
+                  >
+                    SIGN IN TO BOOK →
+                  </button>
+                </div>
+              ) : isSoldOut ? (
+                <div className="p-4 bg-[#5A120D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
+                  THIS SESSION IS SOLD OUT.
+                </div>
+              ) : isPast ? (
+                <div className="p-4 bg-[#5A120D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
+                  THIS SESSION HAS ALREADY TAKEN PLACE.
+                </div>
+              ) : (
+                <>
               {/* TIER SELECTION BUTTONS */}
               <div className="flex flex-col gap-3">
                 {ticketTiers.map((tier) => (
@@ -316,20 +432,27 @@ export const BookingPage = () => {
                   </div>
                 </div>
 
-                {isSubmitted ? (
-                  <div className="p-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410] animate-bounce">
-                    ✓ CONFIRMED // REDIRECTING TO PAYMENT GATEWAY...
+                {bookingError && (
+                  <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-[10px] font-bold border-2 border-[#191410]">
+                    ✕ {bookingError}
                   </div>
-                ) : (
-                  <button
-                    type="submit"
-                    className="w-full h-14 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    PROCEED TO PAYMENT (₹{totalAmount.toLocaleString()}) →
-                  </button>
                 )}
 
+                <div className="p-2 bg-[#d1a437]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
+                  ℹ️ TEST MODE — payment capture isn't wired up yet, so this confirms your booking directly. Live Razorpay checkout will replace this before launch.
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-14 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? 'CONFIRMING...' : `CONFIRM BOOKING (₹${totalAmount.toLocaleString()}) →`}
+                </button>
+
               </form>
+              </>
+              )}
 
             </div>
 
@@ -340,19 +463,22 @@ export const BookingPage = () => {
       </main>
 
       {/* MOBILE STICKY BOTTOM PAYMENT BAR (<1024px) */}
-      <div className="fixed bottom-0 left-0 right-0 z-[150] bg-[#191410] border-t-2 border-[#d1a437] p-3 flex lg:hidden items-center justify-between gap-3 shadow-2xl">
-        <div className="flex flex-col text-left">
-          <span className="font-mono text-[9px] text-[#d1a437] font-bold">{ticketQuantity}x {selectedTier.name}</span>
-          <span className="font-poster text-xl text-[#ecdcaf]">₹{totalAmount.toLocaleString()}</span>
-        </div>
+      {!isSubmitted && !isSoldOut && !isPast && (
+        <div className="fixed bottom-0 left-0 right-0 z-[150] bg-[#191410] border-t-2 border-[#d1a437] p-3 flex lg:hidden items-center justify-between gap-3 shadow-2xl">
+          <div className="flex flex-col text-left">
+            <span className="font-mono text-[9px] text-[#d1a437] font-bold">{ticketQuantity}x {selectedTier.name}</span>
+            <span className="font-poster text-xl text-[#ecdcaf]">₹{totalAmount.toLocaleString()}</span>
+          </div>
 
-        <button
-          onClick={handleProceedPayment}
-          className="px-5 py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-widest uppercase border border-[#ecdcaf] active:scale-95 transition-transform"
-        >
-          PROCEED TO PAYMENT →
-        </button>
-      </div>
+          <button
+            onClick={(e) => { isLoggedIn ? handleProceedPayment(e) : openLoginModal(); }}
+            disabled={isSubmitting}
+            className="px-5 py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-widest uppercase border border-[#ecdcaf] active:scale-95 transition-transform disabled:opacity-50"
+          >
+            {isLoggedIn ? (isSubmitting ? 'CONFIRMING...' : 'CONFIRM BOOKING →') : 'SIGN IN TO BOOK →'}
+          </button>
+        </div>
+      )}
 
       <Footer />
     </motion.div>

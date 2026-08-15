@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSharedStore, MOCK_INITIAL_ARTISTS } from '../store/artistStore';
+import { authService } from '../services/authService';
 import { useAudio } from '../../audio/AudioContext';
 
 export const RegisterPage = () => {
@@ -9,7 +9,8 @@ export const RegisterPage = () => {
 
   const [step, setStep] = useState(1);
   const totalSteps = 4;
-  const [artists, setArtists] = useSharedStore("artists", MOCK_INITIAL_ARTISTS);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -38,26 +39,32 @@ export const RegisterPage = () => {
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     playSFX('ticketClick');
     if (step < totalSteps) {
       setStep(s => s + 1);
-    } else {
-      const newArtist = {
-        id: `A${Date.now()}`,
-        name: form.name || 'New Artist',
-        genre: form.genre.join(', ') || 'Electronic',
-        city: form.city || 'Hyderabad',
-        bio: form.bio || 'Pending review by curation team...',
-        status: 'tentative',
-        color: '#d1a437',
-        tags: form.genre.length > 0 ? form.genre : ['Electronic'],
-        avatar: '',
-        appStatus: 'pending',
-        appliedAt: new Date().toISOString()
-      };
-      setArtists(prev => [...prev, newArtist]);
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+    const res = await authService.applyAsArtist({
+      email: form.email,
+      password: form.password,
+      name: form.name || 'New Artist',
+      genre: form.genre.join(', ') || 'Electronic',
+      city: form.city || 'Hyderabad',
+      bio: form.bio || 'Pending review by curation team...',
+      instagram: form.instagram,
+      soundcloud: form.soundcloud,
+      experienceLevel: form.experience,
+    });
+    setIsSubmitting(false);
+
+    if (res.success) {
       setSubmitted(true);
+    } else {
+      setSubmitError(res.error || 'Something went wrong submitting your application.');
     }
   };
 
@@ -264,10 +271,16 @@ export const RegisterPage = () => {
           </div>
         )}
 
+        {submitError && (
+          <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
+            ✕ {submitError}
+          </div>
+        )}
+
         {/* CONTROLS */}
         <div className="flex justify-between items-center border-t-2 border-[#191410]/20 pt-4 mt-2">
           {step > 1 ? (
-            <button 
+            <button
               type="button"
               onClick={handleBack}
               className="px-4 py-2 bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] font-mono text-xs font-bold active:scale-95"
@@ -275,7 +288,7 @@ export const RegisterPage = () => {
               ← BACK
             </button>
           ) : (
-            <button 
+            <button
               type="button"
               onClick={() => { playSFX('ticketClick'); navigate('/artist/login'); }}
               className="font-mono text-xs text-[#c2272a] font-bold underline uppercase"
@@ -284,12 +297,13 @@ export const RegisterPage = () => {
             </button>
           )}
 
-          <button 
+          <button
             type="button"
             onClick={handleNext}
-            className="px-6 py-3 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all"
+            disabled={isSubmitting}
+            className="px-6 py-3 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all disabled:opacity-50"
           >
-            {step === totalSteps ? 'SUBMIT AUDITION →' : 'CONTINUE →'}
+            {isSubmitting ? 'SUBMITTING...' : step === totalSteps ? 'SUBMIT AUDITION →' : 'CONTINUE →'}
           </button>
         </div>
 

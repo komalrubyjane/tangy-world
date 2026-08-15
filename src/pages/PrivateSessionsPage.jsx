@@ -4,22 +4,57 @@ import { motion } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+
+const ENQUIRY_TYPES = [
+  { id: 'private_gathering', label: 'Private Gathering' },
+  { id: 'corporate_event', label: 'Corporate Event' },
+  { id: 'wedding', label: 'Wedding' },
+  { id: 'heritage_experience', label: 'Heritage Experience' },
+];
 
 export const PrivateSessionsPage = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
 
+  const [enquiryType, setEnquiryType] = useState('private_gathering');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [date, setDate] = useState('');
   const [venue, setVenue] = useState('');
   const [guests, setGuests] = useState('50-100');
   const [budget, setBudget] = useState('₹50,000 - ₹100,000');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!date || !venue) return;
+    if (!date || !venue || !name || !email) return;
     playSFX('ticketClick');
+    setFormError('');
+    if (!isSupabaseConfigured) {
+      setSubmitted(true);
+      return;
+    }
+    setSubmitting(true);
+    const guestCount = parseInt(guests, 10) || null;
+    const { error } = await supabase.from('private_enquiries').insert({
+      type: enquiryType,
+      name,
+      email,
+      phone,
+      preferred_date: date,
+      guest_count: guestCount,
+      message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
+    });
+    setSubmitting(false);
+    if (error) {
+      setFormError('Something went wrong submitting your request — please try again.');
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -153,6 +188,23 @@ export const PrivateSessionsPage = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
+              <div className="flex flex-wrap gap-1.5">
+                {ENQUIRY_TYPES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setEnquiryType(t.id)}
+                    className={`px-2.5 py-1.5 text-[9px] font-bold uppercase border transition-colors ${enquiryType === t.id ? 'bg-[#ecdcaf] text-[#191410] border-[#ecdcaf]' : 'bg-[#241a12] text-[#ecdcaf]/70 border-[#ecdcaf]/30'}`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input required type="text" placeholder="YOUR NAME *" value={name} onChange={(e) => setName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
+                <input required type="email" placeholder="YOUR EMAIL *" value={email} onChange={(e) => setEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
+              </div>
+              <input type="tel" placeholder="PHONE NUMBER (OPTIONAL)" value={phone} onChange={(e) => setPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input required type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
                 <input required type="text" placeholder="EVENT VENUE / LOCATION *" value={venue} onChange={(e) => setVenue(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
@@ -171,8 +223,9 @@ export const PrivateSessionsPage = () => {
                 </select>
               </div>
               <textarea rows={4} placeholder="DETAILS ABOUT YOUR EVENT & PREFERRED MUSIC TYPE..." value={message} onChange={(e) => setMessage(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              <button type="submit" className="py-4 bg-[#ecdcaf] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#d1a437] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410]">
-                SUBMIT RESERVATION REQUEST →
+              {formError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
+              <button type="submit" disabled={submitting} className="py-4 bg-[#ecdcaf] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#d1a437] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+                {submitting ? 'SUBMITTING...' : 'SUBMIT RESERVATION REQUEST →'}
               </button>
             </form>
           )}

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 export const CrewPage = () => {
   const navigate = useNavigate();
@@ -16,11 +17,31 @@ export const CrewPage = () => {
   const [volRole, setVolRole] = useState('Photography');
   const [volExperience, setVolExperience] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [crewSubmitting, setCrewSubmitting] = useState(false);
+  const [crewError, setCrewError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!volName || !volPhone || !volEmail) return;
     playSFX('ticketClick');
+    setCrewError('');
+    if (!isSupabaseConfigured) {
+      setSubmitted(true);
+      return;
+    }
+    setCrewSubmitting(true);
+    const { error } = await supabase.from('crew_applications').insert({
+      name: volName,
+      email: volEmail,
+      phone: volPhone,
+      role_interest: volRole,
+      message: `College/Institution: ${volCollege || '—'}\n\n${volExperience}`,
+    });
+    setCrewSubmitting(false);
+    if (error) {
+      setCrewError('Something went wrong submitting your application — please try again.');
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -177,8 +198,9 @@ export const CrewPage = () => {
                 </select>
               </div>
               <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              <button type="submit" className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410]">
-                SUBMIT CREW APPLICATION →
+              {crewError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
+              <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+                {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
               </button>
             </form>
           )}

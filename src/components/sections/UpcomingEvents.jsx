@@ -1,7 +1,7 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { events } from '../../data/mockData';
+import { useEvents } from '../../hooks/useEvents';
 import { useAudio } from '../../audio/AudioContext';
 import { WarpedCheckerPattern } from '../ui/BackgroundDecorations';
 
@@ -79,6 +79,8 @@ const EditorialCardInner = () => (
 
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
+  const { events: allEvents } = useEvents();
+  const events = allEvents.filter((e) => e.dbStatus !== 'past');
 
   const sectionRef = useGSAPContext((ctx) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;

@@ -1,13 +1,34 @@
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 export const ContactPage = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [inquiry, setInquiry] = useState('GENERAL');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    if (!isSupabaseConfigured) {
+      setSubmitted(true);
+      return;
+    }
+    setSubmitting(true);
+    const { error: err } = await supabase.from('contact_enquiries').insert({
+      name, email, subject, message, inquiry_type: inquiry,
+    });
+    setSubmitting(false);
+    if (err) {
+      setError('Something went wrong sending your message — please try again.');
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -126,29 +147,32 @@ export const ContactPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="font-bold text-[#B94717] block mb-1 uppercase text-[10px]">NAME *</label>
-                  <input required type="text" placeholder="YOUR NAME" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
+                  <input required type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="YOUR NAME" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
                 </div>
                 <div>
                   <label className="font-bold text-[#B94717] block mb-1 uppercase text-[10px]">EMAIL *</label>
-                  <input required type="email" placeholder="YOUR EMAIL" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
+                  <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="YOUR EMAIL" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
                 </div>
               </div>
 
               <div>
                 <label className="font-bold text-[#B94717] block mb-1 uppercase text-[10px]">SUBJECT *</label>
-                <input required type="text" placeholder="SUBJECT OF INQUIRY" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
+                <input required type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="SUBJECT OF INQUIRY" className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717]" />
               </div>
 
               <div>
                 <label className="font-bold text-[#B94717] block mb-1 uppercase text-[10px]">MESSAGE *</label>
-                <textarea required rows={5} placeholder="YOUR MESSAGE..." className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717] resize-none" />
+                <textarea required rows={5} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="YOUR MESSAGE..." className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717] resize-none" />
               </div>
+
+              {error && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#11100C]">{error}</div>}
 
               <button
                 type="submit"
-                className="py-3 sm:py-4 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C]"
+                disabled={submitting}
+                className="py-3 sm:py-4 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
               >
-                SEND DISPATCH →
+                {submitting ? 'SENDING...' : 'SEND DISPATCH →'}
               </button>
             </form>
           )}

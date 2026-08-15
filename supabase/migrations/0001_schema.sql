@@ -49,7 +49,7 @@ create table artists (
   user_id uuid references auth.users(id) on delete set null,
   name text not null,
   email text not null,
-  genre text[] default '{}',
+  genre text,
   city text,
   bio text,
   instagram text,
@@ -75,6 +75,8 @@ create table events (
   price int not null default 0,
   status text not null default 'draft', -- draft | on-sale | sold-out | past | cancelled
   featured boolean not null default false,
+  tags text[] default '{}',
+  story text,
   created_at timestamptz not null default now()
 );
 

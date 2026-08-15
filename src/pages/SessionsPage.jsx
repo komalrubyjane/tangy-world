@@ -1,22 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
-import { events } from '../data/mockData';
+import { useEvents } from '../hooks/useEvents';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../audio/AudioContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const VENUE_FILTERS = ['ALL', 'STEPWELL', 'BARADARI', 'COURTYARD'];
 
 export const SessionsPage = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const { events, loading: eventsLoading } = useEvents();
   const [filter, setFilter] = useState('ALL');
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
   const [waitlistEmail, setWaitlistEmail] = useState('');
   const [waitlistName, setWaitlistName] = useState('');
-  const [waitlistVenue, setWaitlistVenue] = useState('Bansilalpet Stepwell');
+  const [waitlistPhone, setWaitlistPhone] = useState('');
+  const [waitlistEventId, setWaitlistEventId] = useState('');
+  const [waitlistError, setWaitlistError] = useState('');
+  const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
 
-  const filteredEvents = events.filter(evt => {
+  const upcomingEvents = events.filter((e) => e.dbStatus !== 'past');
+
+  useEffect(() => {
+    if (!waitlistEventId && upcomingEvents.length > 0) {
+      setWaitlistEventId(upcomingEvents[0].id);
+    }
+  }, [upcomingEvents, waitlistEventId]);
+
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    setWaitlistError('');
+    if (!waitlistName || !waitlistEmail) return;
+    if (!/^\S+@\S+\.\S+$/.test(waitlistEmail)) {
+      setWaitlistError('Please enter a valid email address.');
+      return;
+    }
+    if (waitlistPhone && !/^[\d\s+()-]{7,15}$/.test(waitlistPhone)) {
+      setWaitlistError('Please enter a valid phone number, or leave it blank.');
+      return;
+    }
+    playSFX('ticketClick');
+
+    if (!isSupabaseConfigured || !waitlistEventId) {
+      setWaitlistSubmitted(true);
+      return;
+    }
+
+    setWaitlistSubmitting(true);
+    const { error } = await supabase.from('waitlist').insert({
+      event_id: waitlistEventId,
+      name: waitlistName,
+      email: waitlistEmail,
+      phone: waitlistPhone || null,
+    });
+    setWaitlistSubmitting(false);
+
+    if (error) {
+      if (error.code === '23505') {
+        setWaitlistError("You're already on the waitlist for this session.");
+      } else {
+        setWaitlistError('Something went wrong — please try again.');
+      }
+      return;
+    }
+    setWaitlistSubmitted(true);
+  };
+
+  const filteredEvents = upcomingEvents.filter(evt => {
     if (filter === 'ALL') return true;
     return evt.venue?.toUpperCase().includes(filter);
   });
@@ -26,13 +78,6 @@ export const SessionsPage = () => {
     'AVAILABLE': { bg: '#2D5A1B', text: '#E7D5A4' },
     'ALMOST GONE': { bg: '#B94717', text: '#E7D5A4' },
     'UPCOMING': { bg: '#11100C', text: '#C99A2E' }
-  };
-
-  const handleWaitlistSubmit = (e) => {
-    e.preventDefault();
-    if (!waitlistName || !waitlistEmail) return;
-    playSFX('ticketClick');
-    setWaitlistSubmitted(true);
   };
 
   return (
@@ -105,8 +150,20 @@ export const SessionsPage = () => {
           ))}
         </div>
 
+        {eventsLoading && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+            LOADING SESSIONS...
+          </div>
+        )}
+
+        {!eventsLoading && filteredEvents.length === 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+            NO SESSIONS MATCH THIS FILTER YET — CHECK BACK SOON.
+          </div>
+        )}
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
-          {filteredEvents.map((evt, idx) => {
+          {!eventsLoading && filteredEvents.map((evt, idx) => {
             const statusStyle = STATUS_STYLES[evt.status] || STATUS_STYLES['AVAILABLE'];
             const isSoldOut = evt.status === 'SOLD OUT';
 
@@ -201,25 +258,30 @@ export const SessionsPage = () => {
           <h2 className="display text-4xl sm:text-6xl text-[#11100C] text-center mb-8">SESSION CALENDAR</h2>
 
           <div className="bg-[#F5E9C9] border-4 border-[#11100C] p-4 sm:p-8 shadow-[10px_10px_0px_#11100C]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                { month: 'JANUARY 2026', title: 'Winter Solstice Raga', venue: 'Bansilalpet Stepwell', status: 'COMPLETED' },
-                { month: 'FEBRUARY 2026', title: 'Tangy Sessions Vol. 3', venue: 'Bansilalpet Stepwell', status: 'AVAILABLE' },
-                { month: 'APRIL 2026', title: 'Spring Strings Fusion', venue: 'Old City Haveli', status: 'ANNOUNCING SOON' },
-                { month: 'JUNE 2026', title: 'Summer Solstice', venue: 'Taramati Baradari', status: 'AVAILABLE' },
-                { month: 'JULY 2026', title: 'Monsoon Ritual', venue: 'Old City Courtyard', status: 'AVAILABLE' },
-                { month: 'OCTOBER 2026', title: '10-Year Anniversary Session', venue: 'Bansilalpet Stepwell', status: 'WAITLIST ONLY' }
-              ].map((cal, i) => (
-                <div key={i} className="bg-[#E7D5A4] border-2 border-[#11100C] p-4">
-                  <span className="font-mono text-[9px] font-bold text-[#B94717] block mb-1">{cal.month}</span>
-                  <h4 className="display text-xl text-[#11100C] mb-1">{cal.title}</h4>
-                  <p className="font-mono text-[10px] text-[#11100C]/70 mb-2">{cal.venue}</p>
-                  <span className="inline-block bg-[#11100C] text-[#E7D5A4] font-mono text-[8px] font-bold px-2 py-0.5">
-                    {cal.status}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {events.length === 0 ? (
+              <div className="text-center py-10 font-mono text-xs font-bold text-[#11100C]/60">
+                NO SESSIONS ON THE CALENDAR YET — CHECK BACK SOON.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {[...events]
+                  .sort((a, b) => (a.rawDate || '').localeCompare(b.rawDate || ''))
+                  .map((evt) => (
+                    <button
+                      key={evt.id}
+                      onClick={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
+                      className="text-left bg-[#E7D5A4] border-2 border-[#11100C] p-4 hover:-translate-y-0.5 transition-transform"
+                    >
+                      <span className="font-mono text-[9px] font-bold text-[#B94717] block mb-1 uppercase">{evt.date}</span>
+                      <h4 className="display text-xl text-[#11100C] mb-1">{evt.title}</h4>
+                      <p className="font-mono text-[10px] text-[#11100C]/70 mb-2">{evt.venue}</p>
+                      <span className="inline-block bg-[#11100C] text-[#E7D5A4] font-mono text-[8px] font-bold px-2 py-0.5">
+                        {evt.status}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -240,7 +302,11 @@ export const SessionsPage = () => {
           {waitlistSubmitted ? (
             <div className="text-center py-8 border-2 border-[#11100C] bg-[#F5E9C9]">
               <h3 className="display text-3xl text-[#11100C] mb-2">YOU ARE ON THE WAITLIST!</h3>
-              <p className="font-mono text-xs text-[#11100C]/70 uppercase">We will email you as soon as tickets open for {waitlistVenue}.</p>
+              <p className="font-mono text-xs text-[#11100C]/70 uppercase">We'll email you the moment tickets open.</p>
+            </div>
+          ) : upcomingEvents.length === 0 ? (
+            <div className="text-center py-8 border-2 border-dashed border-[#11100C]/40 font-mono text-xs text-[#11100C]/60">
+              NO UPCOMING SESSIONS TO WAITLIST FOR RIGHT NOW — CHECK BACK SOON.
             </div>
           ) : (
             <form onSubmit={handleWaitlistSubmit} className="flex flex-col gap-4 font-mono text-xs">
@@ -260,20 +326,35 @@ export const SessionsPage = () => {
                 onChange={(e) => setWaitlistEmail(e.target.value)}
                 className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
               />
+              <input
+                type="tel"
+                placeholder="PHONE NUMBER (OPTIONAL)"
+                value={waitlistPhone}
+                onChange={(e) => setWaitlistPhone(e.target.value)}
+                className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
+              />
               <select
-                value={waitlistVenue}
-                onChange={(e) => setWaitlistVenue(e.target.value)}
+                value={waitlistEventId}
+                onChange={(e) => setWaitlistEventId(e.target.value)}
                 className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
               >
-                <option value="Bansilalpet Stepwell">Bansilalpet Stepwell (Hyderabad)</option>
-                <option value="Taramati Baradari">Taramati Baradari (Hyderabad)</option>
-                <option value="Old City Courtyard">Old City Courtyard (Hyderabad)</option>
+                {upcomingEvents.map((evt) => (
+                  <option key={evt.id} value={evt.id}>{evt.title} — {evt.date}</option>
+                ))}
               </select>
+
+              {waitlistError && (
+                <div className="p-3 bg-[#B94717] text-[#E7D5A4] font-bold border border-[#11100C]">
+                  ✕ {waitlistError}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C]"
+                disabled={waitlistSubmitting}
+                className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
               >
-                JOIN SESSION WAITLIST →
+                {waitlistSubmitting ? 'JOINING...' : 'JOIN SESSION WAITLIST →'}
               </button>
             </form>
           )}
