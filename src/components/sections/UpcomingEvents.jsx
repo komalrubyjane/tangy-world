@@ -80,7 +80,7 @@ const EditorialCardInner = () => (
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
   const { events: allEvents } = useEvents();
-  const events = allEvents.filter((e) => e.dbStatus !== 'past');
+  const events = allEvents.filter((e) => e.dbStatus !== 'past').slice(0, 3);
 
   const sectionRef = useGSAPContext((ctx) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;

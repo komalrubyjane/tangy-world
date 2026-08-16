@@ -54,6 +54,57 @@ import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
 import { MediaPage } from './artist/pages/MediaPage';
 import { SettingsPage } from './artist/pages/SettingsPage';
 
+// Mock account system (new, separate from real Supabase auth above)
+import { MockAuthProvider } from './context/MockAuthContext';
+import { MockProtectedRoute } from './components/mockauth/MockProtectedRoute';
+import { JoinPage } from './pages/join/JoinPage';
+import { JoinLoginPage } from './pages/join/JoinLoginPage';
+import { PatronDashboard } from './pages/dashboards/PatronDashboard';
+import { ArtistMockDashboard } from './pages/dashboards/ArtistMockDashboard';
+import { VendorDashboard } from './pages/dashboards/VendorDashboard';
+import { CrewMockDashboard } from './pages/dashboards/CrewMockDashboard';
+import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard';
+import { SponsorDashboard } from './pages/dashboards/SponsorDashboard';
+import { VenueDashboard } from './pages/dashboards/VenueDashboard';
+import { PrivateDashboard } from './pages/dashboards/PrivateDashboard';
+
+// Public Tangy AI assistant
+import { AIAssistantPage } from './pages/AIAssistantPage';
+import { TangyAssistantLauncher } from './components/ai/TangyAssistantLauncher';
+
+// Announcement character overlay (admin-authored, publicly triggered)
+import { AnnouncementCharacterOverlay } from './components/announcements/AnnouncementCharacterOverlay';
+import { useAnnouncementTrigger } from './hooks/useAnnouncementTrigger';
+
+// New dedicated subsection pages (reuse existing section components/content)
+import { WhyTangyPage } from './pages/subsections/WhyTangyPage';
+import { ChronologyPage } from './pages/subsections/ChronologyPage';
+import { TeamPage } from './pages/subsections/TeamPage';
+import { FullStoryPage } from './pages/subsections/FullStoryPage';
+import { UpcomingSessionsPage } from './pages/subsections/UpcomingSessionsPage';
+import { ConcertCulturePage } from './pages/subsections/ConcertCulturePage';
+import { WaitlistPage } from './pages/subsections/WaitlistPage';
+import { SessionCalendarPage } from './pages/SessionCalendarPage';
+import { SessionArchivePage } from './pages/subsections/SessionArchivePage';
+import { MuseumTimelinePage } from './pages/subsections/MuseumTimelinePage';
+import { PastMemoriesPage } from './pages/subsections/PastMemoriesPage';
+import { ContactSheetsPage } from './pages/subsections/ContactSheetsPage';
+import { VolunteerOpportunitiesPage } from './pages/subsections/VolunteerOpportunitiesPage';
+import { ProductionTeamPage } from './pages/subsections/ProductionTeamPage';
+import { StageOperationsPage } from './pages/subsections/StageOperationsPage';
+import { CrewApplyPage } from './pages/subsections/CrewApplyPage';
+import { CollaborateOpportunitiesPage } from './pages/subsections/CollaborateOpportunitiesPage';
+import { PrivateGatheringsPage } from './pages/subsections/PrivateGatheringsPage';
+import { CorporateEventsPage } from './pages/subsections/CorporateEventsPage';
+import { WeddingsPage } from './pages/subsections/WeddingsPage';
+import { HeritageExperiencesPage } from './pages/subsections/HeritageExperiencesPage';
+import { MuseumJournalPage } from './pages/subsections/MuseumJournalPage';
+import { RecentStoriesPage } from './pages/subsections/RecentStoriesPage';
+import { BehindTheScenesPage } from './pages/subsections/BehindTheScenesPage';
+import { LocationPage } from './pages/subsections/LocationPage';
+import { EmailDispatchPage } from './pages/subsections/EmailDispatchPage';
+import { InstagramPage } from './pages/subsections/InstagramPage';
+
 // Homepage Sections
 import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
@@ -243,15 +294,34 @@ function MainWorld() {
   );
 }
 
+function GlobalOverlays() {
+  const { announcement, show, dismiss } = useAnnouncementTrigger();
+  return (
+    <>
+      <TangyAssistantLauncher />
+      <AnnouncementCharacterOverlay
+        announcement={announcement}
+        character={announcement?.character}
+        position="bottom-left"
+        duration={6000}
+        isOpen={show}
+        onClose={dismiss}
+      />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <AudioProvider>
       <UserAuthProvider>
+        <MockAuthProvider>
         <LenisProvider>
           <CursorProvider>
             <CustomCursor />
             <BrowserRouter>
               <ScrollToTop />
+              <GlobalOverlays />
               <Routes>
                 {/* PUBLIC WEBSITE HOMEPAGE */}
                 <Route path="/" element={<MainWorld />} />
@@ -336,12 +406,84 @@ export default function App() {
                   />
                 </Route>
 
+
+                {/* ===================== NEW MOCK ACCOUNT SYSTEM ===================== */}
+                {/* Separate from the real Supabase patron/artist auth above. */}
+                <Route path="/join" element={<JoinPage />} />
+                <Route path="/join/login" element={<JoinLoginPage />} />
+
+                <Route path="/dashboard" element={<MockProtectedRoute role="patron"><PatronDashboard /></MockProtectedRoute>} />
+                <Route path="/artist-mock/portal" element={<MockProtectedRoute role="artist"><ArtistMockDashboard /></MockProtectedRoute>} />
+                <Route path="/vendor/dashboard" element={<MockProtectedRoute role="vendor"><VendorDashboard /></MockProtectedRoute>} />
+                <Route path="/crew-mock/dashboard" element={<MockProtectedRoute role="crew"><CrewMockDashboard /></MockProtectedRoute>} />
+                <Route path="/volunteer/dashboard" element={<MockProtectedRoute role="volunteer"><VolunteerDashboard /></MockProtectedRoute>} />
+                <Route path="/sponsor/dashboard" element={<MockProtectedRoute role="sponsor"><SponsorDashboard /></MockProtectedRoute>} />
+                <Route path="/venue/dashboard" element={<MockProtectedRoute role="venue"><VenueDashboard /></MockProtectedRoute>} />
+                <Route path="/private/dashboard" element={<MockProtectedRoute role="private"><PrivateDashboard /></MockProtectedRoute>} />
+
+                {/* ===================== PUBLIC TANGY AI ASSISTANT ===================== */}
+                <Route path="/ai" element={<AIAssistantPage />} />
+
+                {/* ===================== DEDICATED SUBSECTION ROUTES ===================== */}
+                {/* About */}
+                <Route path="/about/why-tangy" element={<WhyTangyPage />} />
+                <Route path="/about/chronology" element={<ChronologyPage />} />
+                <Route path="/about/team" element={<TeamPage />} />
+                <Route path="/about/full-story" element={<FullStoryPage />} />
+
+                {/* Sessions */}
+                <Route path="/sessions/upcoming" element={<UpcomingSessionsPage />} />
+                <Route path="/sessions/concert-culture" element={<ConcertCulturePage />} />
+                <Route path="/sessions/calendar" element={<SessionCalendarPage />} />
+                <Route path="/sessions/waitlist" element={<WaitlistPage />} />
+
+                {/* Archive */}
+                <Route path="/archive/session-archive" element={<SessionArchivePage />} />
+                <Route path="/archive/museum-timeline" element={<MuseumTimelinePage />} />
+                <Route path="/archive/past-memories" element={<PastMemoriesPage />} />
+                <Route path="/archive/contact-sheets" element={<ContactSheetsPage />} />
+
+                {/* Artists (plural) — real system lives at /artist/*, these are just aliases */}
+                <Route path="/artists" element={<Navigate to="/artist" replace />} />
+                <Route path="/artists/apply" element={<Navigate to="/artist/register" replace />} />
+                <Route path="/artists/login" element={<Navigate to="/artist/login" replace />} />
+                <Route path="/artists/portal" element={<Navigate to="/artist/dashboard" replace />} />
+
+                {/* Crew */}
+                <Route path="/crew/volunteer" element={<VolunteerOpportunitiesPage />} />
+                <Route path="/crew/production" element={<ProductionTeamPage />} />
+                <Route path="/crew/stage-operations" element={<StageOperationsPage />} />
+                <Route path="/crew/apply" element={<CrewApplyPage />} />
+
+                {/* Collaborate */}
+                <Route path="/collaborate/vendors" element={<Navigate to="/apply/vendors" replace />} />
+                <Route path="/collaborate/sponsors" element={<Navigate to="/apply/sponsors" replace />} />
+                <Route path="/collaborate/venue-host" element={<Navigate to="/apply/venue-host" replace />} />
+                <Route path="/collaborate/opportunities" element={<CollaborateOpportunitiesPage />} />
+
+                {/* Private */}
+                <Route path="/private/gatherings" element={<PrivateGatheringsPage />} />
+                <Route path="/private/corporate" element={<CorporateEventsPage />} />
+                <Route path="/private/weddings" element={<WeddingsPage />} />
+                <Route path="/private/heritage" element={<HeritageExperiencesPage />} />
+
+                {/* Diary */}
+                <Route path="/diary/journal" element={<MuseumJournalPage />} />
+                <Route path="/diary/stories" element={<RecentStoriesPage />} />
+                <Route path="/diary/behind-the-scenes" element={<BehindTheScenesPage />} />
+
+                {/* Contact */}
+                <Route path="/contact/location" element={<LocationPage />} />
+                <Route path="/contact/email" element={<EmailDispatchPage />} />
+                <Route path="/contact/instagram" element={<InstagramPage />} />
+
                 {/* FALLBACK REDIRECT */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </BrowserRouter>
           </CursorProvider>
         </LenisProvider>
+        </MockAuthProvider>
       </UserAuthProvider>
     </AudioProvider>
   );

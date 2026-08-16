@@ -11,6 +11,8 @@ import { CollaborationsSection } from '../admin/sections/CollaborationsSection';
 import { ContactEnquiriesSection, PrivateEnquiriesSection } from '../admin/sections/EnquiriesSection';
 import { WaitlistSection } from '../admin/sections/WaitlistSection';
 import { UsersSection } from '../admin/sections/UsersSection';
+import { InboxSection } from '../admin/sections/InboxSection';
+import { AnnouncementsSection } from '../admin/sections/AnnouncementsSection';
 
 const TABS = [
   { id: 'overview', label: '📊 OVERVIEW', component: OverviewSection },
@@ -23,6 +25,8 @@ const TABS = [
   { id: 'contact', label: '✉️ CONTACT', component: ContactEnquiriesSection },
   { id: 'waitlist', label: '⏳ WAITLIST', component: WaitlistSection },
   { id: 'users', label: '👤 USERS', component: UsersSection },
+  { id: 'inbox', label: '📥 INBOX', component: InboxSection },
+  { id: 'announcements', label: '📣 ANNOUNCEMENTS', component: AnnouncementsSection },
 ];
 
 const AdminDashboard = () => {
