@@ -11,6 +11,8 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
 
   const currentScrollY = useRef(0);
   const targetScrollY = useRef(0);
+  const cachedTotalLength = useRef(0);
+  const isLoopRunning = useRef(false);
 
   useEffect(() => {
     if (!active) return;
@@ -78,20 +80,13 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       pathEl.setAttribute('d', d);
 
       const totalLength = pathEl.getTotalLength();
+      cachedTotalLength.current = totalLength;
       pathEl.style.strokeDasharray = `${totalLength}`;
       pathEl.style.strokeDashoffset = `${totalLength}`;
     };
 
     updatePath();
     window.addEventListener('resize', updatePath);
-
-    // 2. High-Frequency Scroll Listener
-    const handleScroll = () => {
-      targetScrollY.current = window.scrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
 
     // 3. Binary Search for Path Distance at Target Document Y
     const findPathDistanceForY = (pathObj, totalLen, targetDocY) => {
@@ -112,21 +107,24 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
       return bestDist;
     };
 
-    // 4. Smooth 60 FPS Render Loop
+    // 4. Smooth render loop — stops itself once the lerp has converged instead of
+    // running forever; a scroll event restarts it. Avoids doing a 22-iteration
+    // binary search + multiple getPointAtLength() geometry queries every single
+    // frame for the entire time the page is open, even while scroll is idle.
     const renderLoop = () => {
-      currentScrollY.current += (targetScrollY.current - currentScrollY.current) * 0.08;
+      const delta = targetScrollY.current - currentScrollY.current;
+      currentScrollY.current += delta * 0.08;
 
       const pathObj = pathRef.current;
       const micObj = micHeadRef.current;
+      const totalLength = cachedTotalLength.current;
 
-      if (pathObj && micObj) {
-        const totalLength = pathObj.getTotalLength();
+      if (pathObj && micObj && totalLength) {
         const vh = window.innerHeight;
         const isMobile = window.innerWidth < 768;
-        
+
         // Microphone display dimensions & top metal connector offset (59.8% X, 0px Y)
         const micWidth = isMobile ? 40 : 56;
-        const micHeight = isMobile ? 86 : 118;
         const connectorXOffset = micWidth * 0.598;
 
         // Position microphone suspended near ~55% of user's active viewport
@@ -149,10 +147,30 @@ export const GlobalMicrophoneJourney = ({ active = true }) => {
         micObj.style.transform = `translate3d(${pt.x - connectorXOffset}px, ${pt.y}px, 0px) rotate(${angleDeg}deg)`;
       }
 
-      animationFrameRef.current = requestAnimationFrame(renderLoop);
+      if (Math.abs(delta) > 0.4) {
+        animationFrameRef.current = requestAnimationFrame(renderLoop);
+      } else {
+        isLoopRunning.current = false; // converged — idle until the next scroll
+      }
     };
 
-    renderLoop();
+    const ensureLoopRunning = () => {
+      if (!isLoopRunning.current) {
+        isLoopRunning.current = true;
+        renderLoop();
+      }
+    };
+
+    // 2. High-Frequency Scroll Listener
+    const handleScroll = () => {
+      targetScrollY.current = window.scrollY;
+      ensureLoopRunning();
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    ensureLoopRunning();
 
     return () => {
       window.removeEventListener('resize', updatePath);

@@ -65,6 +65,11 @@ export const AuthProvider = ({ children }) => {
     };
   }, [loadArtist]);
 
+  // Returns { ok, error } rather than a bare boolean — callers that store the
+  // failure message into their own local state (e.g. LoginPage.jsx) need the
+  // error value returned directly, not read back off context state, because
+  // by the time this async call resolves the caller's own closure has
+  // already captured the OLD `authError` from before this login attempt.
   const login = async (email, password) => {
     setAuthError('');
     setLoading(true);
@@ -72,15 +77,16 @@ export const AuthProvider = ({ children }) => {
     if (!res.success) {
       setLoading(false);
       setAuthError(res.error);
-      return false;
+      return { ok: false, error: res.error };
     }
     const artistRow = await loadArtist(res.user);
     setLoading(false);
     if (!artistRow) {
-      setAuthError('This account has no artist application on file. Apply first, or sign in with your artist account.');
-      return false;
+      const error = 'This account has no artist application on file. Apply first, or sign in with your artist account.';
+      setAuthError(error);
+      return { ok: false, error };
     }
-    return true;
+    return { ok: true, error: '' };
   };
 
   const logout = async () => {

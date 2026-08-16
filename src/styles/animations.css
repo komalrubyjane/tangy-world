@@ -24,3 +24,15 @@
   0%, 100% { opacity: .3; }
   50% { opacity: 1; }
 }
+
+/* Announcement character overlay: tiny idle sway once settled (transform-only). */
+@keyframes announceIdleSway {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-0.6deg); }
+}
+
+/* Tangy Assistant launcher: tiny "live signal" equalizer badge (transform-only). */
+@keyframes eqBar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}

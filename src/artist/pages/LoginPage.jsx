@@ -6,7 +6,7 @@ import { useAudio } from '../../audio/AudioContext';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, loading, authError } = useAuth();
+  const { login, loading } = useAuth();
   const { playSFX } = useAudio();
 
   const [email, setEmail] = useState('');
@@ -23,11 +23,11 @@ export const LoginPage = () => {
     }
     setError('');
     playSFX('ticketClick');
-    const ok = await login(email, password);
-    if (ok) {
+    const result = await login(email, password);
+    if (result.ok) {
       navigate('/artist/dashboard');
     } else {
-      setError(authError || 'AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
+      setError(result.error || 'AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
     }
   };
 
