@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { authService } from '../services/authService';
+import { AUTH_MODE, isMockAuth } from '../../config/auth';
+import { mockAuthService, MOCK_SESSION_EVENT } from '../../services/mockAuthService';
 
 const AuthContext = createContext(null);
 
@@ -27,6 +29,28 @@ function toPortalUser(sessionUser, artistRow) {
   };
 }
 
+// Maps a mock session ({id,email,fullName,role}) onto the same shape as
+// toPortalUser above, so the rest of the artist portal UI never has to know
+// which backend authenticated the current user.
+function toMockPortalUser(session) {
+  if (!session) return null;
+  return {
+    id: session.id,
+    userId: session.id,
+    email: session.email,
+    name: session.fullName || session.name || session.email,
+    avatar: '',
+    genre: '',
+    city: '',
+    bio: '',
+    instagram: '',
+    soundcloud: '',
+    experience: '',
+    status: 'approved',
+    profileComplete: 100,
+  };
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +67,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (isMockAuth) {
+      const applySession = () => {
+        const session = mockAuthService.getMockSession();
+        setUser(session && session.role === 'artist' ? toMockPortalUser(session) : null);
+      };
+      applySession();
+      setLoading(false);
+      window.addEventListener(MOCK_SESSION_EVENT, applySession);
+      return () => window.removeEventListener(MOCK_SESSION_EVENT, applySession);
+    }
+
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -73,6 +108,23 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setAuthError('');
     setLoading(true);
+
+    if (isMockAuth) {
+      const res = mockAuthService.mockLogin(email, password);
+      setLoading(false);
+      if (!res.success) {
+        setAuthError(res.error);
+        return { ok: false, error: res.error };
+      }
+      if (res.user.role !== 'artist') {
+        const error = 'This account is not an artist development account. Use artist@tangysessions.test.';
+        setAuthError(error);
+        return { ok: false, error };
+      }
+      setUser(toMockPortalUser(res.user));
+      return { ok: true, error: '' };
+    }
+
     const res = await authService.signIn(email, password);
     if (!res.success) {
       setLoading(false);
@@ -90,12 +142,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    if (isMockAuth) {
+      mockAuthService.mockLogout();
+      setUser(null);
+      return;
+    }
     await authService.logout();
     setUser(null);
   };
 
   const updateUser = async (updates) => {
     if (!user) return;
+
+    if (isMockAuth) {
+      setUser((u) => ({ ...u, ...updates }));
+      return;
+    }
+
     const dbUpdates = {};
     if ('name' in updates) dbUpdates.name = updates.name;
     if ('avatar' in updates) dbUpdates.avatar_url = updates.avatar;
@@ -119,7 +182,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, authError }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, authError, authMode: AUTH_MODE }}>
       {children}
     </AuthContext.Provider>
   );

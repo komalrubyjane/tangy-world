@@ -1,7 +1,9 @@
 // Centralized MOCK authentication service — the ONLY place mock auth logic
-// lives. Every mock-auth consumer (MockAuthContext, JoinPage, JoinLoginPage,
-// the 9 role dashboards) goes through this file; nothing else should touch
-// localStorage or reimplement login/signup logic directly.
+// lives. Consumed both by the standalone mock account system (MockAuthContext,
+// JoinPage, JoinLoginPage, the 9 role dashboards) AND — when AUTH_MODE ===
+// 'mock' (see src/config/auth.js) — by the EXISTING real-auth surfaces
+// (UserAuthContext/UserLoginModal, artist AuthContext/LoginPage,
+// StaffAuthGate) so there is exactly one mock implementation, never three.
 //
 // Architecture guarantee: this file NEVER imports supabaseClient and NEVER
 // calls any supabase.auth.* method. It works fully offline, with zero
@@ -9,15 +11,23 @@
 // or has any tables at all. Verified by code (no supabase import exists
 // below) and confirmed live via network inspection during testing.
 //
-// This is deliberately separate from:
-//   - src/context/UserAuthContext.jsx      (real Supabase patron auth)
-//   - src/artist/contexts/AuthContext.jsx  (real Supabase artist auth)
-//   - src/admin/StaffAuthGate.jsx          (real Supabase admin auth)
-// None of those are touched or referenced by this file.
+// The real Supabase-backed contexts (UserAuthContext.jsx, artist
+// AuthContext.jsx, StaffAuthGate.jsx) branch on AUTH_MODE to call either
+// this file or their own Supabase logic — never both, never mixed.
 
 const SESSION_KEY = 'tangy_mock_session';
 const ROLE_STORE_KEY = 'tangy_mock_v2_role_accounts';
 const DEV_PASSWORD = 'TangyMock@2026';
+
+// Fired on every session write/clear so the several React contexts that each
+// independently read this same localStorage key (UserAuthContext, artist
+// AuthContext, MockAuthContext) can react immediately without a page reload
+// — e.g. logging in via the /join dev-account panel and client-navigating
+// straight to a StaffAuthGate-protected route.
+export const MOCK_SESSION_EVENT = 'tangy-mock-session-changed';
+function notifySessionChanged() {
+  window.dispatchEvent(new Event(MOCK_SESSION_EVENT));
+}
 
 export const ROLE_META = {
   patron: { label: 'Attend Sessions', tagline: 'Book tickets, collect stamps, and follow the sessions you love.', dashboard: '/dashboard' },
@@ -34,9 +44,11 @@ export const ROLE_META = {
 // localStorage state (even a fresh incognito browser), so documented test
 // credentials never fail with "account not found". These sit ONLY in the
 // mock system's own role store, entirely separate from ROLE_META (which
-// intentionally has no 'admin' entry — the real admin role belongs to
-// StaffAuthGate/Supabase; "admin" here exists solely for /admin-mock).
-const DEV_ACCOUNT_ROLES = { ...ROLE_META, admin: { label: 'Admin (dev only)', tagline: 'Mock operations console preview — not the real Tangy admin.', dashboard: '/admin-mock' } };
+// intentionally has no 'admin' entry — the signup role-picker never offers
+// it). In mock mode the admin dev account lands on the REAL /admin route
+// (StaffAuthGate, made AUTH_MODE-aware) so it exercises the existing admin
+// UI, not a separate mock-only console.
+const DEV_ACCOUNT_ROLES = { ...ROLE_META, admin: { label: 'Admin (dev only)', tagline: 'Mock development access to the existing admin console — not real production security.', dashboard: '/admin' } };
 
 function buildDevAccounts() {
   const accounts = {};
@@ -103,7 +115,7 @@ function readSession() {
   }
 }
 
-export const authService = {
+export const mockAuthService = {
   // ---- Primary API (requested names) ----
 
   getMockSession() {
@@ -146,35 +158,39 @@ export const authService = {
 
     const session = { ...account, isMock: true, authenticated: true };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    notifySessionChanged();
     return { success: true, user: session };
   },
 
-  mockLogin({ email, password }) {
+  mockLogin(email, password) {
     const accounts = loadRoleAccounts();
-    const record = accounts[email.toLowerCase()];
+    const record = accounts[(email || '').toLowerCase()];
     if (!record || record.password !== password) {
       return { success: false, error: 'Invalid development account.' };
     }
     const { password: _pw, ...rest } = record;
     const session = { ...rest, isMock: true, authenticated: true };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    notifySessionChanged();
     return { success: true, user: session };
   },
 
   mockLogout() {
     localStorage.removeItem(SESSION_KEY);
+    notifySessionChanged();
   },
 
   seedDemoUser(role) {
     // convenience for previewing dashboards without a full signup
     const demo = { id: `demo-${role}`, fullName: `Demo ${DEV_ACCOUNT_ROLES[role]?.label || role}`, email: `demo-${role}@tangy.demo`, role, createdAt: new Date().toISOString(), applicationStatus: role === 'patron' ? null : 'approved', isMock: true, authenticated: true };
     localStorage.setItem(SESSION_KEY, JSON.stringify(demo));
+    notifySessionChanged();
     return demo;
   },
 
   // ---- Back-compat aliases (existing call sites, e.g. MockAuthContext) ----
   getSession() { return this.getMockSession(); },
   signUp(data) { return this.mockSignup(data); },
-  signIn(data) { return this.mockLogin(data); },
+  signIn({ email, password }) { return this.mockLogin(email, password); },
   signOut() { return this.mockLogout(); },
 };

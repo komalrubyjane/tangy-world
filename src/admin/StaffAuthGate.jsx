@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../context/UserAuthContext';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { DEV_ACCOUNT_LIST } from '../services/mockAuthService';
 
 // Shared gate for /admin and /check-in — both are staff-only surfaces backed
 // by the same Supabase Auth identity as patron accounts, distinguished only by
@@ -100,7 +102,20 @@ export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin
               </div>
             )}
 
-            {!isSupabaseConfigured && (
+            {isMockAuth ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const acc = DEV_ACCOUNT_LIST.find((a) => a.role === 'admin');
+                  setEmail(acc.email);
+                  setPassword(acc.password);
+                }}
+                className="w-full text-left text-[10px] text-[#C99A2E] bg-[#C99A2E]/10 hover:bg-[#C99A2E]/20 border border-[#C99A2E]/40 p-2 transition-colors"
+              >
+                <span className="font-bold uppercase tracking-wider">DEVELOPMENT ACCESS · MOCK AUTHENTICATION</span>
+                <br />Tap to fill admin@tangysessions.test — then Authenticate.
+              </button>
+            ) : !isSupabaseConfigured && (
               <div className="text-[10px] text-[#C99A2E] bg-[#C99A2E]/10 border border-[#C99A2E]/40 p-2 text-center">
                 Backend not connected yet — staff sign-in is unavailable until Supabase is configured.
               </div>

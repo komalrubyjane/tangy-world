@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useMockAuth } from '../../context/MockAuthContext';
-import { ROLE_META } from '../../services/authService';
+import { ROLE_META } from '../../services/mockAuthService';
 
 const ROLE_ICONS = {
   patron: '🎫', artist: '🎤', vendor: '🍵', crew: '🎬',

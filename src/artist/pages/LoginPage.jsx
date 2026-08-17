@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
 import { useAudio } from '../../audio/AudioContext';
+import { isMockAuth } from '../../config/auth';
+import { DEV_ACCOUNT_LIST } from '../../services/mockAuthService';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ export const LoginPage = () => {
     playSFX('ticketClick');
     const result = await login(email, password);
     if (result.ok) {
-      navigate('/artist/dashboard');
+      navigate(isMockAuth ? '/artist-mock/portal' : '/artist/dashboard');
     } else {
       setError(result.error || 'AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
     }
@@ -87,6 +89,21 @@ export const LoginPage = () => {
             </div>
           )}
 
+          {isMockAuth && (
+            <button
+              type="button"
+              onClick={() => {
+                const acc = DEV_ACCOUNT_LIST.find((a) => a.role === 'artist');
+                setEmail(acc.email);
+                setPassword(acc.password);
+              }}
+              className="text-left p-3 bg-[#d1a437]/15 hover:bg-[#d1a437]/25 border border-[#d1a437]/50 font-mono text-[10px] transition-colors"
+            >
+              <span className="font-bold uppercase tracking-wider text-[#d1a437]">DEVELOPMENT ACCESS · MOCK AUTHENTICATION</span>
+              <br />Tap to fill artist@tangysessions.test — then Enter Artist Portal.
+            </button>
+          )}
+
           {resetSent && (
             <div className="p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
               ✓ PASSWORD RESET LINK SENT — CHECK YOUR EMAIL.
@@ -132,6 +149,10 @@ export const LoginPage = () => {
               <button
                 type="button"
                 onClick={async () => {
+                  if (isMockAuth) {
+                    setError('Password reset is not available in development mode.');
+                    return;
+                  }
                   if (!email) {
                     setError('Enter your email above first, then tap Forgot Password.');
                     return;

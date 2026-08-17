@@ -1,7 +1,23 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { AUTH_MODE, isMockAuth } from '../config/auth';
+import { mockAuthService, MOCK_SESSION_EVENT } from '../services/mockAuthService';
 
 const UserAuthContext = createContext(null);
+
+// Maps a mock session ({id,email,fullName,role,...}) onto the field names
+// this context's consumers (UserLoginModal, StaffAuthGate) expect from a
+// real `profiles` row, so neither has to know which backend is active.
+function toProfileUser(session) {
+  if (!session) return null;
+  return {
+    id: session.id,
+    email: session.email,
+    full_name: session.fullName || session.name || session.email,
+    role: session.role,
+    passport_id: session.id,
+  };
+}
 
 export const UserAuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -31,6 +47,14 @@ export const UserAuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    if (isMockAuth) {
+      setUser(toProfileUser(mockAuthService.getMockSession()));
+      setLoading(false);
+      const onChange = () => setUser(toProfileUser(mockAuthService.getMockSession()));
+      window.addEventListener(MOCK_SESSION_EVENT, onChange);
+      return () => window.removeEventListener(MOCK_SESSION_EVENT, onChange);
+    }
+
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -55,6 +79,18 @@ export const UserAuthProvider = ({ children }) => {
 
   const signUp = async (email, password, fullName) => {
     setAuthError('');
+
+    if (isMockAuth) {
+      const res = mockAuthService.mockSignup({ fullName, email, password, role: 'patron' });
+      if (!res.success) {
+        setAuthError(res.error);
+        return false;
+      }
+      setUser(toProfileUser(res.user));
+      setIsLoginModalOpen(false);
+      return true;
+    }
+
     if (!isSupabaseConfigured) {
       setAuthError('Sign up is not available right now — please try again shortly.');
       return false;
@@ -74,6 +110,18 @@ export const UserAuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     setAuthError('');
+
+    if (isMockAuth) {
+      const res = mockAuthService.mockLogin(email, password);
+      if (!res.success) {
+        setAuthError(res.error);
+        return false;
+      }
+      setUser(toProfileUser(res.user));
+      setIsLoginModalOpen(false);
+      return true;
+    }
+
     if (!isSupabaseConfigured) {
       setAuthError('Sign in is not available right now — please try again shortly.');
       return false;
@@ -88,6 +136,11 @@ export const UserAuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    if (isMockAuth) {
+      mockAuthService.mockLogout();
+      setUser(null);
+      return;
+    }
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
     }
@@ -113,6 +166,7 @@ export const UserAuthProvider = ({ children }) => {
         isLoginModalOpen,
         openLoginModal,
         closeLoginModal,
+        authMode: AUTH_MODE,
       }}
     >
       {children}

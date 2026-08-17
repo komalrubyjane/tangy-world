@@ -63,7 +63,6 @@ import { PatronDashboard } from './pages/dashboards/PatronDashboard';
 import { ArtistMockDashboard } from './pages/dashboards/ArtistMockDashboard';
 import { VendorDashboard } from './pages/dashboards/VendorDashboard';
 import { CrewMockDashboard } from './pages/dashboards/CrewMockDashboard';
-import { AdminMockDashboard } from './pages/dashboards/AdminMockDashboard';
 import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard';
 import { SponsorDashboard } from './pages/dashboards/SponsorDashboard';
 import { VenueDashboard } from './pages/dashboards/VenueDashboard';
@@ -421,7 +420,8 @@ export default function App() {
                 <Route path="/sponsor/dashboard" element={<MockProtectedRoute role="sponsor"><SponsorDashboard /></MockProtectedRoute>} />
                 <Route path="/venue/dashboard" element={<MockProtectedRoute role="venue"><VenueDashboard /></MockProtectedRoute>} />
                 <Route path="/private/dashboard" element={<MockProtectedRoute role="private"><PrivateDashboard /></MockProtectedRoute>} />
-                <Route path="/admin-mock" element={<MockProtectedRoute role="admin"><AdminMockDashboard /></MockProtectedRoute>} />
+                {/* Legacy alias — the admin dev account now lands directly on the real /admin (StaffAuthGate, mock-mode aware). */}
+                <Route path="/admin-mock" element={<Navigate to="/admin" replace />} />
 
                 {/* Aliases — keep documented mock URLs working without colliding with the real /artist/* and /crew/* wildcard routes above (static segments always outrank wildcards in React Router). */}
                 <Route path="/artist/portal" element={<Navigate to="/artist-mock/portal" replace />} />

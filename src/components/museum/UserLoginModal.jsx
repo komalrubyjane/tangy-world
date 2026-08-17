@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { useAudio } from '../../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { isMockAuth } from '../../config/auth';
+import { DEV_ACCOUNT_LIST } from '../../services/mockAuthService';
 
 export const UserLoginModal = () => {
   const { isLoginModalOpen, closeLoginModal, signIn, signUp, isLoggedIn, user, logout, authError } = useUserAuth();
@@ -170,9 +172,24 @@ export const UserLoginModal = () => {
               </div>
             )}
 
-            <div className="font-mono text-[9px] opacity-70 bg-[#E3D4AC] p-2 border border-[#11100C]/30">
-              ℹ️ Customer/Listener Login. (Artists please use the Artist Portal from the main menu).
-            </div>
+            {isMockAuth ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const acc = DEV_ACCOUNT_LIST.find((a) => a.role === 'patron');
+                  setEmail(acc.email);
+                  setPassword(acc.password);
+                }}
+                className="text-left font-mono text-[9px] bg-[#E3D4AC] hover:bg-[#d8c495] p-2 border border-[#11100C]/30 transition-colors"
+              >
+                <span className="font-bold uppercase tracking-wider text-[#B94717]">DEVELOPMENT ACCESS · MOCK AUTHENTICATION</span>
+                <br />Tap to fill patron@tangysessions.test — then press Enter &amp; Unlock Passport.
+              </button>
+            ) : (
+              <div className="font-mono text-[9px] opacity-70 bg-[#E3D4AC] p-2 border border-[#11100C]/30">
+                ℹ️ Customer/Listener Login. (Artists please use the Artist Portal from the main menu).
+              </div>
+            )}
 
             <button
               type="submit"

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useMockAuth } from '../../context/MockAuthContext';
-import { DEV_ACCOUNT_LIST } from '../../services/authService';
+import { DEV_ACCOUNT_LIST } from '../../services/mockAuthService';
 
 export const JoinLoginPage = () => {
   const navigate = useNavigate();
