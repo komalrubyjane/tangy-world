@@ -3,7 +3,7 @@
 // Supabase-backed UserAuthContext (patron login modal) or artist
 // AuthContext (/artist/login) — those stay exactly as they are.
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authService, ROLE_META } from '../services/authService';
+import { authService, ROLE_META, DASHBOARD_BY_ROLE } from '../services/authService';
 
 const MockAuthContext = createContext(null);
 
@@ -40,7 +40,7 @@ export const MockAuthProvider = ({ children }) => {
   };
 
   return (
-    <MockAuthContext.Provider value={{ user, loading, isLoggedIn: !!user, signUp, signIn, signOut, previewRole, ROLE_META }}>
+    <MockAuthContext.Provider value={{ user, loading, isLoggedIn: !!user, signUp, signIn, signOut, previewRole, ROLE_META, DASHBOARD_BY_ROLE }}>
       {children}
     </MockAuthContext.Provider>
   );

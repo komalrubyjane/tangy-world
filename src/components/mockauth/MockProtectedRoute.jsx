@@ -2,18 +2,17 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useMockAuth } from '../../context/MockAuthContext';
 
-// Gates a role-specific dashboard behind the mock auth session. If a
-// `role` prop is given, also requires the signed-in mock account to match
-// that role (prevents e.g. a vendor account from opening /crew/dashboard).
 export const MockProtectedRoute = ({ role, children }) => {
-  const { user, loading } = useMockAuth();
+  const { user, loading, DASHBOARD_BY_ROLE } = useMockAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (loading) return;
     if (!user) { navigate('/join/login'); return; }
-    if (role && user.role !== role) { navigate('/join'); }
-  }, [user, loading, role, navigate]);
+    if (role && user.role !== role) {
+      navigate(DASHBOARD_BY_ROLE[user.role] || '/join');
+    }
+  }, [user, loading, role, navigate, DASHBOARD_BY_ROLE]);
 
   if (loading) {
     return (
