@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { collaborationService } from '../services/collaborationService';
 
 export const VendorApplyPage = () => {
   const [form, setForm] = useState({ businessName: '', email: '', phone: '', category: '', details: '' });
@@ -14,6 +16,18 @@ export const VendorApplyPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (isMockAuth) {
+      collaborationService.create({
+        type: 'vendor',
+        businessName: form.businessName,
+        contactName: form.businessName,
+        email: form.email,
+        phone: form.phone,
+        details: `Category: ${form.category}\n\n${form.details}`,
+      });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;

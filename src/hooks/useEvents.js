@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { events as mockEvents } from '../data/mockData';
+import { isMockAuth } from '../config/auth';
 
 function mapDbEvent(row) {
   const eventDate = new Date(`${row.event_date}T00:00:00`);
@@ -34,10 +35,14 @@ function mapDbEvent(row) {
 export function useEvents() {
   const [events, setEvents] = useState(mockEvents);
   const [source, setSource] = useState('mock');
-  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [loading, setLoading] = useState(!isMockAuth && isSupabaseConfigured);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    // AUTH_MODE === 'mock' (src/config/auth.js) means the whole app runs
+    // fully offline — never hit Supabase here even if env credentials happen
+    // to be present, so every consumer of this hook (Sessions page, Booking
+    // page, Check-in desk) stays network-free in mock mode.
+    if (isMockAuth || !isSupabaseConfigured) return;
     let cancelled = false;
 
     supabase

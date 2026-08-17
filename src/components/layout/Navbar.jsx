@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
+import { useMockAuth } from '../../context/MockAuthContext';
+import { MockModeBadge } from '../../admin/AdminUI';
+import { isMockAuth } from '../../config/auth';
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const { isLoggedIn: mockLoggedIn, user: mockUser } = useMockAuth();
   
   // Active dropdown state for desktop & mobile
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -223,19 +227,61 @@ export const Navbar = () => {
         })}
       </nav>
 
-      {/* RIGHT: MOBILE MENU TOGGLE BUTTON */}
-      <div className="xl:hidden">
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95 z-[10002] relative"
-        >
-          {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
-        </button>
+      {/* RIGHT: MOCK STATUS + MOBILE MENU TOGGLE */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {isMockAuth && <MockModeBadge />}
+
+        {mockLoggedIn && (
+          <div className="hidden xl:flex items-center gap-2">
+            <button
+              onClick={() => handleNav('/profile')}
+              className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#E7D5A4]/90 hover:text-[#C99A2E] border border-[#C99A2E]/40 px-2.5 py-1"
+            >
+              🛂 PASSPORT
+            </button>
+            {mockUser?.role === 'admin' && (
+              <button
+                onClick={() => handleNav('/admin')}
+                className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#C99A2E] border border-[#C99A2E] px-2.5 py-1 hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
+              >
+                ADMIN PORTAL
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="xl:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95 z-[10002] relative"
+          >
+            {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
+          </button>
+        </div>
       </div>
 
       {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
         <div className="fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
+          {mockLoggedIn && (
+            <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
+              <button
+                onClick={() => handleNav('/profile')}
+                className="text-left font-mono text-sm font-bold text-[#E7D5A4] hover:text-[#C99A2E] uppercase"
+              >
+                🛂 PROFILE / PASSPORT
+              </button>
+              {mockUser?.role === 'admin' && (
+                <button
+                  onClick={() => handleNav('/admin')}
+                  className="text-left font-mono text-sm font-bold text-[#C99A2E] uppercase"
+                >
+                  ADMIN PORTAL
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
             NAVIGATION MENU
           </div>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { collaborationService } from '../services/collaborationService';
 
 export const VenueHostApplyPage = () => {
   const [form, setForm] = useState({ propertyName: '', contactName: '', email: '', phone: '', details: '' });
@@ -14,6 +16,18 @@ export const VenueHostApplyPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (isMockAuth) {
+      collaborationService.create({
+        type: 'venue_host',
+        businessName: form.propertyName,
+        contactName: form.contactName,
+        email: form.email,
+        phone: form.phone,
+        details: form.details,
+      });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;

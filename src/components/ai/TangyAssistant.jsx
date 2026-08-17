@@ -95,6 +95,17 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
     };
   }, []);
 
+  // Poll for new messages so a reply sent from the Admin Inbox (a separate
+  // tab/session) shows up here without a manual refresh. Cheap localStorage
+  // read, not a websocket — deliberately simple per the mock-mode scope.
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const latest = messageService.getConversation(sessionId);
+      setMessages((prev) => (latest.length !== prev.length ? latest : prev));
+    }, 3000);
+    return () => window.clearInterval(interval);
+  }, [sessionId]);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;

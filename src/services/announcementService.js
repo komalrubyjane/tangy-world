@@ -1,7 +1,6 @@
-// MOCK service — part of the new mock account/dashboard/AI system.
-// Not connected to Supabase. Swap the internals for real calls later
-// without changing any component that imports this file.
-import { mockAnnouncements, ANNOUNCEMENT_STATUSES, ANNOUNCEMENT_CATEGORIES } from '../data/mock/announcements';
+// MOCK service — not connected to Supabase. Swap the internals for real
+// calls later without changing any component that imports this file.
+import { mockAnnouncements, saveAnnouncements, ANNOUNCEMENT_STATUSES, ANNOUNCEMENT_CATEGORIES } from '../data/mock/announcements';
 
 export const announcementService = {
   getAll: () => mockAnnouncements,
@@ -14,6 +13,7 @@ export const announcementService = {
       ...data,
     };
     mockAnnouncements.unshift(announcement);
+    saveAnnouncements();
     return announcement;
   },
 
@@ -21,6 +21,7 @@ export const announcementService = {
     const a = mockAnnouncements.find((x) => x.id === id);
     if (!a) return null;
     Object.assign(a, updates);
+    saveAnnouncements();
     return a;
   },
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
 
 // Shared data-fetching hook for every admin list section: fetches a table,
 // supports client-side search across given fields, and simple "load more"
@@ -15,6 +16,14 @@ export function useAdminList(table, { select = '*', searchFields = [], orderBy =
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    // Every admin section calls this hook unconditionally (hooks can't be
+    // conditional) even though it renders its own Mock* variant instead —
+    // skip the real fetch entirely in mock mode so no Supabase request ever
+    // fires from an admin screen while AUTH_MODE === 'mock'.
+    if (isMockAuth) {
+      setLoading(false);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setLoading(false);
       setError('not-configured');

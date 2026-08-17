@@ -5,6 +5,8 @@ import { useEvents } from '../hooks/useEvents';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { waitlistService } from '../services/waitlistService';
 
 const VENUE_FILTERS = ['ALL', 'STEPWELL', 'BARADARI', 'COURTYARD'];
 
@@ -42,6 +44,14 @@ export const SessionsPage = () => {
       return;
     }
     playSFX('ticketClick');
+
+    if (isMockAuth) {
+      if (waitlistEventId) {
+        waitlistService.join({ eventId: waitlistEventId, name: waitlistName, email: waitlistEmail, phone: waitlistPhone || null });
+      }
+      setWaitlistSubmitted(true);
+      return;
+    }
 
     if (!isSupabaseConfigured || !waitlistEventId) {
       setWaitlistSubmitted(true);

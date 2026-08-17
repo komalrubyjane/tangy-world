@@ -3,6 +3,9 @@ import { StaffAuthGate } from './StaffAuthGate';
 import { useUserAuth } from '../context/UserAuthContext';
 import { useEvents } from '../hooks/useEvents';
 import { checkinService } from '../lib/checkinService';
+import { mockCheckinAdapter } from '../services/mockCheckinAdapter';
+import { eventService } from '../services/eventService';
+import { isMockAuth } from '../config/auth';
 import { useAudio } from '../audio/AudioContext';
 
 const RESULT_STYLES = {
@@ -46,7 +49,7 @@ function QrScanner({ onDecoded, active }) {
 function CheckInWorkspace() {
   const { user } = useUserAuth();
   const { playSFX } = useAudio();
-  const { events, loading: eventsLoading } = useEvents();
+  const realEvents = useEvents();
   const [eventId, setEventId] = useState('');
   const [mode, setMode] = useState('scan'); // 'scan' | 'manual'
   const [result, setResult] = useState(null); // { type, booking }
@@ -57,7 +60,15 @@ function CheckInWorkspace() {
   const [recent, setRecent] = useState([]);
   const lastScanRef = useRef({ code: '', at: 0 });
 
-  const liveEvents = events.filter((e) => e.dbStatus && e.dbStatus !== 'draft');
+  // Mock mode: source events from the mock account system's own event list
+  // (src/data/mock/events.js via eventService) — the same dataset mock
+  // bookings/Profile/Admin all key off — and swap in the localStorage-backed
+  // check-in adapter instead of the real Supabase-backed checkinService.
+  const svc = isMockAuth ? mockCheckinAdapter : checkinService;
+  const eventsLoading = isMockAuth ? false : realEvents.loading;
+  const liveEvents = isMockAuth
+    ? eventService.getAll().map((e) => ({ id: e.id, title: e.name, date: e.date, dbStatus: e.status }))
+    : realEvents.events.filter((e) => e.dbStatus && e.dbStatus !== 'draft');
 
   useEffect(() => {
     if (!eventId && liveEvents.length > 0) setEventId(liveEvents[0].id);
@@ -66,14 +77,14 @@ function CheckInWorkspace() {
 
   const refreshStats = useCallback(() => {
     if (!eventId) return;
-    checkinService.getStats(eventId).then(setStats);
-    checkinService.getRecentCheckins(eventId).then(setRecent);
-  }, [eventId]);
+    svc.getStats(eventId).then(setStats);
+    svc.getRecentCheckins(eventId).then(setRecent);
+  }, [eventId, svc]);
 
   useEffect(() => { refreshStats(); }, [refreshStats]);
 
   const handleCheckIn = async (booking) => {
-    const res = await checkinService.checkIn(booking.id, eventId, user.id);
+    const res = await svc.checkIn(booking.id, eventId, user.id);
     playSFX('ticketClick');
     if (res.success) {
       setResult({ type: 'success', booking });
@@ -90,7 +101,7 @@ function CheckInWorkspace() {
     if (text === lastScanRef.current.code && now - lastScanRef.current.at < 3000) return; // debounce repeat frames
     lastScanRef.current = { code: text, at: now };
 
-    const lookup = await checkinService.lookupByCode(text, eventId);
+    const lookup = await svc.lookupByCode(text, eventId);
     if (!lookup.found) {
       playSFX('ticketClick');
       setResult({ type: 'invalid', code: text });
@@ -114,12 +125,12 @@ function CheckInWorkspace() {
     let cancelled = false;
     setSearching(true);
     const t = setTimeout(() => {
-      checkinService.searchBookings(searchQuery, eventId).then((rows) => {
+      svc.searchBookings(searchQuery, eventId).then((rows) => {
         if (!cancelled) { setSearchResults(rows); setSearching(false); }
       });
     }, 300);
     return () => { cancelled = true; clearTimeout(t); };
-  }, [searchQuery, eventId, mode]);
+  }, [searchQuery, eventId, mode, svc]);
 
   const selectedEvent = liveEvents.find((e) => e.id === eventId);
 

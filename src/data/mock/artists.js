@@ -1,32 +1,15 @@
 // Mock artists — separate from the real Supabase `artists` table.
-// Used only by the new mock account-creation / role-dashboard system.
-export const mockArtists = [
-  {
-    id: 'art-m01',
-    userId: 'usr-a01',
-    name: 'Damini Bhatla',
-    genre: 'Sufi / Contemporary',
-    city: 'Hyderabad',
-    bio: 'Bridges Sufi tradition and contemporary acoustic soul.',
-    status: 'approved',
-    portfolio: ['soundcloud.com/daminibhatla'],
-    upcomingPerformances: ['evt-vol4'],
-    pastPerformances: ['evt-vol1', 'evt-vol2'],
-    availability: 'Available for bookings',
-    createdAt: '2023-01-10T10:00:00Z',
-  },
-  {
-    id: 'art-m02',
-    userId: 'usr-a02',
-    name: 'Kabir Collective',
-    genre: 'Folk Raga',
-    city: 'Hyderabad',
-    bio: 'A five-piece folk ensemble reviving Telangana raga traditions.',
-    status: 'pending',
-    portfolio: ['instagram.com/kabircollective'],
-    upcomingPerformances: [],
-    pastPerformances: [],
-    availability: 'Under review',
-    createdAt: '2026-07-20T10:00:00Z',
-  },
+// Used by the mock account-creation / role-dashboard system AND the admin
+// Artists section when AUTH_MODE === 'mock'.
+import { loadOrSeed, persist } from './store';
+
+const SEED = [
+  { id: 'art-m01', userId: 'usr-a01', name: 'Damini Bhatla', email: 'damini@example.com', phone: '+91 98111 22334', genre: 'Sufi / Contemporary', city: 'Hyderabad', avatar: '', bio: 'Bridges Sufi tradition and contemporary acoustic soul.', instagram: 'instagram.com/daminibhatla', soundcloud: 'soundcloud.com/daminibhatla', status: 'approved', portfolio: ['soundcloud.com/daminibhatla'], upcomingPerformances: ['evt-vol4'], pastPerformances: ['evt-vol1', 'evt-vol2'], availability: 'Available for bookings', invitations: [{ eventId: 'evt-solstice27', status: 'pending' }], createdAt: '2023-01-10T10:00:00Z', appliedAt: '2023-01-05T10:00:00Z' },
+  { id: 'art-m02', userId: 'usr-a02', name: 'Kabir Collective', email: 'kabir.collective@example.com', phone: '+91 90222 33445', genre: 'Folk Raga', city: 'Hyderabad', avatar: '', bio: 'A five-piece folk ensemble reviving Telangana raga traditions.', instagram: 'instagram.com/kabircollective', soundcloud: '', status: 'pending', portfolio: ['instagram.com/kabircollective'], upcomingPerformances: [], pastPerformances: [], availability: 'Under review', invitations: [], createdAt: '2026-07-20T10:00:00Z', appliedAt: '2026-07-20T10:00:00Z' },
+  { id: 'art-m03', userId: 'usr-a03', name: 'Reha Vocals', email: 'reha.vocals@example.com', phone: '+91 91333 44556', genre: 'Ambient Vocal', city: 'Bengaluru', avatar: '', bio: 'Loop-based vocal textures recorded live, no overdubs.', instagram: 'instagram.com/rehavocals', soundcloud: 'soundcloud.com/rehavocals', status: 'approved', portfolio: ['soundcloud.com/rehavocals'], upcomingPerformances: [], pastPerformances: ['evt-vol3'], availability: 'Available from October', invitations: [], createdAt: '2024-11-02T10:00:00Z', appliedAt: '2024-10-25T10:00:00Z' },
+  { id: 'art-m04', userId: 'usr-a04', name: 'Tabla House', email: 'tablahouse@example.com', phone: '+91 92444 55667', genre: 'Percussion / Fusion', city: 'Hyderabad', avatar: '', bio: 'Three generations of tabla lineage, one stage.', instagram: 'instagram.com/tablahouse', soundcloud: '', status: 'rejected', portfolio: [], upcomingPerformances: [], pastPerformances: [], availability: 'Not currently available', invitations: [], createdAt: '2026-05-14T10:00:00Z', appliedAt: '2026-05-14T10:00:00Z' },
+  { id: 'art-m05', userId: 'usr-a05', name: 'Meher Qawwal Party', email: 'meherqawwal@example.com', phone: '+91 93555 66778', genre: 'Qawwali', city: 'Hyderabad', avatar: '', bio: 'Six-piece qawwali party carrying forward a century-old gharana.', instagram: 'instagram.com/meherqawwal', soundcloud: '', status: 'approved', portfolio: ['instagram.com/meherqawwal'], upcomingPerformances: ['evt-solstice27'], pastPerformances: [], availability: 'Available for bookings', invitations: [], createdAt: '2025-06-01T10:00:00Z', appliedAt: '2025-05-20T10:00:00Z' },
 ];
+
+export const mockArtists = loadOrSeed('artists', () => SEED);
+export const saveArtists = () => persist('artists', mockArtists);

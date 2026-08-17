@@ -4,6 +4,8 @@ import { Footer } from '../../components/layout/Footer';
 import { useEvents } from '../../hooks/useEvents';
 import { useAudio } from '../../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { isMockAuth } from '../../config/auth';
+import { waitlistService } from '../../services/waitlistService';
 
 export const WaitlistPage = () => {
   const { playSFX } = useAudio();
@@ -37,6 +39,14 @@ export const WaitlistPage = () => {
       return;
     }
     playSFX('ticketClick');
+
+    if (isMockAuth) {
+      if (waitlistEventId) {
+        waitlistService.join({ eventId: waitlistEventId, name: waitlistName, email: waitlistEmail, phone: waitlistPhone || null });
+      }
+      setWaitlistSubmitted(true);
+      return;
+    }
 
     if (!isSupabaseConfigured || !waitlistEventId) {
       setWaitlistSubmitted(true);

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { collaborationService } from '../services/collaborationService';
 
 export const SponsorApplyPage = () => {
   const [form, setForm] = useState({ orgName: '', email: '', proposal: '' });
@@ -14,6 +16,17 @@ export const SponsorApplyPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (isMockAuth) {
+      collaborationService.create({
+        type: 'sponsor',
+        businessName: form.orgName,
+        contactName: form.orgName,
+        email: form.email,
+        details: form.proposal,
+      });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;

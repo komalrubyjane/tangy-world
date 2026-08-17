@@ -1,7 +1,6 @@
-// MOCK service — part of the new mock account/dashboard/AI system.
-// Not connected to Supabase. Swap the internals for real calls later
-// without changing any component that imports this file.
-import { mockAgentRequests, AGENT_REQUEST_STATUSES } from '../data/mock/agentRequests';
+// MOCK service — not connected to Supabase. Swap the internals for real
+// calls later without changing any component that imports this file.
+import { mockAgentRequests, saveAgentRequests, AGENT_REQUEST_STATUSES } from '../data/mock/agentRequests';
 
 export const agentService = {
   getAll: () => mockAgentRequests,
@@ -20,6 +19,7 @@ export const agentService = {
       conversationId,
     };
     mockAgentRequests.unshift(request);
+    saveAgentRequests();
     return request;
   },
 
@@ -28,6 +28,7 @@ export const agentService = {
     if (!req) return null;
     req.status = 'active';
     req.assignedTo = adminName;
+    saveAgentRequests();
     return req;
   },
 
@@ -36,6 +37,7 @@ export const agentService = {
     if (!req) return null;
     req.status = 'assigned';
     req.assignedTo = adminName;
+    saveAgentRequests();
     return req;
   },
 
@@ -44,6 +46,7 @@ export const agentService = {
     const req = mockAgentRequests.find((r) => r.id === id);
     if (!req) return null;
     req.status = status;
+    saveAgentRequests();
     return req;
   },
 
@@ -51,6 +54,7 @@ export const agentService = {
     const req = mockAgentRequests.find((r) => r.id === id);
     if (!req) return null;
     req.priority = priority;
+    saveAgentRequests();
     return req;
   },
 };

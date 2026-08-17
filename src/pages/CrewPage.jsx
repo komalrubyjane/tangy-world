@@ -5,6 +5,8 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { userService } from '../services/userService';
 
 export const CrewPage = () => {
   const navigate = useNavigate();
@@ -25,6 +27,17 @@ export const CrewPage = () => {
     if (!volName || !volPhone || !volEmail) return;
     playSFX('ticketClick');
     setCrewError('');
+    if (isMockAuth) {
+      userService.applyForRole('volunteer', {
+        name: volName,
+        email: volEmail,
+        phone: volPhone,
+        interest: volRole,
+        notes: `College/Institution: ${volCollege || '—'}\n\n${volExperience}`,
+      });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;

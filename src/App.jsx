@@ -40,6 +40,7 @@ import { InnerCirclePage } from './pages/InnerCirclePage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminPage } from './pages/AdminPage';
 import { TangyWorldCheckInPage } from './admin/TangyWorldCheckInPage';
+import { ProfilePage as MockProfilePage } from './pages/ProfilePage';
 
 // Artist Portal Migration Imports
 import { ArtistLayout } from './artist/layouts/ArtistLayout';
@@ -412,6 +413,7 @@ export default function App() {
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/join/login" element={<JoinLoginPage />} />
 
+                <Route path="/profile" element={<MockProfilePage />} />
                 <Route path="/dashboard" element={<MockProtectedRoute role="patron"><PatronDashboard /></MockProtectedRoute>} />
                 <Route path="/artist-mock/portal" element={<MockProtectedRoute role="artist"><ArtistMockDashboard /></MockProtectedRoute>} />
                 <Route path="/vendor/dashboard" element={<MockProtectedRoute role="vendor"><VendorDashboard /></MockProtectedRoute>} />

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { agentService } from '../../services/agentService';
 import { messageService } from '../../services/messageService';
 import { useUserAuth } from '../../context/UserAuthContext';
-import { SearchBar, StatusBadge, EmptyState, ActionButton } from '../AdminUI';
+import { SearchBar, StatusBadge, EmptyState, ActionButton, DataTable } from '../AdminUI';
 
 const SUBVIEWS = [
   { id: 'all', label: 'ALL' },
@@ -133,42 +133,35 @@ export const InboxSection = () => {
       {filtered.length === 0 ? (
         <EmptyState>NO REQUESTS IN THIS VIEW.</EmptyState>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-[#C99A2E]/40 text-[#C99A2E]">
-                <th className="py-2">NAME</th>
-                <th className="py-2">ROLE</th>
-                <th className="py-2">CATEGORY</th>
-                <th className="py-2">QUESTION</th>
-                <th className="py-2">PRIORITY</th>
-                <th className="py-2">CREATED</th>
-                <th className="py-2">STATUS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={() => openRequest(r)}
-                  className="border-b border-[#E7D5A4]/10 cursor-pointer hover:bg-[#C99A2E]/5"
-                >
-                  <td className="py-3 font-bold">{r.user}</td>
-                  <td className="py-3 opacity-70 capitalize">{r.role}</td>
-                  <td className="py-3 opacity-70">{r.category}</td>
-                  <td className="py-3 max-w-xs truncate">{r.question}</td>
-                  <td className="py-3">
-                    <StatusBadge status={r.priority} />
-                  </td>
-                  <td className="py-3 opacity-60">{timeAgo(r.createdAt)}</td>
-                  <td className="py-3">
-                    <StatusBadge status={r.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={[
+            { key: 'user', header: 'NAME', render: (r) => <span className="font-bold">{r.user}</span> },
+            { key: 'role', header: 'ROLE', render: (r) => <span className="opacity-70 capitalize">{r.role}</span> },
+            { key: 'category', header: 'CATEGORY', render: (r) => <span className="opacity-70">{r.category}</span> },
+            { key: 'question', header: 'QUESTION', render: (r) => <span className="block max-w-xs truncate">{r.question}</span> },
+            { key: 'priority', header: 'PRIORITY', render: (r) => <StatusBadge status={r.priority} /> },
+            { key: 'created', header: 'CREATED', render: (r) => <span className="opacity-60">{timeAgo(r.createdAt)}</span> },
+            { key: 'status', header: 'STATUS', render: (r) => <StatusBadge status={r.status} /> },
+          ]}
+          rows={filtered}
+          onRowClick={openRequest}
+          renderCard={(r) => (
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-start gap-2">
+                <div>
+                  <div className="font-bold text-sm">{r.user}</div>
+                  <div className="text-[10px] opacity-60 capitalize">{r.role} · {r.category}</div>
+                </div>
+                <StatusBadge status={r.status} />
+              </div>
+              <div className="text-[10px] opacity-70 line-clamp-2">{r.question}</div>
+              <div className="flex items-center gap-2">
+                <StatusBadge status={r.priority} />
+                <span className="text-[10px] opacity-40">{timeAgo(r.createdAt)}</span>
+              </div>
+            </div>
+          )}
+        />
       )}
 
       {selected && (

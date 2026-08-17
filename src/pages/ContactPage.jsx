@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { isMockAuth } from '../config/auth';
+import { enquiryService } from '../services/enquiryService';
 
 export const ContactPage = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -16,6 +18,11 @@ export const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (isMockAuth) {
+      enquiryService.createContact({ name, email, subject, message, category: inquiry });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;

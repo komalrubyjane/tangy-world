@@ -3,6 +3,8 @@ import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useAudio } from '../../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { isMockAuth } from '../../config/auth';
+import { enquiryService } from '../../services/enquiryService';
 
 const ENQUIRY_TYPE = 'corporate_event';
 
@@ -25,12 +27,20 @@ export const CorporateEventsPage = () => {
     if (!date || !venue || !name || !email) return;
     playSFX('ticketClick');
     setFormError('');
+    const guestCount = parseInt(guests, 10) || null;
+    if (isMockAuth) {
+      enquiryService.createPrivate({
+        type: ENQUIRY_TYPE, name, email, phone, preferredDate: date, guestCount, budget,
+        message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
+      });
+      setSubmitted(true);
+      return;
+    }
     if (!isSupabaseConfigured) {
       setSubmitted(true);
       return;
     }
     setSubmitting(true);
-    const guestCount = parseInt(guests, 10) || null;
     const { error } = await supabase.from('private_enquiries').insert({
       type: ENQUIRY_TYPE, name, email, phone, preferred_date: date, guest_count: guestCount,
       message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
