@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 import { useMockAuth } from '../../context/MockAuthContext';
-import { MockModeBadge } from '../../admin/AdminUI';
-import { isMockAuth } from '../../config/auth';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -227,9 +225,15 @@ export const Navbar = () => {
         })}
       </nav>
 
-      {/* RIGHT: MOCK STATUS + MOBILE MENU TOGGLE */}
+      {/* RIGHT: TANGY AI + MOBILE MENU TOGGLE */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {isMockAuth && <MockModeBadge />}
+        <button
+          onClick={() => handleNav('/ai')}
+          className="inline-flex items-center gap-1.5 px-2 py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-[#C99A2E] bg-[#C99A2E]/10 border border-[#C99A2E]/40 rounded-sm hover:bg-[#C99A2E]/20 hover:text-[#E7D5A4] transition-colors"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-pulse" />
+          Tangy AI
+        </button>
 
         {mockLoggedIn && (
           <div className="hidden xl:flex items-center gap-2">
