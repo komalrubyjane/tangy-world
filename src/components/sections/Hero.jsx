@@ -235,7 +235,7 @@ export const Hero = () => {
         {/* RIGHT COLUMN: REC TAG */}
         <div className="badge absolute z-40 right-[3.5cqw] top-[78%] bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-md pointer-events-none">
           <span className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.06em]">REC</span>
-          <div className="w-[0.8cqw] min-w-[5px] h-[0.8cqw] min-h-[5px] rounded-full bg-[#c2272a]" />
+          <div className="w-[0.8cqw] min-w-[5px] h-[0.8cqw] min-h-[5px] rounded-full bg-[#c2272a] animate-[pulseLine_2s_ease-in-out_infinite]" />
         </div>
 
         {/* RIGHT COLUMN: KEEP THE CULTURE ALIVE */}
@@ -244,6 +244,58 @@ export const Hero = () => {
         </div>
         <div className="badge absolute z-40 right-[3cqw] bottom-[3%] font-serif italic font-bold text-[clamp(16px,3cqw,42px)] text-[#d1a437] -rotate-6 drop-shadow-md pointer-events-none">
           Tangy
+        </div>
+
+        {/* ============================================================ */}
+        {/* NEGATIVE-SPACE EDITORIAL ANNOTATIONS — plain typography       */}
+        {/* printed directly on the poster (no card backgrounds), like   */}
+        {/* captions and metadata on a vintage record sleeve. Left/      */}
+        {/* center columns only — the right column above already carries*/}
+        {/* INHERIT/REC/KEEP/Tangy, so this fills the rest without       */}
+        {/* crowding it or covering any performer/instrument.            */}
+        {/* ============================================================ */}
+
+        {/* LEFT COLUMN: EDITORIAL HEADING + CAPTION + QUOTE */}
+        <div className="badge absolute z-40 left-[5%] sm:left-[6%] top-[60%] sm:top-[58%] max-w-[42cqw] sm:max-w-[19cqw] min-w-[130px] pointer-events-none">
+          <div className="font-poster text-[clamp(11px,1.9cqw,22px)] leading-[0.92] tracking-[0.01em] text-[#d1a437] uppercase">
+            The Sound<br />of the City
+          </div>
+          <p className="font-serif italic text-[clamp(6.5px,0.95cqw,10.5px)] leading-snug text-[#ecdcaf]/80 mt-[0.4rem]">
+            Live music, heritage spaces, and stories from Hyderabad.
+          </p>
+          <p className="font-serif italic text-[clamp(6px,0.85cqw,9.5px)] leading-snug text-[#ecdcaf]/50 mt-[0.45rem]">
+            "A room remembers every song."
+          </p>
+        </div>
+
+        {/* CENTER: FIELD RECORDING ANNOTATION + TINY WAVEFORM (near the hanging microphone) */}
+        <div className="badge absolute z-40 left-[52%] sm:left-[50%] top-[63%] sm:top-[61%] w-max max-w-[26cqw] min-w-[96px] flex flex-col items-center gap-[0.3rem] pointer-events-none">
+          <div className="flex items-end gap-[2px] h-[1rem]" aria-hidden="true">
+            {[0.4, 0.85, 0.55, 1, 0.35, 0.7, 0.5].map((h, i) => (
+              <span
+                key={i}
+                className="w-[2.5px] sm:w-[3px] bg-[#d1a437]/80 rounded-sm origin-bottom animate-[eqBar_1.3s_ease-in-out_infinite]"
+                style={{ height: `${h * 100}%`, animationDelay: `${i * 110}ms` }}
+              />
+            ))}
+          </div>
+          <div className="font-mono text-[clamp(5.5px,0.8cqw,8.5px)] font-bold tracking-[0.18em] text-[#ecdcaf]/80 uppercase text-center leading-relaxed">
+            FIELD REC. // SIDE A<br />
+            LIVE • REAL • LOCAL
+          </div>
+        </div>
+
+        {/* LEFT COLUMN: SMALL LABEL + ARCHIVAL METADATA STRIP (plain typography, no card) */}
+        <div className="badge absolute z-40 left-[5%] sm:left-[6%] top-[76%] sm:top-[74%] max-w-[58cqw] sm:max-w-[22cqw] min-w-[150px] pointer-events-none">
+          <div className="font-mono text-[clamp(7px,1.05cqw,11.5px)] font-bold tracking-[0.1em] text-[#ecdcaf] uppercase leading-tight">
+            Tangy Sessions
+          </div>
+          <div className="font-mono text-[clamp(5px,0.72cqw,8px)] tracking-[0.15em] text-[#ecdcaf]/55 uppercase mt-[0.2rem] leading-relaxed">
+            Music experiences in unexpected places
+          </div>
+          <div className="font-mono text-[clamp(5px,0.7cqw,7.5px)] tracking-[0.12em] text-[#d1a437]/65 uppercase mt-[0.5rem] leading-relaxed border-t border-[#ecdcaf]/15 pt-[0.35rem]">
+            33⅓ RPM · STEREO · SIDE A · VOL. 04 · LIVE TAKE · ARCHIVE NO. 1974 · HYD/TS · 432 Hz
+          </div>
         </div>
 
         {/* TEXTURE OVERLAYS */}
