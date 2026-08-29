@@ -1,12 +1,40 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 
+// Mobile-only cast cycle for the hero's single central spot: instead of a
+// fixed guitarist, one performer at a time crossfades in/out every 2s so the
+// full cast is still represented without spreading them across the poster
+// again. Guitarist stays first (strongest silhouette, and the desktop
+// composition's own centered performer). Desktop is untouched — it keeps its
+// original static 5-across row via a separate, unconditional image.
+const HERO_PERFORMER_CYCLE = [
+  { src: '/media/hero-performer-2-guitarist.png', alt: 'Afro Rock Guitarist' },
+  { src: '/media/hero-performer-4-kathak.png', alt: 'Kathak Dancer' },
+  { src: '/media/hero-performer-3-veena.png', alt: 'Veena Musician' },
+  { src: '/media/hero-performer-5-hiphop.png', alt: 'Hip-Hop Dancer' },
+  { src: '/media/hero-performer-1-violinist.png', alt: 'Violinist' },
+];
+const HERO_PERFORMER_INTERVAL_MS = 2000;
+
 export const Hero = () => {
   const navigate = useNavigate();
   const { setFilterCutoff, playSFX } = useAudio();
+  const [activePerformer, setActivePerformer] = useState(0);
+
+  // Cycle the mobile hero's central performer. Skipped entirely under
+  // prefers-reduced-motion, which leaves the guitarist showing statically.
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) return undefined;
+
+    const id = setInterval(() => {
+      setActivePerformer((i) => (i + 1) % HERO_PERFORMER_CYCLE.length);
+    }, HERO_PERFORMER_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
 
   const sectionRef = useGSAPContext((ctx) => {
     let impactTriggered = false;
@@ -165,8 +193,11 @@ export const Hero = () => {
           </g>
         </svg>
 
-        {/* CENTERED TYPOGRAPHY "TANGY SESSIONS" — pushed down from the top metadata/header for poster breathing room (mobile only; sm:/md:/lg: unchanged) */}
-        <div className="headline absolute z-15 top-[122px] sm:top-[16cqw] md:top-[12cqw] lg:top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none will-change-transform">
+        {/* CENTERED TYPOGRAPHY "TANGY SESSIONS" — moved down to sit right above the vertical middle of the */}
+        {/* hero (mobile only; sm:/md:/lg: unchanged). dvh-based, not a fixed px, so "right above the middle" */}
+        {/* holds consistently whether the phone is short or tall — a fixed px offset would sit progressively */}
+        {/* higher (relatively) on taller phones. */}
+        <div className="headline absolute z-15 top-[21dvh] sm:top-[16cqw] md:top-[12cqw] lg:top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none will-change-transform">
           <span 
             className="word tangy block font-poster text-[clamp(2.8rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]" 
             data-text="TANGY"
@@ -196,12 +227,30 @@ export const Hero = () => {
           <img src="/media/hero-performer-4-kathak.png" alt="Kathak Dancer" className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" />
         </div>
 
-        {/* CENTER: Afro Rock Guitarist — the sole mobile cover star, sized up substantially; desktop keeps its original modest scale. */}
-        {/* Height (not just width) drives the box on mobile so it scales with viewport HEIGHT — the min-height floor is kept low enough */}
-        {/* that it never dominates on short devices (320x568) the way a tall fixed floor would, which is what pushed the ticket card */}
-        {/* below the fold there. */}
-        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[44%] lg:top-[32%] -translate-x-1/2 w-[58cqw] lg:w-[19cqw] min-w-[210px] lg:min-w-[92px] max-w-[400px] lg:max-w-[400px] h-[54cqw] lg:h-[44cqw] min-h-[175px] lg:min-h-[180px] max-h-[420px] lg:max-h-[620px] pointer-events-none will-change-transform">
-          <img src="/media/hero-performer-2-guitarist.png" alt="Afro Rock Guitarist" className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" />
+        {/* CENTER: the hero's single focal spot — sized up substantially on mobile; desktop keeps its original modest scale. */}
+        {/* Height is dvh-based (not cqw/width-based) on mobile: a width-driven box scales with how WIDE the */}
+        {/* phone is, but the empty space above/below it is a function of viewport HEIGHT — on a tall phone */}
+        {/* a width-driven box stayed small while the gaps above and below it grew into large dead zones. */}
+        {/* Sizing off dvh instead makes the performer consistently fill the same proportion of the vertical */}
+        {/* space on every phone, tall or short. */}
+        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[40%] lg:top-[32%] -translate-x-1/2 w-[72cqw] lg:w-[19cqw] min-w-[230px] lg:min-w-[92px] max-w-[440px] lg:max-w-[400px] h-[46dvh] lg:h-[44cqw] min-h-[200px] lg:min-h-[180px] max-h-[460px] lg:max-h-[620px] pointer-events-none will-change-transform">
+          {/* Desktop: original static Afro Rock Guitarist, unchanged */}
+          <div className="hidden lg:block w-full h-full">
+            <img src="/media/hero-performer-2-guitarist.png" alt="Afro Rock Guitarist" className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" />
+          </div>
+          {/* Mobile: the full cast crossfades through this same spot every 2s */}
+          <div className="lg:hidden relative w-full h-full">
+            {HERO_PERFORMER_CYCLE.map((performer, i) => (
+              <img
+                key={performer.src}
+                src={performer.src}
+                alt={performer.alt}
+                className={`absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)] transition-opacity duration-700 ease-in-out ${
+                  i === activePerformer ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* INNER RIGHT: Veena Classical Musician — desktop only */}

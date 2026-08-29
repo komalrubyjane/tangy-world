@@ -21,6 +21,7 @@ import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
 import { MerchShopModal } from './components/museum/MerchShopModal';
 import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
 import { PostcardContactModal } from './components/museum/PostcardContactModal';
+import { TangyTVModal } from './components/museum/TangyTVModal';
 import { UserLoginModal } from './components/museum/UserLoginModal';
 import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
 
@@ -134,6 +135,7 @@ function MainWorld() {
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isPassportOpen, setIsPassportOpen] = useState(false);
   const [isPostcardOpen, setIsPostcardOpen] = useState(false);
+  const [isTVOpen, setIsTVOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -200,16 +202,21 @@ function MainWorld() {
         onClose={() => setIsPassportOpen(false)} 
       />
 
-      <PostcardContactModal 
-        isOpen={isPostcardOpen} 
-        onClose={() => setIsPostcardOpen(false)} 
+      <PostcardContactModal
+        isOpen={isPostcardOpen}
+        onClose={() => setIsPostcardOpen(false)}
+      />
+
+      <TangyTVModal
+        isOpen={isTVOpen}
+        onClose={() => setIsTVOpen(false)}
       />
 
       {/* USER LOGIN MODAL (CUSTOMER/PATRON AUTH) */}
       <UserLoginModal />
 
       {/* FLOATING QUICK DOCK TOOLBAR */}
-      <MuseumQuickDock 
+      <MuseumQuickDock
         onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
         onOpenVinyl={() => setIsVinylOpen(true)}
         onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
@@ -217,6 +224,7 @@ function MainWorld() {
         onOpenShop={() => setIsShopOpen(true)}
         onOpenPassport={() => setIsPassportOpen(true)}
         onOpenPostcard={() => setIsPostcardOpen(true)}
+        onOpenTV={() => setIsTVOpen(true)}
       />
 
       {/* UNIFIED SINGLE MASTER SITE EXPERIENCE FOR ALL SCREEN SIZES */}

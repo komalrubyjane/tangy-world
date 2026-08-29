@@ -7,7 +7,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
   const { isLoggedIn: mockLoggedIn, user: mockUser } = useMockAuth();
-  
+
   // Active dropdown state for desktop & mobile
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ export const Navbar = () => {
       items: [
         { label: 'Why Tangy', path: '/about#manifesto' },
         { label: 'Chronology', path: '/about#history' },
-        { label: 'Tangy Team', path: '/about#founders' },
+        { label: 'Tangy Team', path: '/about/team' },
         { label: 'Full Story', path: '/about' }
       ]
     },
@@ -162,7 +162,7 @@ export const Navbar = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#11100C]/95 backdrop-blur-md border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#11100C]/95 border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
       {/* LEFT: BRAND LOGO */}
       <div 
@@ -267,6 +267,9 @@ export const Navbar = () => {
       {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
       {isMobileMenuOpen && (
         <div className="fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
+          {/* The dock's own PROFILE/LOGIN button (bottom nav, always visible on mobile)
+              covers this now — a duplicate entry used to live here from when TV
+              temporarily replaced PROFILE in the dock instead of sitting alongside it. */}
           {mockLoggedIn && (
             <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
               <button

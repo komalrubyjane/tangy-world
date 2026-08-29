@@ -5,7 +5,6 @@
   z-index: 999999 !important;
   pointer-events: none;
   transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
   display: none;
 }
 
@@ -19,12 +18,19 @@
   }
 }
 
+/* `mix-blend-mode: difference` used to sit on .cursor so the dot inverted
+   against any background — but blend modes force the compositor to
+   recompute against everything underneath on every single frame the
+   cursor moves, which is exactly what made the cursor itself feel
+   laggy. A solid color with a dark outline reads clearly against this
+   site's palette without that per-frame cost. */
 .cursor-dot {
   display: block;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--color-tangy-cream);
+  box-shadow: 0 0 0 1px rgba(17, 16, 12, 0.5);
   transition: width .25s ease, height .25s ease, background .25s ease;
 }
 
@@ -33,6 +39,7 @@
   height: 64px;
   background: transparent;
   border: 1px solid var(--color-tangy-cream);
+  box-shadow: 0 0 0 1px rgba(17, 16, 12, 0.35);
   box-sizing: border-box;
 }
 

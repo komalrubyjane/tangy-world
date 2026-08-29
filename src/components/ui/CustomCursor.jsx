@@ -21,27 +21,49 @@ export const CustomCursor = () => {
     const handleMouseMove = (e) => {
       mouseRef.current.x = e.clientX;
       mouseRef.current.y = e.clientY;
-      
-      document.documentElement.style.setProperty('--mx', ((e.clientX / window.innerWidth) * 2 - 1).toFixed(3));
-      document.documentElement.style.setProperty('--my', ((e.clientY / window.innerHeight) * 2 - 1).toFixed(3));
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-
     let rafId;
+    let loopRunning = false;
+
     const render = () => {
-      curRef.current.x += (mouseRef.current.x - curRef.current.x) * 0.18;
-      curRef.current.y += (mouseRef.current.y - curRef.current.y) * 0.18;
-      
+      const dx = mouseRef.current.x - curRef.current.x;
+      const dy = mouseRef.current.y - curRef.current.y;
+      curRef.current.x += dx * 0.18;
+      curRef.current.y += dy * 0.18;
+
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate(${curRef.current.x}px, ${curRef.current.y}px) translate(-50%, -50%)`;
       }
-      rafId = requestAnimationFrame(render);
+
+      // Stop once the lerp has caught up instead of running forever —
+      // a mousemove event restarts it. Avoids a permanent 60fps loop
+      // (and the style write it does every tick) while the pointer sits
+      // still, which was compounding with everything else on the page.
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        rafId = requestAnimationFrame(render);
+      } else {
+        loopRunning = false;
+      }
     };
-    rafId = requestAnimationFrame(render);
+
+    const ensureLoopRunning = () => {
+      if (!loopRunning) {
+        loopRunning = true;
+        rafId = requestAnimationFrame(render);
+      }
+    };
+
+    const handleMouseMoveAndRestart = (e) => {
+      handleMouseMove(e);
+      ensureLoopRunning();
+    };
+
+    window.addEventListener('mousemove', handleMouseMoveAndRestart);
+    ensureLoopRunning();
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMoveAndRestart);
       cancelAnimationFrame(rafId);
       document.body.classList.remove('cursor-ready');
     };

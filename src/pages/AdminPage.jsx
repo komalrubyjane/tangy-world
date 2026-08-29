@@ -13,6 +13,7 @@ import { WaitlistSection } from '../admin/sections/WaitlistSection';
 import { UsersSection } from '../admin/sections/UsersSection';
 import { InboxSection } from '../admin/sections/InboxSection';
 import { AnnouncementsSection } from '../admin/sections/AnnouncementsSection';
+import { TVChannelsSection } from '../admin/sections/TVChannelsSection';
 
 const TABS = [
   { id: 'overview', label: '📊 OVERVIEW', component: OverviewSection },
@@ -27,6 +28,7 @@ const TABS = [
   { id: 'users', label: '👤 USERS', component: UsersSection },
   { id: 'inbox', label: '📥 INBOX', component: InboxSection },
   { id: 'announcements', label: '📣 ANNOUNCEMENTS', component: AnnouncementsSection },
+  { id: 'tv', label: '📺 TANGY TV', component: TVChannelsSection },
 ];
 
 const AdminDashboard = () => {

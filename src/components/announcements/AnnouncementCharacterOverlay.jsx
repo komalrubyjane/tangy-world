@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
@@ -99,17 +99,10 @@ export const AnnouncementCharacterOverlay = ({
   const dismissTimerRef = useRef(null);
   const reducedMotion = useReducedMotion();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const isRight = position === 'bottom-right';
   const edgeSign = isRight ? 1 : -1;
   const interactive = phase === 'open';
-  // On the mobile homepage hero only, the popup collapses into a slim printed
-  // notice strip anchored below the TANGY SESSIONS title instead of the full
-  // character+ticket card — the hero's single viewport doesn't have room for
-  // the full card between the title and the performer arc. Every other route,
-  // and desktop (md+) everywhere including here, keeps the original card.
-  const compactMobile = pathname === '/';
 
   // Open when the parent asks us to.
   useEffect(() => {
@@ -242,31 +235,13 @@ export const AnnouncementCharacterOverlay = ({
     ? 'md:bottom-[calc(11rem+env(safe-area-inset-bottom))]'
     : 'md:bottom-[calc(2rem+env(safe-area-inset-bottom))]';
 
-  // compactMobile (mobile homepage only): the title's own height scales with
-  // viewport WIDTH while the guitarist below it is anchored by viewport
-  // HEIGHT (%). A fixed px offset can't clear both across every phone size
-  // at once, so the strip is positioned with a vw unit that scales the same
-  // way the title does — calibrated (78vw) against the hero's real rendered
-  // geometry now that the mobile hero shows only the guitarist (320-430px
-  // wide, 568-932px tall device pairings), so it clears the title and lands
-  // just above the guitarist at every size tested. No safe-area addition
-  // here (the title above it doesn't use one either): on a notched phone
-  // that extra ~50px would land squarely in the already-thin margin above
-  // the guitarist instead of just adding breathing room.
-  const mobileTopClass = compactMobile
-    ? 'top-[78vw]'
-    : 'top-[calc(4.5rem+env(safe-area-inset-top))]';
-  const mobileSideClass = compactMobile
-    ? 'left-1/2 -translate-x-1/2 md:translate-x-0'
-    : (isRight ? 'right-3' : 'left-3');
-
   return (
     <div
-      className={`fixed z-[500] ${mobileTopClass} md:top-auto ${bottomOffsetClass} ${mobileSideClass} ${
-        isRight ? 'md:right-8' : 'md:left-8'
+      className={`fixed z-[500] top-[calc(4.5rem+env(safe-area-inset-top))] md:top-auto ${bottomOffsetClass} ${
+        isRight ? 'right-3 md:right-8' : 'left-3 md:left-8'
       } flex ${isRight ? 'flex-row-reverse' : 'flex-row'} items-start md:items-end gap-2 md:gap-4 pointer-events-none max-w-[min(26rem,calc(100vw-1.5rem))]`}
     >
-      <div className={`${compactMobile ? 'hidden md:block' : ''} ${showIdleSway ? 'animate-[announceIdleSway_3.4s_ease-in-out_infinite]' : ''}`}>
+      <div className={showIdleSway ? 'animate-[announceIdleSway_3.4s_ease-in-out_infinite]' : ''}>
         <img
           ref={charRef}
           src={imgSrc}
@@ -277,70 +252,35 @@ export const AnnouncementCharacterOverlay = ({
       <div
         ref={paperRef}
         style={{ transformOrigin: isRight ? 'bottom right' : 'bottom left' }}
-        className={`pointer-events-auto relative bg-[#F3E7C9] text-[#191410] border-2 border-[#191410] -rotate-1 ${
-          compactMobile
-            ? 'w-[calc(100vw-2.5rem)] max-w-[380px] shadow-[3px_3px_0_#11100C] md:w-[clamp(210px,58vw,300px)] md:shadow-[6px_6px_0_#11100C]'
-            : 'w-[clamp(210px,58vw,300px)] shadow-[6px_6px_0_#11100C] p-4'
-        }`}
+        className="pointer-events-auto relative w-[clamp(210px,58vw,300px)] bg-[#F3E7C9] text-[#191410] border-2 border-[#191410] shadow-[6px_6px_0_#11100C] p-4 -rotate-1"
       >
         <button
           onClick={handleManualClose}
           aria-label="Dismiss announcement"
-          className={`absolute flex items-center justify-center font-bold ${
-            compactMobile
-              ? 'top-1 right-1 w-4 h-4 text-[9px] bg-[#F3E7C9] text-[#191410]/60 border border-[#191410]/40 md:-top-2 md:-right-2 md:w-6 md:h-6 md:text-xs md:bg-[#C2272A] md:text-white md:border-2 md:border-[#191410] md:rounded-full'
-              : '-top-2 -right-2 w-6 h-6 text-xs bg-[#C2272A] text-white border-2 border-[#191410] rounded-full'
-          }`}
+          className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-[#C2272A] text-white text-xs font-bold border-2 border-[#191410] rounded-full"
         >
           ✕
         </button>
-
-        {/* MOBILE HOMEPAGE ONLY: a slim printed notice strip — the hero has no */}
-        {/* room for the full card between the title and the performer arc.   */}
-        {/* Tap anywhere on the strip to view; full content stays reachable   */}
-        {/* via aria-label for screen readers. Hidden at md+, where the       */}
-        {/* original card (below) always renders instead. */}
-        {compactMobile && (
-          <button
-            onClick={handleView}
-            disabled={!interactive}
-            aria-label={`${announcement.title}. ${announcement.description}`}
-            className={`md:hidden flex items-center gap-1.5 w-full text-left pl-2 pr-5 py-0 ${
-              interactive ? 'cursor-pointer' : 'cursor-default opacity-90'
-            }`}
-          >
-            <span className="shrink-0 font-mono text-[7px] font-bold tracking-[0.1em] uppercase text-[#B94717] border border-dashed border-[#B94717]/60 px-1 py-[1px]">
-              {announcement.category || 'News'}
-            </span>
-            <span className="flex-1 min-w-0 truncate font-display font-bold text-[11px] uppercase tracking-wide">
-              {announcement.title}
-            </span>
-            <span aria-hidden="true" className="shrink-0 font-mono text-[10px] text-[#B94717]">→</span>
-          </button>
-        )}
-
-        <div className={compactMobile ? 'hidden md:block md:p-4' : ''}>
-          <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#B94717] mb-1 border-b border-dashed border-[#191410]/30 pb-1">
-            Tangy Sessions · {announcement.category || 'Announcement'}
-          </div>
-          <h4 ref={titleRef} className="font-display text-lg md:text-xl font-bold leading-tight mb-1">
-            {announcement.title}
-          </h4>
-          <p ref={descRef} className="text-xs md:text-sm font-serif leading-snug mb-3 opacity-90">
-            {announcement.description}
-          </p>
-          <button
-            ref={ctaRef}
-            onClick={handleView}
-            disabled={!interactive}
-            aria-disabled={!interactive}
-            className={`w-full py-2 bg-[#C99A2E] text-[#11100C] text-[10px] font-bold uppercase tracking-wider border-2 border-[#191410] transition-colors ${
-              interactive ? 'hover:bg-[#191410] hover:text-[#C99A2E] cursor-pointer' : 'cursor-default opacity-80'
-            }`}
-          >
-            [ {ctaText} ]
-          </button>
+        <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#B94717] mb-1 border-b border-dashed border-[#191410]/30 pb-1">
+          Tangy Sessions · {announcement.category || 'Announcement'}
         </div>
+        <h4 ref={titleRef} className="font-display text-lg md:text-xl font-bold leading-tight mb-1">
+          {announcement.title}
+        </h4>
+        <p ref={descRef} className="text-xs md:text-sm font-serif leading-snug mb-3 opacity-90">
+          {announcement.description}
+        </p>
+        <button
+          ref={ctaRef}
+          onClick={handleView}
+          disabled={!interactive}
+          aria-disabled={!interactive}
+          className={`w-full py-2 bg-[#C99A2E] text-[#11100C] text-[10px] font-bold uppercase tracking-wider border-2 border-[#191410] transition-colors ${
+            interactive ? 'hover:bg-[#191410] hover:text-[#C99A2E] cursor-pointer' : 'cursor-default opacity-80'
+          }`}
+        >
+          [ {ctaText} ]
+        </button>
       </div>
     </div>
   );
