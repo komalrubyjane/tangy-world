@@ -28,6 +28,38 @@ export const TeamPage = () => {
 
       <Founders />
 
+      {/* TEAM — typography-based editorial cards (no photos on file for these members) */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-[#11100C] border-t-8 border-[#D19A24]">
+        <div className="max-w-5xl mx-auto text-center mb-10 sm:mb-14">
+          <span className="font-mono text-[10px] sm:text-xs font-bold text-[#D19A24] tracking-[0.35em] uppercase mb-2 block">
+            OPENED ARCHIVAL DESK FOLDER // FILE 002
+          </span>
+          <h2 className="display text-5xl sm:text-7xl text-[#EAD9A6] leading-none ink-bleed">THE TEAM</h2>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-8 px-2">
+          {[
+            { name: 'Jhanavi', file: '002-A' },
+            { name: 'Gopika', file: '002-B' },
+            { name: 'Komal', file: '002-C' },
+          ].map((member) => (
+            <div
+              key={member.name}
+              className="relative bg-[#EAD9A6] text-[#15120D] border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] p-6 pt-8 flex flex-col items-center text-center"
+            >
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#15120D] text-[#EAD9A6] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24] whitespace-nowrap">
+                FILE {member.file}
+              </div>
+              <span className="font-serif italic text-3xl text-[#B9471B] leading-none mb-1">"</span>
+              <h3 className="display text-3xl sm:text-4xl leading-none ink-bleed mb-3">{member.name.toUpperCase()}</h3>
+              <span className="font-mono text-[10px] font-bold text-[#B9471B] tracking-[0.3em] uppercase border-t border-dashed border-[#15120D]/40 pt-2 mt-1 w-full">
+                TEAM
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="py-12 sm:py-16 bg-[#1C0E08] border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">
           CONTINUE READING

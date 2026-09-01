@@ -528,8 +528,12 @@ export const TangyDiary = () => {
           </div>{/* /book container */}
         </div>{/* /3d stage */}
 
-        {/* Page Turn Controls & Touch Hint (Visible on mobile or as controls) */}
-        <div className={isMobile ? "flex flex-col items-center gap-1.5 z-30 -mt-3" : "flex flex-col items-center gap-2 z-30 mt-4 lg:mt-6"}>
+        {/* Page Turn Controls & Touch Hint (Visible on mobile or as controls). */}
+        {/* mt-20 on mobile clears the book's fabric bookmark, which hangs   */}
+        {/* ~68px below the book via absolute positioning and isn't counted  */}
+        {/* in this flex column's flow height — a smaller/negative margin    */}
+        {/* here made the controls overlap it. */}
+        <div className={isMobile ? "flex flex-col items-center gap-1.5 z-30 mt-20" : "flex flex-col items-center gap-2 z-30 mt-4 lg:mt-6"}>
           <div className={isMobile
             ? "flex items-center gap-2.5 bg-[#2E1E14]/95 border border-[#A68853]/40 rounded-sm px-3 py-1.5 shadow-[0_8px_18px_rgba(0,0,0,0.5)]"
             : "flex items-center gap-3"}

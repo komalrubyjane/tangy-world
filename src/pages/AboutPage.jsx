@@ -36,14 +36,14 @@ export const AboutPage = () => {
               { label: 'WHY TANGY', hash: '#manifesto' },
               { label: 'CHRONOLOGY', hash: '#history' },
               { label: 'OUR SPACES', hash: '#spaces' },
-              { label: 'TANGY TEAM', hash: '#founders' }
+              { label: 'TANGY TEAM', hash: '/about/team' }
             ].map((link) => (
               <a
                 key={link.hash}
                 href={link.hash}
                 className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
               >
-                {link.label} ↓
+                {link.label} {link.hash.startsWith('/') ? '→' : '↓'}
               </a>
             ))}
           </div>

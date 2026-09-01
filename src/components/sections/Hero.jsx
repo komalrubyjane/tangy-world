@@ -368,7 +368,11 @@ export const Hero = () => {
             {/* it didn't leave enough room for the ticket above the bottom nav on the shortest phones */}
             {/* tested) — this keeps it as the hero's one short quote/sentence, just consolidated into */}
             {/* a single card instead of two stacked elements. */}
-            <div className="badge absolute z-40 left-[5%] top-[68%] w-[56%] max-w-[230px] min-w-[172px] -rotate-2 bg-[#EFE3BE] text-[#241a12] border border-[#241a12]/70 shadow-[3px_3px_0_rgba(17,16,12,0.55)] pointer-events-none">
+            {/* [text-shadow:none] cancels the wrapper's inherited legibility shadow (5px blur radius, */}
+            {/* meant for text floating directly over the artwork background) — this ticket sits on its */}
+            {/* own opaque cream card and doesn't need it; at this card's tiny font sizes that shadow's */}
+            {/* blur radius was larger than the glyphs themselves, reading as blur rather than print. */}
+            <div className="badge absolute z-40 left-[5%] top-[68%] w-[56%] max-w-[230px] min-w-[172px] -rotate-2 bg-[#EFE3BE] text-[#241a12] border border-[#241a12]/70 shadow-[3px_3px_0_rgba(17,16,12,0.55)] [text-shadow:none] pointer-events-none">
               <div className="absolute -top-[6px] left-[14%] w-[28%] h-[9px] bg-[rgba(231,213,164,0.75)] rotate-[-3deg] border border-black/20" aria-hidden="true" />
               <div className="flex">
                 <div className="flex-1 px-[0.4rem] py-[0.3rem] border-r border-dashed border-[#241a12]/40">
