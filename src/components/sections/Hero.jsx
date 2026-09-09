@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
+import { BandhaniDotField, RangoliMedallion, TextileBorderStrip, HandDrawnCircle, HandDrawnArrow, RegistrationMark } from '../ui/CulturalMotifs';
 
 // Mobile-only cast cycle for the hero's single central spot: instead of a
 // fixed guitarist, one performer at a time crossfades in/out every 2s so the
@@ -96,6 +97,19 @@ export const Hero = () => {
       ease: 'back.out(1.4)'
     });
 
+    // Riso-print "misregistration" pass: a vermilion ghost of the headline slides into
+    // near-register with the real type and settles at a permanently visible offset —
+    // a standing two-colour print-registration signature, not just an intro flash.
+    const reducedMotionIntro = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reducedMotionIntro) {
+      gsap.fromTo('.riso-ghost',
+        { x: 14, y: -11, opacity: 0.7 },
+        { x: 5, y: -4, opacity: 0.45, duration: 1.1, ease: 'power3.out', delay: 0.35 }
+      );
+    } else {
+      gsap.set('.riso-ghost', { x: 5, y: -4, opacity: 0.45 });
+    }
+
     // Scroll Scrub Movement Sync
     tl.to('.headline .word.tangy', { y: -15, duration: 0.3 }, 0.1)
       .to('.headline .word.sessions', { y: 15, duration: 0.3 }, 0.1)
@@ -145,13 +159,12 @@ export const Hero = () => {
       <div 
         className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
       >
-        {/* CORNER CROSSHAIRS */}
-        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none">
-          <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
-        </div>
-        <div className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none">
-          <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
-        </div>
+        {/* CORNER REGISTRATION MARKS */}
+        <RegistrationMark color="#ecdcaf" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none" />
+        <RegistrationMark color="#ecdcaf" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none" />
+        {/* BOTTOM-RIGHT — desktop only, mirrors the mobile pair that already existed; */}
+        {/* completes the four-corner print-registration frame. */}
+        <RegistrationMark color="#ecdcaf" className="hidden lg:block absolute z-30 w-[2.2cqw] min-w-[12px] h-[2.2cqw] min-h-[12px] opacity-60 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none" />
 
         {/* TOP BAR VISUAL GRID ALIGNMENT */}
         <div className="absolute z-40 top-[52px] md:top-[2.2cqw] left-[3cqw] right-[3cqw] flex items-start justify-between pointer-events-none">
@@ -198,16 +211,18 @@ export const Hero = () => {
         {/* holds consistently whether the phone is short or tall — a fixed px offset would sit progressively */}
         {/* higher (relatively) on taller phones. */}
         <div className="headline absolute z-15 top-[21dvh] sm:top-[16cqw] md:top-[12cqw] lg:top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none will-change-transform">
-          <span 
-            className="word tangy block font-poster text-[clamp(2.8rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]" 
+          <span
+            className="word tangy block font-poster text-[clamp(2.8rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]"
             data-text="TANGY"
           >
+            <span className="riso-ghost absolute inset-0 -z-1 text-[#D91E18] pointer-events-none select-none" aria-hidden="true">TANGY</span>
             TANGY
           </span>
-          <span 
-            className="word sessions block font-poster text-[clamp(2.5rem,14.5cqw,16.5rem)] leading-[0.80] tracking-[-0.01em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative -mt-[0.2cqw] before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]" 
+          <span
+            className="word sessions block font-poster text-[clamp(2.5rem,14.5cqw,16.5rem)] leading-[0.80] tracking-[-0.01em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative -mt-[0.2cqw] before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]"
             data-text="SESSIONS"
           >
+            <span className="riso-ghost absolute inset-0 -z-1 text-[#D91E18] pointer-events-none select-none" aria-hidden="true">SESSIONS</span>
             SESSIONS
           </span>
         </div>
@@ -297,10 +312,11 @@ export const Hero = () => {
             <div className="font-mono font-bold text-[clamp(5.5px,1cqw,13px)] tracking-[0.18em]">CREATE THE FUTURE</div>
           </div>
 
-          {/* REC TAG */}
-          <div className="badge z-40 bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-md lg:absolute lg:right-[3.5cqw] lg:top-[78%]">
+          {/* REC TAG — circled by hand, an editor's-mark annotation calling it out */}
+          <div className="badge relative z-40 bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-md lg:absolute lg:right-[3.5cqw] lg:top-[78%]">
             <span className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.06em]">REC</span>
             <div className="w-[0.8cqw] min-w-[5px] h-[0.8cqw] min-h-[5px] rounded-full bg-[#c2272a] animate-[pulseLine_2s_ease-in-out_infinite]" />
+            <HandDrawnCircle color="#c2272a" className="absolute -inset-[45%] pointer-events-none" />
           </div>
 
           {/* KEEP THE CULTURE ALIVE */}
@@ -393,6 +409,45 @@ export const Hero = () => {
 
           </div>
         </div>
+
+        {/* BANDHANI-INSPIRED DOT FIELD — a real visible mustard tie-dye pattern across the */}
+        {/* field, not a barely-there texture. */}
+        <BandhaniDotField color="#D1A437" opacity={0.16} size={38} className="z-5" />
+
+        {/* POSTER BORDER FRAME — bold woven textile strips top and bottom, turning the whole */}
+        {/* hero into a framed printed sheet rather than an edge-to-edge background. */}
+        <TextileBorderStrip className="absolute top-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
+        <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
+
+        {/* BOTTOM-LEFT COLOUR-BLOCK WEDGE — desktop only. Breaks the uniform maroon field with */}
+        {/* a mustard spot-colour panel (vintage-poster colour blocking), carrying a large */}
+        {/* Rangoli medallion bleeding off the left edge and a rotated masthead label — the */}
+        {/* section's biggest single asymmetric-composition move. */}
+        <div
+          className="hidden lg:block absolute z-6 left-0 bottom-0 w-[30cqw] h-[46cqw] pointer-events-none overflow-hidden"
+          style={{ clipPath: 'polygon(0 100%, 0 22%, 100% 100%)' }}
+        >
+          <div className="absolute inset-0 bg-[#D1A437]" />
+          <RangoliMedallion
+            color="#4C1210"
+            className="absolute -left-[10cqw] bottom-[-6cqw] w-[34cqw] h-[34cqw] opacity-40 animate-[spin_140s_linear_infinite]"
+          />
+        </div>
+        <div className="hidden lg:flex absolute z-30 left-[1.1cqw] bottom-[3cqw] top-[8cqw] items-end justify-center pointer-events-none">
+          <span
+            className="font-poster text-[#ECDCAF] text-[clamp(13px,1.7cqw,22px)] tracking-[0.1em] uppercase whitespace-nowrap"
+            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+          >
+            VOL. 01 — HYDERABAD ARCHIVE — EST. 2016
+          </span>
+        </div>
+
+        {/* HAND-DRAWN CALLOUT — a single sparing annotation tying the new colour-block */}
+        {/* wedge to the masthead label, an editor's pencil mark rather than a UI hint. */}
+        <HandDrawnArrow
+          color="#191410"
+          className="hidden lg:block absolute z-25 left-[4cqw] bottom-[24cqw] w-[5cqw] max-w-[75px] opacity-45 pointer-events-none rotate-[35deg]"
+        />
 
         {/* TEXTURE OVERLAYS */}
         <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none" />

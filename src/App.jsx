@@ -251,6 +251,7 @@ function MainWorld() {
         {/* Vintage Concert Programme Overlay */}
         <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
         
+
         {/* Lightweight Grain Texture */}
         <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
         

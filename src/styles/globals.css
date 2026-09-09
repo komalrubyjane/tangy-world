@@ -11,7 +11,9 @@
   --color-tangy-brown: #241a12;
   --color-tangy-paper: #e9decb;
   --color-tangy-cream: #ecdcaf;
-  
+  --color-tangy-vermilion: #d91e18;
+  --color-tangy-magenta: #d81b73;
+
   --font-poster: 'Anton', 'Oswald', system-ui, sans-serif;
   --font-display: 'Oswald', sans-serif;
   --font-editorial: 'Oswald', sans-serif;
@@ -30,6 +32,8 @@
     --ink: #241a12;
     --black: #191410;
     --gold: #d1a437;
+    --vermilion: #d91e18;
+    --magenta: #d81b73;
 
     --f-poster: 'Anton', 'Oswald', system-ui, sans-serif;
     --f-display: 'Oswald', sans-serif;

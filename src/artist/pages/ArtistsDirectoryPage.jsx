@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { useAudio } from '../../audio/AudioContext';
+import { PhotoTreatment } from '../../components/ui/PhotoTreatment';
+import { TextileBorderStrip, RangoliMedallion, BandhaniDotField } from '../../components/ui/CulturalMotifs';
+import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
+
+// Each poster card cycles through one of these spot-colour fields — real colour
+// blocking per card rather than one uniform card background repeated N times.
+const CARD_PALETTE = [
+  { bg: '#EAD9A6', text: '#191410', accent: '#c2272a' },
+  { bg: '#D1A437', text: '#191410', accent: '#5A120D' },
+  { bg: '#5A120D', text: '#ECDCAF', accent: '#D1A437' },
+  { bg: '#16323A', text: '#ECDCAF', accent: '#D91E18' },
+];
 
 export const ArtistsDirectoryPage = () => {
   const navigate = useNavigate();
@@ -44,27 +56,44 @@ export const ArtistsDirectoryPage = () => {
   return (
     <div className="w-full min-h-[calc(100vh-50px)] p-3 sm:p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-5 sm:gap-8 text-left overflow-x-hidden">
 
-      {/* HERO HEADER */}
-      <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-4 sm:p-8 shadow-[6px_6px_0px_#4c1210] sm:shadow-[10px_10px_0px_#4c1210] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 max-w-full">
-        <div className="flex flex-col gap-1 max-w-full">
-          <span className="font-mono text-[8.5px] sm:text-[9px] font-bold text-[#c2272a] tracking-[0.25em] sm:tracking-[0.3em] uppercase">
-            THE ROSTER // BANSILAL STEPWELL SESSIONS
-          </span>
-          <h1 className="font-poster text-3xl sm:text-5xl md:text-6xl text-[#191410] leading-none mt-1">
-            THE <span className="text-[#c2272a]">ARTISTS</span>
-          </h1>
-          <p className="font-mono text-[10.5px] sm:text-xs text-[#241a12]/80 mt-1 uppercase max-w-xl leading-relaxed">
-            A curated collective of underground electronic & acoustic artists pushing spatial audio boundaries inside ancient Indian stepwells.
-          </p>
-        </div>
-
-        <button
-          onClick={() => { playSFX('ticketClick'); navigate('/artist/register'); }}
-          className="w-full sm:w-auto px-5 py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase border-2 border-[#191410] shadow-[3px_3px_0px_#191410] sm:shadow-[4px_4px_0px_#191410] hover:bg-[#191410] active:scale-95 transition-all text-center min-h-[44px]"
+      {/* HERO HEADER — a poster masthead, not a settings-page banner: a bleeding Rangoli */}
+      {/* medallion, a huge outline "01" plate mark, and oversized rotated title type. */}
+      <div className="relative bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
+        <BandhaniDotField color="#c2272a" opacity={0.08} size={30} />
+        <RangoliMedallion
+          color="#c2272a"
+          className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] opacity-[0.16] pointer-events-none animate-[spin_150s_linear_infinite]"
+        />
+        <span
+          className="hidden md:block absolute -left-[1%] -bottom-[18%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+          style={{ fontSize: 'clamp(90px,12vw,190px)', WebkitTextStroke: '2px rgba(90,18,13,0.14)' }}
+          aria-hidden="true"
         >
-          APPLY AS ARTIST →
-        </button>
+          01
+        </span>
+
+        <div className="relative flex flex-col md:flex-row justify-between items-start md:items-end gap-5">
+          <div className="flex flex-col gap-1 max-w-full">
+            <span className="font-mono text-[8.5px] sm:text-[9px] font-bold text-[#c2272a] tracking-[0.25em] sm:tracking-[0.3em] uppercase">
+              THE ROSTER // BANSILAL STEPWELL SESSIONS
+            </span>
+            <h1 className="font-poster text-[clamp(2.6rem,10vw,6.5rem)] text-[#191410] leading-[0.82] mt-1 -rotate-1 origin-left">
+              THE<br /><span className="text-[#c2272a]">ARTISTS</span>
+            </h1>
+            <p className="font-mono text-[10.5px] sm:text-xs text-[#241a12]/80 mt-3 uppercase max-w-xl leading-relaxed border-l-2 border-[#c2272a] pl-3">
+              A curated collective of underground electronic & acoustic artists pushing spatial audio boundaries inside ancient Indian stepwells.
+            </p>
+          </div>
+
+          <button
+            onClick={() => { playSFX('ticketClick'); navigate('/artist/register'); }}
+            className="w-full md:w-auto shrink-0 px-6 py-3.5 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] hover:bg-[#191410] active:scale-95 transition-all text-center min-h-[44px] rotate-1"
+          >
+            APPLY AS ARTIST →
+          </button>
+        </div>
       </div>
+      <TextileBorderStrip height={11} colorA="#c2272a" colorB="#191410" />
 
       {/* FILTER & SEARCH CONTROLS */}
       <div className="flex flex-col gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
@@ -110,39 +139,69 @@ export const ArtistsDirectoryPage = () => {
         </div>
       )}
 
-      {/* ARTIST CARDS GRID */}
+      {/* ARTIST CARDS GRID — each card is a self-contained poster composition: a full-bleed */}
+      {/* halftone portrait with a huge outline plate number floating over it, the artist's */}
+      {/* name set in oversized rotated poster type overlapping straight onto the photo, and */}
+      {/* a rotating spot-colour field per card instead of one repeated card background. */}
       {status === 'ready' && filtered.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filtered.map((artist) => (
-            <div
-              key={artist.id}
-              onClick={() => { playSFX('ticketClick'); navigate(`/artist/profile/${artist.id}`); }}
-              className="bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] shadow-[5px_5px_0px_#191410] sm:shadow-[8px_8px_0px_#191410] hover:-translate-y-1 transition-all cursor-pointer overflow-hidden flex flex-col justify-between"
-            >
-              {/* AVATAR COVER WITH FALLBACK */}
-              <div className="w-full h-44 sm:h-56 bg-[#191410] relative border-b-2 sm:border-b-4 border-[#191410] overflow-hidden">
-                <img
-                  src={artist.avatar_url || '/media/gallery/tangy1.jpg'}
-                  alt={artist.name}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/media/gallery/tangy1.jpg';
-                  }}
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+          {filtered.map((artist, idx) => {
+            const palette = CARD_PALETTE[idx % CARD_PALETTE.length];
+            return (
+              <div
+                key={artist.id}
+                onClick={() => { playSFX('ticketClick'); navigate(`/artist/profile/${artist.id}`); }}
+                className="group relative aspect-[3/4] border-2 sm:border-4 border-[#191410] shadow-[6px_6px_0px_#191410] sm:shadow-[10px_10px_0px_#191410] hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all cursor-pointer overflow-hidden isolate"
+                style={{ backgroundColor: palette.bg }}
+              >
+                {/* FULL-BLEED PORTRAIT — top ~64% of the card, original colour, no padding */}
+                <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden border-b-2 sm:border-b-4 border-[#191410]">
+                  <PhotoTreatment
+                    src={artist.avatar_url || '/media/gallery/tangy1.jpg'}
+                    alt={artist.name}
+                    className="w-full h-full"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/media/gallery/tangy1.jpg';
+                    }}
+                  />
+                  {/* HUGE OUTLINE PLATE NUMBER — bleeds over the top of the photo */}
+                  <span
+                    className="absolute -top-[6%] -left-[3%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+                    style={{ fontSize: 'clamp(64px,13vw,110px)', WebkitTextStroke: '2px rgba(236,220,175,0.6)' }}
+                    aria-hidden="true"
+                  >
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <ArchiveStamp text={artist.genre || 'ARTIST'} rotation="4deg" color="dark" className="absolute top-2 right-2 z-10 !text-[8px]" />
+                </div>
 
-              {/* INFO BODY */}
-              <div className="p-3.5 sm:p-5 flex flex-col gap-1.5 sm:gap-2">
-                <h3 className="font-poster text-2xl sm:text-3xl text-[#191410] leading-none">{artist.name}</h3>
-                <span className="font-mono text-[9.5px] sm:text-[10px] font-bold text-[#c2272a] uppercase">{artist.genre}</span>
-                <p className="font-sans text-xs text-[#241a12]/80 line-clamp-2 leading-relaxed">{artist.bio}</p>
-                {artist.city && (
-                  <span className="font-mono text-[8.5px] text-[#241a12]/60 uppercase mt-1">📍 {artist.city}</span>
-                )}
+                {/* NAME BAND — oversized rotated poster type overlapping the photo edge, */}
+                {/* set in the card's own spot colour rather than a plain white panel, with */}
+                {/* a Bandhani field as a real textile layer behind the type. */}
+                <div className="absolute inset-x-0 bottom-0 h-[36%] flex flex-col justify-center px-3.5 sm:px-5 py-2 overflow-hidden" style={{ color: palette.text }}>
+                  <BandhaniDotField color={palette.text} opacity={0.1} size={22} />
+                  <div className="flex items-center justify-between relative">
+                    <span className="font-mono text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest opacity-70">PLATE {String(idx + 1).padStart(2, '0')} · LIVE ARCHIVE</span>
+                  </div>
+                  <h3
+                    className="relative font-poster leading-[0.82] -rotate-1 origin-left -mt-[10%] drop-shadow-[2px_2px_0_rgba(0,0,0,0.35)]"
+                    style={{ fontSize: 'clamp(26px,5.2vw,42px)' }}
+                  >
+                    {artist.name}
+                  </h3>
+                  <p className="relative font-sans text-[11px] sm:text-xs opacity-80 line-clamp-1 leading-relaxed mt-1.5">{artist.bio}</p>
+                  {artist.city && (
+                    <span className="relative font-mono text-[8px] sm:text-[8.5px] uppercase mt-1.5 tracking-widest" style={{ color: palette.accent }}>
+                      ★ {artist.city}
+                    </span>
+                  )}
+                </div>
+
+                <TextileBorderStrip className="absolute bottom-0 inset-x-0 z-10" height={6} colorA={palette.accent} colorB="#191410" />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
