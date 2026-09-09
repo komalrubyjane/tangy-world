@@ -7,6 +7,13 @@ import {
   NotebookGridPattern,
   PushPin,
 } from '../ui/BackgroundDecorations';
+import {
+  BandhaniDotField,
+  RangoliMedallion,
+  TextileBorderStrip,
+  VintageFilmFrame,
+  RegistrationMark,
+} from '../ui/CulturalMotifs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +21,8 @@ gsap.registerPlugin(ScrollTrigger);
 const PhotoCard = ({ photo, i, isLast }) => (
   <div className={`relative bg-[#E3D4AC] p-2.5 sm:p-3 pb-8 sm:pb-12 shadow-xl border-2 border-[#11100C] ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
     style={{ transform: `rotate(${(i % 3 - 1) * 3}deg)` }}>
+    {/* Sprocket-hole side strips sit in the card's own cream mat, never over the photo */}
+    <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-25" />
     <div className="absolute -top-3 left-1/3 w-14 sm:w-16 h-3.5 sm:h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
     <div className="flex justify-between font-mono text-[7.5px] sm:text-[8px] text-[#11100C] font-bold px-0.5 mb-1">
       <span>{String(i + 1).padStart(2, '0')}A</span>
@@ -95,6 +104,13 @@ export const Archive = () => {
 
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
       <TornPaperEdgeTop fill="#11100C" />
+      <BandhaniDotField color="#C99A24" opacity={0.08} size={36} className="z-0" />
+      <RangoliMedallion
+        color="#C99A24"
+        className="hidden lg:block absolute -bottom-[18vw] -right-[10vw] w-[46vw] h-[46vw] max-w-none opacity-[0.1] animate-[spin_150s_linear_infinite] pointer-events-none z-0"
+      />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C99A24" colorB="#11100C" />
+      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-50 z-20 pointer-events-none" />
 
       <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0 hidden md:block">
         <NotebookGridPattern opacity={0.5} />

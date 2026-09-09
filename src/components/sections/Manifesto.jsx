@@ -1,11 +1,20 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
-import { 
-  NotebookGridPattern, 
-  CassetteTapeGraphic, 
-  TornNewspaperScrap, 
+import {
+  NotebookGridPattern,
+  CassetteTapeGraphic,
+  TornNewspaperScrap,
   CoffeeStain
 } from '../ui/BackgroundDecorations';
+import {
+  BandhaniDotField,
+  RisographOffset,
+  ArchiveNumber,
+  VintageFilmFrame,
+  RegistrationMark,
+  HandDrawnUnderline,
+  TextileBorderStrip,
+} from '../ui/CulturalMotifs';
 
 export const Manifesto = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -54,24 +63,39 @@ export const Manifesto = () => {
       {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
       <NotebookGridPattern opacity={0.07} />
 
+      {/* BANDHANI DOT FIELD — a real textile layer across the section, not a hint */}
+      <BandhaniDotField color="#B94717" opacity={0.09} size={34} className="z-0" />
+
       {/* CASSETTE TAPE ACCENTS */}
       <CassetteTapeGraphic className="absolute top-10 right-10 w-44 hidden md:block" />
       <TornNewspaperScrap className="absolute bottom-12 left-10 w-48 hidden md:block" />
       <CoffeeStain className="-bottom-16 left-1/4 w-52 h-52 rotate-45 pointer-events-none" />
 
+      {/* GIANT OUTLINE ARCHIVE NUMBER — bleeds behind the newspaper card */}
+      <ArchiveNumber color="#B94717" size="clamp(140px,22vw,320px)" className="hidden lg:block absolute top-[8%] left-[4%] opacity-[0.14] z-0">02</ArchiveNumber>
+
       {/* CROP MARKS & PRINT REGISTRATION CROSSES */}
       <div className="absolute top-4 left-4 font-mono text-[8px] sm:text-[9px] text-[#B94717] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
         [ ✚ ] CROP MARK // ARCHIVE NO. 1974-M
       </div>
+      <RegistrationMark color="#B94717" className="hidden md:block absolute top-4 right-4 w-6 h-6 opacity-70 z-20 pointer-events-none" />
+
+      {/* TEXTILE BORDER — frames the whole manifesto sheet top and bottom */}
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#B94717" colorB="#11100C" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#B94717" colorB="#11100C" />
 
       {/* 1975 NEWSPAPER / MUSEUM MANIFESTO DOCUMENT */}
       <div className="manifesto-newspaper relative w-full max-w-[1100px] bg-[#F5E9C9] border-4 border-[#11100C] p-5 sm:p-8 md:p-14 shadow-[14px_14px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] z-10 my-auto">
-        
+
         {/* COFFEE STAIN GRAPHIC ACCENT */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[14px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-multiply rotate-12 hidden sm:block" />
 
         {/* MASKING TAPE AT TOP CENTER */}
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-28 h-6 bg-[rgba(231,213,164,0.85)] rotate-[-1deg] border border-black/30 z-30 pointer-events-none" />
+
+        {/* CORNER REGISTRATION MARKS ON THE SHEET ITSELF */}
+        <RegistrationMark color="#11100C" className="hidden sm:block absolute -top-3 -left-3 w-6 h-6 opacity-40 pointer-events-none" />
+        <RegistrationMark color="#11100C" className="hidden sm:block absolute -bottom-3 -right-3 w-6 h-6 opacity-40 pointer-events-none" />
 
         {/* Newspaper Header Bar */}
         <div className="flex flex-col sm:flex-row justify-between items-center border-b-2 border-[#11100C] pb-2 sm:pb-3 mb-4 sm:mb-6 font-mono text-[8.5px] sm:text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase gap-1 text-center sm:text-left">
@@ -84,15 +108,20 @@ export const Manifesto = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-center border-b-2 border-[#11100C] pb-6 sm:pb-8 mb-6 sm:mb-8">
           <div className="md:col-span-2">
             <h2 className="display text-5xl sm:text-7xl md:text-[8vw] text-[#11100C] leading-[0.85] tracking-tighter ink-bleed">
-              WHY<br/>TANGY?
+              <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.3}>
+                WHY<br/>TANGY?
+              </RisographOffset>
             </h2>
             <p className="font-mono text-xs sm:text-sm md:text-base font-bold text-[#B94717] tracking-wider sm:tracking-widest mt-3 sm:mt-4 uppercase">
               WE DON'T JUST HOST SHOWS. WE CREATE MEMORIES.
             </p>
+            <HandDrawnUnderline color="#B94717" className="w-40 h-2.5 mt-1 opacity-70" />
           </div>
 
-          {/* Archival Photo Frame with Paper Clip */}
+          {/* Archival Photo Frame with Paper Clip — film-frame sprocket holes sit in the */}
+          {/* card's own black padding margin, never over the photo's own pixels. */}
           <div className="relative bg-[#11100C] p-2 border-2 border-[#11100C] shadow-md rotate-[-3deg] max-w-[240px] md:max-w-none mx-auto md:mx-0">
+            <VintageFilmFrame color="#11100C" holeColor="#5A2B15" className="opacity-80" />
             <div className="absolute -top-3 left-4 w-3 h-9 border-2 border-slate-700 rounded-full z-30 pointer-events-none" />
             <img src="/media/gallery/tangy4.jpg" alt="Tangy Crowd" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
             <span className="absolute bottom-1 right-2 font-mono text-[8px] text-[#E7D5A4]">FIG 02.1</span>

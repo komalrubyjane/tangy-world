@@ -2,6 +2,13 @@ import { useRef, useEffect } from 'react';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
+import {
+  BandhaniDotField,
+  TextileBorderStrip,
+  RegistrationMark,
+  HandDrawnCircle,
+  RisographOffset,
+} from '../ui/CulturalMotifs';
 
 export const Founders = () => {
   const { playSFX } = useAudio();
@@ -99,6 +106,12 @@ export const Founders = () => {
         <span className="display text-[22vw] leading-none text-[#EAD9A6] uppercase">FILE 001</span>
       </div>
 
+      {/* BANDHANI TEXTILE LAYER + FRAME */}
+      <BandhaniDotField color="#D19A24" opacity={0.07} size={34} className="z-0" />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
+      <RegistrationMark color="#EAD9A6" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+
       {/* ARCHIVAL METADATA */}
       <div className="absolute top-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#D19A24] font-bold pointer-events-none uppercase hidden md:block">
         TANGY SESSIONS // FOUNDERS ARCHIVE
@@ -118,7 +131,7 @@ export const Founders = () => {
           OPENED ARCHIVAL DESK FOLDER // FILE 001
         </span>
         <h2 className="display text-6xl md:text-9xl text-[#EAD9A6] leading-none ink-bleed mb-4">
-          FOUNDERS ARCHIVE
+          <RisographOffset colors={['#D91E18']} offsets={[[6, -4]]} opacity={0.28}>FOUNDERS ARCHIVE</RisographOffset>
         </h2>
         <p className="font-mono text-xs md:text-sm text-[#EAD9A6]/90 tracking-[0.3em] uppercase border-y-2 border-[#15120D] py-2 inline-block px-6 bg-[#15120D]/90 backdrop-blur-xs shadow-md">
           THE ARCHITECTS OF TANGY WORLD
@@ -169,6 +182,7 @@ export const Founders = () => {
               <div className="relative w-[140px] sm:w-[180px] md:w-[230px] bg-[#F5E9C9] p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
                 <img src={founder.image} alt={founder.name} className="w-full aspect-[3/4] object-cover filter grayscale contrast-130 border border-[#15120D]" />
                 <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-2">✎ FOUNDER ARCHIVE // {founder.year}</p>
+                {idx === 0 && <HandDrawnCircle color="#5A120D" className="hidden md:block absolute -inset-3 opacity-40 pointer-events-none" />}
               </div>
 
               {/* HANDWRITTEN QUOTE */}

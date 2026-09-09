@@ -1,5 +1,6 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
+import { BandhaniDotField, TextileBorderStrip, RegistrationMark, RisographOffset } from '../ui/CulturalMotifs';
 
 export const Closing = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -25,13 +26,18 @@ export const Closing = () => {
         <img src="/media/gallery/tangy9.jpg" alt="After Hours" className="w-full h-full object-cover filter grayscale contrast-150" />
       </div>
 
+      <BandhaniDotField color="#C99A2E" opacity={0.07} size={34} className="z-10" />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C99A2E" colorB="#11100C" />
+      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-8 left-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+
       <div className="contact-back-page relative z-30 text-center px-4 max-w-4xl">
         <span className="font-mono text-[#C99A2E] text-[11px] tracking-[0.4em] mb-4 uppercase block font-bold">
           CONTACT // MAGAZINE BACK PAGE
         </span>
-        
+
         <h2 className="display text-4xl sm:text-7xl md:text-9xl text-[#E7D5A4] mb-3 leading-tight sm:leading-none ink-bleed">
-          COME<br/>
+          <RisographOffset colors={['#D91E18']} offsets={[[6, -4]]} opacity={0.28}>COME</RisographOffset><br/>
           <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
         </h2>
 

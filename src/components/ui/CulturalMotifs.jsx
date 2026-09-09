@@ -198,8 +198,100 @@ export const RetroPosterFrame = ({ color = '#ECDCAF', inset = 14, className = ''
   </div>
 );
 
+// 11. Archive number — the oversized outline numeral (transparent fill, stroked
+// outline) used as a poster-feature background mark. Purely typographic —
+// never placed as a filled block over a photograph.
+export const ArchiveNumber = ({ children, color = '#ECDCAF', size = 'clamp(70px,12vw,180px)', strokeWidth = '2px', className = '' }) => (
+  <span
+    className={`font-display font-black leading-none text-transparent pointer-events-none select-none ${className}`}
+    style={{ fontSize: size, WebkitTextStroke: `${strokeWidth} ${color}` }}
+    aria-hidden="true"
+  >
+    {children}
+  </span>
+);
+
+// 12. Risograph offset — wraps a heading/graphic and prints one or two colour-
+// shifted duplicate copies behind it at a slight offset, the misregistered-
+// ink-pass look. Only ever wraps typography/graphics, never a photograph.
+export const RisographOffset = ({ children, colors = ['#D91E18'], offsets = [[6, -4]], opacity = 0.35, className = '' }) => (
+  <span className={`relative inline-block ${className}`}>
+    {colors.map((color, i) => {
+      const [x, y] = offsets[i] || offsets[0];
+      return (
+        <span
+          key={i}
+          className="absolute inset-0 -z-10 mix-blend-screen pointer-events-none select-none"
+          style={{ color, opacity, transform: `translate(${x}px, ${y}px)` }}
+          aria-hidden="true"
+        >
+          {children}
+        </span>
+      );
+    })}
+    {children}
+  </span>
+);
+
+// 13. Vintage film frame — a sprocket-hole border for wrapping a photo without
+// ever touching the photo's own pixels; the holes sit outside/beside it.
+export const VintageFilmFrame = ({ color = '#11100C', holeColor = '#ECDCAF', className = '' }) => {
+  const holes = Array.from({ length: 8 });
+  return (
+    <div className={`absolute inset-0 pointer-events-none ${className}`} aria-hidden="true">
+      <div className="absolute inset-0 border-y-[10px]" style={{ borderColor: color }} />
+      {['left-[2px]', 'right-[2px]'].map((side) => (
+        <div key={side} className={`absolute ${side} top-0 bottom-0 w-[6px] flex flex-col justify-between py-1`}>
+          {holes.map((_, i) => (
+            <span key={i} className="block w-[6px] h-[4px] rounded-[1px]" style={{ backgroundColor: holeColor }} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// 14. Colour block — a diagonal clip-path spot-colour panel, formalising the
+// asymmetric colour-blocking used across the Music sections.
+export const ColorBlock = ({ color = '#D1A437', angle = 12, origin = 'bottom-left', className = '' }) => {
+  const clipPaths = {
+    'bottom-left': `polygon(0 100%, 0 ${angle}%, 100% 100%)`,
+    'bottom-right': `polygon(100% 100%, 100% ${angle}%, 0 100%)`,
+    'top-left': `polygon(0 0, 100% 0, 0 ${100 - angle}%)`,
+    'top-right': `polygon(100% 0, 100% ${100 - angle}%, 0 0)`,
+  };
+  return (
+    <div
+      className={`absolute pointer-events-none ${className}`}
+      style={{ backgroundColor: color, clipPath: clipPaths[origin] || clipPaths['bottom-left'] }}
+      aria-hidden="true"
+    />
+  );
+};
+
+// 15. Dotted border — a simple repeating-dot rule, distinct from the diamond-
+// weave TextileBorderStrip; for lighter/smaller edge treatments.
+export const DottedBorder = ({ color = '#D19A24', height = 6, gap = 10, className = '' }) => (
+  <div
+    className={`w-full pointer-events-none ${className}`}
+    style={{
+      height,
+      backgroundImage: `radial-gradient(circle, ${color} 35%, transparent 38%)`,
+      backgroundSize: `${gap}px ${height}px`,
+      backgroundRepeat: 'repeat-x',
+    }}
+    aria-hidden="true"
+  />
+);
+
 // Aliases matching the exact names requested for the retro design system, so
 // either name can be imported interchangeably.
 export const BandhaniPattern = BandhaniDotField;
+export const TextilePattern = TextileBorderStrip;
 export const RangoliMotif = RangoliMedallion;
 export const LotusStamp = LotusMotif;
+export const ScribbleUnderline = HandDrawnUnderline;
+export const RegistrationMarks = RegistrationMark;
+export const EditorialLabel = PaperLabel;
+export const ScreenPrintTexture = HalftoneTexture;
+export const GeometricFrame = RetroPosterFrame;

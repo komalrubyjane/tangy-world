@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAudio } from '../../audio/AudioContext';
+import { BandhaniDotField, TextileBorderStrip, RisographOffset, LotusMotif } from '../ui/CulturalMotifs';
 
 export const Newsletter = () => {
   const { playSFX } = useAudio();
@@ -19,10 +20,15 @@ export const Newsletter = () => {
   return (
     <section className="relative w-full py-16 sm:py-24 bg-[#694323] border-t-8 border-[#11100C] text-center flex flex-col items-center justify-center">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
-      
+      <BandhaniDotField color="#C99A2E" opacity={0.08} size={32} className="z-0" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={9} colorA="#C99A2E" colorB="#11100C" />
+      <LotusMotif color="#C99A2E" className="hidden md:block absolute top-8 left-8 w-9 h-9 opacity-40 z-10 pointer-events-none" />
+
       <div className="relative z-10 max-w-xl w-full px-4">
         <span className="font-mono text-tangy-mustard text-[10px] tracking-[0.3em] font-bold uppercase mb-2 block">PRIVATE MAILING LIST</span>
-        <h2 className="display text-5xl md:text-7xl text-[#E3D4AC] mb-2 ink-bleed">INNER CIRCLE</h2>
+        <h2 className="display text-5xl md:text-7xl text-[#E3D4AC] mb-2 ink-bleed">
+          <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.3}>INNER CIRCLE</RisographOffset>
+        </h2>
         <p className="font-serif italic text-sm md:text-base text-[#E3D4AC]/90 mb-10">
           "The best stories are shared with those who stay close."
         </p>

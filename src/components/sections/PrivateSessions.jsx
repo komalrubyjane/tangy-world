@@ -2,6 +2,13 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import { SoundWaveGraphic } from '../ui/BackgroundDecorations';
+import {
+  BandhaniDotField,
+  TextileBorderStrip,
+  LotusMotif,
+  HandDrawnUnderline,
+  RegistrationMark,
+} from '../ui/CulturalMotifs';
 
 export const PrivateSessions = ({ onRequestPrivate }) => {
   const { playSFX } = useAudio();
@@ -66,6 +73,12 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       {/* ANALOG SOUND WAVE FREQUENCY GRAPHIC */}
       <SoundWaveGraphic color="#E7D7AC" opacity={0.15} className="absolute left-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />
 
+      {/* BANDHANI TEXTILE LAYER + FRAME */}
+      <BandhaniDotField color="#C69A32" opacity={0.08} size={34} className="z-0" />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
+      <RegistrationMark color="#E7D7AC" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+
       {/* CROP MARKS & ARCHIVE LABELS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
         [ ✚ ] CROP MARK // INVITATION NO. 08-P
@@ -129,7 +142,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
 
           {/* Invitation Top Header */}
           <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#4A2638] border-b-2 border-[#17120D] pb-4 mb-8 uppercase">
-            <span>TANGY PRIVATE SESSIONS</span>
+            <span className="flex items-center gap-1.5"><LotusMotif color="#4A2638" className="w-4 h-4 opacity-70" />TANGY PRIVATE SESSIONS</span>
             <span>HYDERABAD // BY INVITATION</span>
           </div>
 
@@ -144,9 +157,10 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
               ─────── ✦ ───────
             </div>
 
-            <p className="font-body text-base md:text-xl text-[#17120D]/90 leading-relaxed italic max-w-xl mx-auto mb-8 border-y-2 border-[#17120D]/20 py-4">
+            <p className="font-body text-base md:text-xl text-[#17120D]/90 leading-relaxed italic max-w-xl mx-auto mb-2 border-y-2 border-[#17120D]/20 py-4">
               "Some performances aren't announced. They're created exclusively for those who ask."
             </p>
+            <HandDrawnUnderline color="#C69A32" className="w-40 h-2.5 mx-auto mb-6 opacity-70" />
 
             <div className="flex flex-wrap justify-center gap-2 mb-10 font-mono text-[9px] font-bold text-[#17120D] uppercase">
               <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1">PRIVATE GATHERINGS</span>

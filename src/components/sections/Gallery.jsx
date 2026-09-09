@@ -1,6 +1,13 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { gallery } from '../../data/mockData';
+import {
+  BandhaniDotField,
+  RangoliMedallion,
+  TextileBorderStrip,
+  VintageFilmFrame,
+  RisographOffset,
+} from '../ui/CulturalMotifs';
 
 export const Gallery = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -31,8 +38,17 @@ export const Gallery = () => {
 
   return (
     <section ref={sectionRef} id="gallery" className="scene relative w-full h-screen overflow-hidden bg-tangy-wine border-t border-[rgba(231,223,181,.1)] perspective-1000">
+      <BandhaniDotField color="#E7DFB5" opacity={0.07} size={34} className="z-0" />
+      <RangoliMedallion
+        color="#E7DFB5"
+        className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] max-w-none opacity-[0.06] animate-[spin_160s_linear_infinite] pointer-events-none z-0"
+      />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#E7DFB5" colorB="#3C0F0E" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#E7DFB5" colorB="#3C0F0E" />
       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-        <p className="font-display font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">MOMENTS<br/>WE KEPT.</p>
+        <p className="font-display font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">
+          <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.35}>MOMENTS<br/>WE KEPT.</RisographOffset>
+        </p>
       </div>
 
       <div className="gallery-container absolute inset-0 preserve-3d">
@@ -54,10 +70,12 @@ export const Gallery = () => {
               }}
             >
               <div className="w-[300px] md:w-[400px] aspect-[4/3] bg-tangy-paper border-[8px] border-tangy-cream shadow-2xl overflow-hidden p-2 pb-12 relative group transition-transform duration-500 hover:scale-105 cursor-pointer">
+                <VintageFilmFrame color="#3C0F0E" holeColor="#3C0F0E" className="opacity-30" />
                 <img src={photo.src} alt={photo.label} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125 group-hover:grayscale-0 group-hover:sepia-0 transition-all duration-500" />
                 <div className="absolute bottom-3 w-full text-center font-mono text-[10px] tracking-widest text-tangy-grey">
                   {photo.label.toUpperCase()}
                 </div>
+                <span className="absolute top-1.5 right-2.5 font-mono text-[8px] font-bold text-tangy-grey/70">{String(i + 1).padStart(2, '0')}</span>
               </div>
             </div>
           );

@@ -4,6 +4,13 @@ import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import { gallery, artists } from '../../data/mockData';
 import { BlueprintGridPattern } from '../ui/BackgroundDecorations';
+import {
+  BandhaniDotField,
+  TextileBorderStrip,
+  HandDrawnCircle,
+  HandDrawnArrow,
+  RegistrationMark,
+} from '../ui/CulturalMotifs';
 
 export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
   const { playSFX } = useAudio();
@@ -94,6 +101,12 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       {/* TECHNICAL BACKSTAGE BLUEPRINT GRID PATTERN */}
       <BlueprintGridPattern opacity={0.08} />
 
+      {/* BANDHANI TEXTILE LAYER — a real print pattern alongside the blueprint grid */}
+      <BandhaniDotField color="#C69A32" opacity={0.08} size={34} className="z-0" />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
+      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+
       {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-10 z-5">
         <span className="display text-[24vw] leading-none text-[#5F7D80] uppercase">CLASSIFIED 1974</span>
@@ -182,6 +195,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
             <div className="dossier-polaroid-1 relative w-[160px] md:w-[210px] bg-[#F5E9C9] p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[-4deg] my-6 transition-transform group-hover:scale-105">
               <img src={gallery[4]?.src || "/media/gallery/tangy5.jpg"} alt="Stagehands Sound Check" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125 border border-[#17120D]" />
               <p className="font-mono text-[7.5px] text-[#17120D] font-bold tracking-wider mt-1.5">✎ STAGE & PRODUCTION</p>
+              <HandDrawnCircle color="#315B66" className="hidden md:block absolute -inset-3 opacity-45 pointer-events-none" />
             </div>
 
             {/* CLASSIFIED DEPARTMENT TAGS */}
@@ -204,12 +218,15 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
           </div>
 
           {/* Volunteer Action Button */}
-          <a 
-            href="/apply/crew"
-            className="btn-ticket w-full text-center block !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
-          >
-            JOIN THE CREW → APPLY NOW
-          </a>
+          <div className="relative">
+            <HandDrawnArrow color="#17120D" className="hidden md:block absolute -top-8 right-6 w-14 opacity-50 pointer-events-none rotate-[100deg]" />
+            <a
+              href="/apply/crew"
+              className="btn-ticket w-full text-center block !bg-[#C69A32] !text-[#17120D] !border-2 !border-[#17120D] shadow-[6px_6px_0px_#17120D] active:translate-x-1 active:translate-y-1 active:shadow-none font-mono text-xs font-bold uppercase tracking-widest py-3"
+            >
+              JOIN THE CREW → APPLY NOW
+            </a>
+          </div>
 
         </div>
 

@@ -3,6 +3,15 @@ import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import { ArchiveStamp } from '../ui/ArchiveStamp';
 import { PaperTape } from '../ui/PaperTape';
+import {
+  BandhaniDotField,
+  RangoliMedallion,
+  TextileBorderStrip,
+  VintageFilmFrame,
+  RegistrationMark,
+  RisographOffset,
+  HandDrawnUnderline,
+} from '../ui/CulturalMotifs';
 
 const CHRONOLOGY_DATA = [
   {
@@ -211,14 +220,21 @@ export const History = () => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-10">
           <span className="display text-[16vw] md:text-[22vw] leading-none text-[#11100C]">2016—2026</span>
         </div>
+        <BandhaniDotField color="#B94717" opacity={0.07} size={32} className="z-0" />
+        <RangoliMedallion
+          color="#B94717"
+          className="hidden lg:block absolute -top-[10vw] -left-[8vw] w-[36vw] h-[36vw] max-w-none opacity-[0.1] animate-[spin_150s_linear_infinite] pointer-events-none"
+        />
+        <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl">
           <ArchiveStamp text="EXHIBITION PANEL" rotation="-3deg" color="red" className="mb-4" />
 
           <h2 className="display text-5xl md:text-9xl text-[#11100C] leading-[0.85] tracking-tighter ink-bleed mb-6">
-            ARCHIVE / 2016–2026<br/>
+            <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.28}>ARCHIVE / 2016–2026</RisographOffset><br/>
             <span className="italic text-[#B94717] font-normal">THE CHRONOLOGY</span>
           </h2>
+          <HandDrawnUnderline color="#B94717" className="w-44 h-2.5 mx-auto -mt-3 mb-3 opacity-60" />
 
           <p className="font-mono text-xs md:text-sm text-[#11100C]/80 tracking-[0.25em] max-w-xl mx-auto uppercase border-t-2 border-[#11100C]/30 pt-4">
             TEN YEARS OF MUSIC, PEOPLE, PLACES & STORIES.
@@ -240,6 +256,9 @@ export const History = () => {
             style={{ backgroundColor: era.bg, color: era.text }}
           >
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+            <BandhaniDotField color={era.accent} opacity={0.06} size={30} className="z-0" />
+            <RegistrationMark color={era.text} className="hidden md:block absolute top-6 right-6 w-5 h-5 opacity-35 z-10 pointer-events-none" />
+            <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={7} colorA={era.accent} colorB="#11100C" />
 
             <div className="bg-year-text absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
               <span 
@@ -350,15 +369,18 @@ export const History = () => {
                     <span>35MM CONTACT STRIP</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <div className="border border-[#E7D5A4]/30 p-2 bg-black">
+                    <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
+                      <VintageFilmFrame color="#11100C" holeColor="#C99A2E" className="opacity-60" />
                       <img src="/media/gallery/tangy8.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 031</span>
                     </div>
-                    <div className="border border-[#E7D5A4]/30 p-2 bg-black">
+                    <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
+                      <VintageFilmFrame color="#11100C" holeColor="#C99A2E" className="opacity-60" />
                       <img src="/media/gallery/tangy1.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 032</span>
                     </div>
-                    <div className="border border-[#E7D5A4]/30 p-2 bg-black hidden md:block">
+                    <div className="relative border border-[#E7D5A4]/30 p-2 bg-black hidden md:block">
+                      <VintageFilmFrame color="#11100C" holeColor="#C99A2E" className="opacity-60" />
                       <img src="/media/gallery/tangy3.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 033</span>
                     </div>

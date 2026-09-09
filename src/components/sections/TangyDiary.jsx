@@ -4,6 +4,14 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { useAudio } from '../../audio/AudioContext';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import {
+  BandhaniDotField,
+  TextileBorderStrip,
+  LotusMotif,
+  HandDrawnUnderline,
+  RegistrationMark,
+  RisographOffset,
+} from '../ui/CulturalMotifs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -177,6 +185,17 @@ export const TangyDiary = () => {
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.14] pointer-events-none mix-blend-overlay" />
       <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_120px_rgba(0,0,0,0.7)]" />
 
+      {/* RETRO CHROME — kept entirely outside the 3D book stage (its perspective/ */}
+      {/* z-index leaf stacking is precisely tuned) and layered on the section */}
+      {/* background instead: a real textile field, framing strips, registration */}
+      {/* marks and a lotus bookplate stamp. */}
+      <BandhaniDotField color="#A68853" opacity={0.07} size={34} className="z-0" />
+      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
+      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
+      <RegistrationMark color="#EADFC5" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <RegistrationMark color="#EADFC5" className="hidden lg:block absolute bottom-8 left-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <LotusMotif color="#A68853" className="hidden md:block absolute top-10 left-10 w-10 h-10 opacity-40 z-20 pointer-events-none" />
+
       {/* SVG Definitions */}
       <svg className="hidden">
         <defs>
@@ -197,9 +216,12 @@ export const TangyDiary = () => {
       <div className="pt-4 lg:pt-0 lg:absolute lg:top-5 left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-4 lg:mb-0">
         <div>
           <div className="font-mono text-[9px] md:text-[10px] text-[#A68853] tracking-[0.25em] font-bold uppercase opacity-85">
-            ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
+            <RisographOffset colors={['#D91E18']} offsets={[[3, -2]]} opacity={0.4}>
+              ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
+            </RisographOffset>
           </div>
           <p className="font-serif italic text-xs text-[#EADFC5]/75 mt-0.5">"Every room has a memory."</p>
+          <HandDrawnUnderline color="#A68853" className="w-32 h-2 mt-1 mx-auto lg:mx-0 opacity-60" />
         </div>
       </div>
 
