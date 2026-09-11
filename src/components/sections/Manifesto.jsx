@@ -7,7 +7,6 @@ import {
   CoffeeStain
 } from '../ui/BackgroundDecorations';
 import {
-  BandhaniDotField,
   RisographOffset,
   ArchiveNumber,
   VintageFilmFrame,
@@ -15,6 +14,7 @@ import {
   HandDrawnUnderline,
   TextileBorderStrip,
 } from '../ui/CulturalMotifs';
+import { RangoliDecoration, LotusStamp, PatternBackground, PosterFragment, RetroGrain } from '../ui/RetroAssets';
 
 export const Manifesto = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -59,12 +59,13 @@ export const Manifesto = () => {
       
       {/* NOISE & AGED HANDMADE PAPER FIBER TEXTURE */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-multiply pointer-events-none z-10" />
+      <RetroGrain index={0} opacity={0.12} blend="multiply" className="z-10" />
 
       {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
       <NotebookGridPattern opacity={0.07} />
 
       {/* BANDHANI DOT FIELD — a real textile layer across the section, not a hint */}
-      <BandhaniDotField color="#B94717" opacity={0.09} size={34} className="z-0" />
+      <PatternBackground category="bandhani" index={2} opacity={0.38} size="cover" blend="normal" className="z-0" />
 
       {/* CASSETTE TAPE ACCENTS */}
       <CassetteTapeGraphic className="absolute top-10 right-10 w-44 hidden md:block" />
@@ -72,13 +73,22 @@ export const Manifesto = () => {
       <CoffeeStain className="-bottom-16 left-1/4 w-52 h-52 rotate-45 pointer-events-none" />
 
       {/* GIANT OUTLINE ARCHIVE NUMBER — bleeds behind the newspaper card */}
-      <ArchiveNumber color="#B94717" size="clamp(140px,22vw,320px)" className="hidden lg:block absolute top-[8%] left-[4%] opacity-[0.14] z-0">02</ArchiveNumber>
+      <ArchiveNumber color="#11100C" size="clamp(140px,22vw,320px)" className="hidden lg:block absolute top-[8%] left-[4%] opacity-[0.14] z-0">02</ArchiveNumber>
+
+      {/* MOBILE — a cropped Rangoli corner + large partially-hidden floral medallion, */}
+      {/* the mobile-specific stand-ins for the desktop archive numeral/cassette/torn-paper. */}
+      <div className="lg:hidden absolute top-0 right-0 w-[42%] max-w-[170px] aspect-square opacity-[0.14] pointer-events-none z-0">
+        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+      </div>
+      <div className="lg:hidden absolute -bottom-4 left-3 z-20 w-16">
+        <PosterFragment category="illustrations" index={0} rotate={-6} tape={false} />
+      </div>
 
       {/* CROP MARKS & PRINT REGISTRATION CROSSES */}
       <div className="absolute top-4 left-4 font-mono text-[8px] sm:text-[9px] text-[#B94717] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
         [ ✚ ] CROP MARK // ARCHIVE NO. 1974-M
       </div>
-      <RegistrationMark color="#B94717" className="hidden md:block absolute top-4 right-4 w-6 h-6 opacity-70 z-20 pointer-events-none" />
+      <RegistrationMark color="#11100C" className="hidden md:block absolute top-4 right-4 w-6 h-6 opacity-70 z-20 pointer-events-none" />
 
       {/* TEXTILE BORDER — frames the whole manifesto sheet top and bottom */}
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#B94717" colorB="#11100C" />
@@ -89,6 +99,12 @@ export const Manifesto = () => {
 
         {/* COFFEE STAIN GRAPHIC ACCENT */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[14px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-multiply rotate-12 hidden sm:block" />
+
+        {/* REAL RISOGRAPH PRINT FRAGMENT — a pinned offset-print scrap, tucked into the */}
+        {/* newspaper's own top-right corner. */}
+        <div className="hidden md:block absolute -top-6 right-16 w-12 z-20">
+          <PosterFragment category="risograph" index={0} rotate={7} tape />
+        </div>
 
         {/* MASKING TAPE AT TOP CENTER */}
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-28 h-6 bg-[rgba(231,213,164,0.85)] rotate-[-1deg] border border-black/30 z-30 pointer-events-none" />
@@ -106,7 +122,10 @@ export const Manifesto = () => {
 
         {/* Headline */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-center border-b-2 border-[#11100C] pb-6 sm:pb-8 mb-6 sm:mb-8">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 relative">
+            <div className="hidden sm:block absolute -top-6 -left-8 w-24 h-24 opacity-[0.16] pointer-events-none -z-10">
+              <LotusStamp index={1} border="transparent" bg="transparent" className="w-full h-full" />
+            </div>
             <h2 className="display text-5xl sm:text-7xl md:text-[8vw] text-[#11100C] leading-[0.85] tracking-tighter ink-bleed">
               <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.3}>
                 WHY<br/>TANGY?

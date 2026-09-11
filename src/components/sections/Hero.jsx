@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
-import { BandhaniDotField, RangoliMedallion, TextileBorderStrip, HandDrawnCircle, HandDrawnArrow, RegistrationMark } from '../ui/CulturalMotifs';
+import { TextileBorderStrip, HandDrawnCircle, HandDrawnArrow, RegistrationMark } from '../ui/CulturalMotifs';
+import { PosterFragment, LotusStamp, RetroGrain, RangoliDecoration, PatternBackground } from '../ui/RetroAssets';
 
 // Mobile-only cast cycle for the hero's single central spot: instead of a
 // fixed guitarist, one performer at a time crossfades in/out every 2s so the
@@ -160,11 +161,11 @@ export const Hero = () => {
         className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
       >
         {/* CORNER REGISTRATION MARKS */}
-        <RegistrationMark color="#ecdcaf" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none" />
-        <RegistrationMark color="#ecdcaf" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none" />
+        <RegistrationMark color="#11100C" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none" />
+        <RegistrationMark color="#11100C" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none" />
         {/* BOTTOM-RIGHT — desktop only, mirrors the mobile pair that already existed; */}
         {/* completes the four-corner print-registration frame. */}
-        <RegistrationMark color="#ecdcaf" className="hidden lg:block absolute z-30 w-[2.2cqw] min-w-[12px] h-[2.2cqw] min-h-[12px] opacity-60 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none" />
+        <RegistrationMark color="#11100C" className="hidden lg:block absolute z-30 w-[2.2cqw] min-w-[12px] h-[2.2cqw] min-h-[12px] opacity-60 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none" />
 
         {/* TOP BAR VISUAL GRID ALIGNMENT */}
         <div className="absolute z-40 top-[52px] md:top-[2.2cqw] left-[3cqw] right-[3cqw] flex items-start justify-between pointer-events-none">
@@ -343,12 +344,22 @@ export const Hero = () => {
 
           {/* SUBTLE INSET POSTER FRAME */}
           <div className="absolute inset-[10px] border border-[#ecdcaf]/20 pointer-events-none" aria-hidden="true" />
+
+          {/* MOBILE-ONLY REAL-ASSET CORNER DECORATION — the real supplied lotus and */}
+          {/* Rangoli photographs, bleeding off the top-right and bottom-right corners */}
+          {/* behind the badge cluster (low z, low opacity) as printed background pieces. */}
+          <div className="absolute z-[16] -top-[8%] -right-[18%] w-[55%] max-w-[260px] aspect-square opacity-[0.16] pointer-events-none">
+            <RangoliDecoration index={1} className="w-full h-full" />
+          </div>
+          <div className="absolute z-[16] bottom-0 right-0 w-[30%] max-w-[150px] aspect-square opacity-[0.3] pointer-events-none translate-x-[20%] translate-y-[20%]">
+            <LotusStamp index={2} border="transparent" bg="transparent" className="w-full h-full" />
+          </div>
           {/* BOTTOM REGISTRATION CROSSHAIRS (mirrors the two existing top ones) */}
           <div className="absolute z-30 w-[14px] h-[14px] opacity-70 bottom-[14px] left-[14px] pointer-events-none" aria-hidden="true">
-            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
+            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#11100C" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#11100C" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#11100C" strokeWidth="1.2"/></svg>
           </div>
           <div className="absolute z-30 w-[14px] h-[14px] opacity-70 bottom-[14px] right-[14px] pointer-events-none" aria-hidden="true">
-            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#ecdcaf" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#ecdcaf" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#ecdcaf" strokeWidth="1.2"/></svg>
+            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#11100C" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#11100C" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#11100C" strokeWidth="1.2"/></svg>
           </div>
 
           <div className="[text-shadow:0_1px_5px_rgba(17,16,12,0.95),0_1px_2px_rgba(17,16,12,0.95)]">
@@ -410,29 +421,56 @@ export const Hero = () => {
           </div>
         </div>
 
-        {/* BANDHANI-INSPIRED DOT FIELD — a real visible mustard tie-dye pattern across the */}
-        {/* field, not a barely-there texture. */}
-        <BandhaniDotField color="#D1A437" opacity={0.16} size={38} className="z-5" />
+        {/* REAL BANDHANI TEXTILE LAYER — the poster's actual physical surface: a supplied */}
+        {/* tie-dye photograph clearly visible behind the performers, not a faint hint. */}
+        <PatternBackground category="bandhani" index={0} opacity={0.4} size="cover" blend="normal" className="z-5" />
 
         {/* POSTER BORDER FRAME — bold woven textile strips top and bottom, turning the whole */}
         {/* hero into a framed printed sheet rather than an edge-to-edge background. */}
         <TextileBorderStrip className="absolute top-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
         <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
 
-        {/* BOTTOM-LEFT COLOUR-BLOCK WEDGE — desktop only. Breaks the uniform maroon field with */}
-        {/* a mustard spot-colour panel (vintage-poster colour blocking), carrying a large */}
-        {/* Rangoli medallion bleeding off the left edge and a rotated masthead label — the */}
-        {/* section's biggest single asymmetric-composition move. */}
-        <div
-          className="hidden lg:block absolute z-6 left-0 bottom-0 w-[30cqw] h-[46cqw] pointer-events-none overflow-hidden"
-          style={{ clipPath: 'polygon(0 100%, 0 22%, 100% 100%)' }}
-        >
-          <div className="absolute inset-0 bg-[#D1A437]" />
-          <RangoliMedallion
-            color="#4C1210"
-            className="absolute -left-[10cqw] bottom-[-6cqw] w-[34cqw] h-[34cqw] opacity-40 animate-[spin_140s_linear_infinite]"
-          />
+        {/* BOTTOM-LEFT VINTAGE PRINT COLLAGE — desktop only. Replaces the old solid mustard */}
+        {/* triangle with a small layered assembly of real archive-print pieces (a cropped */}
+        {/* textile clipping, a partially-cropped Rangoli fragment, a lotus stamp, localized */}
+        {/* print-texture grain, a registration mark and an archival label) sitting low and */}
+        {/* behind the violinist — pasted-on clippings rather than one heavy geometric block. */}
+        <div className="hidden lg:block absolute z-6 left-0 bottom-0 w-[19cqw] max-w-[210px] h-[27cqw] max-h-[300px] pointer-events-none">
+
+          {/* REAL PRINT-TEXTURE GRAIN — localized imperfect paper surface under the collage. */}
+          <RetroGrain index={1} opacity={0.35} blend="multiply" />
+
+          {/* SLIM READING COLUMN — keeps the vertical masthead label below legible against */}
+          {/* the photo clippings instead of one uniform solid block. */}
+          <div className="absolute left-0 top-0 bottom-0 w-[3.4cqw] bg-[#191410]/55" />
+
+          {/* REAL TEXTILE CLIPPING — a cropped, rotated textile photograph standing in for a */}
+          {/* pasted magazine paper layer, tucked low behind the violinist. */}
+          <div className="absolute left-[4cqw] bottom-[1cqw] w-[10.5cqw] max-w-[118px] aspect-[3/4]">
+            <PosterFragment category="textile" index={1} rotate={-5} tape className="w-full h-full" />
+          </div>
+
+          {/* REAL RANGOLI FRAGMENT — a partially cropped, rotated archival print detail */}
+          {/* bleeding off the left edge. */}
+          <div className="absolute -left-[2.5cqw] bottom-[6.5cqw] w-[9cqw] max-w-[96px] aspect-square opacity-90">
+            <PosterFragment category="rangoli" index={2} rotate={9} tape={false} className="w-full h-full" />
+          </div>
+
+          {/* REAL LOTUS STAMP — a small decorative print stamp at the corner. */}
+          <div className="absolute left-[9.5cqw] bottom-[0.5cqw] w-[4cqw] max-w-[42px] aspect-square">
+            <LotusStamp index={0} border="#ECDCAF" bg="#3C0F0E" className="w-full h-full opacity-95 rotate-[-10deg] shadow-md" />
+          </div>
+
+          {/* THIN REGISTRATION MARK + tiny archival label — print-shop detail. */}
+          <RegistrationMark color="#ECDCAF" className="absolute left-[0.6cqw] top-0 w-3.5 h-3.5 opacity-50" />
+          <span
+            className="absolute left-[0.9cqw] top-[1.5cqw] font-mono text-[6.5px] tracking-[0.18em] text-[#ECDCAF]/55 uppercase whitespace-nowrap"
+            style={{ writingMode: 'vertical-rl' }}
+          >
+            FIG.01
+          </span>
         </div>
+
         <div className="hidden lg:flex absolute z-30 left-[1.1cqw] bottom-[3cqw] top-[8cqw] items-end justify-center pointer-events-none">
           <span
             className="font-poster text-[#ECDCAF] text-[clamp(13px,1.7cqw,22px)] tracking-[0.1em] uppercase whitespace-nowrap"
@@ -442,15 +480,17 @@ export const Hero = () => {
           </span>
         </div>
 
-        {/* HAND-DRAWN CALLOUT — a single sparing annotation tying the new colour-block */}
-        {/* wedge to the masthead label, an editor's pencil mark rather than a UI hint. */}
+        {/* HAND-DRAWN CALLOUT — a single sparing annotation tying the print collage to the */}
+        {/* masthead label, an editor's pencil mark rather than a UI hint. */}
         <HandDrawnArrow
           color="#191410"
-          className="hidden lg:block absolute z-25 left-[4cqw] bottom-[24cqw] w-[5cqw] max-w-[75px] opacity-45 pointer-events-none rotate-[35deg]"
+          className="hidden lg:block absolute z-25 left-[4cqw] bottom-[15cqw] w-[5cqw] max-w-[75px] opacity-45 pointer-events-none rotate-[35deg]"
         />
 
-        {/* TEXTURE OVERLAYS */}
+        {/* TEXTURE OVERLAYS — layers the site's existing grain with the real supplied */}
+        {/* print-texture photograph for an extra, authentic paper-grain pass. */}
         <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none" />
+        <RetroGrain index={0} opacity={0.08} blend="overlay" className="z-10" />
         <div className="vignette absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
 
       </div>

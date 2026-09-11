@@ -2,12 +2,15 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { gallery } from '../../data/mockData';
 import {
-  BandhaniDotField,
-  RangoliMedallion,
   TextileBorderStrip,
   VintageFilmFrame,
   RisographOffset,
 } from '../ui/CulturalMotifs';
+import {
+  PatternBackground,
+  RangoliDecoration,
+  FilmCutout,
+} from '../ui/RetroAssets';
 
 export const Gallery = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -38,13 +41,18 @@ export const Gallery = () => {
 
   return (
     <section ref={sectionRef} id="gallery" className="scene relative w-full h-screen overflow-hidden bg-tangy-wine border-t border-[rgba(231,223,181,.1)] perspective-1000">
-      <BandhaniDotField color="#E7DFB5" opacity={0.07} size={34} className="z-0" />
-      <RangoliMedallion
-        color="#E7DFB5"
-        className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] max-w-none opacity-[0.06] animate-[spin_160s_linear_infinite] pointer-events-none z-0"
-      />
+      <PatternBackground category="textile" index={2} opacity={0.32} size="cover" blend="normal" className="z-0" />
+      <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] max-w-none opacity-[0.08] animate-[spin_160s_linear_infinite] pointer-events-none z-0">
+        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+      </div>
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#E7DFB5" colorB="#3C0F0E" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#E7DFB5" colorB="#3C0F0E" />
+      {/* MOBILE — real cropped Rangoli photo + a film cutout, standing in for the */}
+      {/* desktop medallion which is hidden below lg. */}
+      <div className="lg:hidden absolute bottom-0 left-0 w-[40%] max-w-[170px] aspect-square opacity-[0.12] pointer-events-none z-0">
+        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+      </div>
+      <FilmCutout index={2} rotate={6} className="lg:hidden absolute top-4 right-4 w-14 z-10" />
       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
         <p className="font-display font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">
           <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.35}>MOMENTS<br/>WE KEPT.</RisographOffset>

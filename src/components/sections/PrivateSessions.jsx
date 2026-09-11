@@ -3,12 +3,16 @@ import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import { SoundWaveGraphic } from '../ui/BackgroundDecorations';
 import {
-  BandhaniDotField,
   TextileBorderStrip,
-  LotusMotif,
   HandDrawnUnderline,
   RegistrationMark,
 } from '../ui/CulturalMotifs';
+import {
+  PatternBackground,
+  RangoliDecoration,
+  LotusStamp,
+  RetroGrain,
+} from '../ui/RetroAssets';
 
 export const PrivateSessions = ({ onRequestPrivate }) => {
   const { playSFX } = useAudio();
@@ -69,15 +73,23 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       
       {/* SOFT NOISE & PAPER FIBER TEXTURE */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-0" />
+      <RetroGrain index={1} opacity={0.11} blend="overlay" />
 
       {/* ANALOG SOUND WAVE FREQUENCY GRAPHIC */}
       <SoundWaveGraphic color="#E7D7AC" opacity={0.15} className="absolute left-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />
 
       {/* BANDHANI TEXTILE LAYER + FRAME */}
-      <BandhaniDotField color="#C69A32" opacity={0.08} size={34} className="z-0" />
+      <PatternBackground category="bandhani" index={2} opacity={0.36} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
-      <RegistrationMark color="#E7D7AC" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <div className="hidden lg:block absolute -top-[14vw] -right-[8vw] w-[34vw] h-[34vw] max-w-none opacity-[0.1] animate-[spin_190s_linear_infinite] pointer-events-none z-0">
+        <RangoliDecoration index={1} spin={false} className="w-full h-full" />
+      </div>
+      {/* MOBILE — a real cropped Rangoli photo bleeding from the bottom-left */}
+      <div className="lg:hidden absolute bottom-0 left-0 w-[40%] max-w-[160px] aspect-square opacity-[0.15] pointer-events-none z-0">
+        <RangoliDecoration index={1} spin={false} className="w-full h-full" />
+      </div>
 
       {/* CROP MARKS & ARCHIVE LABELS */}
       <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
@@ -142,7 +154,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
 
           {/* Invitation Top Header */}
           <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#4A2638] border-b-2 border-[#17120D] pb-4 mb-8 uppercase">
-            <span className="flex items-center gap-1.5"><LotusMotif color="#4A2638" className="w-4 h-4 opacity-70" />TANGY PRIVATE SESSIONS</span>
+            <span className="flex items-center gap-1.5"><LotusStamp index={2} bg="transparent" border="#4A2638" className="w-4 h-4 opacity-90" />TANGY PRIVATE SESSIONS</span>
             <span>HYDERABAD // BY INVITATION</span>
           </div>
 

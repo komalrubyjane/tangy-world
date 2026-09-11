@@ -5,7 +5,8 @@ import { useEvents } from '../../hooks/useEvents';
 import { useAudio } from '../../audio/AudioContext';
 import { WarpedCheckerPattern } from '../ui/BackgroundDecorations';
 import { PhotoTreatment } from '../ui/PhotoTreatment';
-import { LotusMotif, RangoliMedallion, BandhaniDotField, HandDrawnUnderline, PaperLabel, RetroPosterFrame } from '../ui/CulturalMotifs';
+import { HandDrawnUnderline, PaperLabel, RetroPosterFrame } from '../ui/CulturalMotifs';
+import { LotusStamp, RangoliDecoration, PatternBackground, PosterFragment, RetroGrain } from '../ui/RetroAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,10 +48,8 @@ const TicketCardInner = ({ event, idx, onBook }) => {
           REC • LIVE AT STEPWELL
         </div>
 
-        {/* LOTUS WAX SEAL */}
-        <div className="absolute top-2 left-2 w-10 h-10 rounded-full bg-[#5A120D] border-2 border-[#C99A2E]/80 flex items-center justify-center shadow-lg -rotate-6">
-          <LotusMotif color="#E7D5A4" className="w-6 h-6 opacity-90" />
-        </div>
+        {/* REAL LOTUS WAX SEAL */}
+        <LotusStamp index={idx} border="#C99A2E" bg="#5A120D" className="absolute top-2 left-2 w-10 h-10 shadow-lg -rotate-6" />
 
         {/* ENORMOUS DATE — bleeds below the photo into the content area */}
         <div className="absolute -bottom-4 left-2 z-10 flex items-end gap-1.5 pointer-events-none">
@@ -94,7 +93,9 @@ const TicketCardInner = ({ event, idx, onBook }) => {
 const EditorialCardInner = () => (
   <div className="w-full h-full bg-[#EDE0C0] p-4 sm:p-5 border-4 border-[#11100C] flex flex-col relative shadow-[16px_16px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] transition-transform duration-300 group-hover:-translate-y-2 overflow-hidden rotate-1"
     style={{ backgroundImage:"url('/noise.png')", backgroundBlendMode:'multiply', backgroundSize:'180px' }}>
-    <RangoliMedallion color="#B94717" className="absolute -right-[20%] -bottom-[15%] w-[65%] max-w-none opacity-[0.12] pointer-events-none animate-[spin_120s_linear_infinite]" />
+    <div className="absolute -right-[20%] -bottom-[15%] w-[65%] max-w-none aspect-square opacity-[0.14] pointer-events-none animate-[spin_120s_linear_infinite]">
+      <RangoliDecoration index={2} spin={false} className="w-full h-full" />
+    </div>
     <div className="absolute -top-3 right-12 sm:right-16 w-8 h-3 bg-[#B94717] border-b-2 border-x-2 border-[#11100C] rounded-b-full z-20" />
     <div className="absolute -bottom-3 right-12 sm:right-16 w-8 h-3 bg-[#B94717] border-t-2 border-x-2 border-[#11100C] rounded-t-full z-20" />
     <div className="absolute top-0 bottom-0 right-16 sm:right-20 w-[2px] border-r-2 border-dashed border-[#11100C]/40 z-20 pointer-events-none" />
@@ -168,10 +169,11 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
       className="relative w-full bg-[#B94717] border-t-8 border-[#11100C] overflow-hidden lg:h-screen lg:flex lg:items-center isolate">
 
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-multiply pointer-events-none z-0" />
-      <BandhaniDotField color="#E7D5A4" opacity={0.09} size={36} className="z-0" />
+      <RetroGrain index={0} opacity={0.1} blend="multiply" />
+      <PatternBackground category="textile" index={1} opacity={0.36} size="cover" blend="normal" className="z-0" />
       <div className="absolute top-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5"><WarpedCheckerPattern opacity={0.12} /></div>
       <div className="absolute bottom-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5"><WarpedCheckerPattern opacity={0.12} /></div>
-      <RetroPosterFrame color="#E7D5A4" inset={14} className="hidden md:block z-10" />
+      <RetroPosterFrame color="#11100C" inset={14} className="hidden md:block z-10" />
       <div className="absolute top-4 left-4 z-20 pointer-events-none">
         <PaperLabel text="CROP MARK // SESSIONS TICKETS" color="#E7D5A4" textColor="#11100C" rotation="-1deg" />
       </div>
@@ -184,16 +186,37 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
       >
         04
       </span>
+      <div className="hidden lg:block absolute -bottom-[16vw] -left-[10vw] w-[38vw] h-[38vw] max-w-none opacity-[0.1] animate-[spin_170s_linear_infinite] pointer-events-none z-0">
+        <RangoliDecoration index={1} spin={false} className="w-full h-full" />
+      </div>
+
+      {/* MOBILE-ONLY DECORATION — a real vertical textile strip on the left edge (the */}
+      {/* desktop equivalent is horizontal checker strips top+bottom) plus a real cropped */}
+      {/* Rangoli photo bleeding from the bottom-right of the card stack. */}
+      <PatternBackground
+        category="textile"
+        index={1}
+        opacity={0.5}
+        size="90px"
+        repeat
+        className="lg:hidden !inset-y-0 !top-0 !bottom-0 !left-0 !right-auto !w-4 z-10"
+      />
+      <div className="lg:hidden absolute bottom-0 right-0 w-[40%] max-w-[180px] aspect-square opacity-[0.16] pointer-events-none z-0">
+        <RangoliDecoration index={2} spin={false} className="w-full h-full" />
+      </div>
 
       <div className="pt-24 lg:pt-0 lg:absolute lg:top-10 left-5 right-5 md:left-12 md:right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div>
           <p className="font-mono text-[#E7D5A4] text-[9px] sm:text-[10px] tracking-[0.3em] font-bold uppercase">COLLECTIBLE CONCERT TICKETS // 1974 SERIES</p>
           <h2 className="display text-5xl md:text-9xl text-[#E7D5A4] opacity-25 leading-none -rotate-1 origin-left">SESSIONS</h2>
         </div>
-        <a href="/sessions"
-          className="hidden md:block bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0 rotate-1">
-          SESSIONS → VIEW MORE
-        </a>
+        <div className="hidden md:flex items-center gap-4">
+          <PosterFragment category="posters" index={0} rotate={-6} tape className="hidden lg:block w-14" />
+          <a href="/sessions"
+            className="bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0 rotate-1">
+            SESSIONS → VIEW MORE
+          </a>
+        </div>
       </div>
 
       {/* MOBILE vertical card stack */}

@@ -284,6 +284,138 @@ export const DottedBorder = ({ color = '#D19A24', height = 6, gap = 10, classNam
   />
 );
 
+// 16. Retro flower — an original 6-petal Indian floral motif distinct from the
+// lotus (rounder, more symmetric, botanical-print in character). Scales from
+// tiny decoration to huge partially-cropped background graphic.
+export const RetroFlower = ({ color = '#ECDCAF', className = '' }) => {
+  const petals = Array.from({ length: 6 });
+  return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <g fill="none" stroke={color} strokeWidth="1.3">
+        {petals.map((_, i) => (
+          <ellipse key={i} cx="50" cy="26" rx="11" ry="22" transform={`rotate(${i * 60} 50 50)`} opacity="0.85" />
+        ))}
+        <circle cx="50" cy="50" r="7" fill={color} stroke="none" opacity="0.9" />
+        <circle cx="50" cy="50" r="12" opacity="0.5" />
+      </g>
+    </svg>
+  );
+};
+
+// 17. Floral cluster — three RetroFlowers at varying scale/rotation grouped
+// into one loose botanical spray, for corner/edge decoration.
+export const FloralCluster = ({ color = '#ECDCAF', className = '' }) => (
+  <div className={`relative pointer-events-none ${className}`} aria-hidden="true">
+    <RetroFlower color={color} className="absolute top-0 left-0 w-[60%] h-[60%] opacity-90" />
+    <RetroFlower color={color} className="absolute bottom-0 right-0 w-[45%] h-[45%] opacity-70 rotate-[20deg]" />
+    <RetroFlower color={color} className="absolute bottom-[10%] left-[20%] w-[35%] h-[35%] opacity-55 -rotate-[15deg]" />
+  </div>
+);
+
+// 18. Floral medallion — a circular Rangoli-style ring with flowers set inside,
+// a large decorative composition rather than a small stamp.
+export const FloralMedallion = ({ color = '#D19A24', className = '' }) => (
+  <svg viewBox="0 0 200 200" className={className} aria-hidden="true">
+    <g stroke={color} fill="none" strokeWidth="1.1" opacity="0.85">
+      <circle cx="100" cy="100" r="94" />
+      <circle cx="100" cy="100" r="76" opacity="0.5" />
+    </g>
+    {Array.from({ length: 8 }).map((_, i) => (
+      <g key={i} transform={`rotate(${i * 45} 100 100)`}>
+        <ellipse cx="100" cy="52" rx="14" ry="26" stroke={color} fill="none" strokeWidth="1.1" opacity="0.75" />
+      </g>
+    ))}
+    <circle cx="100" cy="100" r="14" fill={color} opacity="0.9" />
+    <circle cx="100" cy="100" r="20" stroke={color} fill="none" strokeWidth="1" opacity="0.6" />
+  </svg>
+);
+
+// 19. Flower stamp — a small wax-seal-style circular badge with a flower inside,
+// for corner ornaments where a lotus-in-a-circle feels too repetitive.
+export const FlowerStamp = ({ bg = '#5A120D', color = '#ECDCAF', border = '#D19A24', className = '' }) => (
+  <div
+    className={`rounded-full flex items-center justify-center shadow-lg pointer-events-none select-none ${className}`}
+    style={{ backgroundColor: bg, border: `2px solid ${border}` }}
+    aria-hidden="true"
+  >
+    <RetroFlower color={color} className="w-[65%] h-[65%]" />
+  </div>
+);
+
+// 20. Flower border — a repeating small-flower rule, an alternative to the
+// diamond-weave TextileBorderStrip for a softer, botanical edge treatment.
+export const FlowerBorder = ({ color = '#D19A24', bg = '#11100C', height = 20, orientation = 'horizontal', className = '' }) => (
+  <div
+    className={`${orientation === 'vertical' ? 'h-full' : 'w-full'} overflow-hidden pointer-events-none select-none ${className}`}
+    style={orientation === 'vertical' ? { width: height, backgroundColor: bg } : { height, backgroundColor: bg }}
+    aria-hidden="true"
+  >
+    <svg width="100%" height="100%" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern
+          id="flower-border-repeat"
+          width={orientation === 'vertical' ? height : height * 1.6}
+          height={orientation === 'vertical' ? height * 1.6 : height}
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx={height * 0.8} cy={height / 2} r={height * 0.1} fill={color} />
+          {Array.from({ length: 6 }).map((_, i) => {
+            const angle = (i * 60 * Math.PI) / 180;
+            const cx = height * 0.8 + Math.cos(angle) * height * 0.22;
+            const cy = height / 2 + Math.sin(angle) * height * 0.22;
+            return <ellipse key={i} cx={cx} cy={cy} rx={height * 0.09} ry={height * 0.16} fill="none" stroke={color} strokeWidth="0.8" transform={`rotate(${i * 60} ${cx} ${cy})`} />;
+          })}
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#flower-border-repeat)" />
+    </svg>
+  </div>
+);
+
+// 21. Rangoli corner — a quarter-mandala ornament anchored to a corner (via the
+// className's positioning), for framing sections/cards without a full medallion.
+export const RangoliCorner = ({ color = '#D19A24', className = '' }) => (
+  <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+    <g stroke={color} fill="none" strokeWidth="1.2" opacity="0.85">
+      <path d="M0,100 A100,100 0 0,0 100,0" />
+      <path d="M0,78 A78,78 0 0,0 78,0" opacity="0.6" />
+      <path d="M0,54 A54,54 0 0,0 54,0" opacity="0.4" />
+    </g>
+    {[18, 45, 72].map((d, i) => (
+      <circle key={i} cx={d} cy={100 - d} r="3" fill={color} opacity="0.8" />
+    ))}
+  </svg>
+);
+
+// 22. Ticket frame — a perforated/notched edge (dashed line + two half-circle
+// notches) formalising the ticket-stub language used in Events, reusable
+// anywhere a "physical ticket" edge is wanted.
+export const TicketFrame = ({ color = '#11100C', bg = '#E7D5A4', position = 'right', offset = '16%', className = '' }) => {
+  const isVertical = position === 'right' || position === 'left';
+  return (
+    <div className={`absolute pointer-events-none ${className}`} style={isVertical ? { [position]: offset, top: 0, bottom: 0 } : { [position]: offset, left: 0, right: 0 }} aria-hidden="true">
+      <div className={isVertical ? 'relative h-full w-0 border-r-2 border-dashed' : 'relative w-full h-0 border-b-2 border-dashed'} style={{ borderColor: `${color}66` }}>
+        <span className="absolute rounded-full" style={isVertical ? { top: -8, left: -8, width: 16, height: 16, backgroundColor: bg, border: `2px solid ${color}` } : { left: -8, top: -8, width: 16, height: 16, backgroundColor: bg, border: `2px solid ${color}` }} />
+        <span className="absolute rounded-full" style={isVertical ? { bottom: -8, left: -8, width: 16, height: 16, backgroundColor: bg, border: `2px solid ${color}` } : { right: -8, top: -8, width: 16, height: 16, backgroundColor: bg, border: `2px solid ${color}` }} />
+      </div>
+    </div>
+  );
+};
+
+// 23. Scribble — a loose, energetic freeform mark distinct from the cleaner
+// HandDrawnCircle/Underline — for a rougher annotation moment.
+export const Scribble = ({ color = '#ECDCAF', className = '' }) => (
+  <svg viewBox="0 0 100 60" className={className} aria-hidden="true">
+    <path
+      d="M6 40 C 18 12, 30 50, 42 22 C 50 4, 58 46, 70 18 C 78 2, 86 34, 94 20"
+      fill="none"
+      stroke={color}
+      strokeWidth="2.2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 // Aliases matching the exact names requested for the retro design system, so
 // either name can be imported interchangeably.
 export const BandhaniPattern = BandhaniDotField;
@@ -295,3 +427,12 @@ export const RegistrationMarks = RegistrationMark;
 export const EditorialLabel = PaperLabel;
 export const ScreenPrintTexture = HalftoneTexture;
 export const GeometricFrame = RetroPosterFrame;
+export const RetroLotus = LotusMotif;
+export const FilmStrip = VintageFilmFrame;
+export const PosterBlock = ColorBlock;
+export const Rangoli = RangoliMedallion;
+export const BandhaniBorder = DottedBorder;
+export const HalftoneFrame = VintageFilmFrame;
+export const PrintShadow = ({ children, className = '', color = '#11100C', offset = 6 }) => (
+  <div className={className} style={{ filter: `drop-shadow(${offset}px ${offset}px 0 ${color})` }}>{children}</div>
+);

@@ -1,7 +1,8 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
-import { TextileBorderStrip, BandhaniDotField, HandDrawnUnderline, HandDrawnCircle, RangoliMedallion } from '../ui/CulturalMotifs';
+import { TextileBorderStrip, HandDrawnUnderline, HandDrawnCircle } from '../ui/CulturalMotifs';
 import { TapeStrip } from '../ui/BackgroundDecorations';
+import { RangoliDecoration, PatternBackground, PosterFragment } from '../ui/RetroAssets';
 
 export const TangyTalks = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -54,17 +55,23 @@ export const TangyTalks = () => {
         aria-hidden="true"
       />
 
-      <BandhaniDotField color="#D19A24" opacity={0.1} size={40} className="z-0" />
+      {/* REAL BANDHANI PHOTOGRAPH — the supplied textile reference, low-opacity full-bleed */}
+      <PatternBackground category="bandhani" index={2} opacity={0.36} size="cover" blend="normal" className="z-0" />
 
-      {/* GIANT RANGOLI — bleeds off the top-right corner, a real graphic presence rather */}
-      {/* than a background hint. */}
-      <RangoliMedallion
-        color="#D19A24"
-        className="absolute -top-[16vw] -right-[12vw] w-[52vw] h-[52vw] max-w-none opacity-[0.16] animate-[spin_130s_linear_infinite] pointer-events-none z-0"
-      />
+      {/* GIANT REAL RANGOLI PHOTOGRAPH — bleeds off the top-right corner, the actual */}
+      {/* supplied reference image rather than a generated pattern. */}
+      <div className="absolute -top-[16vw] -right-[12vw] w-[52vw] h-[52vw] max-w-none opacity-[0.18] animate-[spin_130s_linear_infinite] pointer-events-none z-0">
+        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+      </div>
 
       {/* TORN POSTER EDGE FRAME */}
       <div className="absolute inset-[10px] sm:inset-[18px] z-10 border-2 border-[#D19A24]/45 pointer-events-none" />
+
+      {/* REAL VINTAGE POSTER FRAGMENT — a taped physical scrap pinned in the corner, */}
+      {/* the underground-flyer-pasted-on-a-wall feeling this section wants. */}
+      <div className="hidden md:block absolute bottom-6 left-6 z-20 w-24 lg:w-28">
+        <PosterFragment category="posters" index={0} rotate={-6} tape />
+      </div>
 
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-10" height={10} colorA="#D19A24" colorB="#0D0A08" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={10} colorA="#D19A24" colorB="#0D0A08" />

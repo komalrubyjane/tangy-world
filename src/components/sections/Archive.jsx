@@ -8,12 +8,18 @@ import {
   PushPin,
 } from '../ui/BackgroundDecorations';
 import {
-  BandhaniDotField,
-  RangoliMedallion,
   TextileBorderStrip,
   VintageFilmFrame,
   RegistrationMark,
 } from '../ui/CulturalMotifs';
+import {
+  PatternBackground,
+  RangoliDecoration,
+  LotusStamp,
+  PosterFragment,
+  FilmCutout,
+  RetroGrain,
+} from '../ui/RetroAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -103,14 +109,22 @@ export const Archive = () => {
       className="relative w-full bg-[#11100C] border-t-8 border-[#4A0C0C] overflow-hidden lg:h-screen lg:flex lg:items-center perspective-[1000px]">
 
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
+      <RetroGrain index={1} opacity={0.1} blend="overlay" />
       <TornPaperEdgeTop fill="#11100C" />
-      <BandhaniDotField color="#C99A24" opacity={0.08} size={36} className="z-0" />
-      <RangoliMedallion
-        color="#C99A24"
-        className="hidden lg:block absolute -bottom-[18vw] -right-[10vw] w-[46vw] h-[46vw] max-w-none opacity-[0.1] animate-[spin_150s_linear_infinite] pointer-events-none z-0"
-      />
+      <PatternBackground category="bandhani" index={1} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <div className="hidden lg:block absolute -bottom-[18vw] -right-[10vw] w-[46vw] h-[46vw] max-w-none opacity-[0.12] animate-[spin_150s_linear_infinite] pointer-events-none z-0">
+        <RangoliDecoration index={2} spin={false} className="w-full h-full" />
+      </div>
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C99A24" colorB="#11100C" />
-      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-50 z-20 pointer-events-none" />
+      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-50 z-20 pointer-events-none" />
+      {/* REAL vintage poster fragment tucked behind the header, desktop only */}
+      <div className="hidden lg:block absolute top-6 left-[36%] w-16 z-10 opacity-90">
+        <PosterFragment category="posters" index={0} rotate={-5} tape />
+      </div>
+      {/* MOBILE — cropped Rangoli photo standing in for the desktop medallion */}
+      <div className="lg:hidden absolute top-0 left-0 w-[38%] max-w-[160px] aspect-square opacity-[0.15] pointer-events-none z-0 -rotate-90">
+        <RangoliDecoration index={2} spin={false} className="w-full h-full" />
+      </div>
 
       <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0 hidden md:block">
         <NotebookGridPattern opacity={0.5} />
@@ -121,6 +135,11 @@ export const Archive = () => {
 
       <div className="absolute bottom-16 right-16 z-20 pointer-events-none border-2 border-[#C2272A] text-[#C2272A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.3em] uppercase rotate-[-8deg] opacity-75 hidden md:block">
         CLASSIFIED // ARCHIVAL RECORD ✦
+      </div>
+
+      {/* REAL HALFTONE PRINT FRAGMENT — an actual screen-printed photo scrap, desktop only. */}
+      <div className="hidden lg:block absolute bottom-16 right-48 w-14 z-20 opacity-95">
+        <PosterFragment category="halftone" index={0} rotate={-6} tape />
       </div>
 
       {/* Section Header */}
@@ -137,9 +156,12 @@ export const Archive = () => {
 
       {/* MOBILE: 2-column photo grid */}
       <div className="mobile-archive-grid lg:hidden w-full px-5 pt-4 pb-16 max-w-[480px] mx-auto">
-        <p className="font-serif italic text-xs text-[#E7D5A4]/80 mb-8">
-          "Every gathering leaves behind more than photographs."
-        </p>
+        <div className="flex items-end justify-between gap-4 mb-8">
+          <p className="font-serif italic text-xs text-[#E7D5A4]/80 max-w-[70%]">
+            "Every gathering leaves behind more than photographs."
+          </p>
+          <FilmCutout index={0} rotate={5} className="w-12 shrink-0" />
+        </div>
         <div className="grid grid-cols-2 gap-5 sm:gap-7">
           {gallery.map((photo, i) => (
             <div key={photo.id} className="mobile-archive-photo">
@@ -149,13 +171,14 @@ export const Archive = () => {
         </div>
 
         {/* VIEW MORE ARCHIVE card — mobile standalone card at bottom */}
-        <div className="mobile-archive-photo mt-10 mx-auto max-w-[260px] -rotate-1"
+        <div className="mobile-archive-photo relative mt-10 mx-auto max-w-[260px] -rotate-1"
           style={{
             background: 'linear-gradient(150deg, #EEE4C8 0%, #E3D4AC 60%, #D8C99A 100%)',
             border: '2px solid #11100C',
             boxShadow: '6px 6px 0px rgba(17,16,12,0.7)',
             padding: '16px',
           }}>
+          <LotusStamp index={0} bg="#5A120D" border="#C99A24" className="absolute -top-3 -right-3 w-9 h-9 z-10" />
           <div className="relative mb-3">
             <div className="absolute -top-[18px] left-1/2 -translate-x-1/2 w-20 h-[14px] rotate-[-1deg]"
               style={{ background: 'rgba(201,154,46,0.5)', border: '1px solid rgba(160,120,20,0.3)' }} />

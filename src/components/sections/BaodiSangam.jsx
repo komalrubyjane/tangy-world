@@ -1,7 +1,8 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
-import { RangoliMedallion, LotusMotif, TextileBorderStrip, BandhaniDotField, HandDrawnCircle } from '../ui/CulturalMotifs';
+import { TextileBorderStrip, HandDrawnCircle } from '../ui/CulturalMotifs';
 import { PushPin, TapeStrip } from '../ui/BackgroundDecorations';
+import { RangoliDecoration, LotusStamp, PatternBackground, FilmCutout, PosterFragment } from '../ui/RetroAssets';
 
 export const BaodiSangam = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -35,12 +36,14 @@ export const BaodiSangam = () => {
       {/* motifs at real scale, not a background hint. Split-page poster composition instead */}
       {/* of a single centered field. */}
       <div className="relative w-full lg:w-[42%] h-[34%] lg:h-full shrink-0 overflow-hidden bg-[#16323A] border-b-4 lg:border-b-0 lg:border-r-4 border-[#0d1a1f]">
-        <BandhaniDotField color="#5FA8B8" opacity={0.14} size={34} />
-        <RangoliMedallion
-          color="#D19A24"
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[74%] aspect-square max-w-none opacity-40 animate-[spin_110s_linear_infinite] pointer-events-none"
-        />
-        <LotusMotif color="#ECDCAF" className="absolute bottom-[6%] left-1/2 -translate-x-1/2 w-[26%] max-w-[120px] opacity-80" />
+        <PatternBackground category="bandhani" index={1} opacity={0.38} size="cover" blend="normal" />
+        {/* REAL RANGOLI PHOTOGRAPH standing in for the stepwell's concentric ripples */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[74%] aspect-square max-w-none opacity-45 animate-[spin_110s_linear_infinite] pointer-events-none">
+          <RangoliDecoration index={1} spin={false} className="w-full h-full" />
+        </div>
+        <div className="absolute bottom-[6%] left-1/2 -translate-x-1/2 w-[26%] max-w-[120px] aspect-square opacity-90">
+          <LotusStamp index={0} border="#ECDCAF" bg="#0d1a1f" className="w-full h-full" />
+        </div>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_60%,rgba(0,0,0,0.55)_100%)]" />
         {/* PUSH PIN — pins the panel divider like a physically-assembled poster piece */}
         <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-2 z-20">
@@ -69,6 +72,14 @@ export const BaodiSangam = () => {
 
         <div className="absolute top-6 right-6 md:right-9 font-mono text-[9px] text-[#5FA8B8] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
           [ ✚ ] FIELD RECORDING // BAODI
+        </div>
+
+        {/* REAL CUTOUT FRAGMENT — a physical collage scrap tucked in the corner */}
+        <FilmCutout index={1} rotate={4} className="hidden md:block absolute bottom-8 right-8 z-10 w-16 lg:w-20 aspect-[3/5] opacity-90" />
+
+        {/* REAL HALFTONE PRINT FRAGMENT — a screen-printed scrap pinned near the top */}
+        <div className="hidden lg:block absolute top-16 right-10 w-14 z-10 opacity-90">
+          <PosterFragment category="halftone" index={0} rotate={7} tape />
         </div>
 
         <div className="baodi-text relative z-10 h-full flex flex-col items-start justify-center text-left px-[8%] lg:px-[10%]">

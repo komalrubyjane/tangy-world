@@ -1,6 +1,7 @@
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
-import { BandhaniDotField, TextileBorderStrip, RegistrationMark, RisographOffset } from '../ui/CulturalMotifs';
+import { TextileBorderStrip, RegistrationMark, RisographOffset } from '../ui/CulturalMotifs';
+import { PatternBackground, FilmCutout, LotusStamp, RetroGrain } from '../ui/RetroAssets';
 
 export const Closing = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -20,16 +21,19 @@ export const Closing = () => {
     <section ref={sectionRef} id="contact" className="relative w-full py-20 sm:py-32 bg-[#11100C] text-[#E7D5A4] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#5A120D]">
       
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
+      <RetroGrain index={0} opacity={0.12} blend="overlay" />
 
       {/* Background Archival Photo */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <img src="/media/gallery/tangy9.jpg" alt="After Hours" className="w-full h-full object-cover filter grayscale contrast-150" />
       </div>
 
-      <BandhaniDotField color="#C99A2E" opacity={0.07} size={34} className="z-10" />
+      <PatternBackground category="bandhani" index={1} opacity={0.26} size="cover" blend="normal" className="z-10" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C99A2E" colorB="#11100C" />
-      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
-      <RegistrationMark color="#E7D5A4" className="hidden lg:block absolute top-8 left-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 left-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      <FilmCutout index={1} rotate={-5} className="lg:hidden absolute top-4 left-4 w-12 z-20 pointer-events-none" />
+      <LotusStamp index={3} bg="transparent" border="#C99A2E" className="lg:hidden absolute bottom-4 right-4 w-10 h-10 opacity-90 z-20 pointer-events-none" />
 
       <div className="contact-back-page relative z-30 text-center px-4 max-w-4xl">
         <span className="font-mono text-[#C99A2E] text-[11px] tracking-[0.4em] mb-4 uppercase block font-bold">

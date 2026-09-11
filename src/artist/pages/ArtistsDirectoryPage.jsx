@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { useAudio } from '../../audio/AudioContext';
 import { PhotoTreatment } from '../../components/ui/PhotoTreatment';
-import { TextileBorderStrip, RangoliMedallion, BandhaniDotField } from '../../components/ui/CulturalMotifs';
+import { TextileBorderStrip } from '../../components/ui/CulturalMotifs';
 import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
+import { RangoliDecoration, LotusStamp, PatternBackground, FilmCutout, RetroGrain } from '../../components/ui/RetroAssets';
 
 // Each poster card cycles through one of these spot-colour fields — real colour
 // blocking per card rather than one uniform card background repeated N times.
@@ -59,11 +60,16 @@ export const ArtistsDirectoryPage = () => {
       {/* HERO HEADER — a poster masthead, not a settings-page banner: a bleeding Rangoli */}
       {/* medallion, a huge outline "01" plate mark, and oversized rotated title type. */}
       <div className="relative bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
-        <BandhaniDotField color="#c2272a" opacity={0.08} size={30} />
-        <RangoliMedallion
-          color="#c2272a"
-          className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] opacity-[0.16] pointer-events-none animate-[spin_150s_linear_infinite]"
-        />
+        <PatternBackground category="textile" index={1} opacity={0.34} size="cover" blend="normal" />
+        <RetroGrain index={0} opacity={0.09} blend="multiply" />
+        <div className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] aspect-square opacity-[0.18] animate-[spin_150s_linear_infinite] pointer-events-none">
+          <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+        </div>
+        {/* MOBILE — a real Rangoli photograph bleeding from the bottom-right, standing in */}
+        {/* for the full medallion that's desktop-only above this breakpoint. */}
+        <div className="sm:hidden absolute -bottom-[10%] -right-[10%] w-[46%] max-w-[160px] aspect-square opacity-[0.2] pointer-events-none">
+          <RangoliDecoration index={0} spin={false} className="w-full h-full" />
+        </div>
         <span
           className="hidden md:block absolute -left-[1%] -bottom-[18%] font-display font-black leading-none text-transparent pointer-events-none select-none"
           style={{ fontSize: 'clamp(90px,12vw,190px)', WebkitTextStroke: '2px rgba(90,18,13,0.14)' }}
@@ -174,13 +180,22 @@ export const ArtistsDirectoryPage = () => {
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <ArchiveStamp text={artist.genre || 'ARTIST'} rotation="4deg" color="dark" className="absolute top-2 right-2 z-10 !text-[8px]" />
+                  <LotusStamp
+                    index={idx}
+                    bg={palette.accent}
+                    border="#191410"
+                    className="absolute bottom-2 right-2 z-10 w-8 h-8 sm:w-9 sm:h-9"
+                  />
+                  {idx % 3 === 0 && (
+                    <FilmCutout index={idx} rotate={-3} className="hidden lg:block absolute bottom-2 left-2 z-10 w-10 aspect-[3/5] opacity-90" />
+                  )}
                 </div>
 
                 {/* NAME BAND — oversized rotated poster type overlapping the photo edge, */}
                 {/* set in the card's own spot colour rather than a plain white panel, with */}
                 {/* a Bandhani field as a real textile layer behind the type. */}
                 <div className="absolute inset-x-0 bottom-0 h-[36%] flex flex-col justify-center px-3.5 sm:px-5 py-2 overflow-hidden" style={{ color: palette.text }}>
-                  <BandhaniDotField color={palette.text} opacity={0.1} size={22} />
+                  <PatternBackground category="textile" index={idx} opacity={0.12} size="180px" repeat />
                   <div className="flex items-center justify-between relative">
                     <span className="font-mono text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest opacity-70">PLATE {String(idx + 1).padStart(2, '0')} · LIVE ARCHIVE</span>
                   </div>
