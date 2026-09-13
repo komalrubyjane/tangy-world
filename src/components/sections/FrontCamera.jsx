@@ -20,7 +20,7 @@ const FOOTAGE_LIST = [
     take: 'TAKE 02',
     timecode: '00:18:45',
     label: 'DAMINI BHATLA LIVE',
-    src: '/media/background-video/Fresh from the archives, when @daminibhatlach performed for us, the space softened around her, w.mp4',
+    src: '/media/background-video/Video-daminibhattacharya-live.mp4',
     aspect: 'aspect-[3/4]',
     marking: '★ KEEP THIS'
   },

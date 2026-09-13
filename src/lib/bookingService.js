@@ -99,6 +99,42 @@ export const bookingService = {
     return { success: true, booking: data };
   },
 
+  // Real payment path — creates a Razorpay order + a 'pending' booking
+  // server-side (the Edge Function computes the authoritative amount from
+  // the event's own price + tier markup; nothing about the amount is
+  // trusted from this call). Requires a real Supabase session regardless of
+  // the app's global AUTH_MODE — there is no mock equivalent, since a mock
+  // session has no JWT for the Edge Function to verify.
+  createPaymentOrder: async ({ eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone }) => {
+    if (!isSupabaseConfigured) {
+      return { success: false, error: 'Payment is not available right now — please try again shortly.' };
+    }
+    const { data, error } = await supabase.functions.invoke('razorpay-create-order', {
+      body: { eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone },
+    });
+    if (error) return { success: false, error: error.message || 'Could not start payment.' };
+    if (data?.error) return { success: false, error: data.error };
+    return { success: true, order: data };
+  },
+
+  // Verifies the Razorpay checkout response server-side and only then flips
+  // the booking to 'confirmed'. The razorpay-webhook Edge Function is the
+  // real source of truth in the background regardless of whether this call
+  // ever completes (browser closed mid-flow, etc.).
+  verifyPayment: async ({ bookingId, razorpayOrderId, razorpayPaymentId, razorpaySignature }) => {
+    const { data, error } = await supabase.functions.invoke('razorpay-verify-payment', {
+      body: {
+        booking_id: bookingId,
+        razorpay_order_id: razorpayOrderId,
+        razorpay_payment_id: razorpayPaymentId,
+        razorpay_signature: razorpaySignature,
+      },
+    });
+    if (error) return { success: false, error: error.message || 'Could not verify payment.' };
+    if (data?.error) return { success: false, error: data.error };
+    return { success: true, booking: data.booking };
+  },
+
   getMyBookings: async (userId) => {
     if (isMockAuth) {
       const events = mockEventServiceImpl.getAll();

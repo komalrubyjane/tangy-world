@@ -2,11 +2,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 import { useMockAuth } from '../../context/MockAuthContext';
+import { useUserAuth } from '../../context/UserAuthContext';
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
-  const { isLoggedIn: mockLoggedIn, user: mockUser } = useMockAuth();
+  const { isLoggedIn: mockLoggedIn } = useMockAuth();
+  // Admin Portal visibility must follow the same DB-verified role /admin's own
+  // StaffAuthGate checks — never the separate mock account system's session,
+  // which is a purely client-side, self-selectable role with no backend
+  // authorization behind it and shouldn't be trusted to gate anything.
+  const { user: authUser } = useUserAuth();
+  const isAdminUser = authUser?.role === 'admin' || authUser?.role === 'super_admin';
 
   // Active dropdown state for desktop & mobile
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -243,15 +250,16 @@ export const Navbar = () => {
             >
               🛂 PASSPORT
             </button>
-            {mockUser?.role === 'admin' && (
-              <button
-                onClick={() => handleNav('/admin')}
-                className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#C99A2E] border border-[#C99A2E] px-2.5 py-1 hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
-              >
-                ADMIN PORTAL
-              </button>
-            )}
           </div>
+        )}
+
+        {isAdminUser && (
+          <button
+            onClick={() => handleNav('/admin')}
+            className="hidden xl:inline-flex font-mono text-[10px] font-bold uppercase tracking-widest text-[#C99A2E] border border-[#C99A2E] px-2.5 py-1 hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
+          >
+            ADMIN PORTAL
+          </button>
         )}
 
         <div className="xl:hidden">
@@ -278,14 +286,17 @@ export const Navbar = () => {
               >
                 🛂 PROFILE / PASSPORT
               </button>
-              {mockUser?.role === 'admin' && (
-                <button
-                  onClick={() => handleNav('/admin')}
-                  className="text-left font-mono text-sm font-bold text-[#C99A2E] uppercase"
-                >
-                  ADMIN PORTAL
-                </button>
-              )}
+            </div>
+          )}
+
+          {isAdminUser && (
+            <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
+              <button
+                onClick={() => handleNav('/admin')}
+                className="text-left font-mono text-sm font-bold text-[#C99A2E] uppercase"
+              >
+                ADMIN PORTAL
+              </button>
             </div>
           )}
 

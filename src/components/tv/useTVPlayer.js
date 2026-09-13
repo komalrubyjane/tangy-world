@@ -54,7 +54,13 @@ export function useTVPlayer() {
     return null;
   })();
 
-  const currentSrc      = currentVideo?.url || '';
+  // Admin-entered channel URLs (tvChannels.js) are raw local paths, unlike
+  // FIRST_VIDEO/MIDDLE_VIDEO which come pre-encoded from Vite's import.meta.glob.
+  // A raw path with spaces/commas/@ etc. plays fine from Vite's dev server but
+  // can fail to resolve against the static host in production, silently
+  // falling through to the SPA rewrite — so encode local paths before use.
+  const rawUrl           = currentVideo?.url || '';
+  const currentSrc       = rawUrl.startsWith('/') ? encodeURI(rawUrl) : rawUrl;
   const channelNumber   = currentIndex + 1;
   const totalVideos     = shuffled.length;
 

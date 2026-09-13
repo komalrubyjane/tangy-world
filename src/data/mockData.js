@@ -411,7 +411,7 @@ export const videos = {
   hero: "/media/videos/tangy.mp4",
   frontCamera: "/media/videos/hero-bg.mp4",
   backgrounds: [
-    "/media/background-video/Fresh from the archives, when @daminibhatlach performed for us, the space softened around her, w.mp4",
+    "/media/background-video/Video-daminibhattacharya-live.mp4",
     "/media/background-video/Video-63639.mp4",
     "/media/videos/tangy.mp4"
   ]

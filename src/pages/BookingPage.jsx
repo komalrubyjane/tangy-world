@@ -5,6 +5,7 @@ import { artists, gallery } from '../data/mockData';
 import { useEvents } from '../hooks/useEvents';
 import { useUserAuth } from '../context/UserAuthContext';
 import { bookingService } from '../lib/bookingService';
+import { isMockAuth } from '../config/auth';
 import { generateQrDataUrl } from '../lib/qr';
 import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
@@ -61,6 +62,22 @@ export const BookingPage = () => {
   const taxes = Math.round(subtotal * 0.18);
   const totalAmount = subtotal + taxes;
 
+  const loadRazorpayScript = () => new Promise((resolve, reject) => {
+    if (window.Razorpay) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Could not load the payment gateway. Check your connection and try again.'));
+    document.body.appendChild(script);
+  });
+
+  const finalizeConfirmedBooking = async (booking) => {
+    setConfirmedBooking(booking);
+    setIsSubmitted(true);
+    const qr = await generateQrDataUrl(booking.registration_code);
+    setQrDataUrl(qr);
+  };
+
   const handleProceedPayment = async (e) => {
     e.preventDefault();
     if (!fullName || !phone || !email || !session) return;
@@ -68,27 +85,88 @@ export const BookingPage = () => {
     playSFX('ticketClick');
     setIsSubmitting(true);
 
-    const res = await bookingService.createBooking({
-      userId: user.id,
-      eventId: session.id,
-      attendeeName: fullName,
-      attendeeEmail: email,
-      attendeePhone: phone,
-      quantity: ticketQuantity,
-      amount: totalAmount,
-    });
-
-    setIsSubmitting(false);
-
-    if (!res.success) {
-      setBookingError(res.error || 'Something went wrong creating your booking.');
+    // Mock mode has no real Supabase session for an Edge Function to verify
+    // against, so it keeps confirming bookings directly — this is the site's
+    // existing, pre-payment test path, unrelated to whether real Razorpay
+    // checkout is wired up.
+    if (isMockAuth) {
+      const res = await bookingService.createBooking({
+        userId: user.id,
+        eventId: session.id,
+        attendeeName: fullName,
+        attendeeEmail: email,
+        attendeePhone: phone,
+        quantity: ticketQuantity,
+        amount: totalAmount,
+      });
+      setIsSubmitting(false);
+      if (!res.success) {
+        setBookingError(res.error || 'Something went wrong creating your booking.');
+        return;
+      }
+      await finalizeConfirmedBooking(res.booking);
       return;
     }
 
-    setConfirmedBooking(res.booking);
-    setIsSubmitted(true);
-    const qr = await generateQrDataUrl(res.booking.registration_code);
-    setQrDataUrl(qr);
+    // Real payment flow: server computes the authoritative amount and
+    // creates the Razorpay order; nothing here is trusted for pricing.
+    const orderRes = await bookingService.createPaymentOrder({
+      eventId: session.id,
+      quantity: ticketQuantity,
+      tierId: selectedTier.id,
+      attendeeName: fullName,
+      attendeeEmail: email,
+      attendeePhone: phone,
+    });
+
+    if (!orderRes.success) {
+      setIsSubmitting(false);
+      setBookingError(orderRes.error || 'Could not start payment.');
+      return;
+    }
+
+    try {
+      await loadRazorpayScript();
+    } catch (err) {
+      setIsSubmitting(false);
+      setBookingError(err.message);
+      return;
+    }
+
+    const { order_id, amount, currency, key_id, booking_id } = orderRes.order;
+
+    const rzp = new window.Razorpay({
+      key: key_id,
+      amount,
+      currency,
+      order_id,
+      name: 'Tangy Sessions',
+      description: `${selectedTier.name} — ${session.title}`,
+      prefill: { name: fullName, email, contact: phone },
+      theme: { color: '#c2272a' },
+      handler: async (response) => {
+        const verifyRes = await bookingService.verifyPayment({
+          bookingId: booking_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpaySignature: response.razorpay_signature,
+        });
+        setIsSubmitting(false);
+        if (!verifyRes.success) {
+          setBookingError(verifyRes.error || 'Payment verification failed — please contact support before retrying.');
+          return;
+        }
+        await finalizeConfirmedBooking(verifyRes.booking);
+      },
+      modal: {
+        ondismiss: () => setIsSubmitting(false),
+      },
+    });
+    rzp.on('payment.failed', (resp) => {
+      setIsSubmitting(false);
+      setBookingError(resp.error?.description || 'Payment failed. Please try again.');
+    });
+    rzp.open();
   };
 
   const handleQuantityChange = (delta) => {
@@ -439,7 +517,9 @@ export const BookingPage = () => {
                 )}
 
                 <div className="p-2 bg-[#d1a437]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
-                  ℹ️ TEST MODE — payment capture isn't wired up yet, so this confirms your booking directly. Live Razorpay checkout will replace this before launch.
+                  {isMockAuth
+                    ? 'ℹ️ TEST MODE — payment capture isn\'t wired up yet, so this confirms your booking directly. Live Razorpay checkout will replace this before launch.'
+                    : '🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy\'s servers.'}
                 </div>
 
                 <button
@@ -447,7 +527,7 @@ export const BookingPage = () => {
                   disabled={isSubmitting}
                   className="w-full h-14 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {isSubmitting ? 'CONFIRMING...' : `CONFIRM BOOKING (₹${totalAmount.toLocaleString()}) →`}
+                  {isSubmitting ? 'PROCESSING...' : `${isMockAuth ? 'CONFIRM BOOKING' : 'PAY & CONFIRM'} (₹${totalAmount.toLocaleString()}) →`}
                 </button>
 
               </form>

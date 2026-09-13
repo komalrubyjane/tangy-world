@@ -7,7 +7,7 @@
 import { loadOrSeed, persist } from './store';
 
 const SEED = [
-  { id: 'tv-001', title: 'Damini Bhatlacharya — Live Session', url: '/media/background-video/Fresh from the archives, when @daminibhatlach performed for us, the space softened around her, w.mp4', status: 'active' },
+  { id: 'tv-001', title: 'Damini Bhatlacharya — Live Session', url: '/media/background-video/Video-daminibhattacharya-live.mp4', status: 'active' },
   { id: 'tv-002', title: 'Field Recording — Vol. 22402', url: '/media/background-video/Video-22402.mp4', status: 'active' },
   { id: 'tv-003', title: 'Field Recording — Vol. 22653', url: '/media/background-video/Video-22653.mp4', status: 'active' },
   { id: 'tv-004', title: 'Field Recording — Vol. 37256', url: '/media/background-video/Video-37256.mp4', status: 'active' },
