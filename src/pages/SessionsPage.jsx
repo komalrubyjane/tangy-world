@@ -7,6 +7,7 @@ import { useAudio } from '../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { waitlistService } from '../services/waitlistService';
+import { PosterEventCard } from '../components/ui/PosterEventCard';
 
 const VENUE_FILTERS = ['ALL', 'STEPWELL', 'BARADARI', 'COURTYARD'];
 
@@ -82,13 +83,6 @@ export const SessionsPage = () => {
     if (filter === 'ALL') return true;
     return evt.venue?.toUpperCase().includes(filter);
   });
-
-  const STATUS_STYLES = {
-    'SOLD OUT': { bg: '#5A120D', text: '#E7D5A4' },
-    'AVAILABLE': { bg: '#2D5A1B', text: '#E7D5A4' },
-    'ALMOST GONE': { bg: '#B94717', text: '#E7D5A4' },
-    'UPCOMING': { bg: '#11100C', text: '#C99A2E' }
-  };
 
   return (
     <div className="min-h-screen bg-[#B94717] text-[#E7D5A4] font-mono selection:bg-[#11100C] selection:text-[#E7D5A4] overflow-x-hidden">
@@ -173,65 +167,14 @@ export const SessionsPage = () => {
         )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
-          {!eventsLoading && filteredEvents.map((evt, idx) => {
-            const statusStyle = STATUS_STYLES[evt.status] || STATUS_STYLES['AVAILABLE'];
-            const isSoldOut = evt.status === 'SOLD OUT';
-
-            return (
-              <div
-                key={evt.id}
-                className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex flex-col justify-between overflow-hidden group hover:-translate-y-1 transition-transform duration-200"
-              >
-                <div className="relative w-full aspect-[4/3] bg-black border-b-4 border-[#11100C] overflow-hidden">
-                  <img
-                    src={evt.image}
-                    alt={evt.title}
-                    className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
-                  />
-                  <div
-                    className="absolute top-2 right-2 font-mono text-[9px] px-2 py-1 font-bold uppercase"
-                    style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
-                  >
-                    {evt.status}
-                  </div>
-                  <div className="absolute bottom-2 left-2 bg-[#11100C]/80 text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold">
-                    TICKET #TK-1974-00{idx + 1}
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-center font-mono text-[9px] sm:text-[10px] font-bold text-[#B94717] border-b-2 border-[#11100C] pb-2 mb-3 uppercase">
-                    <span>{evt.date}</span>
-                    <span>{evt.time}</span>
-                  </div>
-
-                  <h3 className="display text-2xl sm:text-3xl text-[#11100C] leading-tight mb-1">{evt.title}</h3>
-                  <p className="font-mono text-[10px] sm:text-xs text-[#5A120D] font-bold uppercase mb-1">{evt.artist}</p>
-                  <p className="font-mono text-[10px] sm:text-xs font-bold text-[#B94717] mb-2">{evt.venue} · {evt.city}</p>
-                  <p className="font-mono text-[10px] sm:text-xs text-[#11100C]/75 leading-relaxed mb-4 flex-1">
-                    {evt.description}
-                  </p>
-
-                  <div className="flex justify-between items-center mb-3 font-mono text-[9px] uppercase text-[#11100C]/60">
-                    <span>{evt.tags?.slice(0, 2).join(' · ')}</span>
-                    <span className="font-bold text-[#B94717]">{evt.price}</span>
-                  </div>
-
-                  <button
-                    onClick={() => { playSFX('ticketClick'); !isSoldOut && navigate(`/book/${evt.slug || evt.id}`); }}
-                    disabled={isSoldOut}
-                    className={`w-full py-3 font-mono text-[11px] font-bold uppercase tracking-widest border-2 transition-colors ${
-                      isSoldOut
-                        ? 'bg-[#5A120D] text-[#E7D5A4]/60 border-[#5A120D] cursor-not-allowed'
-                        : 'bg-[#11100C] text-[#E7D5A4] border-[#11100C] hover:bg-[#B94717] hover:border-[#B94717]'
-                    }`}
-                  >
-                    {isSoldOut ? 'SOLD OUT ✗' : 'BOOK TICKETS →'}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          {!eventsLoading && filteredEvents.map((evt, idx) => (
+            <PosterEventCard
+              key={evt.id}
+              event={evt}
+              idx={idx}
+              onBook={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
+            />
+          ))}
         </div>
       </section>
 

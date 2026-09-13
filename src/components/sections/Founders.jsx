@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
 import {
   TextileBorderStrip,
-  RegistrationMark,
   HandDrawnCircle,
   RisographOffset,
 } from '../ui/CulturalMotifs';
@@ -111,7 +110,7 @@ export const Founders = () => {
       <PatternBackground category="textile" index={0} opacity={0.36} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      
       <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-[8vw] w-[30vw] h-[30vw] max-w-none opacity-[0.1] animate-[spin_190s_linear_infinite] pointer-events-none z-0">
         <RangoliDecoration index={1} spin={false} className="w-full h-full" />
       </div>
@@ -119,7 +118,7 @@ export const Founders = () => {
       <div className="lg:hidden absolute bottom-0 right-0 w-[36%] max-w-[150px] aspect-square opacity-[0.16] pointer-events-none z-0">
         <RangoliDecoration index={1} spin={false} className="w-full h-full" />
       </div>
-      <LotusStamp index={3} bg="#5A120D" border="#D19A24" className="lg:hidden absolute top-[8%] left-4 w-9 h-9 opacity-90 z-10" />
+      <LotusStamp index={3} bg="transparent" border="#D19A24" className="lg:hidden absolute top-[8%] left-4 w-9 h-9 opacity-90 z-10" />
 
       {/* ARCHIVAL METADATA */}
       <div className="absolute top-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#D19A24] font-bold pointer-events-none uppercase hidden md:block">

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
-import { TextileBorderStrip, HandDrawnCircle, HandDrawnArrow, RegistrationMark } from '../ui/CulturalMotifs';
-import { PosterFragment, LotusStamp, RetroGrain, RangoliDecoration, PatternBackground } from '../ui/RetroAssets';
+import { TextileBorderStrip, HandDrawnCircle, HandDrawnArrow } from '../ui/CulturalMotifs';
+import { LotusStamp, RetroGrain, RangoliDecoration, PatternBackground } from '../ui/RetroAssets';
 
 // Mobile-only cast cycle for the hero's single central spot: instead of a
 // fixed guitarist, one performer at a time crossfades in/out every 2s so the
@@ -161,11 +161,11 @@ export const Hero = () => {
         className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
       >
         {/* CORNER REGISTRATION MARKS */}
-        <RegistrationMark color="#11100C" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] left-[1.4cqw] pointer-events-none" />
-        <RegistrationMark color="#11100C" className="absolute z-30 w-[2.8cqw] min-w-[12px] h-[2.8cqw] min-h-[12px] opacity-85 top-[1.4cqw] right-[1.4cqw] pointer-events-none" />
+        
+        
         {/* BOTTOM-RIGHT — desktop only, mirrors the mobile pair that already existed; */}
         {/* completes the four-corner print-registration frame. */}
-        <RegistrationMark color="#11100C" className="hidden lg:block absolute z-30 w-[2.2cqw] min-w-[12px] h-[2.2cqw] min-h-[12px] opacity-60 bottom-[1.4cqw] right-[1.4cqw] pointer-events-none" />
+        
 
         {/* TOP BAR VISUAL GRID ALIGNMENT */}
         <div className="absolute z-40 top-[52px] md:top-[2.2cqw] left-[3cqw] right-[3cqw] flex items-start justify-between pointer-events-none">
@@ -446,23 +446,15 @@ export const Hero = () => {
 
           {/* REAL TEXTILE CLIPPING — a cropped, rotated textile photograph standing in for a */}
           {/* pasted magazine paper layer, tucked low behind the violinist. */}
-          <div className="absolute left-[4cqw] bottom-[1cqw] w-[10.5cqw] max-w-[118px] aspect-[3/4]">
-            <PosterFragment category="textile" index={1} rotate={-5} tape className="w-full h-full" />
-          </div>
-
           {/* REAL RANGOLI FRAGMENT — a partially cropped, rotated archival print detail */}
           {/* bleeding off the left edge. */}
-          <div className="absolute -left-[2.5cqw] bottom-[6.5cqw] w-[9cqw] max-w-[96px] aspect-square opacity-90">
-            <PosterFragment category="rangoli" index={2} rotate={9} tape={false} className="w-full h-full" />
-          </div>
-
           {/* REAL LOTUS STAMP — a small decorative print stamp at the corner. */}
           <div className="absolute left-[9.5cqw] bottom-[0.5cqw] w-[4cqw] max-w-[42px] aspect-square">
-            <LotusStamp index={0} border="#ECDCAF" bg="#3C0F0E" className="w-full h-full opacity-95 rotate-[-10deg] shadow-md" />
+            <LotusStamp index={0} border="#ECDCAF" bg="transparent" className="w-full h-full opacity-95 rotate-[-10deg] shadow-md" />
           </div>
 
           {/* THIN REGISTRATION MARK + tiny archival label — print-shop detail. */}
-          <RegistrationMark color="#ECDCAF" className="absolute left-[0.6cqw] top-0 w-3.5 h-3.5 opacity-50" />
+          
           <span
             className="absolute left-[0.9cqw] top-[1.5cqw] font-mono text-[6.5px] tracking-[0.18em] text-[#ECDCAF]/55 uppercase whitespace-nowrap"
             style={{ writingMode: 'vertical-rl' }}

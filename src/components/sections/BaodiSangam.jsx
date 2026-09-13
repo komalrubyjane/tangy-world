@@ -2,7 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { TextileBorderStrip, HandDrawnCircle } from '../ui/CulturalMotifs';
 import { PushPin, TapeStrip } from '../ui/BackgroundDecorations';
-import { RangoliDecoration, LotusStamp, PatternBackground, FilmCutout, PosterFragment } from '../ui/RetroAssets';
+import { RangoliDecoration, LotusStamp, PatternBackground } from '../ui/RetroAssets';
 
 export const BaodiSangam = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -42,7 +42,7 @@ export const BaodiSangam = () => {
           <RangoliDecoration index={1} spin={false} className="w-full h-full" />
         </div>
         <div className="absolute bottom-[6%] left-1/2 -translate-x-1/2 w-[26%] max-w-[120px] aspect-square opacity-90">
-          <LotusStamp index={0} border="#ECDCAF" bg="#0d1a1f" className="w-full h-full" />
+          <LotusStamp index={0} border="#ECDCAF" bg="transparent" className="w-full h-full" />
         </div>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_60%,rgba(0,0,0,0.55)_100%)]" />
         {/* PUSH PIN — pins the panel divider like a physically-assembled poster piece */}
@@ -75,13 +75,9 @@ export const BaodiSangam = () => {
         </div>
 
         {/* REAL CUTOUT FRAGMENT — a physical collage scrap tucked in the corner */}
-        <FilmCutout index={1} rotate={4} className="hidden md:block absolute bottom-8 right-8 z-10 w-16 lg:w-20 aspect-[3/5] opacity-90" />
+        
 
         {/* REAL HALFTONE PRINT FRAGMENT — a screen-printed scrap pinned near the top */}
-        <div className="hidden lg:block absolute top-16 right-10 w-14 z-10 opacity-90">
-          <PosterFragment category="halftone" index={0} rotate={7} tape />
-        </div>
-
         <div className="baodi-text relative z-10 h-full flex flex-col items-start justify-center text-left px-[8%] lg:px-[10%]">
           <div className="relative inline-block mb-4">
             <TapeStrip className="absolute -top-2 -left-3 w-14 h-4 rotate-3" />

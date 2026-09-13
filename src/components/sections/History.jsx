@@ -6,11 +6,10 @@ import { PaperTape } from '../ui/PaperTape';
 import {
   TextileBorderStrip,
   VintageFilmFrame,
-  RegistrationMark,
   RisographOffset,
   HandDrawnUnderline,
 } from '../ui/CulturalMotifs';
-import { RangoliDecoration, LotusStamp, PatternBackground, FilmCutout, RetroGrain } from '../ui/RetroAssets';
+import { RangoliDecoration, LotusStamp, PatternBackground, RetroGrain } from '../ui/RetroAssets';
 
 const CHRONOLOGY_DATA = [
   {
@@ -224,7 +223,7 @@ export const History = () => {
         <div className="hidden lg:block absolute -top-[10vw] -left-[8vw] w-[36vw] h-[36vw] max-w-none opacity-[0.12] animate-[spin_150s_linear_infinite] pointer-events-none">
           <RangoliDecoration index={2} spin={false} className="w-full h-full" />
         </div>
-        <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 pointer-events-none" />
+        
         {/* MOBILE — real cropped Rangoli photograph standing in for the desktop medallion above */}
         <div className="lg:hidden absolute top-0 right-0 w-[36%] max-w-[150px] aspect-square opacity-[0.15] pointer-events-none">
           <RangoliDecoration index={2} spin={false} className="w-full h-full" />
@@ -260,8 +259,8 @@ export const History = () => {
           >
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
             <PatternBackground category="bandhani" index={index} opacity={0.24} size="cover" blend="multiply" className="z-0" />
-            <RegistrationMark color="#11100C" className="hidden md:block absolute top-6 right-6 w-5 h-5 opacity-35 z-10 pointer-events-none" />
-            <LotusStamp index={index} bg={era.accent} border={era.text} className="md:hidden absolute top-4 right-4 w-8 h-8 opacity-90 z-10" />
+            
+            <LotusStamp index={index} bg="transparent" border={era.text} className="md:hidden absolute top-4 right-4 w-8 h-8 opacity-90 z-10" />
             <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={7} colorA={era.accent} colorB="#11100C" />
 
             <div className="bg-year-text absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
@@ -393,7 +392,7 @@ export const History = () => {
                   <p className="font-body text-sm md:text-base text-[#E7D5A4]/90 italic">{era.description}</p>
 
                   {/* REAL CUTOUT PHOTOGRAPHY FRAGMENT — an extra pinned contact-strip frame */}
-                  <FilmCutout index={0} rotate={-4} className="hidden lg:block absolute -bottom-6 -right-6 w-16 aspect-[3/5] opacity-95" />
+                  
                 </div>
               )}
 

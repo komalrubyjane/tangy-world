@@ -2,7 +2,7 @@ import { useGSAPContext } from '../../hooks/useGSAPContext';
 import gsap from 'gsap';
 import { TextileBorderStrip, HandDrawnUnderline, HandDrawnCircle } from '../ui/CulturalMotifs';
 import { TapeStrip } from '../ui/BackgroundDecorations';
-import { RangoliDecoration, PatternBackground, PosterFragment } from '../ui/RetroAssets';
+import { RangoliDecoration, PatternBackground } from '../ui/RetroAssets';
 
 export const TangyTalks = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -69,10 +69,6 @@ export const TangyTalks = () => {
 
       {/* REAL VINTAGE POSTER FRAGMENT — a taped physical scrap pinned in the corner, */}
       {/* the underground-flyer-pasted-on-a-wall feeling this section wants. */}
-      <div className="hidden md:block absolute bottom-6 left-6 z-20 w-24 lg:w-28">
-        <PosterFragment category="posters" index={0} rotate={-6} tape />
-      </div>
-
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-10" height={10} colorA="#D19A24" colorB="#0D0A08" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={10} colorA="#D19A24" colorB="#0D0A08" />
 

@@ -10,14 +10,11 @@ import {
 import {
   TextileBorderStrip,
   VintageFilmFrame,
-  RegistrationMark,
-} from '../ui/CulturalMotifs';
+  } from '../ui/CulturalMotifs';
 import {
   PatternBackground,
   RangoliDecoration,
   LotusStamp,
-  PosterFragment,
-  FilmCutout,
   RetroGrain,
 } from '../ui/RetroAssets';
 
@@ -25,12 +22,20 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* --- Shared photo card --- */
 const PhotoCard = ({ photo, i, isLast }) => (
-  <div className={`relative bg-[#E3D4AC] p-2.5 sm:p-3 pb-8 sm:pb-12 shadow-xl border-2 border-[#11100C] ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
+  <div className={`relative bg-[#E3D4AC] p-2.5 sm:p-3 pb-8 sm:pb-12 border-2 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] transition-transform duration-300 hover:-translate-y-1.5 ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
     style={{ transform: `rotate(${(i % 3 - 1) * 3}deg)` }}>
+    {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection clipped to the card's own mat. */}
+    <RetroGrain index={i % 2} opacity={0.14} blend="multiply" />
+    
     {/* Sprocket-hole side strips sit in the card's own cream mat, never over the photo */}
     <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-25" />
     <div className="absolute -top-3 left-1/3 w-14 sm:w-16 h-3.5 sm:h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
-    <div className="flex justify-between font-mono text-[7.5px] sm:text-[8px] text-[#11100C] font-bold px-0.5 mb-1">
+    {/* REAL LOTUS ARCHIVE SEAL — every third frame carries a small pressed-stamp mark, an */}
+    {/* archival detail rather than a repeated identical treatment across every card. */}
+    {i % 3 === 2 && (
+      <LotusStamp index={i} bg="transparent" border="#C99A24" className="absolute -bottom-3 -right-3 w-8 h-8 z-20 shadow-md rotate-[-6deg]" />
+    )}
+    <div className="relative flex justify-between font-mono text-[7.5px] sm:text-[8px] text-[#11100C] font-bold px-0.5 mb-1">
       <span>{String(i + 1).padStart(2, '0')}A</span>
       <span>EASTMAN 5247</span>
       <span>▲ {i + 1}</span>
@@ -39,7 +44,7 @@ const PhotoCard = ({ photo, i, isLast }) => (
       <img src={photo.src} alt={photo.label} loading="lazy" decoding="async"
         className="w-full h-full object-cover filter grayscale sepia-[0.35] contrast-125" />
     </div>
-    <div className="mt-2.5 flex justify-between items-baseline font-mono text-[9px] sm:text-[10px] text-[#11100C]">
+    <div className="relative mt-2.5 flex justify-between items-baseline font-mono text-[9px] sm:text-[10px] text-[#11100C]">
       <span className="font-bold tracking-wider truncate mr-1">{photo.label.toUpperCase()}</span>
       <span className="opacity-70 shrink-0">HYD · 2025</span>
     </div>
@@ -116,11 +121,8 @@ export const Archive = () => {
         <RangoliDecoration index={2} spin={false} className="w-full h-full" />
       </div>
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C99A24" colorB="#11100C" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-50 z-20 pointer-events-none" />
+      
       {/* REAL vintage poster fragment tucked behind the header, desktop only */}
-      <div className="hidden lg:block absolute top-6 left-[36%] w-16 z-10 opacity-90">
-        <PosterFragment category="posters" index={0} rotate={-5} tape />
-      </div>
       {/* MOBILE — cropped Rangoli photo standing in for the desktop medallion */}
       <div className="lg:hidden absolute top-0 left-0 w-[38%] max-w-[160px] aspect-square opacity-[0.15] pointer-events-none z-0 -rotate-90">
         <RangoliDecoration index={2} spin={false} className="w-full h-full" />
@@ -138,10 +140,6 @@ export const Archive = () => {
       </div>
 
       {/* REAL HALFTONE PRINT FRAGMENT — an actual screen-printed photo scrap, desktop only. */}
-      <div className="hidden lg:block absolute bottom-16 right-48 w-14 z-20 opacity-95">
-        <PosterFragment category="halftone" index={0} rotate={-6} tape />
-      </div>
-
       {/* Section Header */}
       <div className="pt-24 lg:pt-0 lg:absolute lg:top-10 left-5 right-5 md:left-12 md:right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4 lg:px-0">
         <div>
@@ -160,7 +158,7 @@ export const Archive = () => {
           <p className="font-serif italic text-xs text-[#E7D5A4]/80 max-w-[70%]">
             "Every gathering leaves behind more than photographs."
           </p>
-          <FilmCutout index={0} rotate={5} className="w-12 shrink-0" />
+          
         </div>
         <div className="grid grid-cols-2 gap-5 sm:gap-7">
           {gallery.map((photo, i) => (
@@ -178,7 +176,7 @@ export const Archive = () => {
             boxShadow: '6px 6px 0px rgba(17,16,12,0.7)',
             padding: '16px',
           }}>
-          <LotusStamp index={0} bg="#5A120D" border="#C99A24" className="absolute -top-3 -right-3 w-9 h-9 z-10" />
+          <LotusStamp index={0} bg="transparent" border="#C99A24" className="absolute -top-3 -right-3 w-9 h-9 z-10" />
           <div className="relative mb-3">
             <div className="absolute -top-[18px] left-1/2 -translate-x-1/2 w-20 h-[14px] rotate-[-1deg]"
               style={{ background: 'rgba(201,154,46,0.5)', border: '1px solid rgba(160,120,20,0.3)' }} />

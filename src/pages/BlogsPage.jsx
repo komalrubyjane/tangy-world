@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { diaryEntries } from '../data/mockData';
+import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
 const CATEGORY_TAGS = {
   'ALL': null,
@@ -63,9 +64,11 @@ export const BlogsPage = () => {
           return (
             <article
               key={entry.id}
-              className="bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
+              className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
             >
-              <div className="flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
+              <RetroGrain index={idx % 2} opacity={0.1} blend="multiply" />
+              <LotusStamp index={idx} bg="transparent" border="#7C2D18" className="hidden sm:block absolute -top-3 -right-3 w-9 h-9 z-20 opacity-95 rotate-[-8deg]" />
+              <div className="relative flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
                 <span>ENTRY #00{idx+1} · {entry.date}</span>
                 <span className="hidden sm:block">{entry.location || 'HYDERABAD ARCHIVE'}</span>
               </div>

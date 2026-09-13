@@ -4,6 +4,7 @@ import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
 import { eventService } from '../services/eventService';
+import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
 const MONTH_NAMES = [
   'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -245,13 +246,16 @@ export const SessionCalendarPage = () => {
               <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold">
                 SESSIONS ON {MONTH_NAMES[viewMonth]} {selectedDay}, {viewYear}
               </span>
-              {selectedEvents.map((evt) => {
+              {selectedEvents.map((evt, evtIdx) => {
                 const spotsLeft = evt.capacity - evt.sold;
                 const isSoldOut = evt.status === 'sold-out' || spotsLeft <= 0;
                 return (
-                  <div key={evt.id} className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    <div className="sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square overflow-hidden border-2 border-[#11100C]">
+                  <div key={evt.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 overflow-hidden">
+                    <RetroGrain index={evtIdx % 2} opacity={0.1} blend="multiply" />
+                    
+                    <div className="relative sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square overflow-hidden border-2 border-[#11100C]">
                       <img src={evt.image} alt={evt.name} className="w-full h-full object-cover filter grayscale contrast-125" />
+                      <LotusStamp index={evtIdx} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center font-mono text-[9px] sm:text-[10px] font-bold text-[#B94717] uppercase mb-2 flex-wrap gap-1">

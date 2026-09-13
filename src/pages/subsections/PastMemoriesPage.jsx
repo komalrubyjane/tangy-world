@@ -2,6 +2,7 @@ import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { pastMemories } from '../../data/mock/archive';
 import { archiveItems } from '../../data/mockData';
+import { RetroGrain, LotusStamp } from '../../components/ui/RetroAssets';
 
 export const PastMemoriesPage = () => {
   return (
@@ -29,12 +30,13 @@ export const PastMemoriesPage = () => {
           MEMORY REEL // {pastMemories.length} PRESERVED FRAMES
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-14">
-          {pastMemories.map((mem) => (
-            <figure key={mem.id} className="bg-[#1A1510] border border-[#E7D5A4]/15 p-1.5 sm:p-2">
-              <div className="w-full aspect-square bg-black overflow-hidden mb-1.5">
+          {pastMemories.map((mem, mi) => (
+            <figure key={mem.id} className="relative bg-[#1A1510] border border-[#E7D5A4]/15 p-1.5 sm:p-2">
+              <RetroGrain index={mi % 2} opacity={0.12} blend="overlay" />
+              <div className="relative w-full aspect-square bg-black overflow-hidden mb-1.5">
                 <img src={mem.image} alt={mem.caption} className="w-full h-full object-cover filter grayscale sepia-[0.25] contrast-125" />
               </div>
-              <figcaption className="font-mono text-[8px] sm:text-[9px] text-[#E7D5A4]/70 leading-tight">{mem.caption}</figcaption>
+              <figcaption className="relative font-mono text-[8px] sm:text-[9px] text-[#E7D5A4]/70 leading-tight">{mem.caption}</figcaption>
             </figure>
           ))}
         </div>
@@ -43,10 +45,13 @@ export const PastMemoriesPage = () => {
           PHYSICAL ARCHIVE OBJECTS
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
-          {archiveItems.map((item) => (
-            <div key={item.id} className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start">
-              <div className="w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
+          {archiveItems.map((item, ii) => (
+            <div key={item.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start overflow-hidden">
+              <RetroGrain index={ii % 2} opacity={0.1} blend="multiply" />
+              
+              <div className="relative w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
                 <img src={item.image} alt={item.title} className="w-full aspect-[3/4] object-cover filter grayscale sepia-[0.4]" />
+                <LotusStamp index={ii} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-mono text-[8px] sm:text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{item.category} // {item.year}</div>

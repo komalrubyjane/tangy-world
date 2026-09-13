@@ -7,17 +7,14 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
 import {
   TextileBorderStrip,
   HandDrawnUnderline,
-  RegistrationMark,
   RisographOffset,
 } from '../ui/CulturalMotifs';
 import {
   PatternBackground,
   LotusStamp,
   RangoliDecoration,
-  FilmCutout,
   RetroGrain,
-  PosterFragment,
-} from '../ui/RetroAssets';
+  } from '../ui/RetroAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -199,16 +196,13 @@ export const TangyDiary = () => {
       <PatternBackground category="textile" index={2} opacity={0.34} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute bottom-8 left-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      
+      
       <LotusStamp index={2} bg="transparent" border="#A68853" className="hidden md:block absolute top-10 left-10 w-10 h-10 opacity-60 z-20 pointer-events-none" />
       {/* REAL ILLUSTRATION FRAGMENT — a small hand-drawn print scrap pinned near the header. */}
-      <div className="hidden lg:block absolute top-8 right-24 w-11 z-20">
-        <PosterFragment category="illustrations" index={1} rotate={-8} tape={false} />
-      </div>
       {/* MOBILE — kept entirely outside the 3D book stage: a real film cutout corner and */}
       {/* cropped Rangoli photo, standing in for the desktop registration marks/lotus above. */}
-      <FilmCutout index={3} rotate={4} className="md:hidden absolute top-4 right-4 w-14 z-20 pointer-events-none" />
+      
       <div className="md:hidden absolute bottom-0 left-0 w-[34%] max-w-[130px] aspect-square opacity-[0.18] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>

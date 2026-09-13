@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { gallery, archiveItems } from '../data/mockData';
+import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
 const TABS = ['ALL', 'GALLERY', 'ARCHIVE OBJECTS', 'PRESS'];
 
@@ -149,10 +150,11 @@ export const ArchivePage = () => {
           {filteredGallery.map((item, idx) => (
             <div
               key={item.id}
-              className="bg-[#1A1510] border border-[#E7D5A4]/15 p-1.5 sm:p-2 cursor-pointer group hover:border-[#C99A2E]/60 transition-all"
+              className="relative bg-[#1A1510] border border-[#E7D5A4]/15 p-1.5 sm:p-2 cursor-pointer group hover:border-[#C99A2E]/60 transition-all"
               onClick={() => setLightboxSrc(item.src)}
             >
-              <div className="flex justify-between font-mono text-[7px] sm:text-[8px] font-bold text-[#C99A2E] mb-1 uppercase">
+              <RetroGrain index={idx % 2} opacity={0.12} blend="overlay" />
+              <div className="relative flex justify-between font-mono text-[7px] sm:text-[8px] font-bold text-[#C99A2E] mb-1 uppercase">
                 <span>FRAME {String(idx + 1).padStart(3, '0')}</span>
                 <span>HYD 2025</span>
               </div>
@@ -180,10 +182,11 @@ export const ArchivePage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {MUSEUM_MILESTONES.map((m, i) => (
-            <div key={i} className="bg-[#E7D5A4] text-[#11100C] p-4 sm:p-5 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C]">
-              <span className="font-mono text-xs font-bold text-[#B94717] block mb-1">{m.year}</span>
-              <h3 className="display text-lg text-[#11100C] mb-2">{m.event}</h3>
-              <p className="font-mono text-[10px] text-[#11100C]/80 leading-relaxed">{m.details}</p>
+            <div key={i} className="relative bg-[#E7D5A4] text-[#11100C] p-4 sm:p-5 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] overflow-hidden">
+              <RetroGrain index={i % 2} opacity={0.1} blend="multiply" />
+              <span className="relative font-mono text-xs font-bold text-[#B94717] block mb-1">{m.year}</span>
+              <h3 className="relative display text-lg text-[#11100C] mb-2">{m.event}</h3>
+              <p className="relative font-mono text-[10px] text-[#11100C]/80 leading-relaxed">{m.details}</p>
             </div>
           ))}
         </div>
@@ -196,12 +199,15 @@ export const ArchivePage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
-          {archiveItems.map((item) => (
-            <div key={item.id} className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start">
-              <div className="w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
+          {archiveItems.map((item, i) => (
+            <div key={item.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start overflow-hidden">
+              <RetroGrain index={i % 2} opacity={0.1} blend="multiply" />
+              
+              <div className="relative w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
                 <img src={item.image} alt={item.title} className="w-full aspect-[3/4] object-cover filter grayscale sepia-[0.4]" />
+                <LotusStamp index={i} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="relative flex-1 min-w-0">
                 <div className="font-mono text-[8px] sm:text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">
                   {item.category} // {item.year}
                 </div>
@@ -221,12 +227,13 @@ export const ArchivePage = () => {
         </div>
 
         <div className="flex flex-col gap-5 sm:gap-6">
-          {PRESS_CLIPS.map((clip) => (
-            <div key={clip.id} className="bg-[#F5E9C9] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-8 shadow-[4px_4px_0px_#11100C] sm:shadow-[10px_10px_0px_#11100C] grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 items-center">
-              <div className="sm:col-span-1 w-full h-28 sm:h-full overflow-hidden border-2 border-[#11100C]">
+          {PRESS_CLIPS.map((clip, i) => (
+            <div key={clip.id} className="relative bg-[#F5E9C9] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-8 shadow-[4px_4px_0px_#11100C] sm:shadow-[10px_10px_0px_#11100C] grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 items-center overflow-hidden">
+              <RetroGrain index={i % 2} opacity={0.09} blend="multiply" />
+              <div className="relative sm:col-span-1 w-full h-28 sm:h-full overflow-hidden border-2 border-[#11100C]">
                 <img src={clip.image} alt={clip.title} className="w-full h-full object-cover filter grayscale sepia-[0.4]" />
               </div>
-              <div className="sm:col-span-3">
+              <div className="relative sm:col-span-3">
                 <div className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-2">
                   {clip.pub} // {clip.year}
                 </div>

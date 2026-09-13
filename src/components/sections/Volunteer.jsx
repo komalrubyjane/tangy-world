@@ -8,9 +8,8 @@ import {
   TextileBorderStrip,
   HandDrawnCircle,
   HandDrawnArrow,
-  RegistrationMark,
-} from '../ui/CulturalMotifs';
-import { RangoliDecoration, LotusStamp, PatternBackground, PosterFragment, RetroGrain } from '../ui/RetroAssets';
+  } from '../ui/CulturalMotifs';
+import { RangoliDecoration, LotusStamp, PatternBackground, RetroGrain } from '../ui/RetroAssets';
 
 export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
   const { playSFX } = useAudio();
@@ -107,7 +106,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       <PatternBackground category="textile" index={0} opacity={0.42} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-6 right-6 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      
       <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -left-[10vw] w-[32vw] h-[32vw] max-w-none opacity-[0.09] animate-[spin_180s_linear_infinite] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>
@@ -116,7 +115,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       <div className="lg:hidden absolute bottom-0 left-0 w-[36%] max-w-[150px] aspect-square opacity-[0.16] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>
-      <LotusStamp index={2} bg="#17120D" border="#C69A32" className="lg:hidden absolute top-[10%] right-4 w-10 h-10 opacity-90 z-10" />
+      <LotusStamp index={2} bg="transparent" border="#C69A32" className="lg:hidden absolute top-[10%] right-4 w-10 h-10 opacity-90 z-10" />
 
       {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-10 z-5">
@@ -144,9 +143,6 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
       {/* SECTION HEADER                                                 */}
       {/* ------------------------------------------------------------- */}
       <div className="crew-header max-w-4xl mx-auto text-center px-6 relative z-20 mb-16 md:mb-24">
-        <div className="hidden md:block absolute -top-6 right-[6%] w-14 z-10 opacity-90 -rotate-6">
-          <PosterFragment category="posters" index={1} rotate={-8} tape />
-        </div>
         <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
           1970s CLASSIFIED RECRUITMENT DESK // TANGY MUSIC LABEL
         </span>

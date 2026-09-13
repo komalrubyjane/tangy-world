@@ -9,8 +9,7 @@ import {
 import {
   PatternBackground,
   RangoliDecoration,
-  FilmCutout,
-} from '../ui/RetroAssets';
+  } from '../ui/RetroAssets';
 
 export const Gallery = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -52,7 +51,7 @@ export const Gallery = () => {
       <div className="lg:hidden absolute bottom-0 left-0 w-[40%] max-w-[170px] aspect-square opacity-[0.12] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>
-      <FilmCutout index={2} rotate={6} className="lg:hidden absolute top-4 right-4 w-14 z-10" />
+      
       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
         <p className="font-display font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">
           <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.35}>MOMENTS<br/>WE KEPT.</RisographOffset>

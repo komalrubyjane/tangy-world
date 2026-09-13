@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { EASES } from '../../utils/animations';
 import { HandDrawnCircle, HandDrawnArrow, TextileBorderStrip } from '../ui/CulturalMotifs';
 import { TapeStrip } from '../ui/BackgroundDecorations';
-import { PatternBackground, PosterFragment } from '../ui/RetroAssets';
+import { PatternBackground } from '../ui/RetroAssets';
 
 export const MicDrop = () => {
   const micRef = useRef(null);
@@ -61,9 +61,6 @@ export const MicDrop = () => {
       <div className="absolute inset-[10px] sm:inset-[18px] z-10 border-2 border-[#D19A24]/40 pointer-events-none" />
 
       {/* REAL RISOGRAPH POSTER FRAGMENT — a taped physical scrap, top-right */}
-      <div className="hidden md:block absolute top-16 right-6 lg:right-10 z-20 w-20 lg:w-24">
-        <PosterFragment category="risograph" index={0} rotate={5} tape />
-      </div>
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-10" height={10} colorA="#D91E18" colorB="#0D0A08" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={10} colorA="#D91E18" colorB="#0D0A08" />
 

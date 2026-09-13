@@ -1,6 +1,7 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { diaryStories } from '../../data/mock/diary';
+import { RetroGrain, LotusStamp } from '../../components/ui/RetroAssets';
 
 export const RecentStoriesPage = () => {
   return (
@@ -25,9 +26,12 @@ export const RecentStoriesPage = () => {
 
       <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
         {diaryStories.map((story, idx) => (
-          <article key={story.id} className="bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
-            <div className="w-full h-40 overflow-hidden border-b-4 border-[#11100C]">
+          <article key={story.id} className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
+            <RetroGrain index={idx % 2} opacity={0.1} blend="multiply" />
+            
+            <div className="relative w-full h-40 overflow-hidden border-b-4 border-[#11100C]">
               <img src={story.image} alt={story.title} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125" />
+              <LotusStamp index={idx} bg="transparent" border="#D19A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
             </div>
             <div className="p-4 sm:p-5 flex flex-col flex-1">
               <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase mb-2">ENTRY #00{idx + 1} · {story.date}</span>

@@ -5,7 +5,7 @@ import { useAudio } from '../../audio/AudioContext';
 import { PhotoTreatment } from '../../components/ui/PhotoTreatment';
 import { TextileBorderStrip } from '../../components/ui/CulturalMotifs';
 import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
-import { RangoliDecoration, LotusStamp, PatternBackground, FilmCutout, RetroGrain } from '../../components/ui/RetroAssets';
+import { RangoliDecoration, LotusStamp, PatternBackground, RetroGrain } from '../../components/ui/RetroAssets';
 
 // Each poster card cycles through one of these spot-colour fields — real colour
 // blocking per card rather than one uniform card background repeated N times.
@@ -160,6 +160,10 @@ export const ArtistsDirectoryPage = () => {
                 className="group relative aspect-[3/4] border-2 sm:border-4 border-[#191410] shadow-[6px_6px_0px_#191410] sm:shadow-[10px_10px_0px_#191410] hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all cursor-pointer overflow-hidden isolate"
                 style={{ backgroundColor: palette.bg }}
               >
+                {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection, subtly more visible */}
+                {/* on hover like the texture catching the light. */}
+                <RetroGrain index={idx % 2} opacity={0.13} blend="multiply" />
+                
                 {/* FULL-BLEED PORTRAIT — top ~64% of the card, original colour, no padding */}
                 <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden border-b-2 sm:border-b-4 border-[#191410]">
                   <PhotoTreatment
@@ -182,13 +186,10 @@ export const ArtistsDirectoryPage = () => {
                   <ArchiveStamp text={artist.genre || 'ARTIST'} rotation="4deg" color="dark" className="absolute top-2 right-2 z-10 !text-[8px]" />
                   <LotusStamp
                     index={idx}
-                    bg={palette.accent}
+                    bg="transparent"
                     border="#191410"
                     className="absolute bottom-2 right-2 z-10 w-8 h-8 sm:w-9 sm:h-9"
                   />
-                  {idx % 3 === 0 && (
-                    <FilmCutout index={idx} rotate={-3} className="hidden lg:block absolute bottom-2 left-2 z-10 w-10 aspect-[3/5] opacity-90" />
-                  )}
                 </div>
 
                 {/* NAME BAND — oversized rotated poster type overlapping the photo edge, */}

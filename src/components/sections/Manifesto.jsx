@@ -10,11 +10,10 @@ import {
   RisographOffset,
   ArchiveNumber,
   VintageFilmFrame,
-  RegistrationMark,
   HandDrawnUnderline,
   TextileBorderStrip,
 } from '../ui/CulturalMotifs';
-import { RangoliDecoration, LotusStamp, PatternBackground, PosterFragment, RetroGrain } from '../ui/RetroAssets';
+import { RangoliDecoration, LotusStamp, PatternBackground, RetroGrain } from '../ui/RetroAssets';
 
 export const Manifesto = () => {
   const sectionRef = useGSAPContext((ctx) => {
@@ -80,15 +79,11 @@ export const Manifesto = () => {
       <div className="lg:hidden absolute top-0 right-0 w-[42%] max-w-[170px] aspect-square opacity-[0.14] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>
-      <div className="lg:hidden absolute -bottom-4 left-3 z-20 w-16">
-        <PosterFragment category="illustrations" index={0} rotate={-6} tape={false} />
-      </div>
-
       {/* CROP MARKS & PRINT REGISTRATION CROSSES */}
       <div className="absolute top-4 left-4 font-mono text-[8px] sm:text-[9px] text-[#B94717] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
         [ ✚ ] CROP MARK // ARCHIVE NO. 1974-M
       </div>
-      <RegistrationMark color="#11100C" className="hidden md:block absolute top-4 right-4 w-6 h-6 opacity-70 z-20 pointer-events-none" />
+      
 
       {/* TEXTILE BORDER — frames the whole manifesto sheet top and bottom */}
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#B94717" colorB="#11100C" />
@@ -102,16 +97,12 @@ export const Manifesto = () => {
 
         {/* REAL RISOGRAPH PRINT FRAGMENT — a pinned offset-print scrap, tucked into the */}
         {/* newspaper's own top-right corner. */}
-        <div className="hidden md:block absolute -top-6 right-16 w-12 z-20">
-          <PosterFragment category="risograph" index={0} rotate={7} tape />
-        </div>
-
         {/* MASKING TAPE AT TOP CENTER */}
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-28 h-6 bg-[rgba(231,213,164,0.85)] rotate-[-1deg] border border-black/30 z-30 pointer-events-none" />
 
         {/* CORNER REGISTRATION MARKS ON THE SHEET ITSELF */}
-        <RegistrationMark color="#11100C" className="hidden sm:block absolute -top-3 -left-3 w-6 h-6 opacity-40 pointer-events-none" />
-        <RegistrationMark color="#11100C" className="hidden sm:block absolute -bottom-3 -right-3 w-6 h-6 opacity-40 pointer-events-none" />
+        
+        
 
         {/* Newspaper Header Bar */}
         <div className="flex flex-col sm:flex-row justify-between items-center border-b-2 border-[#11100C] pb-2 sm:pb-3 mb-4 sm:mb-6 font-mono text-[8.5px] sm:text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase gap-1 text-center sm:text-left">

@@ -5,8 +5,7 @@ import { SoundWaveGraphic } from '../ui/BackgroundDecorations';
 import {
   TextileBorderStrip,
   HandDrawnUnderline,
-  RegistrationMark,
-} from '../ui/CulturalMotifs';
+  } from '../ui/CulturalMotifs';
 import {
   PatternBackground,
   RangoliDecoration,
@@ -82,7 +81,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       <PatternBackground category="bandhani" index={2} opacity={0.36} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
-      <RegistrationMark color="#11100C" className="hidden lg:block absolute top-8 right-8 w-6 h-6 opacity-40 z-20 pointer-events-none" />
+      
       <div className="hidden lg:block absolute -top-[14vw] -right-[8vw] w-[34vw] h-[34vw] max-w-none opacity-[0.1] animate-[spin_190s_linear_infinite] pointer-events-none z-0">
         <RangoliDecoration index={1} spin={false} className="w-full h-full" />
       </div>

@@ -1,7 +1,7 @@
 import { ArchiveStamp } from '../ui/ArchiveStamp';
 import { TextileBorderStrip, HandDrawnUnderline, RetroPosterFrame } from '../ui/CulturalMotifs';
 import { TapeStrip, PushPin } from '../ui/BackgroundDecorations';
-import { PatternBackground, RangoliDecoration, LotusStamp, RetroGrain, PosterFragment } from '../ui/RetroAssets';
+import { PatternBackground, RangoliDecoration, LotusStamp, RetroGrain } from '../ui/RetroAssets';
 
 export const Footer = () => {
   return (
@@ -42,10 +42,6 @@ export const Footer = () => {
 
       {/* REAL TEXTILE SWATCH — a cropped, rotated textile photograph mounted like a physical */}
       {/* fabric sample pinned to the colophon, desktop only. */}
-      <div className="hidden lg:block absolute right-[8%] bottom-[8%] w-[7%] max-w-[86px] aspect-[3/4] z-10 opacity-95">
-        <PosterFragment category="textile" index={2} rotate={5} tape className="w-full h-full" />
-      </div>
-
       {/* LARGE PARTIALLY-CROPPED LOTUS — a dramatic bloom bleeding off the top edge, the */}
       {/* footer's one big floral gesture (the repeating row below stays small). */}
       <div className="hidden md:block absolute -top-[6%] left-[6%] w-[9%] max-w-[110px] aspect-square opacity-[0.55] pointer-events-none z-0 rotate-[8deg]">
@@ -69,7 +65,7 @@ export const Footer = () => {
           <ArchiveStamp text="MUSEUM INDEX" rotation="-2deg" color="gold" />
           <LotusStamp index={1} bg="transparent" border="#D19A24" className="w-7 h-7 opacity-90" />
           {/* REAL POSTER FRAGMENT — a small pinned archival scrap beside the masthead stamp. */}
-          <PosterFragment category="posters" index={1} rotate={-6} tape className="hidden sm:block w-10" />
+          
         </div>
         <p className="font-mono text-[#D19A24] text-[10px] tracking-[0.3em] font-bold uppercase mb-1">HYDERABAD / INDIA // EST. 2016</p>
         <h2 className="relative display leading-[0.82] text-[#E7D5A4] ink-bleed -rotate-1 origin-left" style={{ fontSize: 'clamp(3.2rem,13vw,10.5rem)' }}>

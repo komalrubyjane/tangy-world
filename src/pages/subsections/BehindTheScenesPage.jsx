@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { diaryEntries } from '../../data/mockData';
+import { RetroGrain } from '../../components/ui/RetroAssets';
 
 const BEHIND_THE_SCENES_IDS = [6, 7];
 
@@ -34,8 +35,11 @@ export const BehindTheScenesPage = () => {
         {fallbackEntries.map((entry, idx) => {
           const isExpanded = expanded === entry.id;
           return (
-            <article key={entry.id} className="bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden">
-              <div className="flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
+            <article key={entry.id} className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden">
+              <RetroGrain index={idx % 2} opacity={0.1} blend="multiply" />
+              
+              
+              <div className="relative flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
                 <span>ENTRY #00{idx + 1} · {entry.date}</span>
                 <span className="hidden sm:block">{entry.location || 'HYDERABAD ARCHIVE'}</span>
               </div>
