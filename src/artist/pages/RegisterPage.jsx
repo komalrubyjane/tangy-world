@@ -2,10 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAudio } from '../../audio/AudioContext';
+import { EmailOtpAuth } from '../../components/auth/EmailOtpAuth';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
+
+  // Email is verified via real Supabase Auth OTP FIRST (see EmailOtpAuth) —
+  // every artist application belongs to a verified, authenticated account
+  // from the moment it's created, never the other way around. `verified`
+  // holds { user, email } once that's done; the wizard below only renders
+  // after that.
+  const [verified, setVerified] = useState(null);
 
   const [step, setStep] = useState(1);
   const totalSteps = 4;
@@ -14,8 +22,6 @@ export const RegisterPage = () => {
 
   const [form, setForm] = useState({
     name: '',
-    email: '',
-    password: '',
     genre: [],
     city: '',
     bio: '',
@@ -25,6 +31,34 @@ export const RegisterPage = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  if (!verified) {
+    return (
+      <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
+        <div className="w-full max-w-md bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[14px_14px_0px_#4c1210] text-left flex flex-col gap-6">
+          <div>
+            <button
+              type="button"
+              onClick={() => navigate('/join')}
+              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/50 hover:text-[#c2272a] uppercase tracking-wider"
+            >
+              ← CHANGE HOW YOU'RE JOINING
+            </button>
+            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest uppercase">ARTIST APPLICATION // STEP 1</span>
+            <h2 className="font-poster text-3xl text-[#241a12] my-1">VERIFY YOUR EMAIL</h2>
+            <p className="font-mono text-xs text-[#241a12]/70">No password needed — we'll send a one-time code first.</p>
+          </div>
+          <EmailOtpAuth onVerified={({ user, email }) => setVerified({ user, email })} />
+          <div className="border-t border-[#191410]/20 pt-4 text-center font-mono text-xs">
+            <span className="text-[#241a12]/70">ALREADY APPLIED? </span>
+            <button onClick={() => { playSFX('ticketClick'); navigate('/artist/login'); }} className="text-[#c2272a] font-bold underline ml-1 uppercase">
+              SIGN IN →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const genresList = [
     'Techno', 'Deep House', 'Ambient', 'Afrobeat', 'Jazz Fusion', 
@@ -48,9 +82,9 @@ export const RegisterPage = () => {
 
     setSubmitError('');
     setIsSubmitting(true);
-    const res = await authService.applyAsArtist({
-      email: form.email,
-      password: form.password,
+    const res = await authService.submitArtistApplication({
+      userId: verified.user.id,
+      email: verified.email,
       name: form.name || 'New Artist',
       genre: form.genre.join(', ') || 'Electronic',
       city: form.city || 'Hyderabad',
@@ -130,40 +164,21 @@ export const RegisterPage = () => {
         {step === 1 && (
           <div className="flex flex-col gap-4">
             <h2 className="font-poster text-3xl text-[#191410]">WHO ARE YOU?</h2>
-            <p className="font-mono text-xs text-[#241a12]/70">Start with the basics — your artist identity and contact credentials.</p>
+            <p className="font-mono text-xs text-[#241a12]/70">Start with the basics — your artist identity.</p>
+
+            <div className="p-3 bg-[#191410]/5 border-2 border-[#191410]/20 font-mono text-[10px]">
+              <span className="uppercase font-bold opacity-60">Verified email</span>
+              <div className="text-sm font-bold mt-0.5">{verified.email}</div>
+            </div>
 
             <div>
               <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">ARTIST / BAND NAME *</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="STAGE NAME"
-                className="w-full p-3 bg-[#ecdcaf] border-2 border-[#191410] font-mono text-xs text-[#191410] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">EMAIL ADDRESS *</label>
-              <input 
-                type="email" 
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="artist@example.com"
-                className="w-full p-3 bg-[#ecdcaf] border-2 border-[#191410] font-mono text-xs text-[#191410] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">CREATE PASSWORD *</label>
-              <input 
-                type="password" 
-                required
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="••••••••"
                 className="w-full p-3 bg-[#ecdcaf] border-2 border-[#191410] font-mono text-xs text-[#191410] outline-none"
               />
             </div>

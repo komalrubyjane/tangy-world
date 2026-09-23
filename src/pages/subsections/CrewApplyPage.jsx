@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useAudio } from '../../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { isMockAuth } from '../../config/auth';
 import { userService } from '../../services/userService';
+import { useUserAuth } from '../../context/UserAuthContext';
+import { RequireAuthToApply } from '../../components/apply/RequireAuthToApply';
+import { ApplicationReceivedNotice } from '../../components/apply/ApplicationReceivedNotice';
 
 const volunteerRoles = [
   "PHOTOGRAPHY", "VIDEOGRAPHY", "BACKSTAGE & ARTIST CARE",
@@ -12,7 +16,9 @@ const volunteerRoles = [
 ];
 
 export const CrewApplyPage = () => {
+  const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const { user } = useUserAuth();
 
   const [volName, setVolName] = useState('');
   const [volPhone, setVolPhone] = useState('');
@@ -50,7 +56,9 @@ export const CrewApplyPage = () => {
       email: volEmail,
       phone: volPhone,
       role_interest: volRole,
+      category: 'crew',
       message: `College/Institution: ${volCollege || '—'}\n\n${volExperience}`,
+      user_id: user?.id ?? null,
     });
     setCrewSubmitting(false);
     if (error) {
@@ -66,7 +74,16 @@ export const CrewApplyPage = () => {
       <Navbar />
 
       <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        <a href="/crew" className="font-mono text-[10px] text-[#ecdcaf]/70 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors">← BACK TO CREW</a>
+        <div className="flex items-center gap-4 flex-wrap">
+          <a href="/crew" className="font-mono text-[10px] text-[#ecdcaf]/70 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors">← BACK TO CREW</a>
+          <button
+            type="button"
+            onClick={() => navigate('/join')}
+            className="font-mono text-[10px] text-[#ecdcaf]/50 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors"
+          >
+            ← CHANGE HOW YOU'RE JOINING
+          </button>
+        </div>
 
         <div className="mt-6 mb-8 text-left">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">CREW APPLICATION FORM</span>
@@ -78,32 +95,31 @@ export const CrewApplyPage = () => {
 
         <div className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
           {submitted ? (
-            <div className="bg-[#241a12] border-2 border-[#ecdcaf] p-8 text-center">
-              <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">APPLICATION TRANSMITTED!</h3>
-              <p className="font-mono text-xs text-[#ecdcaf]/80">Our crew desk will review your submission and contact you via phone/email within 48 hours.</p>
-            </div>
+            <ApplicationReceivedNotice roleLabel="Crew" statusRoute="/crew/dashboard" />
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" placeholder="YOUR FULL NAME *" value={volName} onChange={(e) => setVolName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                <input required type="email" placeholder="YOUR EMAIL ADDRESS *" value={volEmail} onChange={(e) => setVolEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="tel" placeholder="PHONE NUMBER *" value={volPhone} onChange={(e) => setVolPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                <input type="text" placeholder="COLLEGE / INSTITUTION (OPTIONAL)" value={volCollege} onChange={(e) => setVolCollege(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-              </div>
-              <div>
-                <label className="font-bold text-[#c2272a] block mb-2 uppercase text-[10px]">PREFERRED CREW ROLE *</label>
-                <select value={volRole} onChange={(e) => setVolRole(e.target.value)} className="w-full p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
-                  {volunteerRoles.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-              <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              {crewError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
-              <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
-                {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
-              </button>
-            </form>
+            <RequireAuthToApply roleLabel="Crew">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required type="text" placeholder="YOUR FULL NAME *" value={volName} onChange={(e) => setVolName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                  <input required type="email" placeholder="YOUR EMAIL ADDRESS *" value={volEmail} onChange={(e) => setVolEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required type="tel" placeholder="PHONE NUMBER *" value={volPhone} onChange={(e) => setVolPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                  <input type="text" placeholder="COLLEGE / INSTITUTION (OPTIONAL)" value={volCollege} onChange={(e) => setVolCollege(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
+                </div>
+                <div>
+                  <label className="font-bold text-[#c2272a] block mb-2 uppercase text-[10px]">PREFERRED CREW ROLE *</label>
+                  <select value={volRole} onChange={(e) => setVolRole(e.target.value)} className="w-full p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
+                    {volunteerRoles.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+                <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
+                {crewError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
+                <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+                  {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
+                </button>
+              </form>
+            </RequireAuthToApply>
           )}
         </div>
       </main>

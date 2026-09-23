@@ -127,7 +127,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
         
         {/* SURROUNDING ARCHIVAL PHOTO 1 */}
         <div className="private-photo-1 absolute -top-8 left-0 md:left-4 z-10 pointer-events-none hidden md:block">
-          <div className="w-[180px] bg-[#E7D7AC] p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[-4deg]">
+          <div className="w-[180px] paper-surface p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[-4deg]">
             <img src="/media/gallery/tangy9.jpg" alt="Your Place" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
             <p className="absolute bottom-2.5 left-3 font-mono text-[8px] text-[#17120D] font-bold">✎ YOUR SPACE</p>
           </div>
@@ -135,14 +135,14 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
 
         {/* SURROUNDING ARCHIVAL PHOTO 2 */}
         <div className="private-photo-2 absolute -bottom-8 right-0 md:right-4 z-10 pointer-events-none hidden md:block">
-          <div className="w-[190px] bg-[#E7D7AC] p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[4deg]">
+          <div className="w-[190px] paper-surface p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[4deg]">
             <img src="/media/gallery/tangy3.jpg" alt="Our People" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
             <p className="absolute bottom-2.5 left-3 font-mono text-[8px] text-[#17120D] font-bold">✎ OUR PEOPLE</p>
           </div>
         </div>
 
         {/* CENTRAL VINTAGE INVITATION CARD WITH LETTERPRESS DOUBLE-LINE BORDER */}
-        <div className="private-invitation w-full max-w-[800px] bg-[#E7D7AC] text-[#17120D] p-8 md:p-16 border-8 border-double border-[#17120D] shadow-[25px_25px_0px_#17120D] relative flex flex-col justify-between text-center">
+        <div className="private-invitation w-full max-w-[800px] paper-surface text-[#17120D] p-8 md:p-16 border-8 border-double border-[#17120D] shadow-[25px_25px_0px_#17120D] relative flex flex-col justify-between text-center">
           
           {/* VINTAGE GRAPHIC WAX SEAL */}
           <div className="wax-seal absolute -top-6 -right-6 w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#651D2D] border-4 border-[#17120D] shadow-xl flex items-center justify-center z-40 rotate-[-6deg]">

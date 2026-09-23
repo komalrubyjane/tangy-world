@@ -76,7 +76,7 @@ export const Gallery = () => {
                 transform: `translate3d(calc(-50% + ${x}vw), calc(-50% + ${y}vh), ${-depth * 300 - 200}px) rotate(${rotate}deg)`
               }}
             >
-              <div className="w-[300px] md:w-[400px] aspect-[4/3] bg-tangy-paper border-[8px] border-tangy-cream shadow-2xl overflow-hidden p-2 pb-12 relative group transition-transform duration-500 hover:scale-105 cursor-pointer">
+              <div className="w-[300px] md:w-[400px] aspect-[4/3] paper-surface border-[8px] border-tangy-cream shadow-2xl overflow-hidden p-2 pb-12 relative group transition-transform duration-500 hover:scale-105 cursor-pointer">
                 <VintageFilmFrame color="#3C0F0E" holeColor="#3C0F0E" className="opacity-30" />
                 <img src={photo.src} alt={photo.label} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125 group-hover:grayscale-0 group-hover:sepia-0 transition-all duration-500" />
                 <div className="absolute bottom-3 w-full text-center font-mono text-[10px] tracking-widest text-tangy-grey">

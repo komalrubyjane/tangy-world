@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useUserAuth } from '../context/UserAuthContext';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
-import { isMockAuth } from '../config/auth';
-import { DEV_ACCOUNT_LIST } from '../services/mockAuthService';
+// DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. This
+// import only controls whether a link to /demo-admin is shown below; it
+// never touches signIn/signOut or the isAuthorized check above.
+import { DEMO_ADMIN_ENABLED } from '../config/demoAdmin';
 
 // Shared gate for /admin and /check-in — both are staff-only surfaces backed
 // by the same Supabase Auth identity as patron accounts, distinguished only by
@@ -13,7 +15,7 @@ import { DEV_ACCOUNT_LIST } from '../services/mockAuthService';
 // only), while /check-in's check-in tables use is_staff_or_admin().
 export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin', 'super_admin'], children }) => {
   const navigate = useNavigate();
-  const { user, isLoggedIn, loading, signIn, logout, authError } = useUserAuth();
+  const { user, isLoggedIn, loading, signIn, logout, authError, profileError } = useUserAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,7 +65,11 @@ export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin
         {isLoggedIn && user && !isAuthorized ? (
           <div className="flex flex-col gap-4 text-center">
             <p className="text-xs text-[#E7D5A4]/80">
-              Signed in as <span className="font-bold">{user.email}</span>, but this account doesn't have staff access.
+              {profileError ? (
+                <>Signed in as <span className="font-bold">{user.email}</span> — {profileError}</>
+              ) : (
+                <>You are signed in as <span className="font-bold">{user.email}</span>, but this account does not have administrator access.</>
+              )}
             </p>
             <button
               onClick={logout}
@@ -102,20 +108,7 @@ export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin
               </div>
             )}
 
-            {isMockAuth ? (
-              <button
-                type="button"
-                onClick={() => {
-                  const acc = DEV_ACCOUNT_LIST.find((a) => a.role === 'admin');
-                  setEmail(acc.email);
-                  setPassword(acc.password);
-                }}
-                className="w-full text-left text-[10px] text-[#C99A2E] bg-[#C99A2E]/10 hover:bg-[#C99A2E]/20 border border-[#C99A2E]/40 p-2 transition-colors"
-              >
-                <span className="font-bold uppercase tracking-wider">DEVELOPMENT ACCESS · MOCK AUTHENTICATION</span>
-                <br />Tap to fill admin@tangysessions.test — then Authenticate.
-              </button>
-            ) : !isSupabaseConfigured && (
+            {!isSupabaseConfigured && (
               <div className="text-[10px] text-[#C99A2E] bg-[#C99A2E]/10 border border-[#C99A2E]/40 p-2 text-center">
                 Backend not connected yet — staff sign-in is unavailable until Supabase is configured.
               </div>
@@ -137,6 +130,19 @@ export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin
               ← Back to site
             </button>
           </form>
+        )}
+
+        {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
+        {DEMO_ADMIN_ENABLED && (
+          <div className="mt-6 pt-4 border-t border-[#C99A2E]/20 text-center">
+            <div className="text-[9px] font-bold tracking-[0.3em] text-[#E7D5A4]/40 uppercase mb-2">TEAM DEMO</div>
+            <Link
+              to="/demo-admin"
+              className="inline-block w-full bg-transparent text-[#E7D5A4]/70 hover:text-[#E7D5A4] hover:border-[#E7D5A4] font-mono text-[10px] font-bold uppercase tracking-widest py-2.5 border border-[#E7D5A4]/30 transition-colors"
+            >
+              ENTER DEMO ADMIN →
+            </Link>
+          </div>
         )}
 
         <div className="mt-6 text-center text-[9px] text-[#E7D5A4]/40 border-t border-[#C99A2E]/20 pt-4">

@@ -22,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* --- Shared photo card --- */
 const PhotoCard = ({ photo, i, isLast }) => (
-  <div className={`relative bg-[#E3D4AC] p-2.5 sm:p-3 pb-8 sm:pb-12 border-2 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] transition-transform duration-300 hover:-translate-y-1.5 ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
+  <div className={`relative paper-surface p-2.5 sm:p-3 pb-8 sm:pb-12 border-2 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] transition-transform duration-300 hover:-translate-y-1.5 ${isLast ? 'heritage-expand-photo origin-center' : ''}`}
     style={{ transform: `rotate(${(i % 3 - 1) * 3}deg)` }}>
     {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection clipped to the card's own mat. */}
     <RetroGrain index={i % 2} opacity={0.14} blend="multiply" />

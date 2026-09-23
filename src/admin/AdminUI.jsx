@@ -89,6 +89,27 @@ export const ActionButton = ({ onClick, tone = 'default', children, disabled }) 
   );
 };
 
+// Shows the approval-email delivery state for one application row — reads
+// the application_notifications map each admin section builds via
+// notificationService.getForSourceTable(). Distinct from StatusBadge
+// (application status) on purpose: APPLICATION APPROVAL and EMAIL DELIVERY
+// are two different things that can disagree (approved + email failed is a
+// valid, expected state — see 0015_application_lifecycle.sql).
+const EMAIL_STATUS_LABEL = { pending: 'EMAIL QUEUED', sent: 'EMAIL SENT', failed: 'EMAIL FAILED' };
+const EMAIL_STATUS_COLOR = {
+  pending: 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/40',
+  sent: 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]/40',
+  failed: 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/40',
+};
+export const EmailStatusBadge = ({ notification }) => {
+  if (!notification) return null;
+  return (
+    <span className={`inline-block px-2 py-0.5 text-[9px] font-bold uppercase border rounded whitespace-nowrap ${EMAIL_STATUS_COLOR[notification.status]}`}>
+      {EMAIL_STATUS_LABEL[notification.status] || notification.status}
+    </span>
+  );
+};
+
 export const StatCard = ({ label, value, sub, accent }) => (
   <div className="bg-[#191410] border border-[#C99A2E]/60 p-4 sm:p-5 rounded-sm hover:border-[#C99A2E] transition-colors duration-200">
     <div className="text-[9px] sm:text-[10px] text-[#C99A2E] uppercase tracking-widest mb-1">{label}</div>
@@ -156,11 +177,4 @@ export const Drawer = ({ children, onClose }) => (
       {children}
     </div>
   </div>
-);
-
-export const MockModeBadge = () => (
-  <span className="inline-flex items-center gap-1.5 px-2 py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/40 rounded-sm">
-    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />
-    MOCK MODE
-  </span>
 );

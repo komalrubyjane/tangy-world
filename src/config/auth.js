@@ -1,12 +1,12 @@
-// Single global switch for which backend the app's authentication surfaces
-// use. Every real-auth context (UserAuthContext, artist AuthContext,
-// StaffAuthGate) branches on this constant to decide between the mock
-// service (src/services/mockAuthService.js) and their existing Supabase
-// logic. Change ONLY this value to flip the whole app between modes —
-// never hardcode a mode check anywhere else.
-//
-//   'mock' -> MockAuthService -> localStorage      -> role dashboard
-//   'real' -> Supabase Auth   -> database          -> role dashboard
-export const AUTH_MODE = 'mock';
+// Single global switch for which backend the app's data surfaces use.
+// The mock account system (MockAuthContext/mockAuthService) has been
+// removed — UserAuthContext and artist AuthContext are Supabase-Auth-only
+// now. `isMockAuth` is kept only because many admin sections and public
+// application forms still branch on it to choose between a real Supabase
+// query and their still-mock local data (src/data/mock/*, src/services/*
+// mock services) — that migration is tracked separately (admin control
+// room rebuild). Once every one of those call sites is real, delete this
+// flag entirely along with AUTH_MODE.
+export const AUTH_MODE = 'real';
 
-export const isMockAuth = AUTH_MODE === 'mock';
+export const isMockAuth = false;

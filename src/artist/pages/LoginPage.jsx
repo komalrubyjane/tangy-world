@@ -1,42 +1,36 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
 import { useAudio } from '../../audio/AudioContext';
-import { isMockAuth } from '../../config/auth';
-import { DEV_ACCOUNT_LIST } from '../../services/mockAuthService';
+import { EmailOtpAuth } from '../../components/auth/EmailOtpAuth';
+// DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
+import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
   const { playSFX } = useAudio();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
-  const [resetSent, setResetSent] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('PLEASE FILL IN ALL REQUIRED CREDENTIALS');
+  // After a real Supabase OTP verification, check whether this account has
+  // an artist application on file (src/artist/contexts/AuthContext.jsx's
+  // own onAuthStateChange listener will also pick up the new session and
+  // load the same row in the background) — Artist Portal access is gated
+  // by the existence of an `artists` row, never by profiles.role. Anyone
+  // can verify their email; only an applicant reaches the portal.
+  const handleVerified = async ({ user }) => {
+    playSFX('ticketClick');
+    const artistRow = await authService.getArtistByUserId(user.id);
+    if (!artistRow) {
+      setError('This account has no artist application on file. Apply as an artist below, or sign in with your artist account.');
       return;
     }
-    setError('');
-    playSFX('ticketClick');
-    const result = await login(email, password);
-    if (result.ok) {
-      navigate(isMockAuth ? '/artist-mock/portal' : '/artist/dashboard');
-    } else {
-      setError(result.error || 'AUTHENTICATION FAILED. PLEASE TRY AGAIN.');
-    }
+    navigate('/artist/dashboard');
   };
 
   return (
     <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-4xl bg-[#e9decb] text-[#241a12] border-4 border-[#191410] shadow-[14px_14px_0px_#4c1210] grid grid-cols-1 md:grid-cols-2 overflow-hidden text-left">
-        
+
         {/* LEFT PANEL: PORTAL OVERVIEW & CHECKLIST */}
         <div className="bg-[#191410] text-[#ecdcaf] p-8 border-b-4 md:border-b-0 md:border-r-4 border-[#191410] flex flex-col justify-between">
           <div className="flex flex-col gap-4">
@@ -78,9 +72,16 @@ export const LoginPage = () => {
         {/* RIGHT PANEL: LOGIN FORM */}
         <div className="p-8 flex flex-col justify-between gap-6">
           <div>
+            <button
+              type="button"
+              onClick={() => navigate('/join')}
+              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/50 hover:text-[#c2272a] uppercase tracking-wider"
+            >
+              ← CHANGE HOW YOU'RE JOINING
+            </button>
             <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest uppercase">PORTAL CREDENTIALS</span>
             <h2 className="font-poster text-3xl text-[#241a12] my-1">SIGN IN TO PORTAL</h2>
-            <p className="font-mono text-xs text-[#241a12]/70">Enter your registered artist account details below.</p>
+            <p className="font-mono text-xs text-[#241a12]/70">No password needed — verify with a one-time code sent to your email.</p>
           </div>
 
           {error && (
@@ -89,107 +90,32 @@ export const LoginPage = () => {
             </div>
           )}
 
-          {isMockAuth && (
-            <button
-              type="button"
-              onClick={() => {
-                const acc = DEV_ACCOUNT_LIST.find((a) => a.role === 'artist');
-                setEmail(acc.email);
-                setPassword(acc.password);
-              }}
-              className="text-left p-3 bg-[#d1a437]/15 hover:bg-[#d1a437]/25 border border-[#d1a437]/50 font-mono text-[10px] transition-colors"
-            >
-              <span className="font-bold uppercase tracking-wider text-[#d1a437]">DEVELOPMENT ACCESS · MOCK AUTHENTICATION</span>
-              <br />Tap to fill artist@tangysessions.test — then Enter Artist Portal.
-            </button>
-          )}
-
-          {resetSent && (
-            <div className="p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
-              ✓ PASSWORD RESET LINK SENT — CHECK YOUR EMAIL.
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">EMAIL ADDRESS *</label>
-              <input 
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="artist@example.com"
-                className="w-full p-3 bg-[#ecdcaf] border-2 border-[#191410] font-mono text-xs text-[#191410] placeholder:text-[#191410]/50 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="font-mono text-[9.5px] font-bold text-[#241a12] block mb-1 uppercase">PASSWORD *</label>
-              <input 
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full p-3 bg-[#ecdcaf] border-2 border-[#191410] font-mono text-xs text-[#191410] placeholder:text-[#191410]/50 outline-none"
-              />
-            </div>
-
-            <div className="flex justify-between items-center font-mono text-[10px]">
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={rememberMe} 
-                  onChange={(e) => setRememberMe(e.target.checked)} 
-                  className="accent-[#c2272a]"
-                />
-                <span>REMEMBER ME</span>
-              </label>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  if (isMockAuth) {
-                    setError('Password reset is not available in development mode.');
-                    return;
-                  }
-                  if (!email) {
-                    setError('Enter your email above first, then tap Forgot Password.');
-                    return;
-                  }
-                  playSFX('ticketClick');
-                  const res = await authService.requestPasswordReset(email);
-                  if (res.success) {
-                    setError('');
-                    setResetSent(true);
-                  } else {
-                    setError(res.error || 'Could not send reset email.');
-                  }
-                }}
-                className="text-[#c2272a] underline font-bold"
-              >
-                FORGOT PASSWORD?
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all mt-2"
-            >
-              {loading ? 'AUTHENTICATING...' : 'ENTER ARTIST PORTAL →'}
-            </button>
-          </form>
+          <EmailOtpAuth
+            copy={{ emailIntro: 'Enter your registered artist email — we\'ll send a one-time verification code.' }}
+            onVerified={handleVerified}
+          />
 
           <div className="border-t border-[#191410]/20 pt-4 text-center font-mono text-xs">
             <span className="text-[#241a12]/70">NEW ARTIST? </span>
-            <button 
+            <button
               onClick={() => { playSFX('ticketClick'); navigate('/artist/register'); }}
               className="text-[#c2272a] font-bold underline ml-1 uppercase"
             >
               APPLY AS ARTIST →
             </button>
           </div>
+
+          {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
+          {DEMO_ADMIN_ENABLED && (
+            <button
+              type="button"
+              onClick={() => navigate('/demo/artist')}
+              className="w-full text-left font-mono text-[9px] bg-transparent hover:bg-[#191410]/5 p-2.5 border border-dashed border-[#191410]/30 transition-colors"
+            >
+              <span className="font-bold uppercase tracking-wider text-[#241a12]/70">TEAM DEMO</span>
+              <span className="text-[#241a12]/50"> — internal preview access, not a real account →</span>
+            </button>
+          )}
         </div>
 
       </div>

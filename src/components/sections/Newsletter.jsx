@@ -39,7 +39,7 @@ export const Newsletter = () => {
         </p>
 
         {status === 'SUCCESS' ? (
-          <div className="border-4 border-[#11100C] p-6 bg-[#E3D4AC] text-[#11100C] shadow-[10px_10px_0_#11100C]">
+          <div className="border-4 border-[#11100C] p-6 paper-surface text-[#11100C] shadow-[10px_10px_0_#11100C]">
              <h3 className="font-display text-3xl font-bold mb-2">YOU'RE IN THE CIRCLE ✦</h3>
              <p className="font-mono text-xs mb-4">Check your inbox for session confirmation.</p>
              <a 

@@ -11,9 +11,12 @@
 // payment_webhook_events keyed by a unique id before being acted on.
 //
 // NOTE: verify `event_id` extraction and the exact event names below
-// (`payment.captured` / `order.paid`) against the current Razorpay webhook
-// payload reference before going live — confirm in the Razorpay dashboard
-// under Settings -> Webhooks -> your webhook -> recent deliveries.
+// (`payment.captured` / `order.paid` / `payment.failed`) against the current
+// Razorpay webhook payload reference before going live — confirm in the
+// Razorpay dashboard under Settings -> Webhooks -> your webhook -> recent
+// deliveries. In particular, confirm `payload.payment.entity.order_id` is
+// actually present on a `payment.failed` event the same way it is on
+// `payment.captured` — this was not verified against a live payload.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 async function hmacSha256Hex(secret: string, message: string): Promise<string> {
@@ -76,7 +79,7 @@ Deno.serve(async (req) => {
 
     const orderId = paymentEntity?.order_id ?? orderEntity?.id;
     if ((eventType === 'payment.captured' || eventType === 'order.paid') && orderId) {
-      const { error: updateError } = await admin
+      const { data: confirmedBookings, error: updateError } = await admin
         .from('bookings')
         .update({
           status: 'confirmed',
@@ -84,9 +87,30 @@ Deno.serve(async (req) => {
           razorpay_signature_verified: true,
         })
         .eq('razorpay_order_id', orderId)
-        .neq('status', 'confirmed');
+        .neq('status', 'confirmed')
+        .select('id');
 
-      if (updateError) console.error('razorpay-webhook: booking update failed', updateError);
+      if (updateError) {
+        console.error('razorpay-webhook: booking update failed', updateError);
+      } else {
+        // This is the authoritative confirmation path — independent of
+        // whether the client's own razorpay-verify-payment call ever ran
+        // (browser closed, network drop). confirm_booking_and_issue_tickets
+        // is idempotent, so it's safe even if verify-payment already issued
+        // these same tickets, and safe against this same webhook retrying.
+        for (const b of confirmedBookings ?? []) {
+          const { error: ticketError } = await admin.rpc('confirm_booking_and_issue_tickets', { p_booking_id: b.id });
+          if (ticketError) console.error('razorpay-webhook: ticket issuance failed', b.id, ticketError);
+        }
+      }
+    } else if (eventType === 'payment.failed' && orderId) {
+      const { error: failError } = await admin
+        .from('bookings')
+        .update({ status: 'failed' })
+        .eq('razorpay_order_id', orderId)
+        .eq('status', 'pending'); // never overwrite an already-confirmed booking
+
+      if (failError) console.error('razorpay-webhook: booking fail-update failed', failError);
     }
 
     await admin.from('payment_webhook_events').update({ processed: true }).eq('event_id', eventId);

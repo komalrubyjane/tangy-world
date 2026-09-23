@@ -5,6 +5,9 @@ import { aiSupportService } from '../../services/aiSupportService';
 import { messageService } from '../../services/messageService';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { AgentRequestForm } from './AgentRequestForm';
+import { useConversationRealtime } from '../chat/useConversationRealtime';
+import { MessageBubble } from '../chat/MessageBubble';
+import { MessageComposer } from '../chat/MessageComposer';
 
 const GREETING = 'Hey. What would you like to know about Tangy?';
 const SESSION_KEY = 'tangy_ai_session_id';
@@ -75,9 +78,15 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [lastUnmatchedText, setLastUnmatchedText] = useState('');
   const [escalation, setEscalation] = useState(null);
+  const [requester, setRequester] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
 
   const scrollRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+
+  // Real (or mock-real) conversation with the Tangy team, live once escalated.
+  const { messages: teamMessages, loading: teamMessagesLoading, sendMessage: sendTeamReply } =
+    useConversationRealtime(conversationId);
 
   useEffect(() => {
     const existing = messageService.getConversation(sessionId);
@@ -109,7 +118,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, typing]);
+  }, [messages, typing, teamMessages]);
 
   const withTyping = useCallback((cb) => {
     setTyping(true);
@@ -169,15 +178,19 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
     setShowAgentForm(true);
   };
 
-  const handleAgentSubmitted = (request) => {
+  const handleAgentSubmitted = (request, requesterInfo) => {
     setShowAgentForm(false);
     setEscalation(request);
+    setRequester(requesterInfo);
+    setConversationId(request.conversationId);
     messageService.sendAiMessage(sessionId, 'Your request has reached the Tangy team.', { escalationNotice: true });
     const updated = messageService.sendAiMessage(sessionId, 'Someone from the team will join this conversation.', {
       escalationNotice: true,
     });
     setMessages(updated);
   };
+
+  const handleTeamReply = (text) => sendTeamReply(text, { sender: requester });
 
   const categories = aiSupportService.getCategories();
   const questionsForCategory = pickerCategory ? aiSupportService.getQuestionsForCategory(pickerCategory) : [];
@@ -257,7 +270,9 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-4 border-[#C99A2E] bg-[#1A140F]">
         <div className="min-w-0">
           <div className="font-mono text-[9px] font-bold tracking-[0.25em] uppercase text-[#C99A2E]">✦ TANGY ASSISTANT</div>
-          <div className="font-display text-sm text-[#E7D5A4] uppercase tracking-wide truncate">Mock Knowledge-Base Guide</div>
+          <div className="font-display text-sm text-[#E7D5A4] uppercase tracking-wide truncate">
+            {conversationId ? 'Connected with Tangy Team' : 'Mock Knowledge-Base Guide'}
+          </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <button
@@ -288,6 +303,24 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       >
         {messages.map((m) => renderBubble(m))}
         {typing && <TypingIndicator reducedMotion={reducedMotion} />}
+        {conversationId && (
+          <div className="mt-2 pt-2 border-t border-[#C99A2E]/20">
+            {teamMessagesLoading && teamMessages.length === 0 ? (
+              <div className="text-center font-mono text-[9px] text-[#E7D5A4]/40 py-2">LOADING TEAM CHAT...</div>
+            ) : (
+              teamMessages.map((m) => (
+                <MessageBubble
+                  key={m.id}
+                  text={m.text}
+                  isMine={m.senderId === requester?.id}
+                  isSystem={m.messageType === 'system'}
+                  label={m.senderId === requester?.id ? undefined : 'TANGY TEAM'}
+                  timestamp={m.timestamp}
+                />
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Escalation banner */}
@@ -297,7 +330,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
         </div>
       )}
 
-      {/* Agent form OR topics + composer */}
+      {/* Agent form OR (once escalated) the real team composer OR topics + composer */}
       {showAgentForm ? (
         <div className="p-3 border-t-2 border-[#C99A2E]/40 bg-[#1A140F] max-h-[70%] overflow-y-auto">
           <AgentRequestForm
@@ -308,6 +341,8 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
             onSubmitted={handleAgentSubmitted}
           />
         </div>
+      ) : conversationId ? (
+        <MessageComposer onSend={handleTeamReply} placeholder="Message the Tangy team..." />
       ) : (
         <>
           {/* Topics picker */}

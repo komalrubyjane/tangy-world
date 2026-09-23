@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 /* --- Shared editorial card inner --- */
 const EditorialCardInner = () => (
-  <div className="w-full h-full bg-[#EDE0C0] p-4 sm:p-5 border-4 border-[#11100C] flex flex-col relative shadow-[16px_16px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] transition-transform duration-300 group-hover:-translate-y-2 overflow-hidden rotate-1"
+  <div className="w-full h-full paper-surface p-4 sm:p-5 border-4 border-[#11100C] flex flex-col relative shadow-[16px_16px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] transition-transform duration-300 group-hover:-translate-y-2 overflow-hidden rotate-1"
     style={{ backgroundImage:"url('/noise.png')", backgroundBlendMode:'multiply', backgroundSize:'180px' }}>
     <div className="absolute -right-[20%] -bottom-[15%] w-[65%] max-w-none aspect-square opacity-[0.14] pointer-events-none animate-[spin_120s_linear_infinite]">
       <RangoliDecoration index={2} spin={false} className="w-full h-full" />

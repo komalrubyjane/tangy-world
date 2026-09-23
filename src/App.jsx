@@ -5,6 +5,7 @@ import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
 import { UserAuthProvider } from './context/UserAuthContext';
+import { DemoAdminProvider } from './context/DemoAdminContext';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Navbar } from './components/layout/Navbar';
 import { Menu } from './components/sections/Menu';
@@ -40,8 +41,17 @@ import { BlogsPage } from './pages/BlogsPage';
 import { InnerCirclePage } from './pages/InnerCirclePage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminPage } from './pages/AdminPage';
+import { AdminEntitySelector } from './pages/admin/AdminEntitySelector';
+import { AdminPortalPreview } from './pages/admin/AdminPortalPreview';
+import { AdminArtistPreview } from './pages/admin/AdminArtistPreview';
+
+// DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
+import { DemoAdminLogin } from './pages/demoAdmin/DemoAdminLogin';
+import { DemoControlRoom } from './pages/demoAdmin/DemoControlRoom';
+import { DemoRoleDashboard } from './pages/demoAdmin/DemoRoleDashboard';
+import { DemoArtistDashboard } from './pages/demoAdmin/DemoArtistDashboard';
 import { TangyWorldCheckInPage } from './admin/TangyWorldCheckInPage';
-import { ProfilePage as MockProfilePage } from './pages/ProfilePage';
+import { ProfilePage as PassportProfilePage } from './pages/ProfilePage';
 
 // Artist Portal Migration Imports
 import { ArtistLayout } from './artist/layouts/ArtistLayout';
@@ -56,15 +66,15 @@ import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
 import { MediaPage } from './artist/pages/MediaPage';
 import { SettingsPage } from './artist/pages/SettingsPage';
 
-// Mock account system (new, separate from real Supabase auth above)
-import { MockAuthProvider } from './context/MockAuthContext';
-import { MockProtectedRoute } from './components/mockauth/MockProtectedRoute';
+// Real, role-based account dashboards — backed by Supabase Auth
+// (UserAuthContext) + RLS, gated by ProtectedRoute (not the removed mock
+// account system).
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { DashboardRedirect } from './components/auth/DashboardRedirect';
 import { JoinPage } from './pages/join/JoinPage';
 import { JoinLoginPage } from './pages/join/JoinLoginPage';
-import { PatronDashboard } from './pages/dashboards/PatronDashboard';
-import { ArtistMockDashboard } from './pages/dashboards/ArtistMockDashboard';
 import { VendorDashboard } from './pages/dashboards/VendorDashboard';
-import { CrewMockDashboard } from './pages/dashboards/CrewMockDashboard';
+import { CrewDashboard } from './pages/dashboards/CrewDashboard';
 import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard';
 import { SponsorDashboard } from './pages/dashboards/SponsorDashboard';
 import { VenueDashboard } from './pages/dashboards/VenueDashboard';
@@ -95,6 +105,7 @@ import { VolunteerOpportunitiesPage } from './pages/subsections/VolunteerOpportu
 import { ProductionTeamPage } from './pages/subsections/ProductionTeamPage';
 import { StageOperationsPage } from './pages/subsections/StageOperationsPage';
 import { CrewApplyPage } from './pages/subsections/CrewApplyPage';
+import { VolunteerApplyPage } from './pages/subsections/VolunteerApplyPage';
 import { CollaborateOpportunitiesPage } from './pages/subsections/CollaborateOpportunitiesPage';
 import { PrivateGatheringsPage } from './pages/subsections/PrivateGatheringsPage';
 import { CorporateEventsPage } from './pages/subsections/CorporateEventsPage';
@@ -325,7 +336,8 @@ export default function App() {
   return (
     <AudioProvider>
       <UserAuthProvider>
-        <MockAuthProvider>
+        {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
+        <DemoAdminProvider>
         <LenisProvider>
           <CursorProvider>
             <CustomCursor />
@@ -361,6 +373,18 @@ export default function App() {
 
                 {/* ADMIN DASHBOARD DEDICATED ROUTE */}
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/preview/artist/:id" element={<AdminArtistPreview />} />
+                <Route path="/admin/preview/:role/:id" element={<AdminPortalPreview />} />
+                <Route path="/admin/preview/:role" element={<AdminEntitySelector />} />
+
+                {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
+                <Route path="/demo-admin" element={<DemoAdminLogin />} />
+                <Route path="/demo-admin/control-room" element={<DemoControlRoom />} />
+                {/* One click from any login page's "TEAM DEMO" link — straight into that
+                    role's own demo dashboard, no admin detour. Also what the Control
+                    Room's "VIEW PORTALS" grid links to in demo mode (see DemoControlRoom.jsx). */}
+                <Route path="/demo/artist" element={<DemoArtistDashboard />} />
+                <Route path="/demo/:role" element={<DemoRoleDashboard />} />
 
                 {/* TANGY WORLD / EVENT CHECK-IN (STAFF ONLY) */}
                 {/* Note: intentionally not "/tangy-world" — that collides with the
@@ -417,26 +441,36 @@ export default function App() {
                 </Route>
 
 
-                {/* ===================== NEW MOCK ACCOUNT SYSTEM ===================== */}
-                {/* Separate from the real Supabase patron/artist auth above. */}
+                {/* ===================== REAL ROLE-BASED ACCOUNT DASHBOARDS ===================== */}
+                {/* Supabase Auth (UserAuthContext) + RLS — see src/config/auth.js (AUTH_MODE). */}
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/join/login" element={<JoinLoginPage />} />
 
-                <Route path="/profile" element={<MockProfilePage />} />
-                <Route path="/dashboard" element={<MockProtectedRoute role="patron"><PatronDashboard /></MockProtectedRoute>} />
-                <Route path="/artist-mock/portal" element={<MockProtectedRoute role="artist"><ArtistMockDashboard /></MockProtectedRoute>} />
-                <Route path="/vendor/dashboard" element={<MockProtectedRoute role="vendor"><VendorDashboard /></MockProtectedRoute>} />
-                <Route path="/crew-mock/dashboard" element={<MockProtectedRoute role="crew"><CrewMockDashboard /></MockProtectedRoute>} />
-                <Route path="/volunteer/dashboard" element={<MockProtectedRoute role="volunteer"><VolunteerDashboard /></MockProtectedRoute>} />
-                <Route path="/sponsor/dashboard" element={<MockProtectedRoute role="sponsor"><SponsorDashboard /></MockProtectedRoute>} />
-                <Route path="/venue/dashboard" element={<MockProtectedRoute role="venue"><VenueDashboard /></MockProtectedRoute>} />
-                <Route path="/private/dashboard" element={<MockProtectedRoute role="private"><PrivateDashboard /></MockProtectedRoute>} />
-                {/* Legacy alias — the admin dev account now lands directly on the real /admin (StaffAuthGate, mock-mode aware). */}
-                <Route path="/admin-mock" element={<Navigate to="/admin" replace />} />
+                {/* "/dashboard" is the universal post-login landing point — every
+                    login/signup flow sends every role here, and DashboardRedirect
+                    reads the authoritative profiles.role to send each role on to
+                    its own dashboard (or render Patron's directly for role='user'). */}
+                <Route path="/profile" element={<ProtectedRoute><PassportProfilePage /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
+                {/* No `allowedRoles` here, deliberately — these must stay reachable by a
+                    still-role='user' PENDING applicant so they can see their own
+                    application status (each dashboard's own isApproved gate handles
+                    that; see e.g. VendorDashboard.jsx). Restricting by profiles.role
+                    at the route level would bounce a pending applicant back to
+                    /dashboard before ever showing their status. RLS (self-row only)
+                    is the real security boundary — see ProtectedRoute.jsx's own note. */}
+                <Route path="/vendor/dashboard" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
+                <Route path="/crew/dashboard" element={<ProtectedRoute><CrewDashboard /></ProtectedRoute>} />
+                <Route path="/volunteer/dashboard" element={<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>} />
+                <Route path="/sponsor/dashboard" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
+                <Route path="/venue/dashboard" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
+                <Route path="/private/dashboard" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
 
-                {/* Aliases — keep documented mock URLs working without colliding with the real /artist/* and /crew/* wildcard routes above (static segments always outrank wildcards in React Router). */}
-                <Route path="/artist/portal" element={<Navigate to="/artist-mock/portal" replace />} />
-                <Route path="/crew/dashboard" element={<Navigate to="/crew-mock/dashboard" replace />} />
+                {/* Legacy/documented aliases from the removed mock account system. */}
+                <Route path="/admin-mock" element={<Navigate to="/admin" replace />} />
+                <Route path="/artist-mock/portal" element={<Navigate to="/artist/dashboard" replace />} />
+                <Route path="/artist/portal" element={<Navigate to="/artist/dashboard" replace />} />
+                <Route path="/crew-mock/dashboard" element={<Navigate to="/crew/dashboard" replace />} />
 
                 {/* ===================== PUBLIC TANGY AI ASSISTANT ===================== */}
                 <Route path="/ai" element={<AIAssistantPage />} />
@@ -471,6 +505,7 @@ export default function App() {
                 <Route path="/crew/production" element={<ProductionTeamPage />} />
                 <Route path="/crew/stage-operations" element={<StageOperationsPage />} />
                 <Route path="/crew/apply" element={<CrewApplyPage />} />
+                <Route path="/volunteer/apply" element={<VolunteerApplyPage />} />
 
                 {/* Collaborate */}
                 <Route path="/collaborate/vendors" element={<Navigate to="/apply/vendors" replace />} />
@@ -500,7 +535,7 @@ export default function App() {
             </BrowserRouter>
           </CursorProvider>
         </LenisProvider>
-        </MockAuthProvider>
+        </DemoAdminProvider>
       </UserAuthProvider>
     </AudioProvider>
   );

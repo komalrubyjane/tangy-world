@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { authService } from '../services/authService';
-import { AUTH_MODE, isMockAuth } from '../../config/auth';
-import { mockAuthService, MOCK_SESSION_EVENT } from '../../services/mockAuthService';
+import { AUTH_MODE } from '../../config/auth';
 
 const AuthContext = createContext(null);
 
@@ -23,38 +22,16 @@ function toPortalUser(sessionUser, artistRow) {
     bio: artistRow?.bio || '',
     instagram: artistRow?.instagram || '',
     soundcloud: artistRow?.soundcloud || '',
+    spotify: artistRow?.spotify || '',
     experience: artistRow?.experience_level || '',
     status: artistRow?.status || 'pending',
     profileComplete: artistRow ? 100 : 40,
   };
 }
 
-// Maps a mock session ({id,email,fullName,role}) onto the same shape as
-// toPortalUser above, so the rest of the artist portal UI never has to know
-// which backend authenticated the current user.
-function toMockPortalUser(session) {
-  if (!session) return null;
-  return {
-    id: session.id,
-    userId: session.id,
-    email: session.email,
-    name: session.fullName || session.name || session.email,
-    avatar: '',
-    genre: '',
-    city: '',
-    bio: '',
-    instagram: '',
-    soundcloud: '',
-    experience: '',
-    status: 'approved',
-    profileComplete: 100,
-  };
-}
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState('');
 
   const loadArtist = useCallback(async (sessionUser) => {
     if (!sessionUser) {
@@ -67,17 +44,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (isMockAuth) {
-      const applySession = () => {
-        const session = mockAuthService.getMockSession();
-        setUser(session && session.role === 'artist' ? toMockPortalUser(session) : null);
-      };
-      applySession();
-      setLoading(false);
-      window.addEventListener(MOCK_SESSION_EVENT, applySession);
-      return () => window.removeEventListener(MOCK_SESSION_EVENT, applySession);
-    }
-
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -100,64 +66,13 @@ export const AuthProvider = ({ children }) => {
     };
   }, [loadArtist]);
 
-  // Returns { ok, error } rather than a bare boolean — callers that store the
-  // failure message into their own local state (e.g. LoginPage.jsx) need the
-  // error value returned directly, not read back off context state, because
-  // by the time this async call resolves the caller's own closure has
-  // already captured the OLD `authError` from before this login attempt.
-  const login = async (email, password) => {
-    setAuthError('');
-    setLoading(true);
-
-    if (isMockAuth) {
-      const res = mockAuthService.mockLogin(email, password);
-      setLoading(false);
-      if (!res.success) {
-        setAuthError(res.error);
-        return { ok: false, error: res.error };
-      }
-      if (res.user.role !== 'artist') {
-        const error = 'This account is not an artist development account. Use artist@tangysessions.test.';
-        setAuthError(error);
-        return { ok: false, error };
-      }
-      setUser(toMockPortalUser(res.user));
-      return { ok: true, error: '' };
-    }
-
-    const res = await authService.signIn(email, password);
-    if (!res.success) {
-      setLoading(false);
-      setAuthError(res.error);
-      return { ok: false, error: res.error };
-    }
-    const artistRow = await loadArtist(res.user);
-    setLoading(false);
-    if (!artistRow) {
-      const error = 'This account has no artist application on file. Apply first, or sign in with your artist account.';
-      setAuthError(error);
-      return { ok: false, error };
-    }
-    return { ok: true, error: '' };
-  };
-
   const logout = async () => {
-    if (isMockAuth) {
-      mockAuthService.mockLogout();
-      setUser(null);
-      return;
-    }
     await authService.logout();
     setUser(null);
   };
 
   const updateUser = async (updates) => {
     if (!user) return;
-
-    if (isMockAuth) {
-      setUser((u) => ({ ...u, ...updates }));
-      return;
-    }
 
     const dbUpdates = {};
     if ('name' in updates) dbUpdates.name = updates.name;
@@ -167,6 +82,7 @@ export const AuthProvider = ({ children }) => {
     if ('bio' in updates) dbUpdates.bio = updates.bio;
     if ('instagram' in updates) dbUpdates.instagram = updates.instagram;
     if ('soundcloud' in updates) dbUpdates.soundcloud = updates.soundcloud;
+    if ('spotify' in updates) dbUpdates.spotify = updates.spotify;
 
     setUser((u) => ({ ...u, ...updates }));
 
@@ -182,7 +98,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, authError, authMode: AUTH_MODE }}>
+    <AuthContext.Provider value={{ user, loading, logout, updateUser, authMode: AUTH_MODE }}>
       {children}
     </AuthContext.Provider>
   );

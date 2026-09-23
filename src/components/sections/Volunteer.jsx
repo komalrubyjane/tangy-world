@@ -166,7 +166,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
         {/* DOSSIER 1: VOLUNTEER (AGED CREAM MANILA FOLDER ARCHIVE)       */}
         {/* ----------------------------------------------------------- */}
         <div 
-          className="dossier-volunteer group bg-[#E7D7AC] text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[-2deg] transition-all duration-300 relative flex flex-col justify-between"
+          className="dossier-volunteer group paper-surface text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[-2deg] transition-all duration-300 relative flex flex-col justify-between"
           onClick={() => setActiveTab(activeTab === 'vol' ? null : 'vol')}
         >
           
@@ -202,7 +202,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
             </p>
 
             {/* ATTACHED POLAROID PHOTO */}
-            <div className="dossier-polaroid-1 relative w-[160px] md:w-[210px] bg-[#F5E9C9] p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[-4deg] my-6 transition-transform group-hover:scale-105">
+            <div className="dossier-polaroid-1 relative w-[160px] md:w-[210px] paper-surface p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[-4deg] my-6 transition-transform group-hover:scale-105">
               <img src={gallery[4]?.src || "/media/gallery/tangy5.jpg"} alt="Stagehands Sound Check" className="w-full aspect-[4/3] object-cover filter grayscale contrast-125 border border-[#17120D]" />
               <p className="font-mono text-[7.5px] text-[#17120D] font-bold tracking-wider mt-1.5">✎ STAGE & PRODUCTION</p>
               <HandDrawnCircle color="#315B66" className="hidden md:block absolute -inset-3 opacity-45 pointer-events-none" />
@@ -219,7 +219,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
 
             {/* MOBILE TAP DETAILS TOGGLE */}
             {activeTab === 'vol' && (
-              <div className="font-mono text-[10px] text-[#17120D] bg-[#F5E9C9] p-3 border border-[#17120D] mb-4 animate-in fade-in">
+              <div className="font-mono text-[10px] text-[#17120D] paper-surface p-3 border border-[#17120D] mb-4 animate-in fade-in">
                 <p className="font-bold mb-1">RECRUITMENT DETAILS:</p>
                 <p>• Access to all 2025-2026 Tangy Sessions behind-the-scenes.</p>
                 <p>• Hands-on experience with analogue sound rigs & monument lighting.</p>
@@ -244,7 +244,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
         {/* DOSSIER 2: ARTIST (VINTAGE VINYL SLEEVE AUDITION PORTFOLIO)    */}
         {/* ----------------------------------------------------------- */}
         <div 
-          className="dossier-artist group bg-[#E7D7AC] text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[2deg] transition-all duration-300 relative flex flex-col justify-between"
+          className="dossier-artist group paper-surface text-[#17120D] p-6 md:p-12 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D] hover:shadow-[28px_28px_0px_#17120D] hover:-translate-y-2 hover:rotate-[2deg] transition-all duration-300 relative flex flex-col justify-between"
           onClick={() => setActiveTab(activeTab === 'art' ? null : 'art')}
         >
           
@@ -282,7 +282,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
             </p>
 
             {/* ATTACHED POLAROID PHOTO */}
-            <div className="dossier-polaroid-2 relative w-[160px] md:w-[210px] bg-[#F5E9C9] p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[4deg] my-6 transition-transform group-hover:scale-105">
+            <div className="dossier-polaroid-2 relative w-[160px] md:w-[210px] paper-surface p-2 pb-7 border-2 border-[#17120D] shadow-md rotate-[4deg] my-6 transition-transform group-hover:scale-105">
               <img src={artists[6]?.image || "/media/artists/artist7.jpg"} alt="Live Vocalist Performing" className="w-full aspect-[4/3] object-cover filter grayscale contrast-130 border border-[#17120D]" />
               <p className="font-mono text-[7.5px] text-[#17120D] font-bold tracking-wider mt-1.5">✎ LIVE AUDITION // STAGE A</p>
             </div>
@@ -298,7 +298,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
 
             {/* MOBILE TAP DETAILS TOGGLE */}
             {activeTab === 'art' && (
-              <div className="font-mono text-[10px] text-[#17120D] bg-[#F5E9C9] p-3 border border-[#17120D] mb-4 animate-in fade-in">
+              <div className="font-mono text-[10px] text-[#17120D] paper-surface p-3 border border-[#17120D] mb-4 animate-in fade-in">
                 <p className="font-bold mb-1">AUDITION CRITERIA:</p>
                 <p>• Performers of all analog, live electronic & acoustic genres welcome.</p>
                 <p>• Submit demo recordings for season curation.</p>
@@ -340,7 +340,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           
           {/* CARD 1: VENDORS */}
-          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
+          <div className="paper-surface text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
             <div>
               <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#315B66] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
                 <span>FILE NO. 01</span>
@@ -360,7 +360,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
           </div>
 
           {/* CARD 2: SPONSORS */}
-          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[1.5deg] hover:-translate-y-1 transition-transform">
+          <div className="paper-surface text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[1.5deg] hover:-translate-y-1 transition-transform">
             <div>
               <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B84718] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
                 <span>FILE NO. 02</span>
@@ -380,7 +380,7 @@ export const Volunteer = ({ onApplyVolunteer, onApplyArtist }) => {
           </div>
 
           {/* CARD 3: VENUE / HOST */}
-          <div className="bg-[#E7D7AC] text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
+          <div className="paper-surface text-[#17120D] p-6 md:p-8 border-4 border-[#17120D] shadow-[12px_12px_0px_#17120D] flex flex-col justify-between rotate-[-1deg] hover:-translate-y-1 transition-transform">
             <div>
               <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#C69A32] border-b-2 border-[#17120D] pb-2 mb-4 uppercase">
                 <span>FILE NO. 03</span>

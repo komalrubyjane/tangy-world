@@ -7,6 +7,7 @@ import { useAudio } from '../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { enquiryService } from '../services/enquiryService';
+import { useUserAuth } from '../context/UserAuthContext';
 
 const ENQUIRY_TYPES = [
   { id: 'private_gathering', label: 'Private Gathering' },
@@ -18,6 +19,7 @@ const ENQUIRY_TYPES = [
 export const PrivateSessionsPage = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
+  const { user } = useUserAuth();
 
   const [enquiryType, setEnquiryType] = useState('private_gathering');
   const [name, setName] = useState('');
@@ -65,6 +67,7 @@ export const PrivateSessionsPage = () => {
       preferred_date: date,
       guest_count: guestCount,
       message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
+      user_id: user?.id ?? null,
     });
     setSubmitting(false);
     if (error) {

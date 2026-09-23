@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { collaborationService } from '../services/collaborationService';
+import { useUserAuth } from '../context/UserAuthContext';
+import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
+import { ApplicationReceivedNotice } from '../components/apply/ApplicationReceivedNotice';
 
 export const SponsorApplyPage = () => {
+  const navigate = useNavigate();
+  const { user } = useUserAuth();
   const [form, setForm] = useState({ orgName: '', email: '', proposal: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -38,6 +44,7 @@ export const SponsorApplyPage = () => {
       contact_name: form.orgName,
       email: form.email,
       details: form.proposal,
+      user_id: user?.id ?? null,
     });
     setSubmitting(false);
     if (err) {
@@ -52,6 +59,13 @@ export const SponsorApplyPage = () => {
       <Navbar />
 
       <section className="relative pt-32 pb-16 px-6 max-w-5xl mx-auto text-center border-b-2 border-[#E7D7AC]/40">
+        <button
+          type="button"
+          onClick={() => navigate('/join')}
+          className="mb-3 font-mono text-[10px] font-bold text-[#E7D7AC]/50 hover:text-[#C69A32] uppercase tracking-wider"
+        >
+          ← CHANGE HOW YOU'RE JOINING
+        </button>
         <span className="font-mono text-xs text-[#C69A32] tracking-[0.35em] uppercase font-bold mb-3 block">
           CULTURAL PRESERVATION // SPONSORSHIPS
         </span>
@@ -77,22 +91,21 @@ export const SponsorApplyPage = () => {
           </p>
 
           {submitted ? (
-            <div className="bg-[#4A2638] text-[#E7D7AC] p-8 border-2 border-[#17120D] text-center">
-              <h3 className="display text-4xl mb-2">PARTNERSHIP INQUIRY RECEIVED</h3>
-              <p className="font-mono text-xs">Our executive director will contact you directly within 24 hours.</p>
-            </div>
+            <ApplicationReceivedNotice roleLabel="Sponsor" statusRoute="/sponsor/dashboard" />
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" value={form.orgName} onChange={set('orgName')} placeholder="ORGANIZATION / BRAND NAME *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-                <input required type="email" value={form.email} onChange={set('email')} placeholder="CONTACT EMAIL *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-              </div>
-              <textarea required rows={4} value={form.proposal} onChange={set('proposal')} placeholder="DESIRED PARTNERSHIP LEVEL / PROPOSAL *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-              {error && <div className="p-3 bg-[#c2272a] text-white font-bold border border-[#17120D]">{error}</div>}
-              <button type="submit" disabled={submitting} className="btn-ticket w-full py-4 text-center !bg-[#4A2638] !text-[#E7D7AC] font-bold uppercase tracking-widest text-sm disabled:opacity-50">
-                {submitting ? 'SUBMITTING...' : 'SUBMIT SPONSORSHIP INQUIRY →'}
-              </button>
-            </form>
+            <RequireAuthToApply roleLabel="Sponsor">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required type="text" value={form.orgName} onChange={set('orgName')} placeholder="ORGANIZATION / BRAND NAME *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                  <input required type="email" value={form.email} onChange={set('email')} placeholder="CONTACT EMAIL *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                </div>
+                <textarea required rows={4} value={form.proposal} onChange={set('proposal')} placeholder="DESIRED PARTNERSHIP LEVEL / PROPOSAL *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                {error && <div className="p-3 bg-[#c2272a] text-white font-bold border border-[#17120D]">{error}</div>}
+                <button type="submit" disabled={submitting} className="btn-ticket w-full py-4 text-center !bg-[#4A2638] !text-[#E7D7AC] font-bold uppercase tracking-widest text-sm disabled:opacity-50">
+                  {submitting ? 'SUBMITTING...' : 'SUBMIT SPONSORSHIP INQUIRY →'}
+                </button>
+              </form>
+            </RequireAuthToApply>
           )}
 
         </div>

@@ -1,233 +1,181 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Navbar } from '../../components/layout/Navbar';
-import { Footer } from '../../components/layout/Footer';
-import { useMockAuth } from '../../context/MockAuthContext';
-import { eventService } from '../../services/eventService';
-import { userService } from '../../services/userService';
-import { agentService } from '../../services/agentService';
-
-const STATUS_COLORS = {
-  active: 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]/40',
-  pending: 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/40',
-};
-
-const Badge = ({ status }) => (
-  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#E7D5A4]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
-    {status || 'open'}
-  </span>
-);
-
-const fmtDate = (d) => {
-  if (!d) return '—';
-  try { return new Date(`${d}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
-  catch { return d; }
-};
-
-const Empty = ({ children }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">{children}</div>
-);
-
-const SPONSOR_TIERS = ['Title Sponsor', 'Stage Sponsor', 'Hospitality Partner', 'Archive Patron'];
+import { useUserAuth } from '../../context/UserAuthContext';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
+import { PortalShell, Badge, Empty, fmtDate, StatTile, ReadOnlyNote } from './portal/PortalUI';
 
 const TABS = [
+  { id: 'overview', label: '📊 OVERVIEW' },
+  { id: 'deliverables', label: '🎗️ DELIVERABLES' },
+  { id: 'applications', label: '📋 APPLICATIONS' },
   { id: 'profile', label: '✦ PROFILE' },
-  { id: 'opportunities', label: '🤝 PARTNERSHIPS' },
-  { id: 'collab', label: '🎗️ ACTIVE COLLABORATIONS' },
-  { id: 'requests', label: '📮 REQUESTS' },
-  { id: 'campaign', label: '📊 CAMPAIGN INFO' },
-  { id: 'help', label: '✦ HELP' },
+  { id: 'help', label: '✦ MESSAGES' },
 ];
 
-export const SponsorDashboard = () => {
+// `overrideProfile` + `readOnly` are set only by the admin preview route
+// (src/pages/admin/AdminPortalPreview.jsx) — see the identical note in
+// CrewDashboard.jsx for the security reasoning (RLS-backed, no impersonation).
+// `demoData` ({ applications, profile, deliverables }) is set only by the
+// demo-admin build (src/pages/demoAdmin/DemoRoleDashboard.jsx) — when
+// present, this skips every real Supabase call below. See demoAdminData.js.
+export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
   const navigate = useNavigate();
-  const { user, signOut } = useMockAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const { user: authUser, logout } = useUserAuth();
+  const user = overrideProfile || authUser;
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
-  const [agentForm, setAgentForm] = useState({ category: 'Sponsorship', question: '' });
+  const [applications, setApplications] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [profileForm, setProfileForm] = useState({ organization_name: '', sponsorship_tier: '', website: '', contact_designation: '' });
+  const [profileMsg, setProfileMsg] = useState('');
+  const [deliverables, setDeliverables] = useState([]);
   const [agentSent, setAgentSent] = useState(null);
 
-  useEffect(() => { setLoading(false); }, []);
+  const load = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
 
-  const events = eventService.getAll();
-  const eventById = (id) => events.find((e) => e.id === id);
-  const sponsorRecord = userService.getProfileTable('sponsor').find((s) => s.organizationName.toLowerCase() === user.fullName.toLowerCase());
+    if (demoData) {
+      setApplications(demoData.applications || []);
+      setProfile(demoData.profile || null);
+      if (demoData.profile) setProfileForm({ organization_name: demoData.profile.organization_name || '', sponsorship_tier: demoData.profile.sponsorship_tier || '', website: demoData.profile.website || '', contact_designation: demoData.profile.contact_designation || '' });
+      setDeliverables(demoData.deliverables || []);
+      setLoading(false);
+      return;
+    }
+    if (!isSupabaseConfigured) { setLoading(false); return; }
 
-  const upcomingSessions = eventService.getUpcoming();
-  const opportunities = upcomingSessions.map((ev, i) => ({ event: ev, tier: SPONSOR_TIERS[i % SPONSOR_TIERS.length] }));
-  const activeCollaborations = (sponsorRecord?.activeCollaborations || []).map(eventById).filter(Boolean);
-  const requests = sponsorRecord?.requests || [];
-  const tier = sponsorRecord?.tier || 'Prospective Partner';
+    const [{ data: apps }, { data: prof }, { data: delivs }] = await Promise.all([
+      supabase.from('collaborations').select('*').eq('user_id', user.id).eq('type', 'sponsor').order('created_at', { ascending: false }),
+      supabase.from('sponsor_profiles').select('*').eq('id', user.id).maybeSingle(),
+      supabase.from('sponsor_deliverables').select('*, events(name, event_date)').eq('sponsor_profile_id', user.id).order('created_at', { ascending: false }),
+    ]);
 
-  const handleLogout = () => { signOut(); navigate('/'); };
-  const handleAgentSubmit = (e) => {
+    setApplications(apps || []);
+    setProfile(prof || null);
+    if (prof) setProfileForm({ organization_name: prof.organization_name || '', sponsorship_tier: prof.sponsorship_tier || '', website: prof.website || '', contact_designation: prof.contact_designation || '' });
+    setDeliverables(delivs || []);
+    setLoading(false);
+  }, [user, demoData]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleLogout = async () => { await logout(); navigate('/'); };
+
+  const saveProfile = async (e) => {
     e.preventDefault();
-    if (!agentForm.question.trim()) return;
-    const req = agentService.create({ user: sponsorRecord?.organizationName || user.fullName, role: 'sponsor', category: agentForm.category, question: agentForm.question });
-    setAgentSent(req.id);
-    setAgentForm({ category: 'Sponsorship', question: '' });
+    if (readOnly) return;
+    const { error } = await supabase.from('sponsor_profiles').update(profileForm).eq('id', user.id);
+    setProfileMsg(error ? 'Could not save.' : '✓ SAVED');
   };
 
+  const pendingDeliverables = deliverables.filter((d) => d.status !== 'delivered');
+  const isApproved = applications.some((a) => a.status === 'approved');
+
+  if (loading || !user) {
+    return <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">LOADING SPONSOR DASHBOARD...</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
-      <Navbar />
-
-      <section className="pt-24 sm:pt-28 pb-4 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-widest block">CULTURAL PARTNERSHIP DESK</span>
-            <h1 className="font-display text-xl sm:text-2xl font-bold uppercase">{sponsorRecord?.organizationName || user.fullName}</h1>
-            <span className="inline-block mt-2 px-3 py-1 bg-[#C99A2E] text-[#11100C] font-mono text-[10px] font-bold uppercase tracking-widest">{tier}</span>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link to="/ai" className="border border-[#C99A2E]/60 text-[#E7D5A4] hover:bg-[#C99A2E]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">✦ ASK TANGY AI</Link>
-            <button onClick={handleLogout} className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border border-[#B94717] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">LOG OUT ✕</button>
-          </div>
+    <PortalShell
+      icon="✦"
+      roleLabel="SPONSOR ACCOUNT"
+      title={profile?.organization_name || user.full_name || user.email}
+      subtitle={user.email}
+      statusBadge={isApproved ? <Badge status="approved" /> : applications[0] ? <Badge status={applications[0].status} /> : null}
+      tabs={TABS}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onLogout={handleLogout}
+      preview={readOnly ? { label: `Viewing Sponsor Portal — ${profile?.organization_name || user.full_name || user.email}` } : undefined}
+    >
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {!isApproved && (
+            <div className="sm:col-span-3"><Empty>YOUR SPONSORSHIP APPLICATION ISN'T APPROVED YET — CHECK THE APPLICATIONS TAB.</Empty></div>
+          )}
+          <StatTile label="Deliverables Pending" value={pendingDeliverables.length} sub="awaiting delivery" />
+          <StatTile label="Deliverables Total" value={deliverables.length} sub="on file" />
+          <StatTile label="Applications" value={applications.length} sub="submitted so far" />
         </div>
-      </section>
+      )}
 
-      <section className="px-4 sm:px-6 max-w-6xl mx-auto">
-        <nav className="flex flex-wrap gap-2 border-b-2 border-[#C99A2E]/40 pb-3 mb-6">
-          {TABS.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
-                activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
-              }`}>
-              {tab.label}
-            </button>
+      {activeTab === 'deliverables' && (
+        deliverables.length === 0 ? <Empty>NO DELIVERABLES ON FILE YET.</Empty> : (
+          <div className="flex flex-col gap-3">
+            {deliverables.map((d) => (
+              <div key={d.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-4 flex justify-between items-start gap-3">
+                <div>
+                  <h4 className="font-display font-bold uppercase">{d.title}</h4>
+                  {d.events?.name && <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{d.events.name} · {fmtDate(d.events.event_date)}</p>}
+                  {d.due_date && <p className="font-mono text-[10px] text-[#E7D5A4]/50 mt-1">Due {fmtDate(d.due_date)}</p>}
+                  {d.description && <p className="font-mono text-[11px] text-[#E7D5A4]/80 mt-2">{d.description}</p>}
+                </div>
+                <Badge status={d.status === 'delivered' ? 'delivered' : 'pending'} />
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      {activeTab === 'applications' && (
+        <div className="flex flex-col gap-4">
+          {applications.length === 0 ? (
+            <Empty>NO SPONSORSHIP APPLICATION ON FILE YET. <Link to="/apply/sponsors" className="text-[#C99A2E] underline">APPLY NOW →</Link></Empty>
+          ) : applications.map((a) => (
+            <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
+              <div className="flex justify-between items-start gap-3 mb-2">
+                <div>
+                  <h3 className="font-display text-lg font-bold uppercase">{a.business_name}</h3>
+                  <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
+                </div>
+                <Badge status={a.status} />
+              </div>
+              {a.details && <p className="font-mono text-[11px] text-[#E7D5A4]/80 whitespace-pre-wrap border-t border-[#C99A2E]/20 pt-3">{a.details}</p>}
+            </div>
           ))}
-        </nav>
-      </section>
+        </div>
+      )}
 
-      <section className="px-4 sm:px-6 max-w-6xl mx-auto pb-20">
-        {loading ? (
-          <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING PARTNERSHIP DESK...</div>
+      {activeTab === 'profile' && (
+        !isApproved ? (
+          <Empty>YOUR SPONSOR PROFILE UNLOCKS ONCE YOUR APPLICATION IS APPROVED.</Empty>
         ) : (
-          <>
-            {activeTab === 'profile' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Partnership Tier</span>
-                  <div className="font-display text-xl font-bold mt-1">{tier}</div>
-                </div>
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Active Collaborations</span>
-                  <div className="font-display text-4xl font-bold mt-1">{activeCollaborations.length}</div>
-                </div>
-                <div className="sm:col-span-2 bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-                  <p className="font-mono text-xs text-[#E7D5A4]/80 leading-relaxed">
-                    {sponsorRecord
-                      ? `${sponsorRecord.organizationName} has partnered with Tangy Sessions since ${fmtDate(sponsorRecord.createdAt?.slice(0, 10))}, supporting heritage preservation and independent artist grants.`
-                      : 'Your organization hasn’t been matched to an archive record yet. Explore partnership tracks below to start a conversation with the curation desk.'}
-                  </p>
-                </div>
-              </div>
-            )}
+          <form onSubmit={saveProfile} className="max-w-md bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C] flex flex-col gap-4 text-xs">
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Organization</label>
+              <input disabled={readOnly} value={profileForm.organization_name} onChange={(e) => { setProfileForm({ ...profileForm, organization_name: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Sponsorship tier</label>
+              <input disabled={readOnly} value={profileForm.sponsorship_tier} onChange={(e) => { setProfileForm({ ...profileForm, sponsorship_tier: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Website</label>
+              <input disabled={readOnly} value={profileForm.website} onChange={(e) => { setProfileForm({ ...profileForm, website: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Contact designation</label>
+              <input disabled={readOnly} value={profileForm.contact_designation} onChange={(e) => { setProfileForm({ ...profileForm, contact_designation: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            {profileMsg && <div className="p-2 bg-[#10b981]/20 border border-[#10b981]/40 text-[#0f5132] text-[10px] font-bold">{profileMsg}</div>}
+            {!readOnly && <button type="submit" className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] font-bold uppercase tracking-widest border-2 border-[#11100C]">SAVE</button>}
+          </form>
+        )
+      )}
 
-            {activeTab === 'opportunities' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Partnership Opportunities</h3>
-                {opportunities.length === 0 ? (
-                  <Empty>NO OPEN PARTNERSHIP SLOTS RIGHT NOW.</Empty>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {opportunities.map((o, i) => (
-                      <div key={i} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                        <h4 className="font-display font-bold uppercase">{o.tier}</h4>
-                        <p className="font-mono text-[10px] mt-1">{o.event.name} · {fmtDate(o.event.date)}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'collab' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Active Collaborations</h3>
-                {activeCollaborations.length === 0 ? (
-                  <Empty>NO ACTIVE COLLABORATIONS RIGHT NOW.</Empty>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {activeCollaborations.map((ev) => (
-                      <div key={ev.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
-                        <h4 className="font-display font-bold uppercase">{ev.name}</h4>
-                        <p className="font-mono text-[10px] mt-1 text-[#E7D5A4]/70">{fmtDate(ev.date)} · {ev.venue}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'requests' && (
-              <div className="max-w-lg flex flex-col gap-4">
-                <h3 className="font-display text-lg font-bold uppercase mb-1">Requests</h3>
-                {requests.length === 0 ? (
-                  <Empty>NO OPEN REQUESTS. FILE ONE BELOW IF YOU NEED SOMETHING FROM THE TANGY TEAM.</Empty>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {requests.map((r, i) => (
-                      <div key={i} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3 flex justify-between items-center gap-3">
-                        <span className="font-mono text-xs">{r.note || JSON.stringify(r)}</span>
-                        <Badge status={r.status || 'pending'} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'campaign' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Campaign / Event Info</h3>
-                {activeCollaborations.length === 0 ? (
-                  <Empty>NO LIVE CAMPAIGN DATA — SPONSOR AN UPCOMING SESSION TO SEE REACH FIGURES HERE.</Empty>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {activeCollaborations.map((ev) => (
-                      <div key={ev.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-4">
-                        <h4 className="font-display font-bold uppercase mb-2">{ev.name}</h4>
-                        <div className="flex justify-between font-mono text-[10px] font-bold"><span>CAPACITY</span><span>{ev.capacity}</span></div>
-                        <div className="flex justify-between font-mono text-[10px] font-bold"><span>TICKETS SOLD</span><span>{ev.sold}</span></div>
-                        <div className="flex justify-between font-mono text-[10px] font-bold"><span>% FILLED</span><span>{Math.round((ev.sold / ev.capacity) * 100)}%</span></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'help' && (
-              <div className="max-w-lg flex flex-col gap-4">
-                <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-                  <h3 className="font-display text-lg font-bold uppercase mb-2">Need help?</h3>
-                  <p className="font-mono text-[11px] text-[#E7D5A4]/70 mb-3">Ask Tangy AI about partnership tiers, benefits, or renewal timelines.</p>
-                  <Link to="/ai" className="inline-block px-4 py-2 bg-[#C99A2E] text-[#11100C] font-bold uppercase text-[10px] tracking-widest">✦ ASK TANGY AI →</Link>
-                </div>
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <h3 className="font-display text-lg font-bold uppercase mb-3">Request a Human Agent</h3>
-                  {agentSent ? (
-                    <div className="p-3 bg-[#10b981]/20 border border-[#10b981]/40 text-[10px] font-bold">✓ REQUEST SENT — REF {agentSent}. THE TANGY TEAM WILL REACH OUT.</div>
-                  ) : (
-                    <form onSubmit={handleAgentSubmit} className="flex flex-col gap-3 text-xs">
-                      <select value={agentForm.category} onChange={(e) => setAgentForm({ ...agentForm, category: e.target.value })} className="w-full p-2 bg-[#F5E9C9] border-2 border-[#11100C] outline-none">
-                        <option>Sponsorship</option>
-                        <option>Renewal</option>
-                        <option>General</option>
-                      </select>
-                      <textarea required value={agentForm.question} onChange={(e) => setAgentForm({ ...agentForm, question: e.target.value })} placeholder="What do you need help with?" className="w-full p-2 bg-[#F5E9C9] border-2 border-[#11100C] outline-none h-20" />
-                      <button type="submit" className="py-2 bg-[#11100C] text-[#E7D5A4] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">SEND TO TEAM →</button>
-                    </form>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </section>
-
-      <Footer />
-    </div>
+      {activeTab === 'help' && (
+        <div className="max-w-lg flex flex-col gap-4">
+          {readOnly ? (
+            <ReadOnlyNote>Messaging is disabled in admin preview.</ReadOnlyNote>
+          ) : agentSent ? (
+            <div className="p-4 bg-[#10b981]/20 border-2 border-[#10b981]/40 text-xs font-bold">✓ MESSAGE SENT — THE TANGY TEAM WILL REACH OUT.</div>
+          ) : (
+            <AgentRequestForm onCancel={() => {}} onSubmitted={() => setAgentSent(true)} />
+          )}
+        </div>
+      )}
+    </PortalShell>
   );
 };

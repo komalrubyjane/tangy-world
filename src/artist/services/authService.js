@@ -15,38 +15,18 @@ export const authService = {
     return data;
   },
 
-  signIn: async (email, password) => {
+  // Authentication is real Supabase Auth email OTP now (see
+  // src/components/auth/EmailOtpAuth.jsx) — signInWithOtp()/verifyOtp()
+  // handle both sign-in and account creation, so there's no separate
+  // password sign-in or reset flow left for the artist portal.
+
+  // Inserts the artist application row for an ALREADY-authenticated session
+  // (RegisterPage.jsx verifies the applicant's email via OTP first, then
+  // collects these fields, then calls this — never the other way around,
+  // so every artist application belongs to a verified account from the
+  // start). Replaces the old signUp-then-insert combo.
+  submitArtistApplication: async ({ userId, email, name, genre, city, bio, instagram, soundcloud, experienceLevel }) => {
     if (!isSupabaseConfigured) return NOT_CONFIGURED;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { success: false, error: error.message };
-    return { success: true, user: data.user };
-  },
-
-  requestPasswordReset: async (email) => {
-    if (!isSupabaseConfigured) return NOT_CONFIGURED;
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/artist/login`,
-    });
-    if (error) return { success: false, error: error.message };
-    return { success: true };
-  },
-
-  // Creates the auth account + the artist application row in one step.
-  applyAsArtist: async ({ email, password, name, genre, city, bio, instagram, soundcloud, experienceLevel }) => {
-    if (!isSupabaseConfigured) return NOT_CONFIGURED;
-
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    });
-    if (signUpError) return { success: false, error: signUpError.message };
-
-    const userId = signUpData.user?.id;
-    if (!userId) {
-      return { success: false, error: 'Could not create your account. Please try again.' };
-    }
-
     const { error: insertError } = await supabase.from('artists').insert({
       user_id: userId,
       name,
@@ -60,7 +40,6 @@ export const authService = {
       status: 'pending',
     });
     if (insertError) return { success: false, error: insertError.message };
-
     return { success: true };
   },
 

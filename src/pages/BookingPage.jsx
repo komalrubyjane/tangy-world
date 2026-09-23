@@ -5,7 +5,6 @@ import { artists, gallery } from '../data/mockData';
 import { useEvents } from '../hooks/useEvents';
 import { useUserAuth } from '../context/UserAuthContext';
 import { bookingService } from '../lib/bookingService';
-import { isMockAuth } from '../config/auth';
 import { generateQrDataUrl } from '../lib/qr';
 import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
@@ -43,7 +42,7 @@ export const BookingPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [confirmedBooking, setConfirmedBooking] = useState(null);
-  const [qrDataUrl, setQrDataUrl] = useState('');
+  const [confirmedTickets, setConfirmedTickets] = useState([]);
 
   useEffect(() => {
     setSelectedTier(ticketTiers[0]);
@@ -71,11 +70,20 @@ export const BookingPage = () => {
     document.body.appendChild(script);
   });
 
-  const finalizeConfirmedBooking = async (booking) => {
+  // QR is generated client-side from each ISSUED TICKET's own random token
+  // (never the registration_code, never a database id) — see `tickets` in
+  // 0016_payments_tickets_checkin.sql. Tickets only exist once the booking
+  // is genuinely confirmed server-side, so there's no unverified-state QR.
+  const finalizeConfirmedBooking = async (booking, tickets) => {
     setConfirmedBooking(booking);
     setIsSubmitted(true);
-    const qr = await generateQrDataUrl(booking.registration_code);
-    setQrDataUrl(qr);
+    const withQr = await Promise.all(
+      (tickets || []).map(async (t) => ({ ...t, qrDataUrl: await generateQrDataUrl(`TANGY:TICKET:${t.token}`) }))
+    );
+    setConfirmedTickets(withQr);
+    // Best-effort — the booking is already fully confirmed regardless of
+    // whether this email send succeeds; see sendTicketEmail's own comment.
+    bookingService.sendTicketEmail(booking.id);
   };
 
   const handleProceedPayment = async (e) => {
@@ -84,29 +92,6 @@ export const BookingPage = () => {
     setBookingError('');
     playSFX('ticketClick');
     setIsSubmitting(true);
-
-    // Mock mode has no real Supabase session for an Edge Function to verify
-    // against, so it keeps confirming bookings directly — this is the site's
-    // existing, pre-payment test path, unrelated to whether real Razorpay
-    // checkout is wired up.
-    if (isMockAuth) {
-      const res = await bookingService.createBooking({
-        userId: user.id,
-        eventId: session.id,
-        attendeeName: fullName,
-        attendeeEmail: email,
-        attendeePhone: phone,
-        quantity: ticketQuantity,
-        amount: totalAmount,
-      });
-      setIsSubmitting(false);
-      if (!res.success) {
-        setBookingError(res.error || 'Something went wrong creating your booking.');
-        return;
-      }
-      await finalizeConfirmedBooking(res.booking);
-      return;
-    }
 
     // Real payment flow: server computes the authoritative amount and
     // creates the Razorpay order; nothing here is trusted for pricing.
@@ -156,7 +141,7 @@ export const BookingPage = () => {
           setBookingError(verifyRes.error || 'Payment verification failed — please contact support before retrying.');
           return;
         }
-        await finalizeConfirmedBooking(verifyRes.booking);
+        await finalizeConfirmedBooking(verifyRes.booking, verifyRes.tickets);
       },
       modal: {
         ondismiss: () => setIsSubmitting(false),
@@ -383,14 +368,25 @@ export const BookingPage = () => {
 
               {isSubmitted && confirmedBooking ? (
                 <div className="flex flex-col items-center gap-4 text-center py-2">
-                  {qrDataUrl && (
-                    <img src={qrDataUrl} alt="Ticket QR code" className="w-48 h-48 border-4 border-[#191410]" />
-                  )}
                   <div className="font-mono text-lg font-bold tracking-widest text-[#191410]">
                     {confirmedBooking.registration_code}
                   </div>
+
+                  {confirmedTickets.length > 0 ? (
+                    <div className="w-full flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
+                      {confirmedTickets.map((t) => (
+                        <div key={t.id} className="flex flex-col items-center gap-2 border-t-2 border-dashed border-[#191410]/30 pt-4 first:border-t-0 first:pt-0">
+                          <img src={t.qrDataUrl} alt={`QR code for ${t.ticket_number}`} className="w-40 h-40 border-4 border-[#191410]" />
+                          <span className="font-mono text-xs font-bold text-[#191410]">{t.ticket_number}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="font-mono text-[10px] text-[#241a12]/70">Issuing your ticket QR codes — refresh your Passport in a moment if they don't appear here.</p>
+                  )}
+
                   <p className="font-mono text-[10px] text-[#241a12]/70 uppercase leading-relaxed">
-                    Show this QR code at check-in. A copy is saved to your Passport.
+                    Show each QR code at check-in — one scan per ticket. A copy is saved to your Passport, and we've emailed them to you.
                   </p>
                   <div className="w-full p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border-2 border-[#191410]">
                     ✓ BOOKING CONFIRMED — {ticketQuantity}x {selectedTier.name}
@@ -517,9 +513,7 @@ export const BookingPage = () => {
                 )}
 
                 <div className="p-2 bg-[#d1a437]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
-                  {isMockAuth
-                    ? 'ℹ️ TEST MODE — payment capture isn\'t wired up yet, so this confirms your booking directly. Live Razorpay checkout will replace this before launch.'
-                    : '🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy\'s servers.'}
+                  🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy's servers.
                 </div>
 
                 <button
@@ -527,7 +521,7 @@ export const BookingPage = () => {
                   disabled={isSubmitting}
                   className="w-full h-14 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {isSubmitting ? 'PROCESSING...' : `${isMockAuth ? 'CONFIRM BOOKING' : 'PAY & CONFIRM'} (₹${totalAmount.toLocaleString()}) →`}
+                  {isSubmitting ? 'PROCESSING...' : `PAY & CONFIRM (₹${totalAmount.toLocaleString()}) →`}
                 </button>
 
               </form>

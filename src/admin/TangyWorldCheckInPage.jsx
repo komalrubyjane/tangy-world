@@ -3,16 +3,18 @@ import { StaffAuthGate } from './StaffAuthGate';
 import { useUserAuth } from '../context/UserAuthContext';
 import { useEvents } from '../hooks/useEvents';
 import { checkinService } from '../lib/checkinService';
-import { mockCheckinAdapter } from '../services/mockCheckinAdapter';
-import { eventService } from '../services/eventService';
-import { isMockAuth } from '../config/auth';
 import { useAudio } from '../audio/AudioContext';
 
+// Every `result` value here is exactly what check_in_ticket() (0016_payments_tickets_checkin.sql)
+// returns — this page only renders it, it never decides validity itself.
 const RESULT_STYLES = {
-  success: { bg: '#10b981', label: '✓ CHECK-IN SUCCESSFUL' },
-  duplicate: { bg: '#f59e0b', label: '⚠ ALREADY CHECKED IN' },
-  invalid: { bg: '#ef4444', label: '✕ INVALID REGISTRATION' },
-  wrongEvent: { bg: '#ef4444', label: '✕ TICKET IS FOR A DIFFERENT SESSION' },
+  valid: { bg: '#10b981', label: '✓ VALID TICKET — CHECKED IN' },
+  already_checked_in: { bg: '#f59e0b', label: '⚠ ALREADY CHECKED IN' },
+  wrong_event: { bg: '#ef4444', label: '✕ TICKET IS FOR A DIFFERENT SESSION' },
+  cancelled: { bg: '#ef4444', label: '✕ TICKET CANCELLED' },
+  payment_not_confirmed: { bg: '#ef4444', label: '✕ PAYMENT NOT CONFIRMED' },
+  not_found: { bg: '#ef4444', label: '✕ INVALID TICKET' },
+  error: { bg: '#ef4444', label: '✕ UNABLE TO VERIFY TICKET' },
 };
 
 function QrScanner({ onDecoded, active }) {
@@ -52,23 +54,19 @@ function CheckInWorkspace() {
   const realEvents = useEvents();
   const [eventId, setEventId] = useState('');
   const [mode, setMode] = useState('scan'); // 'scan' | 'manual'
-  const [result, setResult] = useState(null); // { type, booking }
+  const [result, setResult] = useState(null); // the RPC's own result object
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [checkingInId, setCheckingInId] = useState(null);
   const [stats, setStats] = useState({ totalAttendees: 0, checkedIn: 0 });
   const [recent, setRecent] = useState([]);
+  const [scanError, setScanError] = useState('');
   const lastScanRef = useRef({ code: '', at: 0 });
 
-  // Mock mode: source events from the mock account system's own event list
-  // (src/data/mock/events.js via eventService) — the same dataset mock
-  // bookings/Profile/Admin all key off — and swap in the localStorage-backed
-  // check-in adapter instead of the real Supabase-backed checkinService.
-  const svc = isMockAuth ? mockCheckinAdapter : checkinService;
-  const eventsLoading = isMockAuth ? false : realEvents.loading;
-  const liveEvents = isMockAuth
-    ? eventService.getAll().map((e) => ({ id: e.id, title: e.name, date: e.date, dbStatus: e.status }))
-    : realEvents.events.filter((e) => e.dbStatus && e.dbStatus !== 'draft');
+  const svc = checkinService;
+  const eventsLoading = realEvents.loading;
+  const liveEvents = realEvents.events.filter((e) => e.dbStatus && e.dbStatus !== 'draft');
 
   useEffect(() => {
     if (!eventId && liveEvents.length > 0) setEventId(liveEvents[0].id);
@@ -83,41 +81,31 @@ function CheckInWorkspace() {
 
   useEffect(() => { refreshStats(); }, [refreshStats]);
 
-  const handleCheckIn = async (booking) => {
-    const res = await svc.checkIn(booking.id, eventId, user.id);
+  const runCheckIn = async (tokenOrScan) => {
+    setScanError('');
     playSFX('ticketClick');
-    if (res.success) {
-      setResult({ type: 'success', booking });
-      refreshStats();
-    } else if (res.alreadyCheckedIn) {
-      setResult({ type: 'duplicate', booking });
-    } else {
-      setResult({ type: 'invalid', booking, error: res.error });
+    // navigator.onLine is a hint, not proof — the RPC call itself is what
+    // actually determines success; this just gives a faster, clearer
+    // message for the common "phone lost signal" case rather than a raw
+    // network error bubbling up.
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setScanError('Unable to verify ticket. Please reconnect and try again.');
+      return;
     }
+    const res = await svc.checkInByToken(tokenOrScan, eventId);
+    if (res.result === 'error') {
+      setScanError(res.error || 'Unable to verify ticket. Please reconnect and try again.');
+      return;
+    }
+    setResult(res);
+    refreshStats();
   };
 
-  const handleDecoded = async (text) => {
+  const handleDecoded = (text) => {
     const now = Date.now();
     if (text === lastScanRef.current.code && now - lastScanRef.current.at < 3000) return; // debounce repeat frames
     lastScanRef.current = { code: text, at: now };
-
-    const lookup = await svc.lookupByCode(text, eventId);
-    if (!lookup.found) {
-      playSFX('ticketClick');
-      setResult({ type: 'invalid', code: text });
-      return;
-    }
-    if (lookup.wrongEvent) {
-      playSFX('ticketClick');
-      setResult({ type: 'wrongEvent', booking: lookup.booking });
-      return;
-    }
-    if (lookup.alreadyCheckedIn) {
-      playSFX('ticketClick');
-      setResult({ type: 'duplicate', booking: lookup.booking });
-      return;
-    }
-    handleCheckIn(lookup.booking);
+    runCheckIn(text);
   };
 
   useEffect(() => {
@@ -132,7 +120,16 @@ function CheckInWorkspace() {
     return () => { cancelled = true; clearTimeout(t); };
   }, [searchQuery, eventId, mode, svc]);
 
+  const handleManualCheckIn = async (ticket) => {
+    setCheckingInId(ticket.id);
+    await runCheckIn(ticket.token);
+    setCheckingInId(null);
+    // Re-run the current search so this ticket's row reflects its new status.
+    if (searchQuery) svc.searchBookings(searchQuery, eventId).then(setSearchResults);
+  };
+
   const selectedEvent = liveEvents.find((e) => e.id === eventId);
+  const style = result ? RESULT_STYLES[result.result] : null;
 
   return (
     <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono p-3 sm:p-6">
@@ -174,7 +171,7 @@ function CheckInWorkspace() {
         {[{ id: 'scan', label: '📷 QR SCAN' }, { id: 'manual', label: '🔍 MANUAL CHECK-IN' }].map((m) => (
           <button
             key={m.id}
-            onClick={() => { setMode(m.id); setResult(null); }}
+            onClick={() => { setMode(m.id); setResult(null); setScanError(''); }}
             className={`flex-1 py-3 text-xs font-bold uppercase border-2 ${mode === m.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E]' : 'bg-[#191410] text-[#E7D5A4]/70 border-[#C99A2E]/30'}`}
           >
             {m.label}
@@ -182,20 +179,24 @@ function CheckInWorkspace() {
         ))}
       </div>
 
+      {/* NETWORK / RPC ERROR BANNER */}
+      {scanError && (
+        <div className="p-4 mb-4 border-2 border-[#ef4444] bg-[#ef4444]/10 text-[#ef4444] font-bold text-center text-sm">
+          {scanError}
+          <button onClick={() => setScanError('')} className="block mx-auto mt-2 text-xs underline">DISMISS</button>
+        </div>
+      )}
+
       {/* RESULT BANNER */}
       {result && (
-        <div
-          className="p-4 mb-4 border-2 border-[#11100C] text-[#11100C] font-bold text-center"
-          style={{ backgroundColor: RESULT_STYLES[result.type]?.bg }}
-        >
-          <div className="text-lg">{RESULT_STYLES[result.type]?.label}</div>
-          {result.booking && (
-            <div className="text-xs mt-1 font-mono">
-              {result.booking.attendee_name} · {result.booking.registration_code} · {result.booking.quantity} ticket(s)
-            </div>
-          )}
-          {!result.booking && result.code && (
-            <div className="text-xs mt-1 font-mono">Code: {result.code}</div>
+        <div className="p-4 mb-4 border-2 border-[#11100C] text-[#11100C] font-bold text-center" style={{ backgroundColor: style?.bg }}>
+          <div className="text-lg">{style?.label}</div>
+          {result.attendee_name && <div className="text-sm mt-1">{result.attendee_name}</div>}
+          <div className="text-xs mt-1 font-mono">
+            {[result.ticket_number, result.tier].filter(Boolean).join(' · ')}
+          </div>
+          {result.result === 'already_checked_in' && result.checked_in_at && (
+            <div className="text-xs mt-1 font-mono">Checked in at: {new Date(result.checked_in_at).toLocaleTimeString()}</div>
           )}
           <button onClick={() => setResult(null)} className="mt-2 text-xs underline">DISMISS</button>
         </div>
@@ -220,28 +221,35 @@ function CheckInWorkspace() {
             className="w-full bg-[#11100C] border border-[#C99A2E]/60 px-3 py-3 text-sm text-[#E7D5A4] mb-3"
           />
           {searching && <div className="text-xs text-[#E7D5A4]/50">Searching...</div>}
-          <div className="flex flex-col gap-2">
-            {searchResults.map((b) => {
-              const checkedIn = b.checkins && b.checkins.length > 0;
-              return (
-                <div key={b.id} className="flex justify-between items-center bg-[#11100C] border border-[#C99A2E]/30 p-3">
-                  <div>
-                    <div className="text-sm font-bold">{b.attendee_name}</div>
-                    <div className="text-[10px] text-[#E7D5A4]/60">{b.registration_code} · {b.attendee_email} · {b.events?.name}</div>
+          <div className="flex flex-col gap-3">
+            {searchResults.map((b) => (
+              <div key={b.id} className="bg-[#11100C] border border-[#C99A2E]/30 p-3">
+                <div className="text-sm font-bold">{b.attendee_name}</div>
+                <div className="text-[10px] text-[#E7D5A4]/60 mb-2">{b.registration_code} · {b.attendee_email} · {b.events?.name} · {b.status}</div>
+                {(b.tickets || []).length === 0 ? (
+                  <div className="text-[10px] text-[#E7D5A4]/40 uppercase">No tickets issued (payment not confirmed).</div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    {b.tickets.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center bg-[#191410] border border-[#C99A2E]/20 px-2.5 py-1.5">
+                        <span className="text-[10px] font-mono">{t.ticket_number}</span>
+                        {t.status === 'checked_in' ? (
+                          <span className="text-[10px] font-bold text-[#f59e0b]">✓ CHECKED IN</span>
+                        ) : (
+                          <button
+                            onClick={() => handleManualCheckIn(t)}
+                            disabled={checkingInId === t.id}
+                            className="px-3 py-1.5 bg-[#10b981] text-[#11100C] text-[10px] font-bold uppercase disabled:opacity-50"
+                          >
+                            {checkingInId === t.id ? 'CHECKING...' : 'CHECK IN'}
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  {checkedIn ? (
-                    <span className="text-[10px] font-bold text-[#f59e0b]">✓ CHECKED IN</span>
-                  ) : (
-                    <button
-                      onClick={() => handleCheckIn(b)}
-                      className="px-3 py-2 bg-[#10b981] text-[#11100C] text-[10px] font-bold uppercase"
-                    >
-                      CHECK IN
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -253,7 +261,7 @@ function CheckInWorkspace() {
           <div className="flex flex-col gap-1 text-xs">
             {recent.map((r) => (
               <div key={r.id} className="flex justify-between border-b border-[#E7D5A4]/10 py-1">
-                <span>{r.bookings?.attendee_name} ({r.bookings?.registration_code})</span>
+                <span>{r.bookings?.attendee_name} ({r.tickets?.ticket_number})</span>
                 <span className="text-[#E7D5A4]/50">{new Date(r.checked_in_at).toLocaleTimeString()}</span>
               </div>
             ))}

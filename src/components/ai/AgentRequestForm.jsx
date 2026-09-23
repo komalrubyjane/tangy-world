@@ -1,29 +1,17 @@
 import { useState } from 'react';
-import { agentService } from '../../services/agentService';
 import { aiSupportService } from '../../services/aiSupportService';
+import { conversationService } from '../../services/conversationService';
 import { useUserAuth } from '../../context/UserAuthContext';
-import { useMockAuth } from '../../context/MockAuthContext';
-
-// MockAuthProvider isn't mounted app-wide yet, so useMockAuth() can throw.
-// This keeps the form usable regardless of which auth systems are active.
-function useSafeMockAuth() {
-  try {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useMockAuth();
-  } catch {
-    return null;
-  }
-}
 
 const PRIORITIES = ['low', 'normal', 'high'];
 
 /**
- * Escalation form — "REQUEST AN AGENT" flow. Purely a mock handoff: it
- * creates a pending agentRequest via agentService and leaves the
- * conversation in an "escalated" state. No auto-reply is simulated here.
+ * Escalation form — "REQUEST AN AGENT" flow. Sends a real message into the
+ * real support conversation (conversationService) that the Admin Inbox
+ * reads from; priority is kept client-side only for now (no priority column
+ * exists on conversations/messages yet).
  */
 export const AgentRequestForm = ({ conversationId, initialCategory = '', initialQuestion = '', onCancel, onSubmitted }) => {
-  const mockAuth = useSafeMockAuth();
   const { isLoggedIn: realLoggedIn, user: realUser } = useUserAuth();
 
   const [category, setCategory] = useState(initialCategory);
@@ -35,40 +23,36 @@ export const AgentRequestForm = ({ conversationId, initialCategory = '', initial
   const categories = aiSupportService.getCategories();
 
   const resolveRequester = () => {
-    if (mockAuth?.isLoggedIn && mockAuth.user) {
-      return {
-        user: mockAuth.user.fullName || mockAuth.user.email || 'Tangy Member',
-        role: mockAuth.user.role || 'member',
-      };
-    }
     if (realLoggedIn && realUser) {
       return {
-        user: realUser.full_name || realUser.email || 'Tangy Listener',
+        id: realUser.id,
+        name: realUser.full_name || realUser.email || 'Tangy Listener',
+        email: realUser.email,
         role: realUser.role || 'patron',
       };
     }
-    return { user: 'Guest Visitor', role: 'guest' };
+    // Anonymous visitor — stable for this tab only (sessionId doubles as identity).
+    return { id: `guest-${conversationId}`, name: 'Guest Visitor', email: null, role: 'guest' };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    const { user, role } = resolveRequester();
+    const requester = resolveRequester();
     const categoryLabel = categories.find((c) => c.id === category)?.label || category || 'General';
     const combinedQuestion = [question.trim(), description.trim()].filter(Boolean).join(' — ') || 'No details provided.';
 
-    const request = agentService.create({
-      user,
-      role,
-      category: categoryLabel,
-      question: combinedQuestion,
-      priority,
-      conversationId,
-    });
+    // Creates/reuses the real conversation the Admin Inbox chats through, then
+    // keeps the legacy ticket (category/priority) for continuity.
+    const realConversationId = await conversationService.getOrCreateSupportConversation(
+      categoryLabel,
+      requester
+    );
+    await conversationService.sendMessage(realConversationId, { text: combinedQuestion, sender: requester });
 
     setSubmitting(false);
-    onSubmitted?.(request);
+    onSubmitted?.({ conversationId: realConversationId }, requester);
   };
 
   return (

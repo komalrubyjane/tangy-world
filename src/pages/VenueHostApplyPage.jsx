@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { collaborationService } from '../services/collaborationService';
+import { useUserAuth } from '../context/UserAuthContext';
+import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
+import { ApplicationReceivedNotice } from '../components/apply/ApplicationReceivedNotice';
 
 export const VenueHostApplyPage = () => {
+  const navigate = useNavigate();
+  const { user } = useUserAuth();
   const [form, setForm] = useState({ propertyName: '', contactName: '', email: '', phone: '', details: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -40,6 +46,7 @@ export const VenueHostApplyPage = () => {
       email: form.email,
       phone: form.phone,
       details: form.details,
+      user_id: user?.id ?? null,
     });
     setSubmitting(false);
     if (err) {
@@ -54,6 +61,13 @@ export const VenueHostApplyPage = () => {
       <Navbar />
 
       <section className="relative pt-32 pb-16 px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C69A32]/40">
+        <button
+          type="button"
+          onClick={() => navigate('/join')}
+          className="mb-3 font-mono text-[10px] font-bold text-[#E7D5A4]/50 hover:text-[#C69A32] uppercase tracking-wider"
+        >
+          ← CHANGE HOW YOU'RE JOINING
+        </button>
         <span className="font-mono text-xs text-[#C69A32] tracking-[0.35em] uppercase font-bold mb-3 block">
           HERITAGE VENUE APPLICATION // HYDERABAD
         </span>
@@ -79,26 +93,25 @@ export const VenueHostApplyPage = () => {
           </p>
 
           {submitted ? (
-            <div className="bg-[#1C0E08] text-[#E7D5A4] p-8 border-2 border-[#17120D] text-center">
-              <h3 className="display text-4xl mb-2">VENUE FILE SUBMITTED!</h3>
-              <p className="font-mono text-xs">Our architectural acoustic team will conduct an initial site assessment.</p>
-            </div>
+            <ApplicationReceivedNotice roleLabel="Venue / Host" statusRoute="/venue/dashboard" />
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" value={form.propertyName} onChange={set('propertyName')} placeholder="PROPERTY NAME / LOCATION *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-                <input required type="text" value={form.contactName} onChange={set('contactName')} placeholder="OWNER / CONTACT NAME *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="email" value={form.email} onChange={set('email')} placeholder="EMAIL ADDRESS *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-                <input required type="tel" value={form.phone} onChange={set('phone')} placeholder="PHONE NUMBER *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-              </div>
-              <textarea required rows={4} value={form.details} onChange={set('details')} placeholder="DESCRIBE THE PROPERTY, ESTIMATED CAPACITY & ACOUSTIC FEATURES *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
-              {error && <div className="p-3 bg-[#c2272a] text-white font-bold border border-[#17120D]">{error}</div>}
-              <button type="submit" disabled={submitting} className="btn-ticket w-full py-4 text-center !bg-[#1C0E08] !text-[#E7D5A4] hover:!bg-[#C69A32] hover:!text-[#17120D] font-bold uppercase tracking-widest text-sm disabled:opacity-50">
-                {submitting ? 'SUBMITTING...' : 'SUBMIT VENUE FOR EVALUATION →'}
-              </button>
-            </form>
+            <RequireAuthToApply roleLabel="Venue / Host">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required type="text" value={form.propertyName} onChange={set('propertyName')} placeholder="PROPERTY NAME / LOCATION *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                  <input required type="text" value={form.contactName} onChange={set('contactName')} placeholder="OWNER / CONTACT NAME *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required type="email" value={form.email} onChange={set('email')} placeholder="EMAIL ADDRESS *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                  <input required type="tel" value={form.phone} onChange={set('phone')} placeholder="PHONE NUMBER *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                </div>
+                <textarea required rows={4} value={form.details} onChange={set('details')} placeholder="DESCRIBE THE PROPERTY, ESTIMATED CAPACITY & ACOUSTIC FEATURES *" className="p-3 bg-[#F5E9C9] border border-[#17120D] focus:outline-none" />
+                {error && <div className="p-3 bg-[#c2272a] text-white font-bold border border-[#17120D]">{error}</div>}
+                <button type="submit" disabled={submitting} className="btn-ticket w-full py-4 text-center !bg-[#1C0E08] !text-[#E7D5A4] hover:!bg-[#C69A32] hover:!text-[#17120D] font-bold uppercase tracking-widest text-sm disabled:opacity-50">
+                  {submitting ? 'SUBMITTING...' : 'SUBMIT VENUE FOR EVALUATION →'}
+                </button>
+              </form>
+            </RequireAuthToApply>
           )}
 
         </div>

@@ -90,7 +90,7 @@ export const Manifesto = () => {
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#B94717" colorB="#11100C" />
 
       {/* 1975 NEWSPAPER / MUSEUM MANIFESTO DOCUMENT */}
-      <div className="manifesto-newspaper relative w-full max-w-[1100px] bg-[#F5E9C9] border-4 border-[#11100C] p-5 sm:p-8 md:p-14 shadow-[14px_14px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] z-10 my-auto">
+      <div className="manifesto-newspaper relative w-full max-w-[1100px] paper-surface border-4 border-[#11100C] p-5 sm:p-8 md:p-14 shadow-[14px_14px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] z-10 my-auto">
 
         {/* COFFEE STAIN GRAPHIC ACCENT */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[14px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-multiply rotate-12 hidden sm:block" />

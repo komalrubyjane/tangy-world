@@ -81,10 +81,40 @@ Deno.serve(async (req) => {
     const totalAmountRupees = subtotalRupees + taxesRupees;
     const totalAmountPaise = totalAmountRupees * 100;
 
+    const registrationCode = generateRegistrationCode();
+
+    // create_pending_booking() takes a row lock on the event and checks
+    // capacity (confirmed + already-pending quantity) BEFORE inserting —
+    // this is the actual overselling protection, not the event.status check
+    // above. A concurrent buyer racing for the last seats serializes here
+    // instead of both succeeding. Deliberately called before ever hitting
+    // Razorpay's API, so a sold-out event never wastes a real order.
+    // .rpc() on a function returning a single row (not setof) returns that
+    // row directly in `data`, not an array.
+    const { data: booking, error: bookingError } = await admin.rpc('create_pending_booking', {
+      p_user_id: user.id,
+      p_event_id: eventId,
+      p_registration_code: registrationCode,
+      p_attendee_name: attendeeName,
+      p_attendee_email: attendeeEmail,
+      p_attendee_phone: attendeePhone ?? null,
+      p_quantity: qty,
+      p_amount: totalAmountRupees,
+      p_tier: tierId,
+      p_razorpay_order_id: null,
+    });
+
+    if (bookingError) {
+      if (bookingError.message?.includes('SOLD_OUT')) {
+        return json({ error: 'Not enough tickets remain for this session.' }, 409);
+      }
+      console.error('Booking insert failed', bookingError);
+      return json({ error: 'Could not record booking.' }, 500);
+    }
+
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')!;
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')!;
     const basicAuth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
-    const registrationCode = generateRegistrationCode();
 
     const orderRes = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
@@ -103,29 +133,19 @@ Deno.serve(async (req) => {
     if (!orderRes.ok) {
       const errBody = await orderRes.text();
       console.error('Razorpay order creation failed', errBody);
+      // Release the capacity this booking was holding — a 'failed' booking
+      // no longer counts against create_pending_booking's capacity check.
+      await admin.from('bookings').update({ status: 'failed' }).eq('id', booking.id);
       return json({ error: 'Could not create payment order.' }, 502);
     }
     const order = await orderRes.json();
 
-    const { data: booking, error: bookingError } = await admin
+    const { error: attachError } = await admin
       .from('bookings')
-      .insert({
-        registration_code: registrationCode,
-        user_id: user.id,
-        event_id: eventId,
-        attendee_name: attendeeName,
-        attendee_email: attendeeEmail,
-        attendee_phone: attendeePhone ?? null,
-        quantity: qty,
-        amount: totalAmountRupees,
-        status: 'pending',
-        razorpay_order_id: order.id,
-      })
-      .select()
-      .single();
-
-    if (bookingError) {
-      console.error('Booking insert failed', bookingError);
+      .update({ razorpay_order_id: order.id })
+      .eq('id', booking.id);
+    if (attachError) {
+      console.error('Could not attach order id to booking', attachError);
       return json({ error: 'Could not record booking.' }, 500);
     }
 

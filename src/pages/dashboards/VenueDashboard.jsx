@@ -1,228 +1,198 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Navbar } from '../../components/layout/Navbar';
-import { Footer } from '../../components/layout/Footer';
-import { useMockAuth } from '../../context/MockAuthContext';
-import { eventService } from '../../services/eventService';
-import { userService } from '../../services/userService';
-import { agentService } from '../../services/agentService';
-
-const STATUS_COLORS = {
-  active: 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]/40',
-  pending: 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/40',
-};
-
-const Badge = ({ status }) => (
-  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#E7D5A4]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
-    {status || 'open'}
-  </span>
-);
-
-const fmtDate = (d) => {
-  if (!d) return '—';
-  try { return new Date(`${d}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
-  catch { return d; }
-};
-
-const Empty = ({ children }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">{children}</div>
-);
-
-const HOSTING_FORMATS = [
-  { name: 'Full Session Host', desc: 'A complete headline night — full production, ticketing and crew moves into your property for one evening.' },
-  { name: 'Pop-Up Acoustic Set', desc: 'A stripped-down 90-minute unamplified set for smaller courtyards, terraces or havelis.' },
-  { name: 'Archive Exhibition Night', desc: 'A quieter format pairing photography and contact-sheet archives with a short live set.' },
-];
+import { useUserAuth } from '../../context/UserAuthContext';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
+import { PortalShell, Badge, Empty, fmtDate, StatTile, ReadOnlyNote } from './portal/PortalUI';
 
 const TABS = [
+  { id: 'overview', label: '📊 OVERVIEW' },
+  { id: 'events', label: '🏛️ HOSTED EVENTS' },
+  { id: 'applications', label: '📋 APPLICATIONS' },
   { id: 'profile', label: '🏛️ PROFILE' },
-  { id: 'opportunities', label: '🪧 HOSTING FORMATS' },
-  { id: 'requests', label: '📮 HOSTING REQUESTS' },
-  { id: 'upcoming', label: '📅 UPCOMING EVENTS' },
-  { id: 'collab', label: '🤝 COLLABORATIONS' },
-  { id: 'help', label: '✦ HELP' },
+  { id: 'help', label: '✦ MESSAGES' },
 ];
 
-export const VenueDashboard = () => {
+const TODAY = new Date().toISOString().slice(0, 10);
+
+// `overrideProfile` + `readOnly` are set only by the admin preview route
+// (src/pages/admin/AdminPortalPreview.jsx) — see the identical note in
+// CrewDashboard.jsx for the security reasoning (RLS-backed, no impersonation).
+// `demoData` ({ applications, profile, hostedEvents }) is set only by the
+// demo-admin build (src/pages/demoAdmin/DemoRoleDashboard.jsx) — when
+// present, this skips every real Supabase call below. See demoAdminData.js.
+export const VenueDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
   const navigate = useNavigate();
-  const { user, signOut } = useMockAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const { user: authUser, logout } = useUserAuth();
+  const user = overrideProfile || authUser;
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
-  const [agentForm, setAgentForm] = useState({ category: 'Venue Hosting', question: '' });
+  const [applications, setApplications] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [profileForm, setProfileForm] = useState({ property_name: '', location: '', capacity: '', description: '' });
+  const [profileMsg, setProfileMsg] = useState('');
+  const [hostedEvents, setHostedEvents] = useState([]);
   const [agentSent, setAgentSent] = useState(null);
 
-  useEffect(() => { setLoading(false); }, []);
+  const load = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
 
-  const events = eventService.getAll();
-  const eventById = (id) => events.find((e) => e.id === id);
-  const venueRecord = userService.getProfileTable('venue').find((v) => v.propertyName.toLowerCase() === user.fullName.toLowerCase());
+    if (demoData) {
+      setApplications(demoData.applications || []);
+      setProfile(demoData.profile || null);
+      if (demoData.profile) setProfileForm({ property_name: demoData.profile.property_name || '', location: demoData.profile.location || '', capacity: demoData.profile.capacity ?? '', description: demoData.profile.description || '' });
+      setHostedEvents(demoData.hostedEvents || []);
+      setLoading(false);
+      return;
+    }
+    if (!isSupabaseConfigured) { setLoading(false); return; }
 
-  const upcomingEvents = (venueRecord?.upcomingEvents || []).map(eventById).filter(Boolean);
-  const hostingRequests = venueRecord?.hostingRequests || [];
-  const propertyEvents = venueRecord ? events.filter((e) => e.venue === venueRecord.propertyName) : [];
-  const pastCollaborations = propertyEvents.filter((e) => e.status === 'past');
+    const [{ data: apps }, { data: prof }, { data: events }] = await Promise.all([
+      supabase.from('collaborations').select('*').eq('user_id', user.id).eq('type', 'venue_host').order('created_at', { ascending: false }),
+      supabase.from('venue_profiles').select('*').eq('id', user.id).maybeSingle(),
+      supabase.from('events').select('*').eq('venue_partner_id', user.id).order('event_date', { ascending: true }),
+    ]);
 
-  const handleLogout = () => { signOut(); navigate('/'); };
-  const handleAgentSubmit = (e) => {
+    setApplications(apps || []);
+    setProfile(prof || null);
+    if (prof) setProfileForm({ property_name: prof.property_name || '', location: prof.location || '', capacity: prof.capacity ?? '', description: prof.description || '' });
+    setHostedEvents(events || []);
+    setLoading(false);
+  }, [user, demoData]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleLogout = async () => { await logout(); navigate('/'); };
+
+  const saveProfile = async (e) => {
     e.preventDefault();
-    if (!agentForm.question.trim()) return;
-    const req = agentService.create({ user: venueRecord?.propertyName || user.fullName, role: 'venue', category: agentForm.category, question: agentForm.question });
-    setAgentSent(req.id);
-    setAgentForm({ category: 'Venue Hosting', question: '' });
+    if (readOnly) return;
+    const { error } = await supabase.from('venue_profiles').update({ ...profileForm, capacity: profileForm.capacity ? parseInt(profileForm.capacity, 10) : null }).eq('id', user.id);
+    setProfileMsg(error ? 'Could not save.' : '✓ SAVED');
   };
 
-  return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
-      <Navbar />
+  const upcoming = hostedEvents.filter((e) => e.event_date >= TODAY);
+  const past = hostedEvents.filter((e) => e.event_date < TODAY);
+  const isApproved = applications.some((a) => a.status === 'approved');
 
-      <section className="pt-24 sm:pt-28 pb-4 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="bg-[#315B66] border-2 border-[#11100C] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  if (loading || !user) {
+    return <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">LOADING VENUE DASHBOARD...</div>;
+  }
+
+  return (
+    <PortalShell
+      icon="🏛️"
+      roleLabel="VENUE / HOST ACCOUNT"
+      title={profile?.property_name || user.full_name || user.email}
+      subtitle={user.email}
+      statusBadge={isApproved ? <Badge status="approved" /> : applications[0] ? <Badge status={applications[0].status} /> : null}
+      tabs={TABS}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onLogout={handleLogout}
+      preview={readOnly ? { label: `Viewing Venue Portal — ${profile?.property_name || user.full_name || user.email}` } : undefined}
+    >
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {!isApproved && (
+            <div className="sm:col-span-3"><Empty>YOUR VENUE APPLICATION ISN'T APPROVED YET — CHECK THE APPLICATIONS TAB.</Empty></div>
+          )}
+          <StatTile label="Upcoming Hosted Events" value={upcoming.length} sub="linked to your venue" />
+          <StatTile label="Past Hosted Events" value={past.length} sub="on record" />
+          <StatTile label="Applications" value={applications.length} sub="submitted so far" />
+        </div>
+      )}
+
+      {activeTab === 'events' && (
+        <div className="flex flex-col gap-6">
           <div>
-            <span className="font-mono text-[9px] font-bold text-[#E7D5A4]/80 uppercase tracking-widest block">HERITAGE HOSTING DESK</span>
-            <h1 className="font-display text-xl sm:text-2xl font-bold uppercase text-[#E7D5A4]">{venueRecord?.propertyName || user.fullName}</h1>
-            <span className="font-mono text-[10px] text-[#E7D5A4]/70">Contact: {venueRecord?.contactName || user.fullName}</span>
-            <div className="mt-2"><Badge status={venueRecord?.status || user.applicationStatus || 'pending'} /></div>
+            <h3 className="font-display text-lg font-bold uppercase mb-3">Upcoming</h3>
+            {upcoming.length === 0 ? <Empty>NO UPCOMING EVENTS LINKED TO YOUR VENUE YET.</Empty> : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {upcoming.map((e) => (
+                  <div key={e.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
+                    <h4 className="font-display font-bold uppercase">{e.name}</h4>
+                    <p className="font-mono text-[10px] mt-1">{fmtDate(e.event_date)} · {e.event_time}</p>
+                    <Badge status={e.status} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link to="/ai" className="border border-[#E7D5A4]/60 text-[#E7D5A4] hover:bg-[#E7D5A4]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">✦ ASK TANGY AI</Link>
-            <button onClick={handleLogout} className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border border-[#B94717] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">LOG OUT ✕</button>
+          <div>
+            <h3 className="font-display text-lg font-bold uppercase mb-3">Past</h3>
+            {past.length === 0 ? <Empty>NO PAST EVENTS ON RECORD.</Empty> : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {past.map((e) => (
+                  <div key={e.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
+                    <h4 className="font-display font-bold uppercase">{e.name}</h4>
+                    <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(e.event_date)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      </section>
+      )}
 
-      <section className="px-4 sm:px-6 max-w-6xl mx-auto">
-        <nav className="flex flex-wrap gap-2 border-b-2 border-[#C99A2E]/40 pb-3 mb-6">
-          {TABS.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
-                activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
-              }`}>
-              {tab.label}
-            </button>
+      {activeTab === 'applications' && (
+        <div className="flex flex-col gap-4">
+          {applications.length === 0 ? (
+            <Empty>NO VENUE APPLICATION ON FILE YET. <Link to="/apply/venue-host" className="text-[#C99A2E] underline">APPLY NOW →</Link></Empty>
+          ) : applications.map((a) => (
+            <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
+              <div className="flex justify-between items-start gap-3 mb-2">
+                <div>
+                  <h3 className="font-display text-lg font-bold uppercase">{a.business_name}</h3>
+                  <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
+                </div>
+                <Badge status={a.status} />
+              </div>
+              {a.details && <p className="font-mono text-[11px] text-[#E7D5A4]/80 whitespace-pre-wrap border-t border-[#C99A2E]/20 pt-3">{a.details}</p>}
+            </div>
           ))}
-        </nav>
-      </section>
+        </div>
+      )}
 
-      <section className="px-4 sm:px-6 max-w-6xl mx-auto pb-20">
-        {loading ? (
-          <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING HOSTING DESK...</div>
+      {activeTab === 'profile' && (
+        !isApproved ? (
+          <Empty>YOUR VENUE PROFILE UNLOCKS ONCE YOUR APPLICATION IS APPROVED.</Empty>
         ) : (
-          <>
-            {activeTab === 'profile' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Property</span>
-                  <div className="font-display text-xl font-bold mt-1">{venueRecord?.propertyName || 'Not yet on file'}</div>
-                </div>
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Sessions Hosted</span>
-                  <div className="font-display text-4xl font-bold mt-1">{pastCollaborations.length}</div>
-                </div>
-                <div className="sm:col-span-2 bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-                  <p className="font-mono text-xs text-[#E7D5A4]/80 leading-relaxed">
-                    {venueRecord
-                      ? `Listed with Tangy Sessions since ${fmtDate(venueRecord.createdAt?.slice(0, 10))}. We treat every heritage property with a zero structural impact guarantee.`
-                      : 'Your property hasn’t been matched to an archive record yet — this is normal for a fresh mock account. Browse hosting formats below.'}
-                  </p>
-                </div>
-              </div>
-            )}
+          <form onSubmit={saveProfile} className="max-w-md bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C] flex flex-col gap-4 text-xs">
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Property name</label>
+              <input disabled={readOnly} value={profileForm.property_name} onChange={(e) => { setProfileForm({ ...profileForm, property_name: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Location</label>
+              <input disabled={readOnly} value={profileForm.location} onChange={(e) => { setProfileForm({ ...profileForm, location: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Capacity</label>
+              <input disabled={readOnly} type="number" min="0" value={profileForm.capacity} onChange={(e) => { setProfileForm({ ...profileForm, capacity: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase mb-1">Description</label>
+              <textarea disabled={readOnly} rows={3} value={profileForm.description} onChange={(e) => { setProfileForm({ ...profileForm, description: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none resize-none disabled:opacity-60" />
+            </div>
+            {profileMsg && <div className="p-2 bg-[#10b981]/20 border border-[#10b981]/40 text-[#0f5132] text-[10px] font-bold">{profileMsg}</div>}
+            {!readOnly && <button type="submit" className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] font-bold uppercase tracking-widest border-2 border-[#11100C]">SAVE</button>}
+          </form>
+        )
+      )}
 
-            {activeTab === 'opportunities' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Hosting Formats We Offer</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {HOSTING_FORMATS.map((f) => (
-                    <div key={f.name} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-4">
-                      <h4 className="font-display font-bold uppercase mb-2">{f.name}</h4>
-                      <p className="font-mono text-[10px] leading-relaxed">{f.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'requests' && (
-              <div className="max-w-lg">
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Hosting Requests</h3>
-                {hostingRequests.length === 0 ? (
-                  <Empty>NO HOSTING REQUESTS ON FILE. YOU CAN PROPOSE A DATE VIA THE HELP TAB.</Empty>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {hostingRequests.map((r) => (
-                      <div key={r.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3 font-mono text-xs">{r.note}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'upcoming' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Upcoming Events At Your Property</h3>
-                {upcomingEvents.length === 0 ? (
-                  <Empty>NO UPCOMING SESSIONS SCHEDULED AT YOUR PROPERTY.</Empty>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {upcomingEvents.map((ev) => (
-                      <div key={ev.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                        <h4 className="font-display font-bold uppercase">{ev.name}</h4>
-                        <p className="font-mono text-[10px] mt-1">{fmtDate(ev.date)} · {ev.time}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'collab' && (
-              <div>
-                <h3 className="font-display text-lg font-bold uppercase mb-3">Collaboration History</h3>
-                {pastCollaborations.length === 0 ? (
-                  <Empty>NO PAST SESSIONS ON RECORD AT YOUR PROPERTY YET.</Empty>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {pastCollaborations.map((ev) => (
-                      <div key={ev.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
-                        <h4 className="font-display font-bold uppercase">{ev.name}</h4>
-                        <p className="font-mono text-[10px] mt-1 text-[#E7D5A4]/70">{fmtDate(ev.date)} · {ev.sold}/{ev.capacity} attended</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'help' && (
-              <div className="max-w-lg flex flex-col gap-4">
-                <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-                  <h3 className="font-display text-lg font-bold uppercase mb-2">Need help?</h3>
-                  <p className="font-mono text-[11px] text-[#E7D5A4]/70 mb-3">Ask Tangy AI about structural assessments, formats, or scheduling.</p>
-                  <Link to="/ai" className="inline-block px-4 py-2 bg-[#C99A2E] text-[#11100C] font-bold uppercase text-[10px] tracking-widest">✦ ASK TANGY AI →</Link>
-                </div>
-                <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-                  <h3 className="font-display text-lg font-bold uppercase mb-3">Request a Human Agent</h3>
-                  {agentSent ? (
-                    <div className="p-3 bg-[#10b981]/20 border border-[#10b981]/40 text-[10px] font-bold">✓ REQUEST SENT — REF {agentSent}. THE TANGY TEAM WILL REACH OUT.</div>
-                  ) : (
-                    <form onSubmit={handleAgentSubmit} className="flex flex-col gap-3 text-xs">
-                      <select value={agentForm.category} onChange={(e) => setAgentForm({ ...agentForm, category: e.target.value })} className="w-full p-2 bg-[#F5E9C9] border-2 border-[#11100C] outline-none">
-                        <option>Venue Hosting</option>
-                        <option>Structural Assessment</option>
-                        <option>General</option>
-                      </select>
-                      <textarea required value={agentForm.question} onChange={(e) => setAgentForm({ ...agentForm, question: e.target.value })} placeholder="What do you need help with?" className="w-full p-2 bg-[#F5E9C9] border-2 border-[#11100C] outline-none h-20" />
-                      <button type="submit" className="py-2 bg-[#11100C] text-[#E7D5A4] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">SEND TO TEAM →</button>
-                    </form>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </section>
-
-      <Footer />
-    </div>
+      {activeTab === 'help' && (
+        <div className="max-w-lg flex flex-col gap-4">
+          {readOnly ? (
+            <ReadOnlyNote>Messaging is disabled in admin preview.</ReadOnlyNote>
+          ) : agentSent ? (
+            <div className="p-4 bg-[#10b981]/20 border-2 border-[#10b981]/40 text-xs font-bold">✓ MESSAGE SENT — THE TANGY TEAM WILL REACH OUT.</div>
+          ) : (
+            <AgentRequestForm onCancel={() => {}} onSubmitted={() => setAgentSent(true)} />
+          )}
+        </div>
+      )}
+    </PortalShell>
   );
 };

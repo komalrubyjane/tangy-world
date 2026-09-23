@@ -111,7 +111,7 @@ export const MuseumQuickDock = ({
         </button>
         {activeTooltip === 'login' && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#F5E9C9] text-[#11100C] font-mono text-[8.5px] font-bold px-2 py-1 rounded border border-[#C99A2E] shadow-md whitespace-nowrap pointer-events-none animate-fadeIn">
-            {isLoggedIn ? 'Tangy Listener Account' : 'Customer & Patron Sign In'}
+            {isLoggedIn ? 'Tangy Listener Account' : 'How Are You Joining Tangy?'}
           </div>
         )}
       </div>

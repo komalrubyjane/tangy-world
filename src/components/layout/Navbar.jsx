@@ -1,18 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
-import { useMockAuth } from '../../context/MockAuthContext';
 import { useUserAuth } from '../../context/UserAuthContext';
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
-  const { isLoggedIn: mockLoggedIn } = useMockAuth();
   // Admin Portal visibility must follow the same DB-verified role /admin's own
-  // StaffAuthGate checks — never the separate mock account system's session,
-  // which is a purely client-side, self-selectable role with no backend
-  // authorization behind it and shouldn't be trusted to gate anything.
-  const { user: authUser } = useUserAuth();
+  // StaffAuthGate checks — never a client-side, self-selectable role with no
+  // backend authorization behind it.
+  const { user: authUser, isLoggedIn } = useUserAuth();
   const isAdminUser = authUser?.role === 'admin' || authUser?.role === 'super_admin';
 
   // Active dropdown state for desktop & mobile
@@ -242,7 +239,7 @@ export const Navbar = () => {
           Tangy AI
         </button>
 
-        {mockLoggedIn && (
+        {isLoggedIn && (
           <div className="hidden xl:flex items-center gap-2">
             <button
               onClick={() => handleNav('/profile')}
@@ -278,7 +275,7 @@ export const Navbar = () => {
           {/* The dock's own PROFILE/LOGIN button (bottom nav, always visible on mobile)
               covers this now — a duplicate entry used to live here from when TV
               temporarily replaced PROFILE in the dock instead of sitting alongside it. */}
-          {mockLoggedIn && (
+          {isLoggedIn && (
             <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
               <button
                 onClick={() => handleNav('/profile')}

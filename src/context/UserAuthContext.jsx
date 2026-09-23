@@ -1,22 +1,20 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { AUTH_MODE, isMockAuth } from '../config/auth';
-import { mockAuthService, MOCK_SESSION_EVENT } from '../services/mockAuthService';
+import { AUTH_MODE } from '../config/auth';
 
 const UserAuthContext = createContext(null);
 
-// Maps a mock session ({id,email,fullName,role,...}) onto the field names
-// this context's consumers (UserLoginModal, StaffAuthGate) expect from a
-// real `profiles` row, so neither has to know which backend is active.
-function toProfileUser(session) {
-  if (!session) return null;
-  return {
-    id: session.id,
-    email: session.email,
-    full_name: session.fullName || session.name || session.email,
-    role: session.role,
-    passport_id: session.id,
-  };
+// Supabase Auth returns terse, sometimes-inconsistent English error strings
+// (they vary by SDK version) — never render them verbatim as if they were
+// designed copy, and never leak anything backend-specific (stack traces,
+// SQL, RLS internals). Match on the stable substrings Supabase actually
+// uses and fall back to a generic message for anything unrecognized.
+function friendlySignInError(message) {
+  const m = (message || '').toLowerCase();
+  if (m.includes('invalid login credentials')) return 'Email or password is incorrect.';
+  if (m.includes('email not confirmed')) return 'Please confirm your email before signing in.';
+  if (m.includes('too many requests') || m.includes('rate limit')) return 'Too many attempts — please wait a moment and try again.';
+  return 'Could not sign in — please try again.';
 }
 
 export const UserAuthProvider = ({ children }) => {
@@ -24,10 +22,17 @@ export const UserAuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [authError, setAuthError] = useState('');
+  // Distinct from authError (sign-in form failures): set when the user IS
+  // authenticated but their profiles row couldn't be loaded — StaffAuthGate
+  // needs to tell "authenticated, no profile row yet" apart from
+  // "authenticated, profile loaded, role just isn't sufficient" (see
+  // handle_new_user() in 0001_schema.sql for how the row is normally created).
+  const [profileError, setProfileError] = useState('');
 
   const loadProfile = useCallback(async (sessionUser) => {
     if (!sessionUser) {
       setUser(null);
+      setProfileError('');
       return;
     }
     const { data, error } = await supabase
@@ -37,24 +42,22 @@ export const UserAuthProvider = ({ children }) => {
       .single();
 
     if (error) {
-      // Profile row is created by a DB trigger on signup — if it's not there yet
-      // (e.g. still propagating) fall back to bare auth identity rather than
-      // treating the user as logged out.
+      // PGRST116 = PostgREST "no rows returned" — the profiles row genuinely
+      // doesn't exist yet (trigger hasn't run/propagated). Any other error
+      // (network, unexpected RLS denial, etc.) is also surfaced the same way
+      // to the user, but logged distinctly for debugging.
+      if (error.code !== 'PGRST116') {
+        console.error('[Tangy] Failed to load profile:', error.message);
+      }
+      setProfileError('Your account profile could not be loaded. Please contact Tangy admin.');
       setUser({ id: sessionUser.id, email: sessionUser.email, full_name: null, role: 'user' });
       return;
     }
+    setProfileError('');
     setUser({ ...data, email: sessionUser.email });
   }, []);
 
   useEffect(() => {
-    if (isMockAuth) {
-      setUser(toProfileUser(mockAuthService.getMockSession()));
-      setLoading(false);
-      const onChange = () => setUser(toProfileUser(mockAuthService.getMockSession()));
-      window.addEventListener(MOCK_SESSION_EVENT, onChange);
-      return () => window.removeEventListener(MOCK_SESSION_EVENT, onChange);
-    }
-
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
@@ -80,17 +83,6 @@ export const UserAuthProvider = ({ children }) => {
   const signUp = async (email, password, fullName) => {
     setAuthError('');
 
-    if (isMockAuth) {
-      const res = mockAuthService.mockSignup({ fullName, email, password, role: 'patron' });
-      if (!res.success) {
-        setAuthError(res.error);
-        return false;
-      }
-      setUser(toProfileUser(res.user));
-      setIsLoginModalOpen(false);
-      return true;
-    }
-
     if (!isSupabaseConfigured) {
       setAuthError('Sign up is not available right now — please try again shortly.');
       return false;
@@ -111,24 +103,13 @@ export const UserAuthProvider = ({ children }) => {
   const signIn = async (email, password) => {
     setAuthError('');
 
-    if (isMockAuth) {
-      const res = mockAuthService.mockLogin(email, password);
-      if (!res.success) {
-        setAuthError(res.error);
-        return false;
-      }
-      setUser(toProfileUser(res.user));
-      setIsLoginModalOpen(false);
-      return true;
-    }
-
     if (!isSupabaseConfigured) {
       setAuthError('Sign in is not available right now — please try again shortly.');
       return false;
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      setAuthError(error.message);
+      setAuthError(friendlySignInError(error.message));
       return false;
     }
     setIsLoginModalOpen(false);
@@ -136,11 +117,6 @@ export const UserAuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    if (isMockAuth) {
-      mockAuthService.mockLogout();
-      setUser(null);
-      return;
-    }
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
     }
@@ -163,6 +139,7 @@ export const UserAuthProvider = ({ children }) => {
         signIn,
         logout,
         authError,
+        profileError,
         isLoginModalOpen,
         openLoginModal,
         closeLoginModal,

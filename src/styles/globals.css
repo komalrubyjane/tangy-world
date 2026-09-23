@@ -21,6 +21,24 @@
 }
 
 @layer base {
+  /* "Printed paper laid over fabric" — a translucent card surface that lets
+     the bandhani/textile PatternBackground show through instead of hiding it
+     behind a flat opaque rectangle. Two variants match the two content-card
+     tones already used across the site (light cream cards, dark ink cards).
+     Kept deliberately opaque enough (78-84%) to stay readable over a busy
+     pattern — see PatternBackground's own low 0.24-0.42 opacity, which is
+     already faint before this layers on top of it. */
+  .paper-surface {
+    background: rgba(231, 213, 164, 0.82);
+    border: 1px solid rgba(17, 16, 12, 0.35);
+    box-shadow: 4px 4px 0px rgba(17, 16, 12, 0.22);
+  }
+  .paper-surface-dark {
+    background: rgba(17, 16, 12, 0.84);
+    border: 1px solid rgba(201, 154, 46, 0.35);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.35);
+  }
+
   :root {
     --red-1: #8a2320;
     --red-2: #6e1a19;

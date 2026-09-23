@@ -152,7 +152,7 @@ export const Founders = () => {
         {foundersData.map((founder, idx) => (
           <div 
             key={founder.id}
-            className={`founder-dossier-${idx + 1} group bg-[#EAD9A6] text-[#15120D] p-5 md:p-8 lg:p-12 border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[20px_20px_0px_#15120D] hover:shadow-[12px_12px_0px_#15120D] md:hover:shadow-[28px_28px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
+            className={`founder-dossier-${idx + 1} group paper-surface text-[#15120D] p-5 md:p-8 lg:p-12 border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[20px_20px_0px_#15120D] hover:shadow-[12px_12px_0px_#15120D] md:hover:shadow-[28px_28px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
             style={{ transform: window.innerWidth >= 768 ? `rotate(${founder.rotation})` : 'none' }}
           >
             
@@ -187,7 +187,7 @@ export const Founders = () => {
               </span>
 
               {/* POLAROID PHOTO */}
-              <div className="relative w-[140px] sm:w-[180px] md:w-[230px] bg-[#F5E9C9] p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
+              <div className="relative w-[140px] sm:w-[180px] md:w-[230px] paper-surface p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
                 <img src={founder.image} alt={founder.name} className="w-full aspect-[3/4] object-cover filter grayscale contrast-130 border border-[#15120D]" />
                 <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-2">✎ FOUNDER ARCHIVE // {founder.year}</p>
                 {idx === 0 && <HandDrawnCircle color="#5A120D" className="hidden md:block absolute -inset-3 opacity-40 pointer-events-none" />}
