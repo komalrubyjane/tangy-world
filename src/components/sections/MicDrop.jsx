@@ -75,7 +75,7 @@ export const MicDrop = () => {
           <TapeStrip className="absolute -top-2 -left-3 w-14 h-4 -rotate-6" />
           <p className="font-mono text-[10px] md:text-xs tracking-[0.35em] text-[#D19A24] font-bold uppercase">SESSION 09</p>
         </div>
-        <h2 className="font-display font-black text-tangy-paper leading-[0.85] text-[clamp(38px,7vw,88px)] -rotate-1 origin-left">
+        <h2 className="font-condensed font-black text-tangy-paper leading-[0.85] text-[clamp(38px,7vw,88px)] -rotate-1 origin-left">
           LIVE<br />DROP
         </h2>
       </div>

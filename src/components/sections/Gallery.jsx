@@ -53,7 +53,7 @@ export const Gallery = () => {
       </div>
       
       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-        <p className="font-display font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">
+        <p className="font-condensed font-black text-6xl text-tangy-cream opacity-50 mix-blend-overlay">
           <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.35}>MOMENTS<br/>WE KEPT.</RisographOffset>
         </p>
       </div>

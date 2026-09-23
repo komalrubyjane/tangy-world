@@ -18,7 +18,7 @@ export const ConversationListItem = ({ conversation, active, onClick }) => {
         active ? 'bg-[#C99A2E]/15' : 'hover:bg-[#C99A2E]/5'
       }`}
     >
-      <div className="shrink-0 w-9 h-9 rounded-full bg-[#5A120D] text-[#E7D5A4] border border-[#C99A2E]/50 flex items-center justify-center font-display text-sm">
+      <div className="shrink-0 w-9 h-9 rounded-full bg-[#5A120D] text-[#E7D5A4] border border-[#C99A2E]/50 flex items-center justify-center font-condensed text-sm">
         {initial}
       </div>
       <div className="min-w-0 flex-1">

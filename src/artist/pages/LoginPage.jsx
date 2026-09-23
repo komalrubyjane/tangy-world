@@ -29,10 +29,10 @@ export const LoginPage = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-4xl bg-[#e9decb] text-[#241a12] border-4 border-[#191410] shadow-[14px_14px_0px_#4c1210] grid grid-cols-1 md:grid-cols-2 overflow-hidden text-left">
+      <div className="w-full max-w-4xl bg-[#EFE2C0] text-[#241a12] border-4 border-[#191410] shadow-[14px_14px_0px_#4c1210] grid grid-cols-1 md:grid-cols-2 overflow-hidden text-left">
 
         {/* LEFT PANEL: PORTAL OVERVIEW & CHECKLIST */}
-        <div className="bg-[#191410] text-[#ecdcaf] p-8 border-b-4 md:border-b-0 md:border-r-4 border-[#191410] flex flex-col justify-between">
+        <div className="bg-[#181614] text-[#ecdcaf] p-8 border-b-4 md:border-b-0 md:border-r-4 border-[#191410] flex flex-col justify-between">
           <div className="flex flex-col gap-4">
             <span className="font-mono text-[9px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">
               ARTIST PORTAL // ACCESS CONTROL
@@ -85,7 +85,7 @@ export const LoginPage = () => {
           </div>
 
           {error && (
-            <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
+            <div className="p-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
               ✕ {error}
             </div>
           )}

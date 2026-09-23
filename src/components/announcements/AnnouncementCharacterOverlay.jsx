@@ -3,16 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
-// Reuses the site's existing Hero performer illustrations so the announcement
-// "characters" stay visually consistent with the Hero section instead of
-// introducing new art.
-const CHARACTER_IMAGES = {
-  violinist: '/media/hero-performer-1-violinist.png',
-  guitarist: '/media/hero-performer-2-guitarist.png',
-  veena: '/media/hero-performer-3-veena.png',
-  kathak: '/media/hero-performer-4-kathak.png',
-  hiphop: '/media/hero-performer-5-hiphop.png',
-};
+// The performer "character" that used to slide in beside this notice (and
+// sway on an infinite loop) was removed per the Sep 2026 visual feedback —
+// "the animated icon on the left side is not contributing". The admin-
+// authored announcement itself stays: a small printed notice, no mascot.
+// The `character` prop is still accepted (AnnouncementsSection sets it) but
+// no longer rendered.
 
 const CATEGORY_CTA = {
   SESSION: 'VIEW SESSION',
@@ -73,16 +69,15 @@ const MIN_VISIBLE_MS = 1200;
  */
 
 /**
- * A retro poster/ticket-style announcement popup: a hero performer character
- * slides in from a screen edge, a paper ticket "unfolds" beside them showing
- * the announcement, then both exit the same way after `duration` ms (or on
+ * A retro poster/ticket-style announcement popup: a small printed notice
+ * unfolds at a screen corner, then folds away after `duration` ms (or on
  * manual dismiss / CTA click).
  *
- * Props: { announcement, character, position, duration, isOpen, onClose, onView }
+ * Props: { announcement, position, duration, isOpen, onClose, onView }
+ * (`character` may still be passed by callers; it is ignored.)
  */
 export const AnnouncementCharacterOverlay = ({
   announcement,
-  character,
   position = 'bottom-left',
   duration = 6000,
   isOpen,
@@ -90,7 +85,6 @@ export const AnnouncementCharacterOverlay = ({
   onView,
 }) => {
   const [phase, setPhase] = useState('closed'); // closed | entering | open | exiting
-  const charRef = useRef(null);
   const paperRef = useRef(null);
   const titleRef = useRef(null);
   const descRef = useRef(null);
@@ -115,10 +109,8 @@ export const AnnouncementCharacterOverlay = ({
     if (!isOpen && (phase === 'entering' || phase === 'open')) setPhase('exiting');
   }, [isOpen, phase]);
 
-  // Entrance animation: (1) anticipation beat, (2) character steps into
-  // frame, (3) paper unfolds, (4) settles with a spring bounce, (5) text
-  // fades/slides in after the paper settles (staggered), (6) CTA becomes
-  // interactive last.
+  // Entrance animation: the notice unfolds, then its text fades in and the
+  // CTA becomes interactive last.
   useEffect(() => {
     if (phase !== 'entering') return undefined;
     tlRef.current?.kill();
@@ -126,32 +118,25 @@ export const AnnouncementCharacterOverlay = ({
     const textEls = [titleRef.current, descRef.current].filter(Boolean);
 
     if (reducedMotion) {
-      gsap.set(charRef.current, { opacity: 0, xPercent: 0 });
       gsap.set(paperRef.current, { opacity: 0, scaleY: 1, x: 0, clipPath: 'inset(0 0 0% 0)' });
       gsap.set([...textEls, ctaRef.current].filter(Boolean), { opacity: 0 });
       tlRef.current = gsap
         .timeline({ onComplete: () => setPhase('open') })
         .to(
-          [charRef.current, paperRef.current, ...textEls, ctaRef.current].filter(Boolean),
+          [paperRef.current, ...textEls, ctaRef.current].filter(Boolean),
           { opacity: 1, duration: 0.25, ease: 'power1.out' }
         );
     } else {
-      gsap.set(charRef.current, { xPercent: edgeSign * 160, opacity: 0 });
       gsap.set(paperRef.current, { opacity: 0, scaleY: 0.35, x: edgeSign * 30, clipPath: 'inset(0 0 60% 0)' });
       gsap.set(textEls, { opacity: 0, y: 6 });
       gsap.set(ctaRef.current, { opacity: 0, y: 4 });
 
       tlRef.current = gsap
         .timeline({ onComplete: () => setPhase('open') })
-        // (1) anticipation beat — a tiny wind-up before the character commits
-        .to(charRef.current, { xPercent: edgeSign * 172, duration: 0.1, ease: 'power1.inOut' })
-        // (2) character steps into frame
-        .to(charRef.current, { xPercent: 0, opacity: 1, duration: 0.55, ease: 'power3.out' })
-        // (3) paper unfolds + (4) settles with a physical spring bounce
+        // paper unfolds (no bounce — a calm, single motion)
         .to(
           paperRef.current,
-          { opacity: 1, scaleY: 1, x: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.65, ease: 'elastic.out(1, 0.62)' },
-          '-=0.2'
+          { opacity: 1, scaleY: 1, x: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.45, ease: 'power3.out' }
         )
         // (5) text fades/slides in slightly after the paper settles, staggered
         .to(textEls, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08, ease: 'power2.out' }, '-=0.25')
@@ -181,7 +166,7 @@ export const AnnouncementCharacterOverlay = ({
     if (reducedMotion) {
       tlRef.current = gsap
         .timeline({ onComplete: finish })
-        .to([paperRef.current, charRef.current], { opacity: 0, duration: 0.2, ease: 'power1.in' });
+        .to(paperRef.current, { opacity: 0, duration: 0.2, ease: 'power1.in' });
     } else {
       const textEls = [titleRef.current, descRef.current, ctaRef.current].filter(Boolean);
       tlRef.current = gsap
@@ -191,8 +176,7 @@ export const AnnouncementCharacterOverlay = ({
           paperRef.current,
           { opacity: 0, scaleY: 0.3, clipPath: 'inset(0 0 60% 0)', duration: 0.3, ease: 'power2.in' },
           '-=0.05'
-        )
-        .to(charRef.current, { xPercent: edgeSign * 160, opacity: 0, duration: 0.4, ease: 'power3.in' }, '-=0.1');
+        );
     }
 
     return () => tlRef.current?.kill();
@@ -220,9 +204,7 @@ export const AnnouncementCharacterOverlay = ({
 
   if (phase === 'closed' || !announcement) return null;
 
-  const imgSrc = CHARACTER_IMAGES[character] || CHARACTER_IMAGES.violinist;
   const ctaText = getCtaText(announcement);
-  const showIdleSway = phase === 'open' && !reducedMotion;
 
   // Mobile: anchored to the TOP of the viewport (clear of the fixed header,
   // ~49px tall) so this can never share a vertical band with the
@@ -241,18 +223,10 @@ export const AnnouncementCharacterOverlay = ({
         isRight ? 'right-3 md:right-8' : 'left-3 md:left-8'
       } flex ${isRight ? 'flex-row-reverse' : 'flex-row'} items-start md:items-end gap-2 md:gap-4 pointer-events-none max-w-[min(26rem,calc(100vw-1.5rem))]`}
     >
-      <div className={showIdleSway ? 'animate-[announceIdleSway_3.4s_ease-in-out_infinite]' : ''}>
-        <img
-          ref={charRef}
-          src={imgSrc}
-          alt=""
-          className="h-[clamp(5rem,20vw,11rem)] w-auto drop-shadow-[6px_6px_0_rgba(0,0,0,0.5)] pointer-events-none select-none"
-        />
-      </div>
       <div
         ref={paperRef}
         style={{ transformOrigin: isRight ? 'bottom right' : 'bottom left' }}
-        className="pointer-events-auto relative w-[clamp(210px,58vw,300px)] bg-[#F3E7C9] text-[#191410] border-2 border-[#191410] shadow-[6px_6px_0_#11100C] p-4 -rotate-1"
+        className="pointer-events-auto relative w-[clamp(220px,70vw,300px)] bg-[#EFE2C0] text-[#181614] border border-[#181614] shadow-[4px_4px_0_rgba(24,22,20,0.6)] p-4"
       >
         <button
           onClick={handleManualClose}
@@ -264,7 +238,7 @@ export const AnnouncementCharacterOverlay = ({
         <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#B94717] mb-1 border-b border-dashed border-[#191410]/30 pb-1">
           Tangy Sessions · {announcement.category || 'Announcement'}
         </div>
-        <h4 ref={titleRef} className="font-display text-lg md:text-xl font-bold leading-tight mb-1">
+        <h4 ref={titleRef} className="font-condensed text-lg md:text-xl font-bold leading-tight mb-1">
           {announcement.title}
         </h4>
         <p ref={descRef} className="text-xs md:text-sm font-serif leading-snug mb-3 opacity-90">

@@ -21,11 +21,10 @@ export const UpcomingSessionsPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#B94717] text-[#E7D5A4] font-mono selection:bg-[#11100C] selection:text-[#E7D5A4] overflow-x-hidden">
+    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#181614] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#11100C]">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/sessions" className="font-mono text-[10px] text-[#E7D5A4]/70 tracking-widest uppercase hover:text-[#E7D5A4] transition-colors">← BACK TO SESSIONS</a>
           <span className="font-mono text-xs text-[#E7D5A4]/80 tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -41,7 +40,7 @@ export const UpcomingSessionsPage = () => {
       </section>
 
       <section className="pt-10 pb-16">
-        <div className="bg-[#11100C] border-b-2 border-[#B94717] py-3 px-4 sm:px-6 mb-8">
+        <div className="bg-[#181614] border-b-2 border-[#B94717] py-3 px-4 sm:px-6 mb-8">
           <div className="max-w-7xl mx-auto flex justify-between items-center font-mono text-[10px] text-[#E7D5A4]/60 uppercase tracking-widest">
             <span>{filteredEvents.length} SESSION{filteredEvents.length !== 1 ? 'S' : ''} AVAILABLE</span>
             <span>HYDERABAD // HERITAGE CONCERT SERIES</span>
@@ -63,13 +62,13 @@ export const UpcomingSessionsPage = () => {
         </div>
 
         {eventsLoading && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#EFE2C0] paperTexture border-2 border-dashed border-[#11100C]">
             LOADING SESSIONS...
           </div>
         )}
 
         {!eventsLoading && filteredEvents.length === 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#EFE2C0] paperTexture border-2 border-dashed border-[#11100C]">
             NO SESSIONS MATCH THIS FILTER YET — CHECK BACK SOON.
           </div>
         )}

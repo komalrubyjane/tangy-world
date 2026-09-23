@@ -164,15 +164,10 @@ export default function TVControls({
   const titleText  = currentVideo?.filename
     ? currentVideo.filename.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).slice(0, 35)
     : '— — —';
-  // currentTime/duration are driven by whichever clip is CURRENTLY loaded in
-  // the shared <video> element — during BOOTING/SWITCHING that's first.mp4 or
-  // middle.mp4, not a real channel. Without this guard the bar raced toward
-  // 100% as the transition clip neared its (much shorter) end and then
-  // snapped back down once the new channel loaded — the "shooting out of the
-  // TV" glitch. Freeze it at empty outside PLAYING, and clamp regardless so a
-  // stale duration/currentTime pairing can never push the fill past 100%
-  // width (the track has no overflow:hidden, so an unclamped value visibly
-  // overshoots its rounded edge).
+  // currentTime/duration come from the channel <video> only (useTVPlayer
+  // resets them on every source change). Outside PLAYING — booting or
+  // tuning — there is no real channel position to show, so the bar stays
+  // empty; the clamp guards against any stale duration/time pairing.
   const showProgress = tvState === 'PLAYING';
   const progress   = showProgress && duration > 0
     ? Math.min(100, Math.max(0, (currentTime / duration) * 100))

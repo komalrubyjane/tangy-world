@@ -95,15 +95,14 @@ export const PrivateSessionsPage = () => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full min-h-[100dvh] bg-[#315D73] text-[#ecdcaf] font-sans antialiased overflow-x-hidden pt-16 pb-20 select-none"
+      className="w-full min-h-[100dvh] bg-[#181614] text-[#ecdcaf] font-sans antialiased overflow-x-hidden pt-16 pb-20 select-none printNoise"
     >
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
       <Navbar onOpenProgramme={() => navigate('/')} />
 
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {/* HERO BANNER */}
-        <div id="gatherings" className="w-full bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="gatherings" className="w-full bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">
               PRIVATE SESSIONS // BESPOKE CURATION
@@ -116,7 +115,7 @@ export const PrivateSessionsPage = () => {
             </p>
           </div>
 
-          <div className="bg-[#ecdcaf] text-[#191410] p-3 font-mono text-xs font-bold border border-[#191410] shadow-md rotate-2">
+          <div className="bg-[#EFE2C0] paperTexture text-[#191410] p-3 font-mono text-xs font-bold border border-[#191410] shadow-md rotate-2">
             RESERVATIONS OPEN FOR 2026
           </div>
         </div>
@@ -132,7 +131,7 @@ export const PrivateSessionsPage = () => {
             <a
               key={link.hash}
               href={link.hash}
-              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#191410] text-[#ecdcaf] hover:bg-[#ecdcaf] hover:text-[#191410] transition-colors"
+              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#181614] text-[#ecdcaf] hover:bg-[#EFE2C0] hover:text-[#191410] transition-colors"
             >
               {link.label} ↓
             </a>
@@ -151,7 +150,7 @@ export const PrivateSessionsPage = () => {
               <div 
                 key={idx}
                 id={item.id}
-                className="bg-[#191410] border-2 border-[#ecdcaf]/40 p-5 shadow-[6px_6px_0px_#191410] text-left flex flex-col justify-between hover:border-[#d1a437] transition-all"
+                className="bg-[#181614] border-2 border-[#ecdcaf]/40 p-5 shadow-[6px_6px_0px_#191410] text-left flex flex-col justify-between hover:border-[#d1a437] transition-all"
               >
                 <div>
                   <span className="font-mono text-[9px] font-bold text-[#d1a437]">CATEGORY #0{idx+1}</span>
@@ -170,7 +169,7 @@ export const PrivateSessionsPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {packages.map((pkg, idx) => (
-              <div key={idx} className="bg-[#ecdcaf] text-[#191410] p-6 border-4 border-[#191410] shadow-[8px_8px_0px_#191410] flex flex-col justify-between">
+              <div key={idx} className="bg-[#EFE2C0] paperTexture text-[#191410] p-6 border-4 border-[#191410] shadow-[8px_8px_0px_#191410] flex flex-col justify-between">
                 <div>
                   <span className="font-mono text-[9px] font-bold text-[#315D73]">TIER #0{idx+1}</span>
                   <h3 className="font-poster text-2xl text-[#191410] my-1">{pkg.name}</h3>
@@ -183,7 +182,7 @@ export const PrivateSessionsPage = () => {
         </div>
 
         {/* HERITAGE & WEDDINGS SPECIFIC SECTION */}
-        <div id="weddings" className="mb-12 bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+        <div id="weddings" className="mb-12 bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
           <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase block mb-1">
             03 // WEDDINGS &amp; HERITAGE EXPERIENCES
           </span>
@@ -194,14 +193,14 @@ export const PrivateSessionsPage = () => {
         </div>
 
         {/* RESERVATION FORM */}
-        <div className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
           <div className="mb-6">
             <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 // RESERVATION DESK</span>
             <h2 className="font-poster text-3xl text-[#ecdcaf]">REQUEST A PRIVATE SESSION</h2>
           </div>
 
           {submitted ? (
-            <div className="bg-[#241a12] border-2 border-[#ecdcaf] p-8 text-center">
+            <div className="bg-[#211915] border-2 border-[#ecdcaf] p-8 text-center">
               <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">RESERVATION REQUEST TRANSMITTED!</h3>
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our private session coordinator will review your request and get back to you within 48 hours.</p>
             </div>
@@ -242,8 +241,8 @@ export const PrivateSessionsPage = () => {
                 </select>
               </div>
               <textarea rows={4} placeholder="DETAILS ABOUT YOUR EVENT & PREFERRED MUSIC TYPE..." value={message} onChange={(e) => setMessage(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              {formError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
-              <button type="submit" disabled={submitting} className="py-4 bg-[#ecdcaf] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#d1a437] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+              {formError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
+              <button type="submit" disabled={submitting} className="py-4 bg-[#EFE2C0] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#C89D35] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
                 {submitting ? 'SUBMITTING...' : 'SUBMIT RESERVATION REQUEST →'}
               </button>
             </form>

@@ -74,11 +74,10 @@ export const WaitlistPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#B94717] selection:text-[#E7D5A4] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/sessions" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO SESSIONS</a>
           <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -94,9 +93,9 @@ export const WaitlistPage = () => {
       </section>
 
       <section className="py-14 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto bg-[#E7D5A4] text-[#11100C] p-6 sm:p-10 border-4 border-[#11100C] shadow-[12px_12px_0px_#B94717]">
+        <div className="max-w-2xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 border-4 border-[#11100C] shadow-[12px_12px_0px_#B94717]">
           {waitlistSubmitted ? (
-            <div className="text-center py-8 border-2 border-[#11100C] bg-[#F5E9C9]">
+            <div className="text-center py-8 border-2 border-[#11100C] bg-[#EFE2C0] paperTexture">
               <h3 className="display text-3xl text-[#11100C] mb-2">YOU ARE ON THE WAITLIST!</h3>
               <p className="font-mono text-xs text-[#11100C]/70 uppercase">We'll email you the moment tickets open.</p>
             </div>
@@ -116,12 +115,12 @@ export const WaitlistPage = () => {
               </select>
 
               {waitlistError && (
-                <div className="p-3 bg-[#B94717] text-[#E7D5A4] font-bold border border-[#11100C]">
+                <div className="p-3 bg-[#B5532A] text-[#E7D5A4] font-bold border border-[#11100C]">
                   ✕ {waitlistError}
                 </div>
               )}
 
-              <button type="submit" disabled={waitlistSubmitting} className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50">
+              <button type="submit" disabled={waitlistSubmitting} className="py-3 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50">
                 {waitlistSubmitting ? 'JOINING...' : 'JOIN SESSION WAITLIST →'}
               </button>
             </form>

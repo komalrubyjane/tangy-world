@@ -125,7 +125,7 @@ export const UserLoginModal = () => {
                   className="text-left bg-[#F5E9C9] hover:bg-white border-2 border-[#11100C] p-3 shadow-[3px_3px_0px_#11100C] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 transition-transform flex flex-col gap-1 outline-none focus-visible:ring-4 focus-visible:ring-[#B94717] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDE0C0]"
                 >
                   <span className="text-xl" aria-hidden="true">{card.icon}</span>
-                  <span className="font-display text-xs sm:text-sm font-bold uppercase leading-tight">{card.label}</span>
+                  <span className="font-condensed text-xs sm:text-sm font-bold uppercase leading-tight">{card.label}</span>
                   <span className="font-mono text-[9px] text-[#11100C]/70 leading-snug">{card.tagline}</span>
                 </button>
               ))}

@@ -53,7 +53,7 @@ export const Tunnel = () => {
             ref={addToRefs} 
             className="absolute inset-0 flex flex-col items-center justify-center gap-[10px] opacity-0"
           >
-            <span className="font-display font-black text-[min(22vw,220px)] text-tangy-cream">{y}</span>
+            <span className="font-condensed font-black text-[min(22vw,220px)] text-tangy-cream">{y}</span>
             <span className="font-mono text-[10px] tracking-[.3em] text-tangy-gold">
               TANGY SESSIONS ARCHIVE &mdash; VOL. {String(idx + 1).padStart(2, '0')}
             </span>

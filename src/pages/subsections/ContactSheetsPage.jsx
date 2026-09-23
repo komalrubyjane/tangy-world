@@ -4,11 +4,10 @@ import { contactSheets } from '../../data/mock/archive';
 
 export const ContactSheetsPage = () => {
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/archive" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO ARCHIVE</a>
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -25,7 +24,7 @@ export const ContactSheetsPage = () => {
 
       <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 flex flex-col gap-8 sm:gap-12">
         {contactSheets.map((sheet) => (
-          <div key={sheet.id} className="bg-[#1A1510] border-2 border-[#C99A2E]/40 p-3 sm:p-5">
+          <div key={sheet.id} className="bg-[#181614] border-2 border-[#C99A2E]/40 p-3 sm:p-5">
             <div className="font-mono text-[10px] text-[#C99A2E] font-bold uppercase tracking-[0.3em] mb-3 flex justify-between items-center flex-wrap gap-1">
               <span>{sheet.roll}</span>
               <span className="text-[#E7D5A4]/50">35MM // KODAK 5247</span>
@@ -42,12 +41,12 @@ export const ContactSheetsPage = () => {
         ))}
       </section>
 
-      <section className="py-12 sm:py-16 bg-[#1C0E08] border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
+      <section className="py-12 sm:py-16 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">EXPLORE MORE OF THE ARCHIVE</span>
         <div className="flex flex-wrap justify-center gap-3">
-          <a href="/archive/session-archive" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">SESSION ARCHIVE →</a>
-          <a href="/archive/museum-timeline" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">MUSEUM TIMELINE →</a>
-          <a href="/archive/past-memories" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">PAST MEMORIES →</a>
+          <a href="/archive/session-archive" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">SESSION ARCHIVE →</a>
+          <a href="/archive/museum-timeline" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">MUSEUM TIMELINE →</a>
+          <a href="/archive/past-memories" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">PAST MEMORIES →</a>
         </div>
       </section>
 

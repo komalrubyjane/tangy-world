@@ -60,6 +60,30 @@
   opacity: 1;
 }
 
+/* Context states (data-mode is set by CustomCursor on mouseover).
+   Kept small: the cursor should never compete with the page. */
+.cursor[data-mode="link"] .cursor-dot {
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: 1px solid var(--color-tangy-cream);
+  box-shadow: 0 0 0 1px rgba(17, 16, 12, 0.35);
+}
+/* Over photographs: a tiny archival crosshair, like a loupe on a contact sheet. */
+.cursor[data-mode="image"] .cursor-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 0;
+  background:
+    linear-gradient(var(--color-tangy-cream), var(--color-tangy-cream)) center / 1px 100% no-repeat,
+    linear-gradient(var(--color-tangy-cream), var(--color-tangy-cream)) center / 100% 1px no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 1px rgba(17, 16, 12, 0.8));
+}
+/* Text fields: get out of the way of the caret. */
+.cursor[data-mode="field"] .cursor-dot { opacity: 0; }
+.cursor-dot { transition: width .2s ease, height .2s ease, background .2s ease, border-radius .2s ease, opacity .2s ease; }
+
 /* ------------------------------------------------------------- */
 /* MODAL & FORM FIELD CURSOR ACCESSIBILITY FALLBACKS             */
 /* ------------------------------------------------------------- */

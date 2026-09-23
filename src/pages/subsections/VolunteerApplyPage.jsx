@@ -60,7 +60,7 @@ export const VolunteerApplyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#315B66] text-[#E7D5A4] font-mono selection:bg-[#E7D5A4] selection:text-[#315B66] overflow-x-hidden pt-16 pb-20">
+    <div className="min-h-screen bg-[#465667] text-[#E7D5A4] font-mono selection:bg-[#EFE2C0] selection:text-[#315B66] overflow-x-hidden pt-16 pb-20 printNoise">
       <Navbar />
 
       <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -74,7 +74,7 @@ export const VolunteerApplyPage = () => {
           </p>
         </div>
 
-        <div className="bg-[#17120D] border-4 border-[#E7D5A4] p-6 sm:p-10 shadow-[10px_10px_0px_#17120D] text-left">
+        <div className="bg-[#181614] border-4 border-[#E7D5A4] p-6 sm:p-10 shadow-[10px_10px_0px_#17120D] text-left">
           {submitted ? (
             <ApplicationReceivedNotice roleLabel="Volunteer" statusRoute="/volunteer/dashboard" />
           ) : (
@@ -97,7 +97,7 @@ export const VolunteerApplyPage = () => {
                   <label className="font-bold text-[#C69A32] block mb-2 uppercase text-[10px]">WHAT WOULD YOU LIKE TO HELP WITH?</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {INTERESTS.map((i) => (
-                      <label key={i} className="flex items-center gap-2 p-2.5 bg-[#241a12] border border-[#E7D5A4]/30 cursor-pointer">
+                      <label key={i} className="flex items-center gap-2 p-2.5 bg-[#211915] border border-[#E7D5A4]/30 cursor-pointer">
                         <input type="checkbox" checked={interests.includes(i)} onChange={() => toggleInterest(i)} />
                         {i}
                       </label>
@@ -106,8 +106,8 @@ export const VolunteerApplyPage = () => {
                 </div>
 
                 <textarea rows={3} placeholder="ANYTHING ELSE WE SHOULD KNOW? (OPTIONAL)" value={notes} onChange={(e) => setNotes(e.target.value)} className="p-3 bg-[#241a12] border border-[#E7D5A4]/40 text-[#E7D5A4] focus:outline-none resize-none" />
-                {error && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#E7D5A4]">{error}</div>}
-                <button type="submit" disabled={submitting} className="py-4 bg-[#C69A32] text-[#17120D] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#E7D5A4] transition-colors shadow-[4px_4px_0px_#17120D] disabled:opacity-50">
+                {error && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#E7D5A4]">{error}</div>}
+                <button type="submit" disabled={submitting} className="py-4 bg-[#C89D35] text-[#17120D] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] transition-colors shadow-[4px_4px_0px_#17120D] disabled:opacity-50">
                   {submitting ? 'SUBMITTING...' : 'SUBMIT VOLUNTEER APPLICATION →'}
                 </button>
               </form>

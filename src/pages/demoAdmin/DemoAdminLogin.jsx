@@ -29,7 +29,7 @@ export const DemoAdminLogin = () => {
 
         <div className="text-center border-b border-[#C99A2E]/30 pb-4 mb-6">
           <div className="text-[9px] font-bold tracking-[0.3em] text-[#C99A2E] uppercase mb-1">[ ✦ ] TEAM DEMO</div>
-          <h1 className="font-display text-3xl font-bold text-[#E7D5A4] tracking-tight">DEMO ADMIN</h1>
+          <h1 className="font-condensed text-3xl font-bold text-[#E7D5A4] tracking-tight">DEMO ADMIN</h1>
           <p className="font-serif italic text-xs text-[#E7D5A4]/70 mt-1">Internal team preview access — not a real account</p>
         </div>
 

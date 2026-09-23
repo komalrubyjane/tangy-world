@@ -20,12 +20,11 @@ export const BlogsPage = () => {
     : diaryEntries.filter(e => CATEGORY_TAGS[category]?.includes(e.id));
 
   return (
-    <div className="min-h-screen bg-[#1C0E08] text-[#E7D5A4] font-mono selection:bg-[#D19A24] selection:text-[#11100C]">
+    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] printNoise">
       <Navbar />
 
       {/* PAGE HERO */}
       <section id="journal" className="relative pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 block">
           TANGY EDITORIALS // SHOW STORIES & MUSIC LAUNCHES
         </span>
@@ -64,7 +63,7 @@ export const BlogsPage = () => {
           return (
             <article
               key={entry.id}
-              className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
+              className="relative bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
             >
               <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
               <LotusStamp index={idx} bg="transparent" border="#7C2D18" className="hidden sm:block absolute -top-3 -right-3 w-9 h-9 z-20 opacity-95 rotate-[-8deg]" />
@@ -122,7 +121,7 @@ export const BlogsPage = () => {
       </section>
 
       {/* CTA TO INNER CIRCLE */}
-      <section className="bg-[#11100C] border-t-4 border-[#D19A24]/40 py-12 sm:py-16 px-4 sm:px-6 text-center">
+      <section className="bg-[#181614] printNoise border-t-4 border-[#D19A24]/40 py-12 sm:py-16 px-4 sm:px-6 text-center">
         <span className="font-mono text-xs text-[#D19A24] tracking-[0.3em] uppercase font-bold block mb-3">
           NEVER MISS AN ENTRY
         </span>
@@ -132,7 +131,7 @@ export const BlogsPage = () => {
         </p>
         <a
           href="/inner-circle"
-          className="inline-block bg-[#D19A24] text-[#11100C] font-mono font-bold text-xs px-6 py-3 uppercase tracking-widest hover:bg-[#E7D5A4] transition-colors border-2 border-[#D19A24]"
+          className="inline-block bg-[#C89D35] text-[#11100C] font-mono font-bold text-xs px-6 py-3 uppercase tracking-widest hover:bg-[#EFE2C0] transition-colors border-2 border-[#D19A24]"
         >
           JOIN THE CIRCLE →
         </a>

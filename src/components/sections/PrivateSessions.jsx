@@ -1,200 +1,89 @@
-import { useGSAPContext } from '../../hooks/useGSAPContext';
-import gsap from 'gsap';
 import { useAudio } from '../../audio/AudioContext';
-import { SoundWaveGraphic } from '../ui/BackgroundDecorations';
-import {
-  TextileBorderStrip,
-  HandDrawnUnderline,
-  } from '../ui/CulturalMotifs';
-import {
-  PatternBackground,
-  RangoliDecoration,
-  LotusStamp,
-  RetroGrain,
-} from '../ui/RetroAssets';
+import { useReveal } from '../../hooks/useReveal';
 
-export const PrivateSessions = ({ onRequestPrivate }) => {
+// 07 — PRIVATE SESSIONS. More restrained than the public archive: charcoal,
+// one strong photograph, a letterpress invitation, gold used sparingly.
+// The wax seal is the section's single physical detail.
+export const PrivateSessions = () => {
   const { playSFX } = useAudio();
-
-  const sectionRef = useGSAPContext((ctx) => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top 75%'
-      }
-    });
-
-    // 1. Header & Watermark Reveal
-    tl.fromTo('.private-header',
-      { y: 40, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }
-    )
-
-    // 2. Central Invitation Rises
-    .fromTo('.private-invitation',
-      { y: 80, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out' }, 0.2
-    )
-
-    // 3. Surrounding Archival Photos Enter
-    .fromTo('.private-photo-1',
-      { x: -60, opacity: 0, rotation: -8 },
-      { x: 0, opacity: 1, rotation: -4, duration: 0.7, ease: 'back.out(1.2)' }, 0.4
-    )
-    .fromTo('.private-photo-2',
-      { x: 60, opacity: 0, rotation: 8 },
-      { x: 0, opacity: 1, rotation: 4, duration: 0.7, ease: 'back.out(1.2)' }, 0.5
-    )
-
-    // 4. Wax Seal Appears Last
-    .fromTo('.wax-seal',
-      { scale: 2, opacity: 0, rotation: -30 },
-      { scale: 1, opacity: 1, rotation: -6, duration: 0.5, ease: 'bounce.out', onStart: () => playSFX('ticketClick') }, 0.8
-    );
-
-  }, []);
-
-  const handleRequestClick = () => {
-    playSFX('ticketClick');
-    if (onRequestPrivate) {
-      onRequestPrivate();
-    } else {
-      document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const sectionRef = useReveal();
 
   return (
-    <section 
-      ref={sectionRef} 
-      id="private-sessions" 
-      className="relative w-full py-28 md:py-36 bg-[#4A2638] text-[#E7D7AC] overflow-hidden border-t-8 border-[#E7D7AC]"
-    >
-      
-      {/* SOFT NOISE & PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-0" />
-      <RetroGrain index={1} opacity={0.11} blend="overlay" />
+    <section ref={sectionRef} id="private-sessions" className="t-section theme-private filmGrain">
 
-      {/* ANALOG SOUND WAVE FREQUENCY GRAPHIC */}
-      <SoundWaveGraphic color="#E7D7AC" opacity={0.15} className="absolute left-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />
+      <div className="t-container relative">
+        <header className="text-center max-w-3xl mx-auto">
+          <p className="reveal t-label sec-accent m-0">07 — Private experiences // By Tangy</p>
+          <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0" style={{ '--reg-ink': 'rgba(200,157,53,0.35)' }}><span className="rt">Private<br className="sm:hidden" /> Sessions</span></h2>
+          <p className="reveal d2 t-label text-[#EFE2C0]/75 mt-6 mb-0">Your space. Our sound. One night that&rsquo;s yours.</p>
+        </header>
 
-      {/* BANDHANI TEXTILE LAYER + FRAME */}
-      <PatternBackground category="bandhani" index={2} size="cover" blend="normal" className="z-0" />
-      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
-      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
-      
-      <div className="hidden lg:block absolute -top-[14vw] -right-[8vw] w-[34vw] h-[34vw] max-w-none opacity-[0.1] animate-[spin_190s_linear_infinite] pointer-events-none z-0">
-        <RangoliDecoration index={1} spin={false} className="w-full h-full" />
-      </div>
-      {/* MOBILE — a real cropped Rangoli photo bleeding from the bottom-left */}
-      <div className="lg:hidden absolute bottom-0 left-0 w-[40%] max-w-[160px] aspect-square opacity-[0.15] pointer-events-none z-0">
-        <RangoliDecoration index={1} spin={false} className="w-full h-full" />
-      </div>
+        <div className="t-grid mt-14 md:mt-20 items-center gap-y-12">
+          {/* ONE STRONG IMAGE */}
+          <figure className="reveal-paper col-span-4 md:col-span-8 lg:col-span-6 m-0" style={{ '--rest-rot': '-0.6deg' }}>
+            <div className="photoFrame photoFrame--dark paperShadow">
+            <div className="photoFrame-img">
+            <picture>
+              <source
+                type="image/webp"
+                srcSet="/media/opt/gallery-tangy3-480.webp 480w, /media/opt/gallery-tangy3-800.webp 800w"
+                sizes="(min-width: 1024px) 45vw, 92vw"
+              />
+              <img
+                src="/media/gallery/tangy3.jpg"
+                alt="Our people"
+                loading="lazy"
+                decoding="async"
+                className="photo-bw drift-img block w-full aspect-[4/5] md:aspect-[16/10] lg:aspect-[4/5] object-cover"
+              />
+            </picture>
+            </div>
+            </div>
+            <figcaption className="filmCaption text-[#EFE2C0]/60 mt-3">Fig. 07 — Our people</figcaption>
+          </figure>
 
-      {/* CROP MARKS & ARCHIVE LABELS */}
-      <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
-        [ ✚ ] CROP MARK // INVITATION NO. 08-P
-      </div>
-      <div className="absolute top-4 right-4 font-mono text-[9px] text-[#E7D7AC]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
-        TANGY PRIVATE SESSIONS // HYDERABAD
-      </div>
-      <div className="absolute bottom-4 left-4 font-mono text-[9px] text-[#E7D7AC]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
-        REGISTRATION: PERFECT PRINT ALIGNMENT
-      </div>
-      <div className="absolute bottom-4 right-4 font-mono text-[9px] text-[#C69A32] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
-        BY INVITATION ONLY ✦ 33⅓ RPM
-      </div>
+          {/* INVITATION CARD */}
+          <div className="reveal-paper col-span-4 md:col-span-8 lg:col-span-5 lg:col-start-8" style={{ '--rest-rot': '0.7deg' }}>
+            <div className="relative bg-[#EFE2C0] paperTexture paperShadow text-[#181614] p-7 md:p-10 border-[6px] border-double border-[#181614] outline outline-1 outline-[#C89D35]/50 outline-offset-4">
+              {/* Wax seal */}
+              <div className="absolute -top-6 right-3 md:-right-4 w-14 h-14 rounded-full bg-[#4A171D] border-2 border-[#181614] flex items-center justify-center rotate-[-8deg]" aria-hidden="true">
+                <div className="w-[80%] h-[80%] rounded-full border border-[#C89D35] flex items-center justify-center">
+                  <span className="font-display text-xl text-[#EFE2C0] leading-none">T</span>
+                </div>
+              </div>
 
-      {/* OVERSIZED BACKGROUND SCREEN-PRINTED WATERMARK */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.08]">
-        <span className="display text-[25vw] leading-none text-[#351B29] uppercase">BY INVITATION</span>
-      </div>
+              <div className="flex justify-between gap-3 archiveMetadata text-[#4A171D] pb-3 border-b border-[#181614]/40">
+                <span>Tangy Private Sessions</span>
+                <span>Hyderabad // By invitation</span>
+              </div>
 
-      {/* SECTION HEADER */}
-      <div className="private-header max-w-4xl mx-auto text-center px-6 relative z-20 mb-16 md:mb-20">
-        <span className="font-mono text-[10px] md:text-xs font-bold text-[#C69A32] tracking-[0.35em] uppercase mb-2 block">
-          PRIVATE EXPERIENCES // BY TANGY
-        </span>
-        <h2 className="display text-6xl md:text-9xl text-[#E7D7AC] leading-none ink-bleed mb-4">
-          PRIVATE<br/>SESSIONS
-        </h2>
-        <p className="font-mono text-xs md:text-sm text-[#E7D7AC]/90 tracking-[0.3em] uppercase border-y-2 border-[#17120D] py-2 inline-block px-6 bg-[#351B29]/80 backdrop-blur-xs">
-          YOUR SPACE. OUR SOUND. ONE NIGHT THAT'S YOURS.
-        </p>
-      </div>
+              <h3 className="display mt-7 mb-0 text-[clamp(2.4rem,3.6vw,3.4rem)] !leading-[0.95]">Make the night<br />your own.</h3>
+              <p className="t-meta text-[#C89D35] mt-5 mb-0" aria-hidden="true">─── ✦ ───</p>
+              <p className="t-quote text-[#181614]/90 mt-4 mb-0">
+                &ldquo;Some performances aren&rsquo;t announced. They&rsquo;re created exclusively for those who ask.&rdquo;
+              </p>
 
-      {/* MAIN INVITATION CARD & SURROUNDING POLAROIDS */}
-      <div className="max-w-[1100px] mx-auto px-6 relative z-20 flex flex-col items-center">
-        
-        {/* SURROUNDING ARCHIVAL PHOTO 1 */}
-        <div className="private-photo-1 absolute -top-8 left-0 md:left-4 z-10 pointer-events-none hidden md:block">
-          <div className="w-[180px] paper-surface p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[-4deg]">
-            <img src="/media/gallery/tangy9.jpg" alt="Your Place" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
-            <p className="absolute bottom-2.5 left-3 font-mono text-[8px] text-[#17120D] font-bold">✎ YOUR SPACE</p>
+              <span className="reveal-stamp archiveStamp text-[#9a7424] mt-6" style={{ '--rest-rot': '-3deg' }}>By invitation only ✦ 33⅓ RPM</span>
+
+              <ul className="list-none p-0 m-0 mt-6 flex flex-wrap gap-2">
+                {['Private gatherings', 'House sessions', 'Brand experiences', 'Special venues'].map((t) => (
+                  <li key={t} className="t-meta border border-[#181614]/60 px-2 py-1">{t}</li>
+                ))}
+              </ul>
+
+              <a
+                href="/private-sessions"
+                onClick={() => playSFX('ticketClick')}
+                className="t-btn w-full mt-8 !bg-[#4A171D] !border-[#4A171D] hover:!bg-[#181614] hover:!border-[#181614]"
+              >
+                Private sessions → View more
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* SURROUNDING ARCHIVAL PHOTO 2 */}
-        <div className="private-photo-2 absolute -bottom-8 right-0 md:right-4 z-10 pointer-events-none hidden md:block">
-          <div className="w-[190px] paper-surface p-2.5 pb-9 border-2 border-[#17120D] shadow-[15px_15px_40px_rgba(0,0,0,0.8)] rotate-[4deg]">
-            <img src="/media/gallery/tangy3.jpg" alt="Our People" className="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.35]" />
-            <p className="absolute bottom-2.5 left-3 font-mono text-[8px] text-[#17120D] font-bold">✎ OUR PEOPLE</p>
-          </div>
-        </div>
-
-        {/* CENTRAL VINTAGE INVITATION CARD WITH LETTERPRESS DOUBLE-LINE BORDER */}
-        <div className="private-invitation w-full max-w-[800px] paper-surface text-[#17120D] p-8 md:p-16 border-8 border-double border-[#17120D] shadow-[25px_25px_0px_#17120D] relative flex flex-col justify-between text-center">
-          
-          {/* VINTAGE GRAPHIC WAX SEAL */}
-          <div className="wax-seal absolute -top-6 -right-6 w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#651D2D] border-4 border-[#17120D] shadow-xl flex items-center justify-center z-40 rotate-[-6deg]">
-            <div className="w-[82%] h-[82%] rounded-full border-2 border-[#C69A32] flex items-center justify-center">
-              <span className="font-display text-2xl md:text-3xl text-[#E7D7AC] font-bold leading-none">T</span>
-            </div>
-          </div>
-
-          {/* Invitation Top Header */}
-          <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#4A2638] border-b-2 border-[#17120D] pb-4 mb-8 uppercase">
-            <span className="flex items-center gap-1.5"><LotusStamp index={2} bg="transparent" border="#4A2638" className="w-4 h-4 opacity-90" />TANGY PRIVATE SESSIONS</span>
-            <span>HYDERABAD // BY INVITATION</span>
-          </div>
-
-          {/* Invitation Body */}
-          <div className="my-auto">
-            <h3 className="display text-5xl md:text-7xl text-[#17120D] leading-none mb-4 ink-bleed">
-              MAKE THE NIGHT<br/>YOUR OWN.
-            </h3>
-
-            {/* GOLD FLOURISH RULE */}
-            <div className="font-mono text-xs font-bold text-[#C69A32] my-4 tracking-widest uppercase">
-              ─────── ✦ ───────
-            </div>
-
-            <p className="font-body text-base md:text-xl text-[#17120D]/90 leading-relaxed italic max-w-xl mx-auto mb-2 border-y-2 border-[#17120D]/20 py-4">
-              "Some performances aren't announced. They're created exclusively for those who ask."
-            </p>
-            <HandDrawnUnderline color="#C69A32" className="w-40 h-2.5 mx-auto mb-6 opacity-70" />
-
-            <div className="flex flex-wrap justify-center gap-2 mb-10 font-mono text-[9px] font-bold text-[#17120D] uppercase">
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1">PRIVATE GATHERINGS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1">HOUSE SESSIONS</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1">BRAND EXPERIENCES</span>
-              <span className="bg-[#F5E9C9] border border-[#17120D] px-2.5 py-1">SPECIAL VENUES</span>
-            </div>
-          </div>
-
-          {/* Primary Action Button */}
-          <div className="w-full">
-            <a 
-              href="/private-sessions" 
-              className="btn-ticket w-full text-center block !bg-[#4A2638] !text-[#E7D7AC] hover:!bg-[#C69A32] hover:!text-[#17120D] font-mono text-xs font-bold uppercase tracking-widest py-3.5"
-            >
-              PRIVATE SESSIONS → VIEW MORE
-            </a>
-          </div>
-
-        </div>
-
+        <p className="folio text-right mt-14 mb-0" aria-hidden="true">— 07 —</p>
       </div>
-
     </section>
   );
 };

@@ -39,7 +39,6 @@ export const Artists = ({ onArtistSubmit }) => {
   return (
     <section ref={sectionRef} id="artists" className="relative w-full h-screen bg-[#5A120D] text-[#E7D5A4] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C]">
       
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none z-0" />
 
       {/* 5-LINE MUSIC MANUSCRIPT STAFF PATTERN */}
       <MusicManuscriptPattern opacity={0.06} color="#E7D5A4" />

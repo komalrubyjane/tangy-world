@@ -107,12 +107,12 @@ export const VenueDashboard = ({ overrideProfile, readOnly, demoData } = {}) => 
       {activeTab === 'events' && (
         <div className="flex flex-col gap-6">
           <div>
-            <h3 className="font-display text-lg font-bold uppercase mb-3">Upcoming</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3">Upcoming</h3>
             {upcoming.length === 0 ? <Empty>NO UPCOMING EVENTS LINKED TO YOUR VENUE YET.</Empty> : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {upcoming.map((e) => (
                   <div key={e.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                    <h4 className="font-display font-bold uppercase">{e.name}</h4>
+                    <h4 className="font-condensed font-bold uppercase">{e.name}</h4>
                     <p className="font-mono text-[10px] mt-1">{fmtDate(e.event_date)} · {e.event_time}</p>
                     <Badge status={e.status} />
                   </div>
@@ -121,12 +121,12 @@ export const VenueDashboard = ({ overrideProfile, readOnly, demoData } = {}) => 
             )}
           </div>
           <div>
-            <h3 className="font-display text-lg font-bold uppercase mb-3">Past</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3">Past</h3>
             {past.length === 0 ? <Empty>NO PAST EVENTS ON RECORD.</Empty> : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {past.map((e) => (
                   <div key={e.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
-                    <h4 className="font-display font-bold uppercase">{e.name}</h4>
+                    <h4 className="font-condensed font-bold uppercase">{e.name}</h4>
                     <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(e.event_date)}</p>
                   </div>
                 ))}
@@ -144,7 +144,7 @@ export const VenueDashboard = ({ overrideProfile, readOnly, demoData } = {}) => 
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
               <div className="flex justify-between items-start gap-3 mb-2">
                 <div>
-                  <h3 className="font-display text-lg font-bold uppercase">{a.business_name}</h3>
+                  <h3 className="font-condensed text-lg font-bold uppercase">{a.business_name}</h3>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
                 </div>
                 <Badge status={a.status} />

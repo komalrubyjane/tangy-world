@@ -129,12 +129,12 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
           <StatTile label="Pending Tasks" value={pendingTasks.length} sub="across all assignments" />
           <StatTile label="Completed Tasks" value={doneTasks.length} sub="done so far" />
           <div className="sm:col-span-3 bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-            <h3 className="font-display text-lg font-bold uppercase mb-3 text-[#C99A2E]">Next up</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3 text-[#C99A2E]">Next up</h3>
             {upcoming.length === 0 ? (
               <Empty>NO UPCOMING ASSIGNMENTS.</Empty>
             ) : (
               <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                <h4 className="font-display font-bold uppercase">{upcoming[0].events?.name} — {upcoming[0].title}</h4>
+                <h4 className="font-condensed font-bold uppercase">{upcoming[0].events?.name} — {upcoming[0].title}</h4>
                 <p className="font-mono text-[10px] mt-1">{fmtDate(upcoming[0].events?.event_date)} · {upcoming[0].events?.event_time} · {upcoming[0].events?.venue}</p>
                 <Badge status={upcoming[0].status} />
               </div>
@@ -151,7 +151,7 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-4">
               <div className="flex justify-between items-start gap-3">
                 <div>
-                  <h4 className="font-display font-bold uppercase">{a.events?.name}</h4>
+                  <h4 className="font-condensed font-bold uppercase">{a.events?.name}</h4>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(a.events?.event_date)} · {a.events?.event_time} · {a.events?.venue}</p>
                   <p className="font-mono text-[10px] text-[#C99A2E] font-bold mt-1">{a.title}</p>
                 </div>
@@ -193,12 +193,12 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
       {activeTab === 'schedule' && (
         <div className="flex flex-col gap-6">
           <div>
-            <h3 className="font-display text-lg font-bold uppercase mb-3">Upcoming</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3">Upcoming</h3>
             {upcoming.length === 0 ? <Empty>NOTHING SCHEDULED.</Empty> : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {upcoming.map((a) => (
                   <div key={a.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                    <h4 className="font-display font-bold uppercase">{a.events?.name}</h4>
+                    <h4 className="font-condensed font-bold uppercase">{a.events?.name}</h4>
                     <p className="font-mono text-[10px] mt-1">{fmtDate(a.events?.event_date)} · {a.title}</p>
                   </div>
                 ))}
@@ -206,12 +206,12 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
             )}
           </div>
           <div>
-            <h3 className="font-display text-lg font-bold uppercase mb-3">Past</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3">Past</h3>
             {past.length === 0 ? <Empty>NO PAST ASSIGNMENTS ON RECORD.</Empty> : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {past.map((a) => (
                   <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
-                    <h4 className="font-display font-bold uppercase">{a.events?.name}</h4>
+                    <h4 className="font-condensed font-bold uppercase">{a.events?.name}</h4>
                     <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(a.events?.event_date)} · {a.title}</p>
                   </div>
                 ))}
@@ -229,7 +229,7 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
               <div className="flex justify-between items-start gap-3 mb-2">
                 <div>
-                  <h3 className="font-display text-lg font-bold uppercase">{a.role_interest}</h3>
+                  <h3 className="font-condensed text-lg font-bold uppercase">{a.role_interest}</h3>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
                 </div>
                 <Badge status={a.status} />

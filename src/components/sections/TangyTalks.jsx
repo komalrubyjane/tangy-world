@@ -83,7 +83,7 @@ export const TangyTalks = () => {
       <div className="relative z-20 h-full w-full flex flex-col justify-center px-[7vw] md:px-[9vw]">
 
         <span
-          className="absolute top-[8%] right-[6%] md:right-[10%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+          className="absolute top-[8%] right-[6%] md:right-[10%] font-condensed font-black leading-none text-transparent pointer-events-none select-none"
           style={{ fontSize: 'clamp(120px,22vw,340px)', WebkitTextStroke: '2px rgba(217,30,24,0.35)' }}
           aria-hidden="true"
         >
@@ -96,7 +96,7 @@ export const TangyTalks = () => {
           <HandDrawnCircle color="#D19A24" className="absolute -inset-x-3 -inset-y-2 opacity-40 pointer-events-none" />
         </div>
 
-        <h2 className="talks-title relative flex text-left text-[clamp(46px,9.5vw,130px)] font-display font-black text-tangy-paper leading-[0.88] overflow-visible -rotate-1 origin-left">
+        <h2 className="talks-title relative flex text-left text-[clamp(46px,9.5vw,130px)] font-condensed font-black text-tangy-paper leading-[0.88] overflow-visible -rotate-1 origin-left">
           <span className="absolute inset-0 flex -z-10 text-[#D81B73] opacity-40 translate-x-[8px] -translate-y-[5px] mix-blend-screen pointer-events-none select-none" aria-hidden="true">
             {title.split('').map((char, i) => (
               <span key={i} className="inline-block">{char === ' ' ? ' ' : char}</span>

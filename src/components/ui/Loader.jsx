@@ -55,7 +55,7 @@ export const Loader = ({ onComplete }) => {
       <p className="font-mono text-[12px] tracking-[.4em] text-tangy-paper text-center leading-[1.9]">
         SETTING<br/>THE STAGE&hellip;
       </p>
-      <p className="font-display font-bold text-[15vw] text-tangy-cream leading-none">
+      <p className="font-condensed font-bold text-[15vw] text-tangy-cream leading-none">
         {String(pct).padStart(2, '0')}
       </p>
       <span 

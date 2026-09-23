@@ -8,8 +8,8 @@ const MEMBERSHIP_TIERS = [
     name: 'VINYL LISTENER',
     price: 'FREE',
     tag: 'STANDARD MEMBER',
-    color: '#E7D5A4',
-    accent: '#11100C',
+    color: '#EFE2C0',
+    accent: '#181614',
     perks: [
       'Monthly Tangy editorial newsletter',
       'Priority notification on new shows',
@@ -22,8 +22,8 @@ const MEMBERSHIP_TIERS = [
     name: 'PASSPORT HOLDER',
     price: '₹499 / YEAR',
     tag: 'PREMIUM MEMBER',
-    color: '#C99A2E',
-    accent: '#11100C',
+    color: '#C89D35',
+    accent: '#181614',
     perks: [
       'All Vinyl Listener perks',
       '48-hour early ticket reservation',
@@ -37,8 +37,8 @@ const MEMBERSHIP_TIERS = [
     name: 'STONE CIRCLE',
     price: '₹1,499 / YEAR',
     tag: 'FOUNDING MEMBER',
-    color: '#B94717',
-    accent: '#E7D5A4',
+    color: '#B5532A',
+    accent: '#EFE2C0',
     perks: [
       'All Passport Holder perks',
       'Named in session programmes',
@@ -62,16 +62,15 @@ export const InnerCirclePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1C0A04] text-[#E3D4AC] font-mono selection:bg-[#E3D4AC] selection:text-[#1C0A04]">
+    <div className="min-h-screen bg-[#211915] text-[#E3D4AC] font-mono selection:bg-[#EFE2C0] selection:text-[#1C0A04] printNoise">
       <Navbar />
 
       {/* PAGE HERO */}
       <section className="relative pt-28 pb-10 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
         {/* Big watermark text */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-[0.04] select-none">
-          <span className="font-display text-[18vw] leading-none text-[#E3D4AC] uppercase font-bold">CIRCLE</span>
+          <span className="font-condensed text-[18vw] leading-none text-[#E3D4AC] uppercase font-bold">CIRCLE</span>
         </div>
 
         <div className="relative z-10">
@@ -88,7 +87,7 @@ export const InnerCirclePage = () => {
       </section>
 
       {/* WHY JOIN — Stats Banner */}
-      <section className="bg-[#B94717] border-y-4 border-[#11100C] py-6 sm:py-8 px-4 overflow-x-auto">
+      <section className="bg-[#4A171D] textileTexture border-y-4 border-[#11100C] py-6 sm:py-8 px-4 overflow-x-auto">
         <div className="flex gap-6 sm:gap-0 sm:grid sm:grid-cols-4 max-w-5xl mx-auto text-center min-w-max sm:min-w-0">
           {[
             { num: '2,400+', label: 'INNER CIRCLE MEMBERS' },
@@ -125,7 +124,7 @@ export const InnerCirclePage = () => {
             >
               {/* FOLDER TAB */}
               {idx === 1 && (
-                <div className="absolute -top-6 left-4 bg-[#C99A2E] text-[#11100C] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t border-x border-[#11100C] z-10">
+                <div className="absolute -top-6 left-4 bg-[#C89D35] text-[#11100C] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t border-x border-[#11100C] z-10">
                   MOST POPULAR
                 </div>
               )}
@@ -170,7 +169,7 @@ export const InnerCirclePage = () => {
         </div>
 
         {/* SIGNUP FORM */}
-        <div id="join" className="bg-[#11100C] p-6 sm:p-12 border-4 border-[#C99A2E] max-w-2xl mx-auto">
+        <div id="join" className="bg-[#181614] p-6 sm:p-12 border-4 border-[#C99A2E] max-w-2xl mx-auto">
           {/* Masking tape decoration */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-[rgba(201,154,46,0.6)] rotate-[-1deg] border border-[#C99A2E]/40 pointer-events-none hidden sm:block" />
 
@@ -233,7 +232,7 @@ export const InnerCirclePage = () => {
 
               <button
                 type="submit"
-                className="py-3 sm:py-4 bg-[#C99A2E] text-[#11100C] font-mono text-xs font-bold uppercase tracking-[0.25em] hover:bg-[#E7D5A4] border-2 border-[#C99A2E] transition-colors"
+                className="py-3 sm:py-4 bg-[#C89D35] text-[#11100C] font-mono text-xs font-bold uppercase tracking-[0.25em] hover:bg-[#EFE2C0] border-2 border-[#C99A2E] transition-colors"
               >
                 JOIN INNER CIRCLE →
               </button>
@@ -246,7 +245,7 @@ export const InnerCirclePage = () => {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="bg-[#11100C] border-t-4 border-[#C99A2E]/30 py-12 sm:py-16 px-4 sm:px-6">
+      <section className="bg-[#181614] printNoise border-t-4 border-[#C99A2E]/30 py-12 sm:py-16 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <h3 className="display text-3xl sm:text-5xl text-[#E3D4AC] text-center mb-8 sm:mb-12">WHAT MEMBERS SAY</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6">
@@ -255,7 +254,7 @@ export const InnerCirclePage = () => {
               { quote: 'The physical ticket alone is worth it. I have all six framed on my wall.', member: 'STONE CIRCLE · 2022', name: 'Aakash N.' },
               { quote: 'The field tape recordings they send are unlike anything you will find publicly.', member: 'VINYL LISTENER · 2023', name: 'Meera S.' }
             ].map((t, i) => (
-              <div key={i} className="bg-[#F5E9C9] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C]">
+              <div key={i} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C]">
                 <p className="font-body text-sm italic leading-relaxed mb-4 border-l-4 border-[#C99A2E] pl-3">
                   "{t.quote}"
                 </p>

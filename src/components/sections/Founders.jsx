@@ -94,11 +94,10 @@ export const Founders = () => {
     <section 
       ref={sectionRef} 
       id="founders" 
-      className="relative w-full py-16 md:py-28 lg:py-36 bg-[#1C140E] text-[#EAD9A6] overflow-hidden border-t-8 border-[#D19A24]"
+      className="relative w-full py-16 md:py-28 lg:py-36 bg-[#211915] printNoise text-[#EAD9A6] overflow-hidden border-t-8 border-[#D19A24]"
     >
       
       {/* WOODEN DESK & NOISE TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none z-10" />
       <RetroGrain index={1} opacity={0.11} blend="overlay" className="z-10" />
 
       {/* OVERSIZED DESK WATERMARK */}
@@ -141,7 +140,7 @@ export const Founders = () => {
         <h2 className="display text-6xl md:text-9xl text-[#EAD9A6] leading-none ink-bleed mb-4">
           <RisographOffset colors={['#D91E18']} offsets={[[6, -4]]} opacity={0.28}>FOUNDERS ARCHIVE</RisographOffset>
         </h2>
-        <p className="font-mono text-xs md:text-sm text-[#EAD9A6]/90 tracking-[0.3em] uppercase border-y-2 border-[#15120D] py-2 inline-block px-6 bg-[#15120D]/90 backdrop-blur-xs shadow-md">
+        <p className="font-mono text-xs md:text-sm text-[#EAD9A6]/90 tracking-[0.3em] uppercase border-y-2 border-[#15120D] py-2 inline-block px-6 bg-[#181614]/90 backdrop-blur-xs shadow-md">
           THE ARCHITECTS OF TANGY WORLD
         </p>
       </div>
@@ -157,7 +156,7 @@ export const Founders = () => {
           >
             
             {/* MANILA TAB */}
-            <div className="absolute -top-6 left-6 bg-[#15120D] text-[#EAD9A6] px-4 py-1 font-mono text-[9px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24]">
+            <div className="absolute -top-6 left-6 bg-[#181614] text-[#EAD9A6] px-4 py-1 font-mono text-[9px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24]">
               FILE {founder.id} // {founder.tag}
             </div>
 
@@ -168,7 +167,7 @@ export const Founders = () => {
             <div className="absolute -top-3 right-28 w-20 h-5 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30 pointer-events-none" />
 
             {/* CONFIDENTIAL STAMP */}
-            <div className={`${founder.stampClass} absolute -top-5 right-4 border-4 border-[#15120D] bg-[#5A120D] text-[#EAD9A6] font-mono text-[10px] font-bold px-3.5 py-1 uppercase shadow-lg z-30 pointer-events-none`}>
+            <div className={`${founder.stampClass} absolute -top-5 right-4 border-4 border-[#15120D] bg-[#4A171D] text-[#EAD9A6] font-mono text-[10px] font-bold px-3.5 py-1 uppercase shadow-lg z-30 pointer-events-none`}>
               CONFIDENTIAL // FILE 001 ✦
             </div>
 
@@ -212,9 +211,9 @@ export const Founders = () => {
 
       {/* ARCHIVAL MUSICAL DIVIDER AT SECTION BOTTOM */}
       <div className="w-full max-w-4xl mx-auto text-center mt-20 font-mono text-xs font-bold text-[#D19A24] tracking-[0.3em] uppercase flex items-center justify-center gap-4">
-        <span className="h-[1px] w-24 bg-[#D19A24]/40" />
+        <span className="h-[1px] w-24 bg-[#C89D35]/40" />
         <span>─────── 🎻 VINYL COLLECTION ───────</span>
-        <span className="h-[1px] w-24 bg-[#D19A24]/40" />
+        <span className="h-[1px] w-24 bg-[#C89D35]/40" />
       </div>
 
     </section>

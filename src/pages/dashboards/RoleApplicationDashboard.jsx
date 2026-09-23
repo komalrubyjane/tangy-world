@@ -126,7 +126,7 @@ export const RoleApplicationDashboard = ({ config }) => {
               <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-widest block">
                 {config.label.toUpperCase()} ACCOUNT
               </span>
-              <h1 className="font-display text-xl sm:text-2xl font-bold uppercase">{user.full_name || user.email}</h1>
+              <h1 className="font-condensed text-xl sm:text-2xl font-bold uppercase">{user.full_name || user.email}</h1>
               <span className="font-mono text-[10px] text-[#E7D5A4]/60">{user.email}</span>
             </div>
           </div>
@@ -168,7 +168,7 @@ export const RoleApplicationDashboard = ({ config }) => {
                 <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
                   <div className="flex justify-between items-start gap-3 mb-3">
                     <div>
-                      <h3 className="font-display text-lg font-bold uppercase">{a.business_name || a.name || a.role_interest || config.label}</h3>
+                      <h3 className="font-condensed text-lg font-bold uppercase">{a.business_name || a.name || a.role_interest || config.label}</h3>
                       <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
                     </div>
                     <Badge status={a.status} />
@@ -213,7 +213,7 @@ export const RoleApplicationDashboard = ({ config }) => {
         {activeTab === 'help' && (
           <div className="max-w-lg flex flex-col gap-4">
             <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-              <h3 className="font-display text-lg font-bold uppercase mb-2">Message the Tangy team</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-2">Message the Tangy team</h3>
               <p className="font-mono text-[11px] text-[#E7D5A4]/70">Questions about your application or upcoming sessions — reach the team directly.</p>
             </div>
             {agentSent ? (
@@ -226,7 +226,7 @@ export const RoleApplicationDashboard = ({ config }) => {
 
         {activeTab === 'settings' && (
           <div className="max-w-md bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C]">
-            <h3 className="font-display text-lg font-bold uppercase mb-4">Account</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-4">Account</h3>
             <div className="flex flex-col gap-3 text-xs">
               <div>
                 <span className="block text-[10px] font-bold uppercase mb-1 opacity-70">Email</span>

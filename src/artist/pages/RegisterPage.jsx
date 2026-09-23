@@ -35,7 +35,7 @@ export const RegisterPage = () => {
   if (!verified) {
     return (
       <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
-        <div className="w-full max-w-md bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[14px_14px_0px_#4c1210] text-left flex flex-col gap-6">
+        <div className="w-full max-w-md bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[14px_14px_0px_#4c1210] text-left flex flex-col gap-6">
           <div>
             <button
               type="button"
@@ -110,8 +110,8 @@ export const RegisterPage = () => {
   if (submitted) {
     return (
       <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
-        <div className="w-full max-w-lg bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-8 shadow-[14px_14px_0px_#4c1210] text-center flex flex-col items-center gap-4 animate-bounce">
-          <div className="w-16 h-16 rounded-full bg-[#c2272a] text-[#ecdcaf] font-poster text-3xl flex items-center justify-center border-2 border-[#191410]">
+        <div className="w-full max-w-lg bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-8 shadow-[14px_14px_0px_#4c1210] text-center flex flex-col items-center gap-4 animate-bounce">
+          <div className="w-16 h-16 rounded-full bg-[#B5532A] text-[#ecdcaf] font-poster text-3xl flex items-center justify-center border-2 border-[#191410]">
             ✦
           </div>
           <h2 className="font-poster text-3xl text-[#191410]">APPLICATION SUBMITTED!</h2>
@@ -133,7 +133,7 @@ export const RegisterPage = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-2xl bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[14px_14px_0px_#4c1210] text-left flex flex-col gap-6">
+      <div className="w-full max-w-2xl bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 sm:p-10 shadow-[14px_14px_0px_#4c1210] text-left flex flex-col gap-6">
         
         {/* STEP PROGRESS BAR */}
         <div className="flex flex-col gap-2 border-b-2 border-[#191410] pb-4">
@@ -146,7 +146,7 @@ export const RegisterPage = () => {
             {stepTitles.map((t, idx) => (
               <div 
                 key={t}
-                className={`h-2 border border-[#191410] transition-all ${idx + 1 <= step ? 'bg-[#c2272a]' : 'bg-[#ecdcaf]'}`}
+                className={`h-2 border border-[#191410] transition-all ${idx + 1 <= step ? 'bg-[#B5532A]' : 'bg-[#ecdcaf]'}`}
               />
             ))}
           </div>
@@ -166,7 +166,7 @@ export const RegisterPage = () => {
             <h2 className="font-poster text-3xl text-[#191410]">WHO ARE YOU?</h2>
             <p className="font-mono text-xs text-[#241a12]/70">Start with the basics — your artist identity.</p>
 
-            <div className="p-3 bg-[#191410]/5 border-2 border-[#191410]/20 font-mono text-[10px]">
+            <div className="p-3 bg-[#181614]/5 border-2 border-[#191410]/20 font-mono text-[10px]">
               <span className="uppercase font-bold opacity-60">Verified email</span>
               <div className="text-sm font-bold mt-0.5">{verified.email}</div>
             </div>
@@ -287,7 +287,7 @@ export const RegisterPage = () => {
         )}
 
         {submitError && (
-          <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
+          <div className="p-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-[10px] font-bold border border-[#191410]">
             ✕ {submitError}
           </div>
         )}
@@ -298,7 +298,7 @@ export const RegisterPage = () => {
             <button
               type="button"
               onClick={handleBack}
-              className="px-4 py-2 bg-[#ecdcaf] text-[#191410] border-2 border-[#191410] font-mono text-xs font-bold active:scale-95"
+              className="px-4 py-2 bg-[#EFE2C0] text-[#191410] border-2 border-[#191410] font-mono text-xs font-bold active:scale-95"
             >
               ← BACK
             </button>
@@ -316,7 +316,7 @@ export const RegisterPage = () => {
             type="button"
             onClick={handleNext}
             disabled={isSubmitting}
-            className="px-6 py-3 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all disabled:opacity-50"
+            className="px-6 py-3 bg-[#181614] text-[#ecdcaf] hover:bg-[#B5532A] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all disabled:opacity-50"
           >
             {isSubmitting ? 'SUBMITTING...' : step === totalSteps ? 'SUBMIT AUDITION →' : 'CONTINUE →'}
           </button>

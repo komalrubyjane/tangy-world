@@ -53,8 +53,7 @@ export const HeritageExperiencesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#315D73] text-[#ecdcaf] font-mono selection:bg-[#ecdcaf] selection:text-[#315D73] overflow-x-hidden pt-16 pb-20">
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+    <div className="min-h-screen bg-[#181614] text-[#ecdcaf] font-mono selection:bg-[#EFE2C0] selection:text-[#315D73] overflow-x-hidden pt-16 pb-20 printNoise">
       <Navbar />
 
       <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -69,9 +68,9 @@ export const HeritageExperiencesPage = () => {
           </p>
         </div>
 
-        <div className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
           {submitted ? (
-            <div className="bg-[#241a12] border-2 border-[#ecdcaf] p-8 text-center">
+            <div className="bg-[#211915] border-2 border-[#ecdcaf] p-8 text-center">
               <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">REQUEST TRANSMITTED!</h3>
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our private session coordinator will get back to you within 48 hours.</p>
             </div>
@@ -92,8 +91,8 @@ export const HeritageExperiencesPage = () => {
                 <option value="100+">100+ GUESTS</option>
               </select>
               <textarea rows={4} placeholder="TELL US ABOUT THE HERITAGE PROPERTY & YOUR VISION..." value={message} onChange={(e) => setMessage(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              {formError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
-              <button type="submit" disabled={submitting} className="py-4 bg-[#ecdcaf] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#d1a437] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+              {formError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
+              <button type="submit" disabled={submitting} className="py-4 bg-[#EFE2C0] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#C89D35] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
                 {submitting ? 'SUBMITTING...' : 'REQUEST A HERITAGE SESSION →'}
               </button>
             </form>

@@ -26,7 +26,7 @@ function InfoPanel({ conversation }) {
   return (
     <div className="flex flex-col gap-4 text-[#E7D5A4]">
       <div>
-        <div className="w-14 h-14 rounded-full bg-[#5A120D] text-[#E7D5A4] border border-[#C99A2E]/50 flex items-center justify-center font-display text-xl mb-2">
+        <div className="w-14 h-14 rounded-full bg-[#5A120D] text-[#E7D5A4] border border-[#C99A2E]/50 flex items-center justify-center font-condensed text-xl mb-2">
           {(other?.name || '?').trim().charAt(0).toUpperCase()}
         </div>
         <h3 className="text-lg font-bold text-[#C99A2E]">{other?.name || 'Guest Visitor'}</h3>

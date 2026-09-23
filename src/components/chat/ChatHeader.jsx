@@ -17,7 +17,7 @@ export const ChatHeader = ({ title, subtitle, status, onBack, actions }) => (
         </button>
       )}
       <div className="min-w-0">
-        <div className="font-display text-sm text-[#E7D5A4] uppercase tracking-wide truncate">{title}</div>
+        <div className="font-condensed text-sm text-[#E7D5A4] uppercase tracking-wide truncate">{title}</div>
         <div className="flex items-center gap-2 mt-0.5">
           {subtitle && <span className="font-mono text-[9px] text-[#C99A2E] uppercase tracking-wider truncate">{subtitle}</span>}
           {status && <StatusBadge status={status} />}

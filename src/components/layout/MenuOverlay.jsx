@@ -24,7 +24,7 @@ export const MenuOverlay = ({ isOpen, onClose }) => {
           <li key={idx} className="border-t border-[rgba(231,223,181,.15)] last:border-b">
             <a 
               href={link.href} 
-              className="block py-[18px] px-1 font-display font-semibold text-[clamp(28px,5vw,56px)] text-tangy-paper transition-all duration-300 hover:text-tangy-cream hover:pl-5 focus-visible:text-tangy-cream focus-visible:pl-5"
+              className="block py-[18px] px-1 font-condensed font-semibold text-[clamp(28px,5vw,56px)] text-tangy-paper transition-all duration-300 hover:text-tangy-cream hover:pl-5 focus-visible:text-tangy-cream focus-visible:pl-5"
               onClick={() => onClose()}
             >
               {link.label}

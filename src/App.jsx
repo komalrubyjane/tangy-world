@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
@@ -9,79 +9,72 @@ import { DemoAdminProvider } from './context/DemoAdminContext';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Navbar } from './components/layout/Navbar';
 import { Menu } from './components/sections/Menu';
-import { TangySpaceIntro } from './components/ui/TangySpaceIntro';
-import { SoundControl } from './components/ui/SoundControl';
 import { CurtainOverlay } from './components/ui/CurtainOverlay';
-import { GlobalMicrophoneJourney } from './components/ui/GlobalMicrophoneJourney';
+import { MicNavRail } from './components/ui/MicNavRail';
 
 // Museum Interactive Modals & Dock
 import { CassetteSoundArchiveModal } from './components/museum/CassetteSoundArchiveModal';
 import { VinylRecordPlayerModal } from './components/museum/VinylRecordPlayerModal';
 import { ProgrammeBoardModal } from './components/museum/ProgrammeBoardModal';
 import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
-import { MerchShopModal } from './components/museum/MerchShopModal';
-import { DigitalPassportModal } from './components/museum/DigitalPassportModal';
-import { PostcardContactModal } from './components/museum/PostcardContactModal';
-import { TangyTVModal } from './components/museum/TangyTVModal';
-import { UserLoginModal } from './components/museum/UserLoginModal';
-import { MuseumQuickDock } from './components/museum/MuseumQuickDock';
+import { GlobalDock } from './components/museum/GlobalDock';
 
 // Dedicated Standalone Pages
-import { CollaboratePage } from './pages/CollaboratePage';
-import { BookingPage } from './pages/BookingPage';
-import { CrewPage } from './pages/CrewPage';
-import { PrivateSessionsPage } from './pages/PrivateSessionsPage';
-import { AboutPage } from './pages/AboutPage';
-import { SessionsPage } from './pages/SessionsPage';
-import { ArchivePage } from './pages/ArchivePage';
-import { VendorApplyPage } from './pages/VendorApplyPage';
-import { SponsorApplyPage } from './pages/SponsorApplyPage';
-import { VenueHostApplyPage } from './pages/VenueHostApplyPage';
-import { BlogsPage } from './pages/BlogsPage';
-import { InnerCirclePage } from './pages/InnerCirclePage';
-import { ContactPage } from './pages/ContactPage';
-import { AdminPage } from './pages/AdminPage';
-import { AdminEntitySelector } from './pages/admin/AdminEntitySelector';
-import { AdminPortalPreview } from './pages/admin/AdminPortalPreview';
-import { AdminArtistPreview } from './pages/admin/AdminArtistPreview';
+const CollaboratePage = lazy(() => import('./pages/CollaboratePage').then((m) => ({ default: m.CollaboratePage })));
+const BookingPage = lazy(() => import('./pages/BookingPage').then((m) => ({ default: m.BookingPage })));
+const CrewPage = lazy(() => import('./pages/CrewPage').then((m) => ({ default: m.CrewPage })));
+const PrivateSessionsPage = lazy(() => import('./pages/PrivateSessionsPage').then((m) => ({ default: m.PrivateSessionsPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
+const SessionsPage = lazy(() => import('./pages/SessionsPage').then((m) => ({ default: m.SessionsPage })));
+const ArchivePage = lazy(() => import('./pages/ArchivePage').then((m) => ({ default: m.ArchivePage })));
+const VendorApplyPage = lazy(() => import('./pages/VendorApplyPage').then((m) => ({ default: m.VendorApplyPage })));
+const SponsorApplyPage = lazy(() => import('./pages/SponsorApplyPage').then((m) => ({ default: m.SponsorApplyPage })));
+const VenueHostApplyPage = lazy(() => import('./pages/VenueHostApplyPage').then((m) => ({ default: m.VenueHostApplyPage })));
+const BlogsPage = lazy(() => import('./pages/BlogsPage').then((m) => ({ default: m.BlogsPage })));
+const InnerCirclePage = lazy(() => import('./pages/InnerCirclePage').then((m) => ({ default: m.InnerCirclePage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
+const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
+const AdminEntitySelector = lazy(() => import('./pages/admin/AdminEntitySelector').then((m) => ({ default: m.AdminEntitySelector })));
+const AdminPortalPreview = lazy(() => import('./pages/admin/AdminPortalPreview').then((m) => ({ default: m.AdminPortalPreview })));
+const AdminArtistPreview = lazy(() => import('./pages/admin/AdminArtistPreview').then((m) => ({ default: m.AdminArtistPreview })));
 
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
-import { DemoAdminLogin } from './pages/demoAdmin/DemoAdminLogin';
-import { DemoControlRoom } from './pages/demoAdmin/DemoControlRoom';
-import { DemoRoleDashboard } from './pages/demoAdmin/DemoRoleDashboard';
-import { DemoArtistDashboard } from './pages/demoAdmin/DemoArtistDashboard';
-import { TangyWorldCheckInPage } from './admin/TangyWorldCheckInPage';
-import { ProfilePage as PassportProfilePage } from './pages/ProfilePage';
+const DemoAdminLogin = lazy(() => import('./pages/demoAdmin/DemoAdminLogin').then((m) => ({ default: m.DemoAdminLogin })));
+const DemoControlRoom = lazy(() => import('./pages/demoAdmin/DemoControlRoom').then((m) => ({ default: m.DemoControlRoom })));
+const DemoRoleDashboard = lazy(() => import('./pages/demoAdmin/DemoRoleDashboard').then((m) => ({ default: m.DemoRoleDashboard })));
+const DemoArtistDashboard = lazy(() => import('./pages/demoAdmin/DemoArtistDashboard').then((m) => ({ default: m.DemoArtistDashboard })));
+const TangyWorldCheckInPage = lazy(() => import('./admin/TangyWorldCheckInPage').then((m) => ({ default: m.TangyWorldCheckInPage })));
+const PassportProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 
 // Artist Portal Migration Imports
-import { ArtistLayout } from './artist/layouts/ArtistLayout';
+const ArtistLayout = lazy(() => import('./artist/layouts/ArtistLayout').then((m) => ({ default: m.ArtistLayout })));
 import { ArtistProtectedRoute } from './artist/components/ArtistProtectedRoute';
-import { LoginPage } from './artist/pages/LoginPage';
-import { RegisterPage } from './artist/pages/RegisterPage';
-import { DashboardPage } from './artist/pages/DashboardPage';
-import { ProfilePage } from './artist/pages/ProfilePage';
-import { CalendarPage } from './artist/pages/CalendarPage';
-import { ArtistsDirectoryPage } from './artist/pages/ArtistsDirectoryPage';
-import { ArtistDetailsPage } from './artist/pages/ArtistDetailsPage';
-import { MediaPage } from './artist/pages/MediaPage';
-import { SettingsPage } from './artist/pages/SettingsPage';
+const LoginPage = lazy(() => import('./artist/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('./artist/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const DashboardPage = lazy(() => import('./artist/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })));
+const ProfilePage = lazy(() => import('./artist/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const CalendarPage = lazy(() => import('./artist/pages/CalendarPage').then((m) => ({ default: m.CalendarPage })));
+const ArtistsDirectoryPage = lazy(() => import('./artist/pages/ArtistsDirectoryPage').then((m) => ({ default: m.ArtistsDirectoryPage })));
+const ArtistDetailsPage = lazy(() => import('./artist/pages/ArtistDetailsPage').then((m) => ({ default: m.ArtistDetailsPage })));
+const MediaPage = lazy(() => import('./artist/pages/MediaPage').then((m) => ({ default: m.MediaPage })));
+const SettingsPage = lazy(() => import('./artist/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 
 // Real, role-based account dashboards — backed by Supabase Auth
 // (UserAuthContext) + RLS, gated by ProtectedRoute (not the removed mock
 // account system).
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { DashboardRedirect } from './components/auth/DashboardRedirect';
-import { JoinPage } from './pages/join/JoinPage';
-import { JoinLoginPage } from './pages/join/JoinLoginPage';
-import { VendorDashboard } from './pages/dashboards/VendorDashboard';
-import { CrewDashboard } from './pages/dashboards/CrewDashboard';
-import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard';
-import { SponsorDashboard } from './pages/dashboards/SponsorDashboard';
-import { VenueDashboard } from './pages/dashboards/VenueDashboard';
-import { PrivateDashboard } from './pages/dashboards/PrivateDashboard';
+const JoinPage = lazy(() => import('./pages/join/JoinPage').then((m) => ({ default: m.JoinPage })));
+const JoinLoginPage = lazy(() => import('./pages/join/JoinLoginPage').then((m) => ({ default: m.JoinLoginPage })));
+const VendorDashboard = lazy(() => import('./pages/dashboards/VendorDashboard').then((m) => ({ default: m.VendorDashboard })));
+const CrewDashboard = lazy(() => import('./pages/dashboards/CrewDashboard').then((m) => ({ default: m.CrewDashboard })));
+const VolunteerDashboard = lazy(() => import('./pages/dashboards/VolunteerDashboard').then((m) => ({ default: m.VolunteerDashboard })));
+const SponsorDashboard = lazy(() => import('./pages/dashboards/SponsorDashboard').then((m) => ({ default: m.SponsorDashboard })));
+const VenueDashboard = lazy(() => import('./pages/dashboards/VenueDashboard').then((m) => ({ default: m.VenueDashboard })));
+const PrivateDashboard = lazy(() => import('./pages/dashboards/PrivateDashboard').then((m) => ({ default: m.PrivateDashboard })));
 
 // Public Tangy AI assistant
-import { AIAssistantPage } from './pages/AIAssistantPage';
+const AIAssistantPage = lazy(() => import('./pages/AIAssistantPage').then((m) => ({ default: m.AIAssistantPage })));
 import { TangyAssistantLauncher } from './components/ai/TangyAssistantLauncher';
 
 // Announcement character overlay (admin-authored, publicly triggered)
@@ -89,34 +82,34 @@ import { AnnouncementCharacterOverlay } from './components/announcements/Announc
 import { useAnnouncementTrigger } from './hooks/useAnnouncementTrigger';
 
 // New dedicated subsection pages (reuse existing section components/content)
-import { WhyTangyPage } from './pages/subsections/WhyTangyPage';
-import { ChronologyPage } from './pages/subsections/ChronologyPage';
-import { TeamPage } from './pages/subsections/TeamPage';
-import { FullStoryPage } from './pages/subsections/FullStoryPage';
-import { UpcomingSessionsPage } from './pages/subsections/UpcomingSessionsPage';
-import { ConcertCulturePage } from './pages/subsections/ConcertCulturePage';
-import { WaitlistPage } from './pages/subsections/WaitlistPage';
-import { SessionCalendarPage } from './pages/SessionCalendarPage';
-import { SessionArchivePage } from './pages/subsections/SessionArchivePage';
-import { MuseumTimelinePage } from './pages/subsections/MuseumTimelinePage';
-import { PastMemoriesPage } from './pages/subsections/PastMemoriesPage';
-import { ContactSheetsPage } from './pages/subsections/ContactSheetsPage';
-import { VolunteerOpportunitiesPage } from './pages/subsections/VolunteerOpportunitiesPage';
-import { ProductionTeamPage } from './pages/subsections/ProductionTeamPage';
-import { StageOperationsPage } from './pages/subsections/StageOperationsPage';
-import { CrewApplyPage } from './pages/subsections/CrewApplyPage';
-import { VolunteerApplyPage } from './pages/subsections/VolunteerApplyPage';
-import { CollaborateOpportunitiesPage } from './pages/subsections/CollaborateOpportunitiesPage';
-import { PrivateGatheringsPage } from './pages/subsections/PrivateGatheringsPage';
-import { CorporateEventsPage } from './pages/subsections/CorporateEventsPage';
-import { WeddingsPage } from './pages/subsections/WeddingsPage';
-import { HeritageExperiencesPage } from './pages/subsections/HeritageExperiencesPage';
-import { MuseumJournalPage } from './pages/subsections/MuseumJournalPage';
-import { RecentStoriesPage } from './pages/subsections/RecentStoriesPage';
-import { BehindTheScenesPage } from './pages/subsections/BehindTheScenesPage';
-import { LocationPage } from './pages/subsections/LocationPage';
-import { EmailDispatchPage } from './pages/subsections/EmailDispatchPage';
-import { InstagramPage } from './pages/subsections/InstagramPage';
+const WhyTangyPage = lazy(() => import('./pages/subsections/WhyTangyPage').then((m) => ({ default: m.WhyTangyPage })));
+const ChronologyPage = lazy(() => import('./pages/subsections/ChronologyPage').then((m) => ({ default: m.ChronologyPage })));
+const TeamPage = lazy(() => import('./pages/subsections/TeamPage').then((m) => ({ default: m.TeamPage })));
+const FullStoryPage = lazy(() => import('./pages/subsections/FullStoryPage').then((m) => ({ default: m.FullStoryPage })));
+const UpcomingSessionsPage = lazy(() => import('./pages/subsections/UpcomingSessionsPage').then((m) => ({ default: m.UpcomingSessionsPage })));
+const ConcertCulturePage = lazy(() => import('./pages/subsections/ConcertCulturePage').then((m) => ({ default: m.ConcertCulturePage })));
+const WaitlistPage = lazy(() => import('./pages/subsections/WaitlistPage').then((m) => ({ default: m.WaitlistPage })));
+const SessionCalendarPage = lazy(() => import('./pages/SessionCalendarPage').then((m) => ({ default: m.SessionCalendarPage })));
+const SessionArchivePage = lazy(() => import('./pages/subsections/SessionArchivePage').then((m) => ({ default: m.SessionArchivePage })));
+const MuseumTimelinePage = lazy(() => import('./pages/subsections/MuseumTimelinePage').then((m) => ({ default: m.MuseumTimelinePage })));
+const PastMemoriesPage = lazy(() => import('./pages/subsections/PastMemoriesPage').then((m) => ({ default: m.PastMemoriesPage })));
+const ContactSheetsPage = lazy(() => import('./pages/subsections/ContactSheetsPage').then((m) => ({ default: m.ContactSheetsPage })));
+const VolunteerOpportunitiesPage = lazy(() => import('./pages/subsections/VolunteerOpportunitiesPage').then((m) => ({ default: m.VolunteerOpportunitiesPage })));
+const ProductionTeamPage = lazy(() => import('./pages/subsections/ProductionTeamPage').then((m) => ({ default: m.ProductionTeamPage })));
+const StageOperationsPage = lazy(() => import('./pages/subsections/StageOperationsPage').then((m) => ({ default: m.StageOperationsPage })));
+const CrewApplyPage = lazy(() => import('./pages/subsections/CrewApplyPage').then((m) => ({ default: m.CrewApplyPage })));
+const VolunteerApplyPage = lazy(() => import('./pages/subsections/VolunteerApplyPage').then((m) => ({ default: m.VolunteerApplyPage })));
+const CollaborateOpportunitiesPage = lazy(() => import('./pages/subsections/CollaborateOpportunitiesPage').then((m) => ({ default: m.CollaborateOpportunitiesPage })));
+const PrivateGatheringsPage = lazy(() => import('./pages/subsections/PrivateGatheringsPage').then((m) => ({ default: m.PrivateGatheringsPage })));
+const CorporateEventsPage = lazy(() => import('./pages/subsections/CorporateEventsPage').then((m) => ({ default: m.CorporateEventsPage })));
+const WeddingsPage = lazy(() => import('./pages/subsections/WeddingsPage').then((m) => ({ default: m.WeddingsPage })));
+const HeritageExperiencesPage = lazy(() => import('./pages/subsections/HeritageExperiencesPage').then((m) => ({ default: m.HeritageExperiencesPage })));
+const MuseumJournalPage = lazy(() => import('./pages/subsections/MuseumJournalPage').then((m) => ({ default: m.MuseumJournalPage })));
+const RecentStoriesPage = lazy(() => import('./pages/subsections/RecentStoriesPage').then((m) => ({ default: m.RecentStoriesPage })));
+const BehindTheScenesPage = lazy(() => import('./pages/subsections/BehindTheScenesPage').then((m) => ({ default: m.BehindTheScenesPage })));
+const LocationPage = lazy(() => import('./pages/subsections/LocationPage').then((m) => ({ default: m.LocationPage })));
+const EmailDispatchPage = lazy(() => import('./pages/subsections/EmailDispatchPage').then((m) => ({ default: m.EmailDispatchPage })));
+const InstagramPage = lazy(() => import('./pages/subsections/InstagramPage').then((m) => ({ default: m.InstagramPage })));
 
 // Homepage Sections
 import { Hero } from './components/sections/Hero';
@@ -132,51 +125,18 @@ import { Footer } from './components/layout/Footer';
 
 function MainWorld() {
   const navigate = useNavigate();
-  const [progress, setProgress] = useState(0);
   const [isProgrammeOpen, setIsProgrammeOpen] = useState(false);
-  const [isIntroActive, setIsIntroActive] = useState(true);
   const [showUiControls, setShowUiControls] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   // Museum Modals State
   const [isSoundArchiveOpen, setIsSoundArchiveOpen] = useState(false);
   const [isVinylOpen, setIsVinylOpen] = useState(false);
   const [isProgrammeBoardOpen, setIsProgrammeBoardOpen] = useState(false);
   const [isArchiveSpreadOpen, setIsArchiveSpreadOpen] = useState(false);
-  const [isShopOpen, setIsShopOpen] = useState(false);
-  const [isPassportOpen, setIsPassportOpen] = useState(false);
-  const [isPostcardOpen, setIsPostcardOpen] = useState(false);
-  const [isTVOpen, setIsTVOpen] = useState(false);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    const alreadyPlayed = sessionStorage.getItem('tangyIntroPlayed');
-    if (alreadyPlayed) {
-      setIsIntroActive(false);
-    }
-  }, []);
-
-  // Stable references — CurtainOverlay/TangySpaceIntro's own effects depend
-  // on `onComplete` (see those files). Passed as an inline arrow function
-  // here before, every one of those was a NEW function identity on every
-  // MainWorld re-render (e.g. the resize listener above firing on mobile
-  // viewport changes — address bar show/hide, keyboard open, rotation —
-  // which happens often during the first few seconds of a real page load).
-  // Each new identity re-ran that effect, which starts by calling
-  // `tl.kill()` on the in-flight GSAP timeline and building a fresh one —
-  // so a resize mid-animation could restart the curtain/intro before its
-  // own `onComplete` ever fired, leaving that fixed, high-z-index, colored
-  // overlay stuck on screen instead of cleanly finishing and unmounting.
+  // Stable reference — CurtainOverlay's effect depends on `onComplete`; a new
+  // function identity per render would restart its GSAP timeline mid-flight.
   const handleCurtainComplete = useCallback(() => setShowUiControls(true), []);
-  const handleIntroComplete = useCallback(() => setIsIntroActive(false), []);
 
   const handleNavigateBooking = (evt) => {
     navigate(`/book/${evt.slug || evt.id}`);
@@ -217,87 +177,24 @@ function MainWorld() {
         onClose={() => setIsArchiveSpreadOpen(false)} 
       />
 
-      <MerchShopModal 
-        isOpen={isShopOpen} 
-        onClose={() => setIsShopOpen(false)} 
-      />
-
-      <DigitalPassportModal 
-        isOpen={isPassportOpen} 
-        onClose={() => setIsPassportOpen(false)} 
-      />
-
-      <PostcardContactModal
-        isOpen={isPostcardOpen}
-        onClose={() => setIsPostcardOpen(false)}
-      />
-
-      <TangyTVModal
-        isOpen={isTVOpen}
-        onClose={() => setIsTVOpen(false)}
-      />
-
-      {/* USER LOGIN MODAL (CUSTOMER/PATRON AUTH) */}
-      <UserLoginModal />
-
-      {/* FLOATING QUICK DOCK TOOLBAR */}
-      <MuseumQuickDock
-        onOpenSoundArchive={() => setIsSoundArchiveOpen(true)}
-        onOpenVinyl={() => setIsVinylOpen(true)}
-        onOpenProgramme={() => setIsProgrammeBoardOpen(true)}
-        onOpenArchive={() => setIsArchiveSpreadOpen(true)}
-        onOpenShop={() => setIsShopOpen(true)}
-        onOpenPassport={() => setIsPassportOpen(true)}
-        onOpenPostcard={() => setIsPostcardOpen(true)}
-        onOpenTV={() => setIsTVOpen(true)}
-      />
-
       {/* UNIFIED SINGLE MASTER SITE EXPERIENCE FOR ALL SCREEN SIZES */}
       <>
         {/* Temporary Theatre Curtain Opening Overlay */}
         <CurtainOverlay onComplete={handleCurtainComplete} />
 
-        {/* Global Continuous Hanging Microphone Experience */}
-        <GlobalMicrophoneJourney active={showUiControls} />
-
-        {/* Cinematic Deep Space Intro */}
-        {isIntroActive && (
-          <TangySpaceIntro onComplete={handleIntroComplete} />
-        )}
-
-        {/* Floating Retro Sound Control */}
-        {showUiControls && <SoundControl />}
-        
         {/* Fixed 1970s Printed Navbar */}
         {showUiControls && (
           <Navbar onOpenProgramme={() => setIsProgrammeOpen(true)} />
         )}
-        
+
         {/* Vintage Concert Programme Overlay */}
         <Menu isOpen={isProgrammeOpen} onClose={() => setIsProgrammeOpen(false)} />
-        
 
-        {/* Lightweight Grain Texture */}
-        <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
-        
-        {/* Vignette — kept subtle deliberately: this sits `fixed`/`inset-0` above
-            EVERY section on the site at all times (z-[80]), so its strength affects
-            every background/photo, not just whichever section is in view. It was
-            previously 0.85 alpha at a 140px spread, which is heavy enough to
-            visibly wash out a full-bleed photo section (e.g. the Spaces/"Where
-            Heritage Meets Music" background) even after that section's own local
-            overlay was already fixed — this was the actual remaining source. */}
-        <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_90px_rgba(0,0,0,0.3)]" />
+        {/* Right-side chapter rail — the microphone lives here now, as one
+            purposeful navigation control instead of a free-floating object. */}
+        {showUiControls && <MicNavRail />}
 
-        {/* Scroll Progress Rail */}
-        <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">
-           <div 
-             className="w-full bg-tangy-mustard"
-             style={{ height: `${progress}%` }}
-           />
-        </div>
-
-        <div className="tangy-world pt-0 md:pt-12 overflow-x-hidden">
+        <div className="tangy-world pt-0 overflow-x-hidden">
           <main>
             {/* 01 — LANDING PAGE (HERO) */}
             <Hero />
@@ -335,10 +232,21 @@ function MainWorld() {
   );
 }
 
+// Shown while a route's code chunk downloads (every page except the homepage
+// is split out, so the homepage doesn't ship the portals/admin/QR scanner).
+function RouteFallback() {
+  return (
+    <div className="min-h-[100svh] bg-family-ink flex items-center justify-center">
+      <span className="t-label text-[#EFE2C0]/60">Loading…</span>
+    </div>
+  );
+}
+
 function GlobalOverlays() {
   const { announcement, show, dismiss } = useAnnouncementTrigger();
   return (
     <>
+      <GlobalDock />
       <TangyAssistantLauncher />
       <AnnouncementCharacterOverlay
         announcement={announcement}
@@ -364,6 +272,7 @@ export default function App() {
             <BrowserRouter>
               <ScrollToTop />
               <GlobalOverlays />
+              <Suspense fallback={<RouteFallback />}>
               <Routes>
                 {/* PUBLIC WEBSITE HOMEPAGE */}
                 <Route path="/" element={<MainWorld />} />
@@ -552,6 +461,7 @@ export default function App() {
                 {/* FALLBACK REDIRECT */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
+              </Suspense>
             </BrowserRouter>
           </CursorProvider>
         </LenisProvider>

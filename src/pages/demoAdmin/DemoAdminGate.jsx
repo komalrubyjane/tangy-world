@@ -17,7 +17,7 @@ export const DemoAdminGate = ({ children }) => {
     <div className="min-h-screen bg-[#11100C] flex items-center justify-center p-4 text-[#E7D5A4] font-mono">
       <div className="w-full max-w-md bg-[#191410] border-2 border-[#C99A2E] p-8 rounded-sm text-center flex flex-col gap-4">
         <div className="text-[9px] font-bold tracking-[0.3em] text-[#C99A2E] uppercase">[ ✦ ] TEAM DEMO</div>
-        <h1 className="font-display text-2xl font-bold">
+        <h1 className="font-condensed text-2xl font-bold">
           {demoAdminEnabled ? 'DEMO MODE NOT ACTIVE' : 'DEMO MODE IS DISABLED'}
         </h1>
         <p className="text-xs text-[#E7D5A4]/70">

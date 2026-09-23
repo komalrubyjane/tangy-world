@@ -1,26 +1,20 @@
-// A single, richly-detailed poster-ticket composition: a torn black mounting
-// frame around an aged paper poster, an oversized date numeral bleeding off
-// the (full-colour, unfiltered) event photo's base, and a torn ticket-stub
-// panel below carrying a 3-column info table, tag pills, a perforated price
-// stub and a printed "book" bar.
+// A poster-ticket: black mount, aged-paper poster, the event photograph in
+// full colour, an oversized date numeral, then a ticket panel (info table,
+// tags, perforated price stub, book bar). Every card — first, middle or
+// last — renders through this exact markup; nothing branches on position.
 //
-// HARD RULE: the event photograph itself never receives a colour-altering
-// filter — it renders in its original colours, exactly like the reference.
-// No decorative element is ever placed on top of the photo itself (a lotus
-// medallion and a taped print fragment used to overlap it — removed as
-// unwanted sticker overlays; retro cues stay in the surrounding frame/strip).
+// HARD RULE: the event photograph never receives a colour-altering filter
+// and nothing is ever placed over it except the date numeral at its base.
 
 import { TornPaperEdgeTop } from './BackgroundDecorations';
-import { RetroGrain, PatternBackground } from './RetroAssets';
 
+// Stamp ink per availability — muted green for available, per the catalogue.
 const STATUS_STYLES = {
-  'SOLD OUT': { bg: '#5A120D', text: '#E7D5A4' },
-  AVAILABLE: { bg: '#2D5A1B', text: '#E7D5A4' },
-  'ALMOST GONE': { bg: '#B94717', text: '#E7D5A4' },
-  UPCOMING: { bg: '#11100C', text: '#C99A2E' },
+  'SOLD OUT': { ink: '#4A171D' },
+  AVAILABLE: { ink: '#4F5D3A' },
+  'ALMOST GONE': { ink: '#B5532A' },
+  UPCOMING: { ink: '#181614' },
 };
-
-const CORNER_MARK = 'absolute text-[#E7D5A4]/70 text-[9px] sm:text-[10px] leading-none pointer-events-none select-none z-30';
 
 export const PosterEventCard = ({ event: evt, idx, onBook }) => {
   const isSoldOut = evt.status === 'SOLD OUT';
@@ -31,132 +25,82 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
   })();
 
   return (
-    <div className="relative bg-[#11100C] p-[8px] sm:p-[12px] shadow-[8px_8px_0px_#11100C] sm:shadow-[14px_14px_0px_#11100C] group hover:-translate-y-1 transition-transform duration-200">
-      {/* CROP-MARK CORNERS on the outer black mount, echoing the print-registration marks */}
-      {/* on the reference mock-up. */}
-      <span className={`${CORNER_MARK} top-1 left-1`}>✦</span>
-      <span className={`${CORNER_MARK} top-1 right-1`}>✦</span>
-      <span className={`${CORNER_MARK} bottom-1 left-1`}>✦</span>
-      <span className={`${CORNER_MARK} bottom-1 right-1`}>✦</span>
+    <article className="group relative h-full bg-[#181614] p-2 sm:p-2.5 paperShadow paperLift">
+      <div className="relative h-full bg-[#EDE0C0] paperTexture text-[#181614] overflow-hidden flex">
 
-      {/* AGED PAPER BODY */}
-      <div className="relative bg-[#EDE0C0] text-[#11100C] overflow-hidden flex">
-        <RetroGrain index={idx % 2} opacity={0.14} blend="overlay" />
-
-        {/* REAL BANDHANI SIDE STRIP — vertical spot-colour panel carrying the event's tags, */}
-        {/* a genuine textile photograph rather than a CSS pattern. */}
-        <div className="relative w-5 sm:w-6 shrink-0 bg-[#B94717] overflow-hidden">
-          {/* Intentional exception: a narrow (~24px) accent strip, not the card's background
-              photo — low opacity + multiply tints it into the strip's own accent color. */}
-          <PatternBackground category="bandhani" index={idx % 3} opacity={0.4} size="cover" blend="multiply" />
+        {/* Spot-colour side strip carrying the event's tags */}
+        <div className="relative w-6 shrink-0 bg-[#B5532A]">
           <span
-            className="absolute inset-0 flex items-center justify-center font-mono text-[7px] sm:text-[7.5px] font-bold text-[#E7D5A4] uppercase tracking-[0.25em] whitespace-nowrap"
+            className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-medium text-[#EFE2C0] uppercase tracking-[0.22em] whitespace-nowrap"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
             {(evt.tags?.slice(0, 3).join(' · ') || 'LIVE · MUSIC · CULTURE')}
           </span>
         </div>
 
-        <div className="relative flex-1 min-w-0">
-          {/* TOP BAR — archive number + availability + REC label */}
-          <div className="relative z-20 flex justify-between items-start p-2 sm:p-2.5">
-            <span className="font-mono text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest">
-              VOL. TK-1974 · NO. 00{idx + 1}
+        <div className="relative flex-1 min-w-0 flex flex-col">
+          {/* Ticket number + availability */}
+          <div className="flex justify-between items-center gap-2 px-3 py-2.5">
+            <span className="t-meta">Vol. TK-1974 · No. {String(idx + 1).padStart(3, '0')}</span>
+            {/* Availability as a rubber stamp in the status ink */}
+            <span className="archiveStamp !text-[10px] !py-0.5 !px-1.5" style={{ color: statusStyle.ink, '--rest-rot': '-5deg' }}>
+              {evt.status}
             </span>
-            <div className="flex flex-col items-end gap-1">
-              <span
-                className="font-mono text-[7.5px] sm:text-[8px] font-bold uppercase px-2 py-0.5 border border-[#11100C]"
-                style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
-              >
-                {evt.status}
-              </span>
-              <span className="hidden sm:block font-mono text-[7px] font-bold uppercase px-1.5 py-0.5 bg-[#5A120D] text-[#E7D5A4] border border-[#11100C]">
-                REC · LIVE AT VENUE
-              </span>
-            </div>
           </div>
 
-          {/* MAIN PHOTO — full colour, no filter, exactly the supplied photograph. */}
-          <div className="relative w-full aspect-[4/3] overflow-hidden">
-            <img src={evt.image} alt={evt.title} className="w-full h-full object-cover" />
-
-            {/* OVERSIZED DATE NUMERAL bleeding off the photo's base. */}
-            <div className="absolute -bottom-1 left-2 sm:left-3 z-20">
-              <h2 className="display font-black text-[#EDE0C0] leading-[0.78] ink-bleed uppercase drop-shadow-[2px_2px_0_#11100C]" style={{ fontSize: 'clamp(28px,7vw,46px)' }}>
+          {/* Event photograph — full colour, unfiltered */}
+          <div className="photoFrame-img relative w-full aspect-[4/3] bg-[#181614]">
+            <img src={evt.image} alt={evt.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <div className="absolute bottom-0 left-3">
+              <p className="display text-[#EDE0C0] m-0 !leading-[0.9]" style={{ fontSize: 'clamp(34px, 4vw, 48px)', textShadow: '0.04em 0.04em 0 #181614, -0.025em -0.02em 0 rgba(181,83,42,0.75)' }}>
                 {dateMain}{dateYear && <><br />{dateYear}</>}
-              </h2>
-              <div className="w-2/3 h-[3px] bg-[#B94717] mt-0.5" />
+              </p>
             </div>
           </div>
 
-          {/* TORN TICKET PANEL */}
-          <div className="relative z-20">
+          {/* Ticket panel */}
+          <div className="relative flex-1 flex flex-col">
             <TornPaperEdgeTop fill="#F5E9C9" />
-            {/* pt cleared to sit below TornPaperEdgeTop's own height (h-4/md:h-6) — that
-                strip is `position:absolute` with its own z-10, so it paints above this
-                panel's normal-flow content regardless of padding; the previous pt-2 left
-                the title's top ~8-16px underneath the wavy edge graphic, distorting it. */}
-            <div className="bg-[#F5E9C9] px-2.5 sm:px-4 pt-5 md:pt-7 pb-3 sm:pb-4">
-              <h3 className="display text-xl sm:text-2xl leading-[0.85] uppercase mb-0.5 line-clamp-2">
-                {evt.title}
-              </h3>
-              <p className="font-mono text-[9px] sm:text-[10px] font-bold text-[#B94717] uppercase tracking-wide mb-2">{evt.artist}</p>
+            <div className="flex-1 flex flex-col bg-[#F5E9C9] px-3 sm:px-4 pt-6 md:pt-7 pb-4">
+              <h3 className="t-h3 m-0 line-clamp-2">{evt.title}</h3>
+              <p className="t-label text-[#B5532A] mt-1 mb-3">{evt.artist}</p>
 
-              {/* THREE-COLUMN INFO TABLE — venue / sound / time, printed poster-ticket style. */}
-              <div className="grid grid-cols-3 divide-x divide-[#11100C]/25 border-y border-[#11100C] py-1.5 mb-2">
-                <div className="pr-1.5">
-                  <span className="block font-mono text-[6.5px] sm:text-[7px] font-bold text-[#B94717] uppercase tracking-widest">Venue</span>
-                  <span className="block font-mono text-[7.5px] sm:text-[8.5px] font-bold leading-tight line-clamp-2">{evt.venue}</span>
+              <div className="grid grid-cols-3 divide-x divide-[#181614]/20 border-y border-[#181614]/60 py-2 mb-3">
+                <div className="pr-2 min-w-0">
+                  <span className="block t-meta text-[#B5532A]">Venue</span>
+                  <span className="block font-mono text-[11px] leading-snug line-clamp-2">{evt.venue}</span>
                 </div>
-                <div className="px-1.5">
-                  <span className="block font-mono text-[6.5px] sm:text-[7px] font-bold text-[#B94717] uppercase tracking-widest">Sound</span>
-                  <span className="block font-mono text-[7.5px] sm:text-[8.5px] font-bold leading-tight line-clamp-2">{evt.tags?.slice(0, 2).join(' · ') || '—'}</span>
+                <div className="px-2 min-w-0">
+                  <span className="block t-meta text-[#B5532A]">Sound</span>
+                  <span className="block font-mono text-[11px] leading-snug line-clamp-2">{evt.tags?.slice(0, 2).join(' · ') || '—'}</span>
                 </div>
-                <div className="pl-1.5">
-                  <span className="block font-mono text-[9px] sm:text-[10px] font-bold leading-tight">{evt.time}</span>
-                  <span className="block font-mono text-[6.5px] sm:text-[7px] opacity-70 leading-tight">{evt.date}</span>
+                <div className="pl-2 min-w-0">
+                  <span className="block t-meta text-[#B5532A]">Time</span>
+                  <span className="block font-mono text-[11px] leading-snug">{evt.time}</span>
                 </div>
               </div>
 
-              <p className="font-mono text-[8.5px] sm:text-[9.5px] leading-snug border-l-2 border-[#B94717] pl-2 mb-2 line-clamp-2 opacity-90">
-                {evt.description}
-              </p>
+              <p className="t-small text-[#181614]/85 m-0 mb-4 line-clamp-2">{evt.description}</p>
 
-              {/* TAG PILLS */}
-              {evt.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {evt.tags.slice(0, 3).map((t) => (
-                    <span key={t} className="font-mono text-[6.5px] sm:text-[7px] font-bold uppercase border border-[#11100C] px-1.5 py-0.5">{t}</span>
-                  ))}
-                </div>
-              )}
-
-              {/* BOOK BAR + PERFORATED PRICE STUB */}
-              <div className="flex items-stretch gap-2">
+              <div className="mt-auto flex items-stretch gap-2">
                 <button
                   onClick={onBook}
                   disabled={isSoldOut}
-                  className={`flex-1 min-w-0 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors ${
-                    isSoldOut ? 'bg-[#5A120D] text-[#E7D5A4]/60 cursor-not-allowed' : 'bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717]'
+                  className={`ticket-cta flex-1 min-w-0 min-h-[44px] font-mono text-[11px] font-medium uppercase tracking-[0.16em] transition-colors ${
+                    isSoldOut ? 'bg-[#4A171D] text-[#EFE2C0]/60 cursor-not-allowed' : 'bg-[#181614] text-[#EFE2C0] hover:bg-[#B5532A] group-hover:bg-[#B5532A]'
                   }`}
                 >
-                  {isSoldOut ? 'SOLD OUT ✗' : 'BOOK TICKETS →'}
+                  {isSoldOut ? 'Sold out' : 'Book tickets →'}
                 </button>
-                <div className="shrink-0 w-14 flex flex-col items-center justify-center bg-[#B94717] text-[#E7D5A4] border-l-2 border-dashed border-[#F5E9C9]">
-                  <span className="font-mono text-[10px] sm:text-[11px] font-black leading-none">{evt.price}</span>
-                  <span className="font-mono text-[5.5px] uppercase tracking-widest opacity-80" style={{ writingMode: 'vertical-rl' }}>ENTRY 1</span>
+                <div className="shrink-0 w-16 flex flex-col items-center justify-center bg-[#B5532A] text-[#EFE2C0] border-l-2 border-dashed border-[#F5E9C9]">
+                  <span className="font-mono text-[12px] font-medium leading-none">{evt.price}</span>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] opacity-80 mt-1">Entry 1</span>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* FOOTER STRIP */}
-          <div className="relative z-20 flex justify-between items-center px-2.5 sm:px-4 py-1.5 border-t border-[#11100C]/30 font-mono text-[6.5px] sm:text-[7px] font-bold uppercase tracking-widest opacity-80">
-            <span>Tangy Music Collective</span>
-            <span>Hyderabad — Est. 2016</span>
-          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };

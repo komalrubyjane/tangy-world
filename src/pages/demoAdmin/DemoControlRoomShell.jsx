@@ -103,7 +103,7 @@ export const DemoControlRoomShell = () => {
         <div className="p-5 border-b border-[#C99A2E]/30">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#8B2E00] animate-pulse" />
-            <span className="font-display font-bold text-lg tracking-tight">TANGY CONTROL ROOM</span>
+            <span className="font-condensed font-bold text-lg tracking-tight">TANGY CONTROL ROOM</span>
           </div>
           <p className="font-serif italic text-[10px] text-[#E7D5A4]/60 mt-1">DEMO ADMIN · TEAM PREVIEW</p>
         </div>
@@ -122,7 +122,7 @@ export const DemoControlRoomShell = () => {
           <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-[#191410] border-r-2 border-[#C99A2E] overflow-y-auto animate-[drawerIn_0.2s_ease]">
             <div className="p-5 border-b border-[#C99A2E]/30 flex justify-between items-start">
               <div>
-                <span className="font-display font-bold text-base">TANGY CONTROL ROOM</span>
+                <span className="font-condensed font-bold text-base">TANGY CONTROL ROOM</span>
                 <p className="font-serif italic text-[10px] text-[#E7D5A4]/60 mt-1">DEMO ADMIN</p>
               </div>
               <button onClick={() => setDrawerOpen(false)} className="text-lg leading-none opacity-70">✕</button>
@@ -139,13 +139,13 @@ export const DemoControlRoomShell = () => {
       <div className="flex-1 min-w-0">
         <header className="lg:hidden sticky top-0 z-[100] bg-[#191410] border-b-2 border-[#C99A2E]/40 px-4 py-3 flex items-center justify-between">
           <button onClick={() => setDrawerOpen(true)} className="border border-[#C99A2E]/60 text-[#C99A2E] px-3 py-1.5 text-xs font-bold uppercase">☰ MENU</button>
-          <span className="font-display font-bold text-sm">{active?.label?.toUpperCase() || 'OVERVIEW'}</span>
+          <span className="font-condensed font-bold text-sm">{active?.label?.toUpperCase() || 'OVERVIEW'}</span>
           <button onClick={handleExit} className="border border-[#8B2E00]/60 text-[#8B2E00] px-2.5 py-1.5 text-[10px] font-bold uppercase">EXIT</button>
         </header>
 
         <main className="p-4 md:p-6 lg:p-8">
           <div className="hidden lg:flex justify-between items-center mb-6">
-            <h1 className="font-display text-2xl font-bold tracking-tight">{active?.label?.toUpperCase() || 'OVERVIEW'}</h1>
+            <h1 className="font-condensed text-2xl font-bold tracking-tight">{active?.label?.toUpperCase() || 'OVERVIEW'}</h1>
           </div>
           <ActiveComponent onNavigate={select} basePath="/demo" />
         </main>

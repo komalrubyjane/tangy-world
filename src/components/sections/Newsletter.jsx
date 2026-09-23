@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useAudio } from '../../audio/AudioContext';
-import { TextileBorderStrip, RisographOffset } from '../ui/CulturalMotifs';
-import { PatternBackground, LotusStamp, RangoliDecoration, RetroGrain } from '../ui/RetroAssets';
+import { useReveal } from '../../hooks/useReveal';
 
+// 09 — INNER CIRCLE. Deliberately the simplest section on the page:
+// burgundy, one line, one field, one button.
 export const Newsletter = () => {
   const { playSFX } = useAudio();
   const [status, setStatus] = useState('IDLE');
   const [email, setEmail] = useState('');
+  const sectionRef = useReveal();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,63 +21,44 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="relative w-full py-16 sm:py-24 bg-[#694323] border-t-8 border-[#11100C] text-center flex flex-col items-center justify-center">
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
-      <RetroGrain index={1} opacity={0.13} blend="overlay" />
-      <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-0" />
-      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={9} colorA="#C99A2E" colorB="#11100C" />
-      <LotusStamp index={0} bg="transparent" border="#C99A2E" className="hidden md:block absolute top-8 left-8 w-9 h-9 opacity-90 z-10 pointer-events-none" />
-      <div className="md:hidden absolute top-0 right-0 w-[30%] max-w-[110px] aspect-square opacity-[0.18] pointer-events-none z-0 rotate-90">
-        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
-      </div>
+    <section ref={sectionRef} id="inner-circle" className="t-section theme-inner overflow-hidden">
 
-      <div className="relative z-10 max-w-xl w-full px-4">
-        <span className="font-mono text-tangy-mustard text-[10px] tracking-[0.3em] font-bold uppercase mb-2 block">PRIVATE MAILING LIST</span>
-        <h2 className="display text-5xl md:text-7xl text-[#E3D4AC] mb-2 ink-bleed">
-          <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.3}>INNER CIRCLE</RisographOffset>
-        </h2>
-        <p className="font-serif italic text-sm md:text-base text-[#E3D4AC]/90 mb-10">
-          "The best stories are shared with those who stay close."
+      <div className="t-container relative max-w-[760px] text-center">
+        <p className="reveal t-label sec-accent m-0">09 — Private mailing list</p>
+        <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">Inner Circle</span></h2>
+        <p className="reveal d2 t-quote text-[#EFE2C0]/90 mt-5 mb-0">
+          &ldquo;The best stories are shared with those who stay close.&rdquo;
         </p>
 
         {status === 'SUCCESS' ? (
-          <div className="border-4 border-[#11100C] p-6 paper-surface text-[#11100C] shadow-[10px_10px_0_#11100C]">
-             <h3 className="font-display text-3xl font-bold mb-2">YOU'RE IN THE CIRCLE ✦</h3>
-             <p className="font-mono text-xs mb-4">Check your inbox for session confirmation.</p>
-             <a 
-               href="/inner-circle"
-               className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-2 px-4 !bg-[#C99A2E] !text-[#11100C]"
-             >
-               INNER CIRCLE → JOIN NOW
-             </a>
+          <div className="mt-10 inline-block text-left border-[3px] border-double border-[#EFE2C0]/40 p-6">
+            <h3 className="t-h3 text-[#EFE2C0] m-0">You&rsquo;re in the circle ✦</h3>
+            <p className="t-small text-[#EFE2C0]/80 mt-2 mb-5">Check your inbox for session confirmation.</p>
+            <a href="/inner-circle" className="t-btn t-btn-light">Inner Circle → Join now</a>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-6 w-full">
-            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 w-full">
-              <input 
-                type="email" 
-                placeholder="ENTER YOUR EMAIL"
+          <>
+            <form onSubmit={handleSubmit} className="reveal d3 mt-10 flex flex-col sm:flex-row items-stretch gap-3 max-w-[600px] mx-auto p-4 border-[3px] border-double border-[#EFE2C0]/35">
+              <label htmlFor="inner-circle-email" className="sr-only">Email address</label>
+              <input
+                id="inner-circle-email"
+                type="email"
+                placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="flex-grow bg-transparent border-b-2 border-[#E3D4AC]/40 p-4 font-mono text-[#E3D4AC] focus:outline-none focus:border-tangy-mustard text-center md:text-left"
+                className="flex-1 min-w-0 min-h-[48px] bg-transparent border border-[#EFE2C0]/45 px-4 font-mono text-sm text-[#EFE2C0] placeholder:text-[#EFE2C0]/50 focus:outline-none focus:border-[#C89D35]"
               />
-              <button 
-                type="submit"
-                disabled={status === 'SUBMITTING'}
-                className="btn-ticket shrink-0"
-              >
-                {status === 'SUBMITTING' ? '...' : 'SUBSCRIBE →'}
+              <button type="submit" disabled={status === 'SUBMITTING'} className="t-btn t-btn-light min-h-[48px]">
+                {status === 'SUBMITTING' ? 'Joining…' : 'Join'}
               </button>
             </form>
-            <a 
-              href="/inner-circle" 
-              className="btn-ticket py-2.5 px-6 font-mono text-xs font-bold uppercase tracking-widest !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E3D4AC] transition-colors mt-2"
-            >
-              INNER CIRCLE → JOIN NOW
+            <a href="/inner-circle" className="t-link inline-block mt-6 text-[#EFE2C0]/75 hover:text-[#C89D35]">
+              Inner Circle → Join now
             </a>
-          </div>
+          </>
         )}
+        <p className="folio mt-14 mb-0" aria-hidden="true">— 09 —</p>
       </div>
     </section>
   );

@@ -58,7 +58,7 @@ export const StaffAuthGate = ({ title, subtitle, allowedRoles = ['staff', 'admin
           <div className="text-[9px] font-bold tracking-[0.3em] text-[#C99A2E] uppercase mb-1">
             [ ✦ ] RESTRICTED ACCESS
           </div>
-          <h1 className="font-display text-3xl font-bold text-[#E7D5A4] tracking-tight">{title}</h1>
+          <h1 className="font-condensed text-3xl font-bold text-[#E7D5A4] tracking-tight">{title}</h1>
           {subtitle && <p className="font-serif italic text-xs text-[#E7D5A4]/70 mt-1">{subtitle}</p>}
         </div>
 

@@ -419,7 +419,7 @@ export const EventsSection = () => {
                   <div className="text-[10px] text-[#C99A2E] font-bold">{evt.event_date}</div>
                   {evt.featured && <span className="text-[8px] bg-[#C99A2E] text-[#11100C] px-1.5 py-0.5 font-bold">FEATURED</span>}
                 </div>
-                <h4 className="font-display text-xl font-bold text-[#E7D5A4] mt-1">{evt.name}</h4>
+                <h4 className="font-condensed text-xl font-bold text-[#E7D5A4] mt-1">{evt.name}</h4>
                 <div className="text-xs opacity-70 mt-1">{evt.venue}</div>
                 <div className="mt-3 text-xs space-y-1">
                   <div>Cap: <span className="font-bold">{evt.capacity}</span></div>

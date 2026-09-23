@@ -135,7 +135,7 @@ function CheckInWorkspace() {
     <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono p-3 sm:p-6">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-[#191410] border-2 border-[#C99A2E] p-4 mb-6 rounded-sm">
         <div>
-          <h1 className="font-display text-xl sm:text-2xl font-bold text-[#E7D5A4]">TANGY WORLD // CHECK-IN</h1>
+          <h1 className="font-condensed text-xl sm:text-2xl font-bold text-[#E7D5A4]">TANGY WORLD // CHECK-IN</h1>
           <p className="font-serif italic text-xs text-[#E7D5A4]/70">Staff: {user.email}</p>
         </div>
         <select

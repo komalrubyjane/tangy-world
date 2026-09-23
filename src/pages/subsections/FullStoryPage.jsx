@@ -3,12 +3,11 @@ import { Footer } from '../../components/layout/Footer';
 
 export const FullStoryPage = () => {
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#B94717] selection:text-[#E7D5A4] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* HERO */}
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/about" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO ABOUT</a>
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -25,7 +24,7 @@ export const FullStoryPage = () => {
 
       {/* EDITORIAL LONG READ */}
       <section className="py-14 sm:py-20 px-4 sm:px-6">
-        <article className="max-w-3xl mx-auto bg-[#F5E9C9] text-[#11100C] p-6 sm:p-12 md:p-16 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
+        <article className="max-w-3xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-12 md:p-16 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-[#11100C] pb-3 mb-8 font-mono text-[10px] sm:text-xs font-bold uppercase gap-1">
             <span>DISPATCH NO. 0001-FS</span>
             <span>HYDERABAD, TELANGANA, INDIA</span>
@@ -111,7 +110,7 @@ export const FullStoryPage = () => {
             <span>— THE TANGY SESSIONS FOUNDING TEAM, HYDERABAD</span>
             <a
               href="/sessions"
-              className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border-2 border-[#11100C] px-4 py-2 font-mono font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
+              className="bg-[#B5532A] text-[#E7D5A4] hover:bg-[#181614] border-2 border-[#11100C] px-4 py-2 font-mono font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
             >
               EXPLORE SESSIONS →
             </a>
@@ -120,14 +119,14 @@ export const FullStoryPage = () => {
       </section>
 
       {/* CROSS-LINKS */}
-      <section className="py-12 sm:py-16 bg-[#1C0E08] border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
+      <section className="py-12 sm:py-16 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">
           READ THE INDIVIDUAL CHAPTERS
         </span>
         <div className="flex flex-wrap justify-center gap-3">
-          <a href="/about/why-tangy" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">WHY TANGY →</a>
-          <a href="/about/chronology" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">CHRONOLOGY →</a>
-          <a href="/about/team" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors">TANGY TEAM →</a>
+          <a href="/about/why-tangy" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">WHY TANGY →</a>
+          <a href="/about/chronology" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">CHRONOLOGY →</a>
+          <a href="/about/team" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">TANGY TEAM →</a>
         </div>
       </section>
 

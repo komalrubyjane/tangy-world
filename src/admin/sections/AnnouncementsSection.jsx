@@ -248,7 +248,7 @@ export const AnnouncementsSection = () => {
                   <span className="text-[9px] font-bold uppercase text-[#C99A2E]">{a.category}</span>
                   <StatusBadge status={a.status} />
                 </div>
-                <h4 className="font-display text-lg font-bold text-[#E7D5A4] mt-1">{a.title}</h4>
+                <h4 className="font-condensed text-lg font-bold text-[#E7D5A4] mt-1">{a.title}</h4>
                 <p className="text-xs opacity-70 mt-1 line-clamp-2">{a.description}</p>
                 <div className="text-[9px] opacity-50 mt-2 uppercase">
                   {a.character} · {a.destination} · {a.audience} · priority: {a.priority}

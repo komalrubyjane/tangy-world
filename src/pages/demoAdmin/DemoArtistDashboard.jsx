@@ -75,11 +75,11 @@ export const DemoArtistDashboard = () => {
 
       <main className="pt-6 pb-20 px-4 sm:px-6 max-w-5xl mx-auto flex flex-col gap-6">
         <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] flex items-start gap-4">
-          <div className="w-16 h-16 shrink-0 rounded-full bg-[#E7D5A4] text-[#11100C] flex items-center justify-center font-display text-xl font-bold border-2 border-[#B94717]">
+          <div className="w-16 h-16 shrink-0 rounded-full bg-[#E7D5A4] text-[#11100C] flex items-center justify-center font-condensed text-xl font-bold border-2 border-[#B94717]">
             D
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold uppercase">{DEMO_ARTIST.name}</h1>
+            <h1 className="font-condensed text-2xl font-bold uppercase">{DEMO_ARTIST.name}</h1>
             <p className="font-mono text-[10px] text-[#E7D5A4]/60">{DEMO_ARTIST.email}</p>
             <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-0.5">{DEMO_ARTIST.genre} · {DEMO_ARTIST.city}</p>
             <div className="mt-2"><Badge status="approved" /></div>
@@ -94,7 +94,7 @@ export const DemoArtistDashboard = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-2 text-[#C99A2E]">Bio</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#C99A2E]">Bio</h3>
           <p className="font-mono text-xs text-[#E7D5A4]/80 whitespace-pre-wrap">{DEMO_ARTIST.bio}</p>
           <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-[#E7D5A4]/60">
             <span>IG: {DEMO_ARTIST.instagram}</span>
@@ -103,11 +103,11 @@ export const DemoArtistDashboard = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Upcoming Performances</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Upcoming Performances</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {DEMO_PERFORMANCES.map((p) => (
               <div key={p.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                <h4 className="font-display font-bold uppercase">{p.name}</h4>
+                <h4 className="font-condensed font-bold uppercase">{p.name}</h4>
                 <p className="font-mono text-[10px] mt-1">{fmtDate(p.event_date)} · {p.venue}</p>
               </div>
             ))}
@@ -115,7 +115,7 @@ export const DemoArtistDashboard = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Availability Calendar (demo)</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Availability Calendar (demo)</h3>
           <div className="flex flex-wrap gap-2">
             {DEMO_AVAILABILITY.map((a) => (
               <span key={a.date} className="px-2.5 py-1 text-[10px] font-bold uppercase border border-[#C99A2E]/40">{a.date} · {a.status}</span>
@@ -125,7 +125,7 @@ export const DemoArtistDashboard = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Media Uploads (demo)</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Media Uploads (demo)</h3>
           <div className="flex flex-col gap-2">
             {DEMO_MEDIA.map((m) => (
               <div key={m.name} className="flex justify-between items-center bg-[#11100C] border border-[#C99A2E]/20 px-3 py-2 text-xs">
@@ -138,7 +138,7 @@ export const DemoArtistDashboard = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Assignment Requests (demo)</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Assignment Requests (demo)</h3>
           <div className="flex flex-col gap-2">
             {DEMO_REQUESTS.map((r) => (
               <div key={r.session} className="flex justify-between items-center bg-[#11100C] border border-[#C99A2E]/20 px-3 py-2 text-xs">
@@ -151,11 +151,11 @@ export const DemoArtistDashboard = () => {
 
         {DEMO_PAST_PERFORMANCES.length > 0 && (
           <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-            <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Past Performances</h3>
+            <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Past Performances</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {DEMO_PAST_PERFORMANCES.map((p) => (
                 <div key={p.id} className="bg-[#11100C] border-2 border-[#C99A2E]/30 p-3">
-                  <h4 className="font-display font-bold uppercase">{p.name}</h4>
+                  <h4 className="font-condensed font-bold uppercase">{p.name}</h4>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(p.event_date)} · {p.venue}</p>
                 </div>
               ))}

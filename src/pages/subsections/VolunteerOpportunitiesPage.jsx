@@ -12,14 +12,13 @@ const volunteerRoles = [
 
 export const VolunteerOpportunitiesPage = () => {
   return (
-    <div className="min-h-screen bg-[#8a2320] text-[#ecdcaf] font-mono selection:bg-[#ecdcaf] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20">
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+    <div className="min-h-screen bg-[#4A171D] text-[#ecdcaf] font-mono selection:bg-[#EFE2C0] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20 textileTexture">
       <Navbar />
 
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         <a href="/crew" className="font-mono text-[10px] text-[#ecdcaf]/70 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors">← BACK TO CREW</a>
 
-        <div className="w-full bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] my-6 text-left">
+        <div className="w-full bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] my-6 text-left">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">JOIN THE TANGY CREW // RECRUITMENT DESK</span>
           <h1 className="font-poster text-4xl sm:text-6xl text-[#ecdcaf] leading-none my-1">VOLUNTEER<br/>OPPORTUNITIES</h1>
           <p className="font-mono text-xs text-[#ecdcaf]/80 max-w-2xl">
@@ -29,7 +28,7 @@ export const VolunteerOpportunitiesPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {volunteerRoles.map((role, idx) => (
-            <div key={idx} className="bg-[#ecdcaf] text-[#191410] p-5 border-2 border-[#191410] shadow-[6px_6px_0px_#191410] flex flex-col text-left justify-between group hover:-translate-y-1 transition-transform">
+            <div key={idx} className="bg-[#EFE2C0] paperTexture text-[#191410] p-5 border-2 border-[#191410] shadow-[6px_6px_0px_#191410] flex flex-col text-left justify-between group hover:-translate-y-1 transition-transform">
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-2xl">{role.icon}</span>
@@ -44,7 +43,7 @@ export const VolunteerOpportunitiesPage = () => {
         </div>
 
         <div className="text-center">
-          <a href="/crew/apply" className="inline-block px-6 py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410]">
+          <a href="/crew/apply" className="inline-block px-6 py-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410]">
             APPLY FOR A ROLE →
           </a>
         </div>

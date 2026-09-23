@@ -72,10 +72,10 @@ export const ArtistDetailsPage = () => {
     <div className="w-full min-h-[calc(100vh-64px)] p-4 sm:p-8 max-w-6xl mx-auto flex flex-col gap-8 text-left">
 
       {/* FULL BLEED ARTIST HERO BANNER */}
-      <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] shadow-[12px_12px_0px_#4c1210] overflow-hidden flex flex-col md:flex-row">
+      <div className="bg-[#EFE2C0] text-[#241a12] border-4 border-[#191410] shadow-[12px_12px_0px_#4c1210] overflow-hidden flex flex-col md:flex-row">
 
         {/* AVATAR DISPLAY */}
-        <div className="w-full md:w-1/2 h-80 md:h-auto bg-[#191410] border-b-4 md:border-b-0 md:border-r-4 border-[#191410] relative overflow-hidden">
+        <div className="w-full md:w-1/2 h-80 md:h-auto bg-[#181614] border-b-4 md:border-b-0 md:border-r-4 border-[#191410] relative overflow-hidden">
           {artist.avatar_url ? (
             <img src={artist.avatar_url} alt={artist.name} className="w-full h-full object-cover grayscale" />
           ) : (
@@ -130,13 +130,13 @@ export const ArtistDetailsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* BIO (2 COLS) */}
-        <div className="md:col-span-2 bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] flex flex-col gap-4">
+        <div className="md:col-span-2 bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] flex flex-col gap-4">
           <span className="font-mono text-xs font-bold text-[#c2272a] uppercase border-b-2 border-[#191410] pb-2">BIOGRAPHY & SONIC PHILOSOPHY</span>
           <p className="font-sans text-sm text-[#241a12]/90 leading-relaxed font-normal">{artist.bio || 'No biography submitted yet.'}</p>
         </div>
 
         {/* UPCOMING SHOWS (1 COL) */}
-        <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] flex flex-col gap-4">
+        <div className="bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] flex flex-col gap-4">
           <span className="font-mono text-xs font-bold text-[#c2272a] uppercase border-b-2 border-[#191410] pb-2">UPCOMING SHOWS</span>
 
           <div className="flex flex-col gap-3 font-mono text-xs">
@@ -144,7 +144,7 @@ export const ArtistDetailsPage = () => {
               <span className="text-[#241a12]/60">No upcoming shows announced yet.</span>
             ) : (
               upcoming.map((show) => (
-                <div key={show.id} className="p-3 bg-[#ecdcaf] border border-[#191410]">
+                <div key={show.id} className="p-3 bg-[#EFE2C0] paperTexture border border-[#191410]">
                   <span className="font-bold text-[#c2272a] block">{show.event_date}</span>
                   <span className="text-[#191410] font-bold block">{show.name}</span>
                   <span className="text-[#241a12]/60 text-[10px] block">{show.venue}</span>

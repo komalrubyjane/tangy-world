@@ -21,19 +21,19 @@ export const JoinLoginPage = () => {
   }, [isLoggedIn, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono overflow-x-hidden">
       <Navbar />
       <section className="pt-28 pb-20 px-4 sm:px-6 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-8 items-start">
-        <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 sm:p-10 shadow-[10px_10px_0px_#11100C]">
+        <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-6 sm:p-10 shadow-[10px_10px_0px_#11100C]">
           <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">TANGY PROFILE // SIGN IN</span>
-          <h1 className="font-display text-2xl font-bold uppercase mb-6 mt-1">WELCOME BACK</h1>
+          <h1 className="font-condensed text-2xl font-bold uppercase mb-6 mt-1">WELCOME BACK</h1>
 
           <EmailOtpAuth onVerified={() => navigate('/dashboard')} />
         </div>
 
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-6 shadow-[8px_8px_0px_#11100C]">
+        <div className="bg-[#181614] border-2 border-[#C99A2E] p-5 sm:p-6 shadow-[8px_8px_0px_#11100C]">
           <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest block">OTHER TANGY LOGINS</span>
-          <h2 className="font-display text-lg font-bold uppercase mt-1 mb-1">NOT A PATRON ACCOUNT?</h2>
+          <h2 className="font-condensed text-lg font-bold uppercase mt-1 mb-1">NOT A PATRON ACCOUNT?</h2>
           <p className="font-mono text-[10px] text-[#E7D5A4]/60 mb-4 leading-relaxed">
             Artists and Tangy staff sign in through their own dedicated portals.
           </p>

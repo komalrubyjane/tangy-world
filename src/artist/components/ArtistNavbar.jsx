@@ -29,14 +29,14 @@ export const ArtistNavbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#191410] border-b-2 border-[#d1a437] px-3 sm:px-6 py-2.5 flex items-center justify-between text-[#ecdcaf] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#181614] printNoise border-b-2 border-[#d1a437] px-3 sm:px-6 py-2.5 flex items-center justify-between text-[#ecdcaf] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
       {/* BRAND & ROUTE HEADER */}
       <div 
         onClick={() => handleNav('/artist')} 
         className="flex items-center gap-2 cursor-pointer group truncate max-w-[200px] sm:max-w-none"
       >
-        <span className="w-2 h-2 rounded-full bg-[#c2272a] group-hover:scale-125 transition-transform flex-shrink-0" />
+        <span className="w-2 h-2 rounded-full bg-[#B5532A] group-hover:scale-125 transition-transform flex-shrink-0" />
         <span className="font-poster text-sm sm:text-base md:text-lg tracking-wider text-[#ecdcaf] group-hover:text-[#d1a437] truncate">
           TANGY ARTIST PORTAL
         </span>
@@ -130,18 +130,18 @@ export const ArtistNavbar = () => {
                 aria-label="Notifications"
               >
                 <span className="text-xs sm:text-sm">🔔</span>
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#c2272a] text-[#ecdcaf] text-[7.5px] sm:text-[8px] font-bold flex items-center justify-center border border-[#191410]">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#B5532A] text-[#ecdcaf] text-[7.5px] sm:text-[8px] font-bold flex items-center justify-center border border-[#191410]">
                   2
                 </span>
               </button>
 
               {showNotifs && (
-                <div className="absolute right-0 top-10 w-64 sm:w-72 bg-[#191410] border-2 border-[#d1a437] p-3 shadow-2xl z-50 text-left flex flex-col gap-2">
+                <div className="absolute right-0 top-10 w-64 sm:w-72 bg-[#181614] border-2 border-[#d1a437] p-3 shadow-2xl z-50 text-left flex flex-col gap-2">
                   <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase border-b border-[#d1a437]/30 pb-1">
                     NOTIFICATIONS
                   </span>
                   {notifications.map(n => (
-                    <div key={n.id} className="p-2 bg-[#0d0a07] border border-[#ecdcaf]/20 flex flex-col">
+                    <div key={n.id} className="p-2 bg-[#181614] border border-[#ecdcaf]/20 flex flex-col">
                       <span className="font-mono text-xs font-bold text-[#ecdcaf]">{n.title}</span>
                       <span className="font-sans text-[10px] text-[#ecdcaf]/80">{n.msg}</span>
                       <span className="font-mono text-[8px] text-[#d1a437] mt-1">{n.time}</span>
@@ -173,7 +173,7 @@ export const ArtistNavbar = () => {
 
       {/* MOBILE SLIDE-OUT DRAWER OVERLAY (<1024px) */}
       {mobileDrawerOpen && (
-        <div className="lg:hidden fixed top-[45px] left-0 right-0 bottom-0 bg-[#191410]/95 backdrop-blur-md z-[150] border-t-2 border-[#d1a437] p-6 flex flex-col justify-between overflow-y-auto animate-fadeIn">
+        <div className="lg:hidden fixed top-[45px] left-0 right-0 bottom-0 bg-[#181614]/95 backdrop-blur-md z-[150] border-t-2 border-[#d1a437] p-6 flex flex-col justify-between overflow-y-auto animate-fadeIn">
           
           <div className="flex flex-col gap-4 font-mono text-xs font-bold text-left">
             <span className="text-[9px] text-[#d1a437] tracking-[0.3em] uppercase border-b border-[#d1a437]/30 pb-2">

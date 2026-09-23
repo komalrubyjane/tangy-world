@@ -28,8 +28,8 @@ export const Intro = ({ isLoaded }) => {
           TANGY SESSIONS<br/>PRESENTS
         </p>
         <div className="opening-title flex flex-col gap-0">
-          <span className="word font-display font-black text-[clamp(64px,15vw,180px)] leading-[.86] text-tangy-cream opacity-0 translate-y-[40px]">TANGY</span>
-          <span className="word font-display font-black text-[clamp(64px,15vw,180px)] leading-[.86] text-tangy-cream opacity-0 translate-y-[40px]">WORLD</span>
+          <span className="word font-condensed font-black text-[clamp(64px,15vw,180px)] leading-[.86] text-tangy-cream opacity-0 translate-y-[40px]">TANGY</span>
+          <span className="word font-condensed font-black text-[clamp(64px,15vw,180px)] leading-[.86] text-tangy-cream opacity-0 translate-y-[40px]">WORLD</span>
         </div>
         <p className="opening-sub font-mono text-[clamp(10px,1.1vw,12px)] tracking-[.3em] text-tangy-gold opacity-0">
           A WORLD OF&nbsp;&nbsp;MUSIC&nbsp;·&nbsp;PEOPLE&nbsp;·&nbsp;PLACES&nbsp;·&nbsp;STORIES

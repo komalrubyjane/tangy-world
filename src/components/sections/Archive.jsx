@@ -1,175 +1,69 @@
-import { useGSAPContext } from '../../hooks/useGSAPContext';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
 import { gallery } from '../../data/mockData';
-import {
-  TornPaperEdgeTop,
-  NotebookGridPattern,
-  PushPin,
-} from '../ui/BackgroundDecorations';
-import {
-  TextileBorderStrip,
-  VintageFilmFrame,
-  } from '../ui/CulturalMotifs';
-import {
-  PatternBackground,
-  RangoliDecoration,
-  RetroGrain,
-} from '../ui/RetroAssets';
+import { useReveal } from '../../hooks/useReveal';
 
-gsap.registerPlugin(ScrollTrigger);
+// Photos in /media/gallery have pre-generated WebP variants in /media/opt.
+const gallerySrcSet = (src) => {
+  const m = src.match(/\/media\/gallery\/(.+)\.jpg$/);
+  return m ? `/media/opt/gallery-${m[1]}-480.webp 480w, /media/opt/gallery-${m[1]}-800.webp 800w` : undefined;
+};
 
-/* --- Shared photo card — every card (including the last) renders through
-   this exact same markup; nothing branches on position in the list. --- */
-const PhotoCard = ({ photo, i }) => (
-  <div className="relative paper-surface p-2.5 sm:p-3 pb-8 sm:pb-12 border-2 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] transition-transform duration-300 hover:-translate-y-1.5"
-    style={{ transform: `rotate(${(i % 3 - 1) * 3}deg)` }}>
-    {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection clipped to the card's own mat. */}
-    <RetroGrain index={i % 2} opacity={0.14} blend="overlay" />
-
-    {/* Sprocket-hole side strips sit in the card's own cream mat, never over the photo */}
-    <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-25" />
-    <div className="absolute -top-3 left-1/3 w-14 sm:w-16 h-3.5 sm:h-4 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-30 pointer-events-none" />
-    <div className="relative flex justify-between font-mono text-[7.5px] sm:text-[8px] text-[#11100C] font-bold px-0.5 mb-1">
-      <span>{String(i + 1).padStart(2, '0')}A</span>
-      <span>EASTMAN 5247</span>
-      <span>▲ {i + 1}</span>
-    </div>
-    <div className="w-full aspect-[4/3] bg-black overflow-hidden relative border border-[#11100C]">
-      <img src={photo.src} alt={photo.label} loading="lazy" decoding="async"
-        className="w-full h-full object-cover filter grayscale sepia-[0.35] contrast-125" />
-    </div>
-    <div className="relative mt-2.5 flex justify-between items-baseline font-mono text-[9px] sm:text-[10px] text-[#11100C]">
-      <span className="font-bold tracking-wider truncate mr-1">{photo.label.toUpperCase()}</span>
-      <span className="opacity-70 shrink-0">HYD · 2025</span>
-    </div>
-  </div>
-);
-
+// 04 — ARCHIVE. A contact sheet laid on aged paper: photography is the hero,
+// every frame shares one markup and one monochrome treatment, and the only
+// print details are frame numbers and the film edge.
 export const Archive = () => {
-  const sectionRef = useGSAPContext((ctx) => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-
-    if (isMobile) {
-      gsap.from('.mobile-archive-photo', {
-        opacity: 0,
-        y: 35,
-        duration: 0.55,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: '.mobile-archive-grid',
-          start: 'top 82%',
-          toggleActions: 'play none none none',
-        },
-      });
-      return;
-    }
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top top',
-        end: '+=400%',
-        scrub: 0.5,
-        pin: true,
-        anticipatePin: 1,
-      },
-    });
-    tl.to('.archive-track', { xPercent: -70, ease: 'none' });
-  }, []);
+  const sectionRef = useReveal();
 
   return (
-    <section ref={sectionRef} id="archive"
-      className="relative w-full bg-[#11100C] border-t-8 border-[#4A0C0C] overflow-hidden lg:h-screen lg:flex lg:items-center">
+    <section ref={sectionRef} id="archive" className="t-section theme-archive overflow-hidden">
 
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.08] pointer-events-none mix-blend-overlay" />
-      <RetroGrain index={1} opacity={0.1} blend="overlay" />
-      <TornPaperEdgeTop fill="#11100C" />
-      <PatternBackground category="bandhani" index={1} size="cover" blend="normal" className="z-0" />
-      <div className="hidden lg:block absolute -bottom-[18vw] -right-[10vw] w-[46vw] h-[46vw] max-w-none opacity-[0.12] animate-[spin_150s_linear_infinite] pointer-events-none z-0">
-        <RangoliDecoration index={2} spin={false} className="w-full h-full" />
-      </div>
-      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C99A24" colorB="#11100C" />
-      
-      {/* REAL vintage poster fragment tucked behind the header, desktop only */}
-      {/* MOBILE — cropped Rangoli photo standing in for the desktop medallion */}
-      <div className="lg:hidden absolute top-0 left-0 w-[38%] max-w-[160px] aspect-square opacity-[0.15] pointer-events-none z-0 -rotate-90">
-        <RangoliDecoration index={2} spin={false} className="w-full h-full" />
-      </div>
-
-      <div className="absolute top-16 left-1/4 w-72 h-48 opacity-10 pointer-events-none z-0 hidden md:block">
-        <NotebookGridPattern opacity={0.5} />
-      </div>
-
-      <PushPin className="top-8 left-1/3 hidden md:block" />
-      <PushPin className="top-12 right-1/4 hidden md:block" />
-
-      <div className="absolute bottom-16 right-16 z-20 pointer-events-none border-2 border-[#C2272A] text-[#C2272A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.3em] uppercase rotate-[-8deg] opacity-75 hidden md:block">
-        CLASSIFIED // ARCHIVAL RECORD ✦
-      </div>
-
-      {/* REAL HALFTONE PRINT FRAGMENT — an actual screen-printed photo scrap, desktop only. */}
-      {/* Section Header */}
-      <div className="pt-24 lg:pt-0 lg:absolute lg:top-10 left-5 right-5 md:left-12 md:right-12 z-20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4 lg:px-0">
-        <div>
-          <p className="font-mono text-[#C99A2E] text-[9px] sm:text-[10px] tracking-[0.3em] uppercase font-bold">ANALOGUE CONTACT SHEET // FILE 35MM</p>
-          <h2 className="display text-4xl md:text-8xl text-[#E7D5A4] opacity-30 leading-none">THE ARCHIVE</h2>
-        </div>
-        <a href="/archive"
-          className="hidden md:block bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] border-2 border-[#11100C] px-4 py-2 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0">
-          ARCHIVE → VIEW MORE
-        </a>
-      </div>
-
-      {/* MOBILE: 2-column photo grid */}
-      <div className="mobile-archive-grid lg:hidden w-full px-5 pt-4 pb-16 max-w-[480px] mx-auto">
-        <div className="flex items-end justify-between gap-4 mb-8">
-          <p className="font-serif italic text-xs text-[#E7D5A4]/80 max-w-[70%]">
-            "Every gathering leaves behind more than photographs."
-          </p>
-          
-        </div>
-        <div className="grid grid-cols-2 gap-5 sm:gap-7">
-          {gallery.map((photo, i) => (
-            <div key={photo.id} className="mobile-archive-photo">
-              <PhotoCard photo={photo} i={i} />
-            </div>
-          ))}
-        </div>
-
-        {/* VIEW MORE ARCHIVE card — mobile standalone card at bottom */}
-        <div className="mobile-archive-photo relative mt-10 mx-auto max-w-[260px] -rotate-1"
-          style={{
-            background: 'linear-gradient(150deg, #EEE4C8 0%, #E3D4AC 60%, #D8C99A 100%)',
-            border: '2px solid #11100C',
-            boxShadow: '6px 6px 0px rgba(17,16,12,0.7)',
-            padding: '16px',
-          }}>
-          <div className="relative mb-3">
-            <div className="absolute -top-[18px] left-1/2 -translate-x-1/2 w-20 h-[14px] rotate-[-1deg]"
-              style={{ background: 'rgba(201,154,46,0.5)', border: '1px solid rgba(160,120,20,0.3)' }} />
+      <div className="t-container relative">
+        <header className="t-grid items-end gap-y-6">
+          <div className="col-span-4 md:col-span-5 lg:col-span-7">
+            <p className="reveal t-label sec-accent m-0">04 — Analogue contact sheet // File 35mm</p>
+            <h2 className="reveal-type t-h1 registrationOffset text-[#181614] mt-4 mb-0" style={{ '--reg-ink': 'rgba(181,83,42,0.35)' }}><span className="rt">The Archive</span></h2>
+            <span className="reveal-stamp archiveStamp text-[#8a2320] mt-6" style={{ '--rest-rot': '-6deg' }}>Classified // Archival record ✦</span>
           </div>
-          <div className="font-mono text-[9px] font-bold text-[#C99A2E] tracking-[0.25em] uppercase mb-2 mt-1">THE ARCHIVE</div>
-          <div className="border-t border-[#11100C]/25 mb-3" />
-          <p className="font-serif italic text-[11px] text-[#2A1A0E] leading-snug opacity-90 mb-4">
-            More stories, photographs and memories from Tangy Sessions.
-          </p>
-          <a href="/archive"
-            className="block w-full text-center font-mono text-[10px] font-bold tracking-[0.18em] uppercase bg-[#C99A2E] text-[#11100C] border border-[#11100C] py-2 transition-colors"
-            style={{ boxShadow: '3px 3px 0px #11100C' }}>
-            VIEW MORE ARCHIVE →
-          </a>
-        </div>
-      </div>
-
-      {/* DESKTOP: pinned horizontal scrub track */}
-      <div className="archive-track hidden lg:flex items-center gap-24 pl-[30vw] pr-[20vw] relative z-10 will-change-transform">
-        {gallery.map((photo, i) => (
-          <div key={photo.id} className="shrink-0 w-[400px]">
-            <PhotoCard photo={photo} i={i} />
+          <div className="reveal d2 col-span-4 md:col-span-3 lg:col-span-4 lg:col-start-9 flex flex-col items-start md:items-end gap-5">
+            <p className="t-quote text-[#181614]/85 m-0 md:text-right">&ldquo;Every gathering leaves behind more than photographs.&rdquo;</p>
+            <a href="/archive" className="t-btn">Archive → View more</a>
           </div>
-        ))}
+        </header>
+
+        {/* THE SHEET */}
+        <div className="reveal-paper contactSheet paperShadow mt-12 md:mt-16" style={{ '--rest-rot': '0.4deg' }}>
+          {/* Taped to the catalogue page at two corners */}
+          <span className="tapeStrip -top-2 left-6 rotate-[-8deg]" aria-hidden="true" />
+          <span className="tapeStrip -top-2 right-6 rotate-[6deg]" aria-hidden="true" />
+          <div className="flex justify-between archiveMetadata text-[#EFE2C0]/60 px-4 pt-3">
+            <span>Eastman 5247</span>
+            <span>Tangy Sessions · Hyderabad</span>
+          </div>
+          <ol className="list-none m-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 p-4">
+            {gallery.map((photo, i) => (
+              <li key={photo.id} className="m-0">
+                <figure className="reveal-frame m-0" style={{ transitionDelay: `${250 + i * 60}ms` }}>
+                  <div className="photoFrame-img aspect-[4/5] bg-black">
+                    <img
+                      src={photo.src}
+                      srcSet={gallerySrcSet(photo.src)}
+                      sizes="(min-width: 1024px) 18vw, (min-width: 768px) 30vw, 46vw"
+                      alt={photo.label}
+                      loading="lazy"
+                      decoding="async"
+                      className="photo-bw w-full h-full object-cover"
+                    />
+                  </div>
+                  <figcaption className="flex justify-between gap-2 mt-2 archiveMetadata text-[#EFE2C0]/75">
+                    <span className="truncate">{photo.label}</span>
+                    <span className="shrink-0 text-[#C89D35]">▸ {String(i + 1).padStart(2, '0')}A</span>
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <p className="folio text-right mt-10 mb-0" aria-hidden="true">— 04 —</p>
       </div>
     </section>
   );

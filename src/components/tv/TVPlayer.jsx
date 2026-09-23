@@ -19,10 +19,6 @@ const TV_STYLES = `
     98% { opacity: 0.5; }
     99% { opacity: 0.95; }
   }
-  @keyframes tvGlowPulse {
-    0%, 100% { opacity: 0.4; }
-    50%       { opacity: 0.8; }
-  }
 `;
 
 export default function TVPlayer() {
@@ -33,16 +29,14 @@ export default function TVPlayer() {
     <>
       <style>{TV_STYLES}</style>
 
-      {/* Ambient glow behind the TV */}
+      {/* Ambient glow behind the TV — a static gradient (no blur filter, no loop) */}
       <div
         style={{
           position: 'absolute',
-          inset: '-6%',
-          background: 'radial-gradient(ellipse, rgba(201,154,46,0.10) 0%, transparent 68%)',
-          filter: 'blur(30px)',
+          inset: '-10%',
+          background: 'radial-gradient(ellipse, rgba(201,154,46,0.10) 0%, transparent 65%)',
           zIndex: 0,
           pointerEvents: 'none',
-          animation: 'tvGlowPulse 5s ease-in-out infinite',
         }}
       />
 
@@ -91,9 +85,10 @@ export default function TVPlayer() {
         >
           <TVScreen
             videoRef={tv.videoRef}
+            tuneRef={tv.tuneRef}
             tvState={tv.tvState}
             isPowered={tv.isPowered}
-            isVideoReady={tv.isVideoReady}
+            isTuningVisible={tv.isTuningVisible}
             channelNumber={tv.channelNumber}
           />
         </div>

@@ -270,7 +270,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-4 border-[#C99A2E] bg-[#1A140F]">
         <div className="min-w-0">
           <div className="font-mono text-[9px] font-bold tracking-[0.25em] uppercase text-[#C99A2E]">✦ TANGY ASSISTANT</div>
-          <div className="font-display text-sm text-[#E7D5A4] uppercase tracking-wide truncate">
+          <div className="font-condensed text-sm text-[#E7D5A4] uppercase tracking-wide truncate">
             {conversationId ? 'Connected with Tangy Team' : 'Mock Knowledge-Base Guide'}
           </div>
         </div>

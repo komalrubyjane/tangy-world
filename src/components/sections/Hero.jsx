@@ -1,490 +1,210 @@
-import { useRef, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { useGSAPContext } from '../../hooks/useGSAPContext';
-import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 import { useAudio } from '../../audio/AudioContext';
-import { TextileBorderStrip, HandDrawnCircle, HandDrawnArrow } from '../ui/CulturalMotifs';
-import { LotusStamp, RetroGrain, RangoliDecoration, PatternBackground } from '../ui/RetroAssets';
+import { useLenis } from '../layout/LenisProvider';
 
-// Mobile-only cast cycle for the hero's single central spot: instead of a
-// fixed guitarist, one performer at a time crossfades in/out every 2s so the
-// full cast is still represented without spreading them across the poster
-// again. Guitarist stays first (strongest silhouette, and the desktop
-// composition's own centered performer). Desktop is untouched — it keeps its
-// original static 5-across row via a separate, unconditional image.
-const HERO_PERFORMER_CYCLE = [
-  { src: '/media/hero-performer-2-guitarist.png', alt: 'Afro Rock Guitarist' },
-  { src: '/media/hero-performer-4-kathak.png', alt: 'Kathak Dancer' },
-  { src: '/media/hero-performer-3-veena.png', alt: 'Veena Musician' },
-  { src: '/media/hero-performer-5-hiphop.png', alt: 'Hip-Hop Dancer' },
-  { src: '/media/hero-performer-1-violinist.png', alt: 'Violinist' },
+// The rotating cast. hero-performer-6-main MUST stay at index 0 — it is the
+// first frame every visitor sees. WebP variants live in /media/opt; the PNGs
+// are the fallback.
+const PERFORMERS = [
+  { key: '6-main', alt: 'Illustrated performer striding forward in wide flared trousers' },
+  { key: '1-violinist', alt: 'Illustrated violinist in a white dress' },
+  { key: '2-guitarist', alt: 'Illustrated guitarist playing a red electric guitar' },
+  { key: '3-veena', alt: 'Illustrated veena player seated in a white sari' },
+  { key: '4-kathak', alt: 'Illustrated Kathak dancer mid-turn' },
+  { key: '5-hiphop', alt: 'Illustrated hip-hop dancer in a blue hoodie' },
+  { key: '7-women', alt: 'Illustrated performer with hennaed hands raised' },
 ];
-const HERO_PERFORMER_INTERVAL_MS = 2000;
+const FRAME_MS = 4500;
+const pad2 = (n) => String(n).padStart(2, '0');
 
-export const Hero = () => {
-  const navigate = useNavigate();
-  const { setFilterCutoff, playSFX } = useAudio();
-  const [activePerformer, setActivePerformer] = useState(0);
+// Left side of the cover: one performer at a time, replaced like a print in
+// an archive drawer (old fades out; new fades in, rises 10px, settles).
+// - One interval, cleaned up on unmount; paused while the hero is off-screen
+//   or the tab is hidden.
+// - Never advances to a frame whose image hasn't loaded, so there is no
+//   blank frame on slow connections — it simply waits a tick.
+// - Only frame 01 loads eagerly; the rest mount after it (they preload at
+//   opacity 0 in the same stack, so switching never re-decodes).
+// - prefers-reduced-motion: frames still change, but as a short plain fade
+//   with no movement or scale (handled in animations.css).
+function HeroPerformerStage({ className = '' }) {
+  const [active, setActive] = useState(0);
+  const [mountRest, setMountRest] = useState(false);
+  const imgRefs = useRef([]);
+  const stageRef = useRef(null);
 
-  // Cycle the mobile hero's central performer. Skipped entirely under
-  // prefers-reduced-motion, which leaves the guitarist showing statically.
+  // Mount frames 02–07 once frame 01 is in (with a fallback in case its
+  // load event fired before React attached the handler).
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reducedMotion) return undefined;
+    const t = setTimeout(() => setMountRest(true), 2500);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!mountRest) return undefined;
+    let onScreen = true;
+    const io = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; });
+    if (stageRef.current) io.observe(stageRef.current);
 
     const id = setInterval(() => {
-      setActivePerformer((i) => (i + 1) % HERO_PERFORMER_CYCLE.length);
-    }, HERO_PERFORMER_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, []);
+      if (!onScreen || document.hidden) return;
+      setActive((i) => {
+        const next = (i + 1) % PERFORMERS.length;
+        const img = imgRefs.current[next];
+        return img && img.complete && img.naturalWidth > 0 ? next : i;
+      });
+    }, FRAME_MS);
 
-  const sectionRef = useGSAPContext((ctx) => {
-    let impactTriggered = false;
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: isMobile ? 'top 80%' : 'top top',
-        end: isMobile ? '+=30%' : '+=75%',
-        scrub: 0.5,
-        pin: !isMobile,
-        anticipatePin: isMobile ? 0 : 1,
-        onUpdate: (self) => {
-          setFilterCutoff(400 + self.progress * 12000);
-
-          if (self.progress > 0.35 && self.progress < 0.45 && !impactTriggered) {
-            playSFX('ticketClick');
-            impactTriggered = true;
-          } else if (self.progress < 0.25) {
-            impactTriggered = false;
-          }
-        }
-      }
-    });
-
-    // Intro Entrance Animations
-    gsap.from('.headline .word', {
-      opacity: 0,
-      y: 35,
-      scale: 1.04,
-      duration: 0.9,
-      stagger: 0.15,
-      ease: 'power3.out'
-    });
-
-    // All 5 Performer Cutouts Fade Up One By One in Sequence
-    gsap.from([
-      '.portrait-wrap-far-left',
-      '.portrait-wrap-inner-left',
-      '.portrait-wrap-center',
-      '.portrait-wrap-inner-right',
-      '.portrait-wrap-far-right'
-    ], {
-      opacity: 0,
-      y: 45,
-      duration: 0.9,
-      stagger: 0.12,
-      delay: 0.2,
-      ease: 'power3.out'
-    });
-
-    gsap.from('.badge', {
-      opacity: 0,
-      scale: 0.75,
-      stagger: 0.06,
-      duration: 0.6,
-      delay: 0.5,
-      ease: 'back.out(1.4)'
-    });
-
-    // Riso-print "misregistration" pass: a vermilion ghost of the headline slides into
-    // near-register with the real type and settles at a permanently visible offset —
-    // a standing two-colour print-registration signature, not just an intro flash.
-    const reducedMotionIntro = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reducedMotionIntro) {
-      gsap.fromTo('.riso-ghost',
-        { x: 14, y: -11, opacity: 0.7 },
-        { x: 5, y: -4, opacity: 0.45, duration: 1.1, ease: 'power3.out', delay: 0.35 }
-      );
-    } else {
-      gsap.set('.riso-ghost', { x: 5, y: -4, opacity: 0.45 });
-    }
-
-    // Scroll Scrub Movement Sync
-    tl.to('.headline .word.tangy', { y: -15, duration: 0.3 }, 0.1)
-      .to('.headline .word.sessions', { y: 15, duration: 0.3 }, 0.1)
-      .to('.portrait-wrap-far-left', { y: -16, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.portrait-wrap-inner-left', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.portrait-wrap-center', { y: -20, scale: 1.02, duration: 0.4 }, 0.2)
-      .to('.portrait-wrap-inner-right', { y: -18, scale: 1.01, duration: 0.4 }, 0.2)
-      .to('.portrait-wrap-far-right', { y: -16, scale: 1.01, duration: 0.4 }, 0.2);
-
-  }, []);
-
-  // Desktop Mouse Parallax
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (window.innerWidth < 768) return;
-      const { clientX, clientY } = e;
-      const moveX = (clientX / window.innerWidth - 0.5) * 16;
-      const moveY = (clientY / window.innerHeight - 0.5) * 16;
-
-      gsap.to('.portrait-wrap-far-left', { x: moveX * 0.16, y: moveY * 0.16, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.portrait-wrap-inner-left', { x: moveX * 0.20, y: moveY * 0.20, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.portrait-wrap-center', { x: moveX * 0.25, y: moveY * 0.25, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.portrait-wrap-inner-right', { x: moveX * 0.21, y: moveY * 0.21, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.portrait-wrap-far-right', { x: moveX * 0.17, y: moveY * 0.17, duration: 1.2, ease: 'power2.out' });
-      gsap.to('.headline', { x: moveX * 0.08, y: moveY * 0.08, duration: 1.2, ease: 'power2.out' });
+    return () => {
+      clearInterval(id);
+      io.disconnect();
     };
+  }, [mountRest]);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+  return (
+    <figure ref={stageRef} className={`hero-stage relative m-0 flex flex-col ${className}`}>
+      <div className="relative flex-1 min-h-0 w-full">
+        {PERFORMERS.map((p, i) => {
+          if (i > 0 && !mountRest) return null;
+          const isActive = i === active;
+          return (
+            <picture key={p.key} className={`performer-frame ${isActive ? 'is-active' : ''}`} aria-hidden={!isActive}>
+              <source srcSet={`/media/opt/performer-${p.key}.webp`} type="image/webp" />
+              <img
+                ref={(el) => { imgRefs.current[i] = el; }}
+                src={`/media/hero-performer-${p.key}.png`}
+                alt={isActive ? p.alt : ''}
+                fetchPriority={i === 0 ? 'high' : 'low'}
+                decoding="async"
+                onLoad={i === 0 ? () => setMountRest(true) : undefined}
+                className="block w-full h-full object-contain object-bottom lg:object-[72%_100%] select-none"
+                draggable="false"
+              />
+            </picture>
+          );
+        })}
+      </div>
+      <figcaption className="archiveMetadata !text-[10px] lg:!text-[0.6875rem] text-[#EFE2C0]/55 mt-1.5 lg:mt-3 flex items-center gap-2 justify-center lg:justify-start" aria-hidden="true">
+        <span className="w-6 h-px bg-[#EFE2C0]/30" />
+        <span>Archive frame <span className="text-[#C89D35] tabular-nums">{pad2(active + 1)}</span> / {pad2(PERFORMERS.length)}</span>
+      </figcaption>
+    </figure>
+  );
+}
+
+// 01 — COVER. An editorial split cover: the people and the music on the
+// left (a rotating cast of performers), the archive and the brand on the
+// right (masthead, standfirst, calls to action). Only the performer changes;
+// type and metadata stay still. Scrolling drives the audio low-pass sweep.
+export const Hero = () => {
+  const { setFilterCutoff, playSFX } = useAudio();
+  const lenis = useLenis();
+
+  const sectionRef = useGSAPContext(() => {
+    let impactTriggered = false;
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top top',
+      end: 'bottom top',
+      onUpdate: (self) => {
+        setFilterCutoff(400 + self.progress * 12000);
+        if (self.progress > 0.35 && self.progress < 0.45 && !impactTriggered) {
+          playSFX('ticketClick');
+          impactTriggered = true;
+        } else if (self.progress < 0.25) {
+          impactTriggered = false;
+        }
+      },
+    });
   }, []);
+
+  const scrollToSessions = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('sessions');
+    if (!el) return;
+    if (lenis) lenis.scrollTo(el, { duration: 1.1 });
+    else el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <section
       ref={sectionRef}
       id="hero"
-      className="hero relative w-full h-[100dvh] max-h-[100dvh] bg-[#3c0f0e] overflow-hidden p-0 m-0 select-none isolate"
+      className="hero theme-hero relative w-full overflow-hidden isolate min-h-[100svh] lg:h-[100svh] lg:min-h-[640px] flex flex-col lg:block pt-[58px] lg:pt-0 pb-[calc(var(--dock-space)+60px)] lg:pb-0"
     >
-      {/* SVG ROUGHEN FILTER */}
-      <svg className="absolute w-0 h-0 overflow-hidden pointer-events-none z-0">
-        <filter id="roughen" x="-20%" y="-20%" width="140%" height="140%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="7" result="noise"/>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </svg>
+      {/* Printed-sheet chrome: an inset trim rule and four registration
+          marks, as on a press proof of the cover. */}
+      <div className="absolute inset-[10px] md:inset-[14px] top-[58px] md:top-[62px] border border-[#EFE2C0]/15 pointer-events-none" aria-hidden="true" />
+      <span className="regMark left-[4px] top-[52px] md:left-[7px] md:top-[55px] text-[#EFE2C0]" aria-hidden="true"><i /></span>
+      <span className="regMark right-[4px] top-[52px] md:right-[7px] md:top-[55px] text-[#EFE2C0]" aria-hidden="true"><i /></span>
+      <span className="regMark left-[4px] bottom-[4px] md:left-[7px] md:bottom-[7px] text-[#EFE2C0]" aria-hidden="true"><i /></span>
+      <span className="regMark right-[4px] bottom-[4px] md:right-[7px] md:bottom-[7px] text-[#EFE2C0]" aria-hidden="true"><i /></span>
 
-      {/* FULL-SCREEN EDGE-TO-EDGE POSTER CANVAS */}
-      <div 
-        className="poster absolute inset-0 w-full h-full bg-[radial-gradient(120%_90%_at_50%_8%,#8a2320_0%,#6e1a19_45%,#4c1210_100%)] overflow-hidden container-inline-size"
-      >
-        {/* CORNER REGISTRATION MARKS */}
-        
-        
-        {/* BOTTOM-RIGHT — desktop only, mirrors the mobile pair that already existed; */}
-        {/* completes the four-corner print-registration frame. */}
-        
-
-        {/* TOP BAR VISUAL GRID ALIGNMENT */}
-        <div className="absolute z-40 top-[52px] md:top-[2.2cqw] left-[3cqw] right-[3cqw] flex items-start justify-between pointer-events-none">
-          {/* TOP LEFT */}
-          <div className="text-[clamp(8px,1.05cqw,16px)] leading-tight text-left font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
-            <div>HYDERABAD, INDIA</div>
-            <div className="flex items-center gap-[0.4cqw] mt-[0.2cqw]">
-              <span>EST. 2016</span>
-              <svg className="w-[1cqw] min-w-[7px] h-[1cqw] min-h-[7px] opacity-90 inline" viewBox="0 0 24 24" fill="none" stroke="#ecdcaf" strokeWidth="1.4"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+      {/* MASTHEAD METADATA — top edge of the cover */}
+      <div className="relative lg:absolute lg:inset-x-0 lg:top-[72px] z-20 pt-2 lg:pt-0">
+        <div className="t-container">
+          <div className="grid grid-cols-2 md:grid-cols-3 items-start gap-4 archiveMetadata text-[#EFE2C0]/85">
+            <div>
+              <div>Hyderabad, India</div>
+              <div className="max-lg:[@media(max-height:720px)]:hidden">Est. 2016</div>
+            </div>
+            <div className="hidden md:block text-center tracking-[0.24em]">Live Music · Heritage · Culture</div>
+            <div className="text-right">
+              <div>Live Archive</div>
+              <div className="max-lg:[@media(max-height:720px)]:hidden">Issue 001 · Side A</div>
             </div>
           </div>
+          <hr className="archivalRule mt-3 text-[#EFE2C0]" />
+          <div className="hidden lg:flex justify-between mt-2 archiveMetadata text-[#EFE2C0]/55">
+            <span>Vol. 01</span>
+            <span>33⅓ RPM · Stereo</span>
+          </div>
+        </div>
+      </div>
 
-          {/* TOP CENTER */}
-          <div className="text-center hidden sm:block">
-            <div className="font-mono font-semibold text-[clamp(8px,1.4cqw,20px)] tracking-[0.22em] text-[#ecdcaf] uppercase">
-              LIVE MUSIC • HERITAGE • CULTURE
+      {/* THE SPLIT — performer left, archive/brand right. Below lg the right
+          column becomes `contents` so its pieces and the performer stack in
+          one intentional order: title → standfirst → performer → CTA. */}
+      <div className="relative lg:absolute lg:inset-x-0 lg:top-[150px] lg:bottom-0 z-10 flex-1 flex flex-col">
+        <div className="t-container flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-6 lg:h-full">
+
+          <HeroPerformerStage
+            className="hero-in hero-in-late order-3 lg:order-none lg:col-span-6 lg:h-full lg:pt-[9svh] lg:pb-[calc(var(--dock-space)-8px)] mt-4 lg:mt-0 h-[clamp(200px,31svh,440px)] max-lg:[@media(max-height:720px)]:h-[clamp(165px,26svh,240px)]"
+          />
+
+          <div className="contents lg:flex lg:flex-col lg:justify-center lg:col-span-6 lg:col-start-7 lg:pb-[var(--dock-space)]">
+            {/* MASTHEAD — the one typographic statement, with a single
+                static vermilion misregistration layer. */}
+            <h1
+              className="hero-in order-1 lg:order-none m-0 mt-3 lg:mt-0 text-center lg:text-left font-display font-normal uppercase text-[#EFE2C0] leading-[0.82] select-none text-[clamp(3.5rem,22vw,8.5rem)] max-lg:[@media(max-height:720px)]:text-[min(22vw,11.5svh)] lg:text-[clamp(5rem,11.6vw,11.5rem)]"
+            >
+              <span className="relative block">
+                <span className="absolute inset-0 text-[#C0392B]/50 translate-x-[0.02em] -translate-y-[0.016em] -z-10" aria-hidden="true">Tangy</span>
+                Tangy
+              </span>
+              <span className="relative block">
+                <span className="absolute inset-0 text-[#C0392B]/50 translate-x-[0.02em] -translate-y-[0.016em] -z-10" aria-hidden="true">Sessions</span>
+                Sessions
+              </span>
+            </h1>
+
+            {/* Standfirst — two lines, magazine-introduction voice */}
+            <p className="hero-in order-2 lg:order-none mt-3 lg:mt-6 mb-0 mx-auto lg:mx-0 max-w-[30ch] text-center lg:text-left font-serif italic font-medium text-[#EFE2C0]/90 leading-[1.25] text-[clamp(1.15rem,4.6vw,1.45rem)] lg:text-[clamp(1.3rem,1.8vw,1.75rem)]">
+              Live music, heritage spaces,<br />
+              and stories worth remembering.
+            </p>
+
+            {/* Calls to action */}
+            <div className="order-4 lg:order-none mt-4 lg:mt-7 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-x-6 gap-y-1">
+              <a href="#sessions" onClick={scrollToSessions} className="t-btn t-btn-light">
+                Upcoming sessions <span aria-hidden="true">↓</span>
+              </a>
+              <a href="/about" className="t-link py-2 text-[#EFE2C0]/85 hover:text-[#C89D35]">Our story</a>
             </div>
-            <div className="flex items-center justify-center gap-[0.5cqw] mt-[0.4cqw]">
-              <span className="w-[8cqw] min-w-[24px] h-[2px] bg-[#d1a437] opacity-80" />
-            </div>
-          </div>
-
-          {/* TOP RIGHT */}
-          <div className="text-[clamp(8px,1.05cqw,16px)] leading-tight text-right font-mono font-semibold text-[#ecdcaf] uppercase tracking-[0.14em]">
-            <div className="flex items-center justify-end gap-[0.4cqw]">
-              <span>LIVE ARCHIVE</span>
-            </div>
-            <div className="mt-[0.2cqw]">ISSUE 001 · SIDE A</div>
           </div>
         </div>
-
-        {/* STEPWELL SILHOUETTE */}
-        <svg className="absolute z-2 left-0 bottom-0 w-[34cqw] min-w-[110px] h-[36cqw] min-h-[130px] opacity-55 mix-blend-multiply pointer-events-none" viewBox="0 0 400 420" preserveAspectRatio="xMinYMax meet">
-          <g fill="#3c0f0e">
-            <rect x="0" y="360" width="400" height="60"/>
-            <rect x="0" y="300" width="360" height="60"/>
-            <rect x="0" y="245" width="310" height="55"/>
-            <rect x="0" y="195" width="260" height="50"/>
-          </g>
-        </svg>
-
-        {/* CENTERED TYPOGRAPHY "TANGY SESSIONS" — moved down to sit right above the vertical middle of the */}
-        {/* hero (mobile only; sm:/md:/lg: unchanged). dvh-based, not a fixed px, so "right above the middle" */}
-        {/* holds consistently whether the phone is short or tall — a fixed px offset would sit progressively */}
-        {/* higher (relatively) on taller phones. */}
-        <div className="headline absolute z-15 top-[21dvh] sm:top-[16cqw] md:top-[12cqw] lg:top-[5cqw] left-0 right-0 text-center flex flex-col items-center justify-center [filter:url(#roughen)] pointer-events-none will-change-transform">
-          <span
-            className="word tangy block font-poster text-[clamp(2.8rem,15.5cqw,17.5rem)] leading-[0.80] tracking-[0.005em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]"
-            data-text="TANGY"
-          >
-            <span className="riso-ghost absolute inset-0 -z-1 text-[#D91E18] pointer-events-none select-none" aria-hidden="true">TANGY</span>
-            TANGY
-          </span>
-          <span
-            className="word sessions block font-poster text-[clamp(2.5rem,14.5cqw,16.5rem)] leading-[0.80] tracking-[-0.01em] text-[#ecdcaf] uppercase [-webkit-text-stroke:0.12cqw_#191410] relative -mt-[0.2cqw] before:content-[attr(data-text)] before:absolute before:left-[0.42cqw] before:top-[0.55cqw] before:-z-1 before:text-[#191410]"
-            data-text="SESSIONS"
-          >
-            <span className="riso-ghost absolute inset-0 -z-1 text-[#D91E18] pointer-events-none select-none" aria-hidden="true">SESSIONS</span>
-            SESSIONS
-          </span>
-        </div>
-
-        {/* PERFORMER COMPOSITION — mobile (<lg) shows ONLY the guitarist as a single */}
-        {/* cover-star focal point (editorial poster direction); the other four are  */}
-        {/* hidden below lg and the guitarist reclaims their space. Desktop (lg+)     */}
-        {/* keeps the original flat 5-across row untouched via lg: overrides that     */}
-        {/* reproduce the pre-existing values exactly. */}
-        {/* FAR LEFT: Violinist — desktop only */}
-        <div className="portrait-wrap-far-left hidden lg:block absolute z-[18] lg:left-[15%] lg:top-[34%] -translate-x-1/2 w-[16cqw] min-w-[55px] max-w-[290px] h-[39cqw] min-h-[150px] max-h-[540px] pointer-events-none will-change-transform">
-          <img src="/media/hero-performer-1-violinist.png" alt="Violinist" className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]" />
-        </div>
-
-        {/* INNER LEFT: Kathak Classical Dancer — desktop only */}
-        <div className="portrait-wrap-inner-left hidden lg:block absolute z-[19] lg:left-[31%] lg:top-[33%] -translate-x-1/2 w-[16cqw] min-w-[60px] max-w-[300px] h-[40cqw] min-h-[160px] max-h-[550px] pointer-events-none will-change-transform">
-          <img src="/media/hero-performer-4-kathak.png" alt="Kathak Dancer" className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" />
-        </div>
-
-        {/* CENTER: the hero's single focal spot — sized up substantially on mobile; desktop keeps its original modest scale. */}
-        {/* Height is dvh-based (not cqw/width-based) on mobile: a width-driven box scales with how WIDE the */}
-        {/* phone is, but the empty space above/below it is a function of viewport HEIGHT — on a tall phone */}
-        {/* a width-driven box stayed small while the gaps above and below it grew into large dead zones. */}
-        {/* Sizing off dvh instead makes the performer consistently fill the same proportion of the vertical */}
-        {/* space on every phone, tall or short. */}
-        <div className="portrait-wrap-center absolute z-20 left-[50%] top-[40%] lg:top-[32%] -translate-x-1/2 w-[72cqw] lg:w-[19cqw] min-w-[230px] lg:min-w-[92px] max-w-[440px] lg:max-w-[400px] h-[46dvh] lg:h-[44cqw] min-h-[200px] lg:min-h-[180px] max-h-[460px] lg:max-h-[620px] pointer-events-none will-change-transform">
-          {/* Desktop: original static Afro Rock Guitarist, unchanged */}
-          <div className="hidden lg:block w-full h-full">
-            <img src="/media/hero-performer-2-guitarist.png" alt="Afro Rock Guitarist" className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)]" />
-          </div>
-          {/* Mobile: the full cast crossfades through this same spot every 2s */}
-          <div className="lg:hidden relative w-full h-full">
-            {HERO_PERFORMER_CYCLE.map((performer, i) => (
-              <img
-                key={performer.src}
-                src={performer.src}
-                alt={performer.alt}
-                className={`absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.6)] transition-opacity duration-700 ease-in-out ${
-                  i === activePerformer ? 'opacity-100' : 'opacity-0'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* INNER RIGHT: Veena Classical Musician — desktop only */}
-        <div className="portrait-wrap-inner-right hidden lg:block absolute z-[19] lg:left-[69%] lg:top-[34%] -translate-x-1/2 w-[16cqw] min-w-[60px] max-w-[300px] h-[39cqw] min-h-[155px] max-h-[540px] pointer-events-none will-change-transform">
-          <img src="/media/hero-performer-3-veena.png" alt="Veena Musician" className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" />
-        </div>
-
-        {/* FAR RIGHT: Hip-Hop Dancer — desktop only */}
-        <div className="portrait-wrap-far-right hidden lg:block absolute z-[18] lg:left-[85%] lg:top-[34%] -translate-x-1/2 w-[16cqw] min-w-[55px] max-w-[290px] h-[40cqw] min-h-[155px] max-h-[550px] pointer-events-none will-change-transform">
-          <img src="/media/hero-performer-5-hiphop.png" alt="Hip-Hop Dancer" className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]" />
-        </div>
-
-        {/* SCROLL TO VIEW INDICATOR */}
-        <div className="absolute z-40 bottom-[1.8cqw] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 font-mono text-[clamp(6.5px,0.7cqw,11px)] font-bold tracking-[0.25em] text-[#ecdcaf]/80 uppercase animate-bounce pointer-events-none">
-          <span>SCROLL TO VIEW</span>
-          <svg className="w-[1.1cqw] min-w-[10px] h-[1.1cqw] min-h-[10px] opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-            <path d="M12 5v14M19 12l-7 7-7-7" />
-          </svg>
-        </div>
-
-        {/* LABELS & STICKERS */}
-        {/* 33⅓ RPM BADGE — nudged down on phone (base) only, past the now much-bigger */}
-        {/* guitarist's head, into the clear margin beside his torso; sm:/desktop unchanged */}
-        <div className="badge absolute z-40 left-[2cqw] top-[57%] sm:top-[18%] w-[11cqw] min-w-[45px] max-w-[120px] aspect-square -rotate-6 pointer-events-none drop-shadow-md">
-          <img src="/media/33-rpm-stereo.png" alt="33⅓ RPM Stereo vinyl badge" className="w-full h-full object-contain" />
-        </div>
-
-        {/* LIVE AND REAL TAPE STICKER — same phone-only nudge */}
-        <div className="badge absolute z-40 left-[14%] sm:left-[16.5%] top-[57%] sm:top-[18%] w-[12cqw] min-w-[50px] max-w-[140px] -rotate-6 pointer-events-none drop-shadow-md">
-          <img src="/media/live-and-real.png" alt="Live and Real tape sticker" className="w-full h-full object-contain" />
-        </div>
-
-        {/* RIGHT COLUMN CLUSTER (INHERIT / REC / KEEP THE CULTURE / Tangy) — these four used to be four */}
-        {/* independent absolutely-positioned badges with mismatched top/bottom anchors; on mobile that */}
-        {/* let them drift into each other and into the fixed bottom nav once the guitarist grew larger. */}
-        {/* This wrapper turns them into one flex-stacked, collision-free column on mobile (<lg), sized to */}
-        {/* fit above the nav on every phone tested. On desktop (lg+) the wrapper becomes `contents` (it */}
-        {/* renders no box of its own) and each child's own `lg:` classes put it back at its exact original */}
-        {/* absolute position — desktop is byte-for-byte the same layout as before. */}
-        <div className="absolute z-40 right-[4%] top-[64%] flex flex-col items-end gap-[0.4rem] lg:contents pointer-events-none">
-          {/* INHERIT THE PAST TAG */}
-          <div className="badge z-40 bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.6cqw_1cqw] shadow-md text-center lg:absolute lg:right-[11%] lg:top-[74%]">
-            <div className="font-mono font-bold text-[clamp(5.5px,1cqw,13px)] tracking-[0.18em]">INHERIT THE PAST</div>
-            <div className="font-mono font-bold text-[clamp(5.5px,1cqw,13px)] tracking-[0.18em]">CREATE THE FUTURE</div>
-          </div>
-
-          {/* REC TAG — circled by hand, an editor's-mark annotation calling it out */}
-          <div className="badge relative z-40 bg-[#e9decb] text-[#241a12] -rotate-3 p-[0.5cqw_0.9cqw] flex items-center gap-[0.4cqw] shadow-md lg:absolute lg:right-[3.5cqw] lg:top-[78%]">
-            <span className="font-mono font-bold text-[clamp(6.5px,1.1cqw,14px)] tracking-[0.06em]">REC</span>
-            <div className="w-[0.8cqw] min-w-[5px] h-[0.8cqw] min-h-[5px] rounded-full bg-[#c2272a] animate-[pulseLine_2s_ease-in-out_infinite]" />
-            <HandDrawnCircle color="#c2272a" className="absolute -inset-[45%] pointer-events-none" />
-          </div>
-
-          {/* KEEP THE CULTURE ALIVE */}
-          <div className="badge z-40 text-right text-[#ecdcaf] lg:absolute lg:right-[4.5cqw] lg:bottom-[8%] lg:text-left">
-            <div className="font-mono font-semibold text-[clamp(7.5px,1.4cqw,18px)] leading-[1.12]">KEEP THE CULTURE ALIVE ★</div>
-          </div>
-
-          {/* Tangy signature */}
-          <div className="badge z-40 font-serif italic font-bold text-[clamp(13px,3cqw,42px)] text-[#d1a437] -rotate-6 drop-shadow-md lg:absolute lg:right-[3cqw] lg:bottom-[3%] lg:text-[clamp(16px,3cqw,42px)]">
-            Tangy
-          </div>
-        </div>
-
-        {/* ============================================================ */}
-        {/* MOBILE-ONLY RECORD-SLEEVE COMPOSITION (below lg / <1024px)    */}
-        {/* Small printed-object graphics — not sections, not paragraphs  */}
-        {/* — scattered through the negative space of the staggered       */}
-        {/* performer arc, sized to fit inside the existing single-        */}
-        {/* viewport hero (no extra hero height). Dark ink shadow keeps   */}
-        {/* text legible over the artwork. Desktop (lg+) renders none of  */}
-        {/* this — untouched.                                             */}
-        {/* ============================================================ */}
-        <div className="lg:hidden">
-
-          {/* SUBTLE INSET POSTER FRAME */}
-          <div className="absolute inset-[10px] border border-[#ecdcaf]/20 pointer-events-none" aria-hidden="true" />
-
-          {/* MOBILE-ONLY REAL-ASSET CORNER DECORATION — the real supplied lotus and */}
-          {/* Rangoli photographs, bleeding off the top-right and bottom-right corners */}
-          {/* behind the badge cluster (low z, low opacity) as printed background pieces. */}
-          <div className="absolute z-[16] -top-[8%] -right-[18%] w-[55%] max-w-[260px] aspect-square opacity-[0.16] pointer-events-none">
-            <RangoliDecoration index={1} className="w-full h-full" />
-          </div>
-          <div className="absolute z-[16] bottom-0 right-0 w-[30%] max-w-[150px] aspect-square opacity-[0.3] pointer-events-none translate-x-[20%] translate-y-[20%]">
-            <LotusStamp index={2} border="transparent" bg="transparent" className="w-full h-full" />
-          </div>
-          {/* BOTTOM REGISTRATION CROSSHAIRS (mirrors the two existing top ones) */}
-          <div className="absolute z-30 w-[14px] h-[14px] opacity-70 bottom-[14px] left-[14px] pointer-events-none" aria-hidden="true">
-            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#11100C" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#11100C" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#11100C" strokeWidth="1.2"/></svg>
-          </div>
-          <div className="absolute z-30 w-[14px] h-[14px] opacity-70 bottom-[14px] right-[14px] pointer-events-none" aria-hidden="true">
-            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#11100C" strokeWidth="1.4"/><line x1="20" y1="0" x2="20" y2="40" stroke="#11100C" strokeWidth="1.2"/><line x1="0" y1="20" x2="40" y2="20" stroke="#11100C" strokeWidth="1.2"/></svg>
-          </div>
-
-          <div className="[text-shadow:0_1px_5px_rgba(17,16,12,0.95),0_1px_2px_rgba(17,16,12,0.95)]">
-
-            {/* ARCHIVE STAMP — upper-right, below the existing "LIVE ARCHIVE" text, dashed distressed stamp */}
-            <div className="badge absolute z-40 right-[5%] top-[13%] rotate-3 border border-dashed border-[#C99A2E]/70 px-[0.5rem] py-[0.25rem] pointer-events-none">
-              <div className="font-mono text-[clamp(6px,1.2cqw,8px)] font-bold tracking-[0.16em] text-[#C99A2E] uppercase text-center">Archive</div>
-              <div className="font-mono text-[clamp(5px,0.95cqw,6.5px)] tracking-[0.12em] text-[#ecdcaf]/75 uppercase text-center mt-[0.1rem]">Hyd / TS</div>
-              <div className="font-mono text-[clamp(6px,1.2cqw,8px)] font-bold tracking-[0.14em] text-[#ecdcaf] uppercase text-center">001</div>
-            </div>
-
-            {/* FIELD RECORDING LABEL — right side, level with the guitarist's torso (below the guitar's headstock), with a tiny eq */}
-            <div className="badge absolute z-40 right-[5%] top-[57%] text-right pointer-events-none">
-              <div className="font-mono text-[clamp(6px,1.15cqw,8px)] font-bold tracking-[0.14em] text-[#ecdcaf]/85 uppercase leading-relaxed">
-                Field Recording // Side A
-              </div>
-              <div className="flex items-center justify-end gap-[0.4rem] mt-[0.2rem]">
-                <span className="font-mono text-[clamp(5.5px,1.05cqw,7px)] tracking-[0.14em] text-[#d1a437]/85 uppercase">Vol. 01</span>
-                <div className="flex items-end gap-[2px] h-[0.6rem]" aria-hidden="true">
-                  {[0.4, 0.8, 0.5, 0.9, 0.3].map((h, i) => (
-                    <span
-                      key={i}
-                      className="w-[2px] bg-[#d1a437] rounded-sm origin-bottom animate-[eqBar_1.3s_ease-in-out_infinite]"
-                      style={{ height: `${h * 100}%`, animationDelay: `${i * 100}ms` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* LIVE SESSION TICKET — lower-left, taped, perforated, small archive metadata folded in. */}
-            {/* The handwritten quote now lives in its footer (a separate floating quote badge above */}
-            {/* it didn't leave enough room for the ticket above the bottom nav on the shortest phones */}
-            {/* tested) — this keeps it as the hero's one short quote/sentence, just consolidated into */}
-            {/* a single card instead of two stacked elements. */}
-            {/* [text-shadow:none] cancels the wrapper's inherited legibility shadow (5px blur radius, */}
-            {/* meant for text floating directly over the artwork background) — this ticket sits on its */}
-            {/* own opaque cream card and doesn't need it; at this card's tiny font sizes that shadow's */}
-            {/* blur radius was larger than the glyphs themselves, reading as blur rather than print. */}
-            <div className="badge absolute z-40 left-[5%] top-[68%] w-[56%] max-w-[230px] min-w-[172px] -rotate-2 bg-[#EFE3BE] text-[#241a12] border border-[#241a12]/70 shadow-[3px_3px_0_rgba(17,16,12,0.55)] [text-shadow:none] pointer-events-none">
-              <div className="absolute -top-[6px] left-[14%] w-[28%] h-[9px] bg-[rgba(231,213,164,0.75)] rotate-[-3deg] border border-black/20" aria-hidden="true" />
-              <div className="flex">
-                <div className="flex-1 px-[0.4rem] py-[0.3rem] border-r border-dashed border-[#241a12]/40">
-                  <div className="font-mono text-[clamp(5px,1cqw,6.5px)] font-bold tracking-[0.1em] uppercase opacity-70">Hyd / TS / 001 · 432 Hz</div>
-                  <div className="font-mono text-[clamp(6.5px,1.5cqw,9.5px)] font-bold tracking-[0.06em] uppercase text-[#B94717] mt-[0.2rem]">Live Session</div>
-                  <div className="font-mono text-[clamp(5px,1cqw,6.5px)] tracking-[0.1em] uppercase mt-[0.3rem] opacity-80 leading-relaxed">
-                    Bansilalpet Stepwell<br />Hyderabad, India
-                  </div>
-                  <p className="font-serif italic text-[clamp(6px,1.3cqw,8px)] leading-snug opacity-75 mt-[0.3rem] border-t border-dashed border-[#241a12]/30 pt-[0.25rem]">
-                    "Every room has a memory."
-                  </p>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-[2px] px-[0.3rem] text-[#C99A2E] text-[6.5px]" aria-hidden="true">
-                  <span>★</span><span>★</span><span>★</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* REAL BANDHANI TEXTILE LAYER — the poster's actual physical surface: a supplied */}
-        {/* tie-dye photograph clearly visible behind the performers, not a faint hint. */}
-        <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-5" />
-
-        {/* POSTER BORDER FRAME — bold woven textile strips top and bottom, turning the whole */}
-        {/* hero into a framed printed sheet rather than an edge-to-edge background. */}
-        <TextileBorderStrip className="absolute top-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
-        <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-30" height={11} colorA="#D1A437" colorB="#191410" />
-
-        {/* BOTTOM-LEFT VINTAGE PRINT COLLAGE — desktop only. Replaces the old solid mustard */}
-        {/* triangle with a small layered assembly of real archive-print pieces (a cropped */}
-        {/* textile clipping, a partially-cropped Rangoli fragment, a lotus stamp, localized */}
-        {/* print-texture grain, a registration mark and an archival label) sitting low and */}
-        {/* behind the violinist — pasted-on clippings rather than one heavy geometric block. */}
-        <div className="hidden lg:block absolute z-6 left-0 bottom-0 w-[19cqw] max-w-[210px] h-[27cqw] max-h-[300px] pointer-events-none">
-
-          {/* REAL PRINT-TEXTURE GRAIN — localized imperfect paper surface under the collage. */}
-          <RetroGrain index={1} opacity={0.35} blend="multiply" />
-
-          {/* SLIM READING COLUMN — keeps the vertical masthead label below legible against */}
-          {/* the photo clippings instead of one uniform solid block. */}
-          <div className="absolute left-0 top-0 bottom-0 w-[3.4cqw] bg-[#191410]/55" />
-
-          {/* REAL TEXTILE CLIPPING — a cropped, rotated textile photograph standing in for a */}
-          {/* pasted magazine paper layer, tucked low behind the violinist. */}
-          {/* REAL RANGOLI FRAGMENT — a partially cropped, rotated archival print detail */}
-          {/* bleeding off the left edge. */}
-          {/* REAL LOTUS STAMP — a small decorative print stamp at the corner. */}
-          <div className="absolute left-[9.5cqw] bottom-[0.5cqw] w-[4cqw] max-w-[42px] aspect-square">
-            <LotusStamp index={0} border="#ECDCAF" bg="transparent" className="w-full h-full opacity-95 rotate-[-10deg] shadow-md" />
-          </div>
-
-          {/* THIN REGISTRATION MARK + tiny archival label — print-shop detail. */}
-          
-          <span
-            className="absolute left-[0.9cqw] top-[1.5cqw] font-mono text-[6.5px] tracking-[0.18em] text-[#ECDCAF]/55 uppercase whitespace-nowrap"
-            style={{ writingMode: 'vertical-rl' }}
-          >
-            FIG.01
-          </span>
-        </div>
-
-        <div className="hidden lg:flex absolute z-30 left-[1.1cqw] bottom-[3cqw] top-[8cqw] items-end justify-center pointer-events-none">
-          <span
-            className="font-poster text-[#ECDCAF] text-[clamp(13px,1.7cqw,22px)] tracking-[0.1em] uppercase whitespace-nowrap"
-            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-          >
-            VOL. 01 — HYDERABAD ARCHIVE — EST. 2016
-          </span>
-        </div>
-
-        {/* HAND-DRAWN CALLOUT — a single sparing annotation tying the print collage to the */}
-        {/* masthead label, an editor's pencil mark rather than a UI hint. */}
-        <HandDrawnArrow
-          color="#191410"
-          className="hidden lg:block absolute z-25 left-[4cqw] bottom-[15cqw] w-[5cqw] max-w-[75px] opacity-45 pointer-events-none rotate-[35deg]"
-        />
-
-        {/* TEXTURE OVERLAYS — layers the site's existing grain with the real supplied */}
-        {/* print-texture photograph for an extra, authentic paper-grain pass. */}
-        <div className="grain absolute inset-0 z-10 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none" />
-        <RetroGrain index={0} opacity={0.08} blend="overlay" className="z-10" />
-        <div className="vignette absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(120%_100%_at_50%_45%,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
-
       </div>
     </section>
   );

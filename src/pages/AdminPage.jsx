@@ -161,7 +161,7 @@ export const AdminDashboard = ({ portalsBasePath = '/admin/preview' } = {}) => {
         <div className="p-5 border-b border-[#C99A2E]/30">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#B94717] animate-pulse" />
-            <span className="font-display font-bold text-lg tracking-tight">TANGY CONTROL ROOM</span>
+            <span className="font-condensed font-bold text-lg tracking-tight">TANGY CONTROL ROOM</span>
           </div>
           <p className="font-serif italic text-[10px] text-[#E7D5A4]/60 mt-1">{user?.role?.toUpperCase()} · {user?.email}</p>
         </div>
@@ -185,7 +185,7 @@ export const AdminDashboard = ({ portalsBasePath = '/admin/preview' } = {}) => {
           <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-[#191410] border-r-2 border-[#C99A2E] overflow-y-auto animate-[drawerIn_0.2s_ease]">
             <div className="p-5 border-b border-[#C99A2E]/30 flex justify-between items-start">
               <div>
-                <span className="font-display font-bold text-base">TANGY CONTROL ROOM</span>
+                <span className="font-condensed font-bold text-base">TANGY CONTROL ROOM</span>
                 <p className="font-serif italic text-[10px] text-[#E7D5A4]/60 mt-1">{user?.email}</p>
               </div>
               <button onClick={() => setDrawerOpen(false)} className="text-lg leading-none opacity-70">✕</button>
@@ -208,13 +208,13 @@ export const AdminDashboard = ({ portalsBasePath = '/admin/preview' } = {}) => {
           <button onClick={() => setDrawerOpen(true)} className="border border-[#C99A2E]/60 text-[#C99A2E] px-3 py-1.5 text-xs font-bold uppercase">
             ☰ MENU
           </button>
-          <span className="font-display font-bold text-sm">{active?.label?.toUpperCase() || 'OVERVIEW'}</span>
+          <span className="font-condensed font-bold text-sm">{active?.label?.toUpperCase() || 'OVERVIEW'}</span>
           <Link to="/check-in" className="border border-[#C99A2E]/60 text-[#C99A2E] px-2.5 py-1.5 text-xs">📷</Link>
         </header>
 
         <main className="p-4 md:p-6 lg:p-8">
           <div className="hidden lg:flex justify-between items-center mb-6">
-            <h1 className="font-display text-2xl font-bold tracking-tight">{active?.label?.toUpperCase() || 'OVERVIEW'}</h1>
+            <h1 className="font-condensed text-2xl font-bold tracking-tight">{active?.label?.toUpperCase() || 'OVERVIEW'}</h1>
             <Link to="/check-in" className="border border-[#C99A2E]/60 text-[#E7D5A4] hover:bg-[#C99A2E]/10 px-3 py-1.5 text-xs tracking-wider">
               📷 CHECK-IN TERMINAL
             </Link>

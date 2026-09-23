@@ -40,11 +40,10 @@ export const JoinPage = () => {
   const selected = ROLE_CARDS.find((c) => c.key === selectedRole);
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-14 sm:pb-20 px-4 sm:px-6 max-w-5xl mx-auto text-center">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.06] mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 block">
             TANGY SESSIONS // MEMBERSHIP DESK
@@ -72,7 +71,7 @@ export const JoinPage = () => {
                 className="text-left bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C] hover:-translate-y-1 focus-visible:-translate-y-1 transition-transform flex flex-col gap-2 outline-none focus-visible:ring-4 focus-visible:ring-[#C99A2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#11100C]"
               >
                 <span className="text-3xl" aria-hidden="true">{card.icon}</span>
-                <h3 className="font-display text-xl font-bold uppercase leading-tight">{card.label}</h3>
+                <h3 className="font-condensed text-xl font-bold uppercase leading-tight">{card.label}</h3>
                 <p className="font-mono text-[11px] text-[#11100C]/70 leading-relaxed">{card.tagline}</p>
                 <span className="mt-2 font-mono text-[10px] font-bold text-[#B94717] uppercase">
                   {card.kind === 'signup' ? 'CREATE ACCOUNT →' : 'APPLY →'}
@@ -100,7 +99,7 @@ export const JoinPage = () => {
                 >
                   <span className="text-xl shrink-0" aria-hidden="true">{card.icon}</span>
                   <span>
-                    <span className="block font-display text-sm font-bold uppercase">{card.label}</span>
+                    <span className="block font-condensed text-sm font-bold uppercase">{card.label}</span>
                     <span className="block font-mono text-[10px] text-[#E7D5A4]/60 mt-0.5 leading-snug">{card.tagline}</span>
                   </span>
                 </button>
@@ -114,11 +113,11 @@ export const JoinPage = () => {
         </section>
       ) : (
         <section className="pb-20 px-4 sm:px-6 max-w-lg mx-auto">
-          <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 sm:p-10 shadow-[10px_10px_0px_#11100C]">
+          <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-6 sm:p-10 shadow-[10px_10px_0px_#11100C]">
             <div className="flex justify-between items-center border-b-2 border-[#11100C] pb-3 mb-6">
               <div>
                 <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">{selected.icon} {selected.label}</span>
-                <h2 className="font-display text-2xl font-bold uppercase">CREATE YOUR ACCOUNT</h2>
+                <h2 className="font-condensed text-2xl font-bold uppercase">CREATE YOUR ACCOUNT</h2>
               </div>
               <button onClick={() => setSelectedRole(null)} className="font-mono text-[10px] font-bold underline">CHANGE</button>
             </div>

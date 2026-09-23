@@ -43,7 +43,7 @@ export const Universe = () => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_0%,rgba(14,13,11,1)_100%)] z-10 pointer-events-none" />
       
       <div className="relative z-20 text-center mix-blend-difference pointer-events-none">
-        <h2 className="font-display font-black text-8xl md:text-[12rem] text-tangy-cream leading-none">
+        <h2 className="font-condensed font-black text-8xl md:text-[12rem] text-tangy-cream leading-none">
           THE<br/>UNIVERSE
         </h2>
       </div>
@@ -72,7 +72,7 @@ export const Universe = () => {
         {/* Additional decorative elements */}
         <div className="memory-layer absolute top-[40%] left-[70%] w-64 h-24 border border-tangy-gold p-4 flex flex-col justify-between" data-depth="0.7">
           <p className="font-mono text-[10px] text-tangy-gold">TICKET // ADMIT ONE</p>
-          <p className="font-display text-2xl text-tangy-cream">BANSILALPET</p>
+          <p className="font-condensed text-2xl text-tangy-cream">BANSILALPET</p>
         </div>
       </div>
     </section>

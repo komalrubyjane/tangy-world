@@ -20,9 +20,9 @@ const CHRONOLOGY_DATA = [
     description: 'Born out of a refusal to let music stay generic. 40 people, two subwoofers, and a cassette deck in a subterranean room.',
     image: '/media/gallery/tangy1.jpg',
     archiveNo: 'NO. 001',
-    bg: '#E7D5A4',
-    text: '#11100C',
-    accent: '#5A120D',
+    bg: '#EFE2C0',
+    text: '#181614',
+    accent: '#4A171D',
     format: 'BEGINNING'
   },
   {
@@ -33,9 +33,9 @@ const CHRONOLOGY_DATA = [
     description: 'Word spread through physical tickets and hand-printed fliers. The crowd grew from 40 to 400 midnight listeners.',
     image: '/media/gallery/tabgy2.jpg',
     archiveNo: 'NO. 004',
-    bg: '#C99A2E',
-    text: '#11100C',
-    accent: '#B94717',
+    bg: '#C89D35',
+    text: '#181614',
+    accent: '#B5532A',
     format: 'SCRAPBOOK'
   },
   {
@@ -46,9 +46,9 @@ const CHRONOLOGY_DATA = [
     description: 'We collaborated with ancient stone for the first time. Transforming a forgotten 17th-century stepwell into a living stage.',
     image: '/media/gallery/tngy7.jpg',
     archiveNo: 'NO. 008',
-    bg: '#B94717',
-    text: '#E7D5A4',
-    accent: '#C99A2E',
+    bg: '#B5532A',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     format: 'POSTER'
   },
   {
@@ -59,9 +59,9 @@ const CHRONOLOGY_DATA = [
     description: 'The stages were empty, but the sub-frequencies kept playing in private archives.',
     image: '/media/gallery/tangy4.jpg',
     archiveNo: 'NO. 010',
-    bg: '#11100C',
-    text: '#E7D5A4',
-    accent: '#5A120D',
+    bg: '#181614',
+    text: '#EFE2C0',
+    accent: '#4A171D',
     format: 'QUIET'
   },
   {
@@ -72,9 +72,9 @@ const CHRONOLOGY_DATA = [
     description: 'Doors reopened. 300 listeners gathered under solstice skies to hear sub-bass echo off 300-year-old limestone walls.',
     image: '/media/gallery/tangy3.jpg',
     archiveNo: 'NO. 014',
-    bg: '#5A120D',
-    text: '#E7D5A4',
-    accent: '#C99A2E',
+    bg: '#4A171D',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     format: 'RETURN'
   },
   {
@@ -85,9 +85,9 @@ const CHRONOLOGY_DATA = [
     description: 'Every session documented on 35mm film. Raw contact prints capturing musicians in unscripted midnight jams.',
     image: '/media/gallery/tangy8.jpg',
     archiveNo: 'NO. 018',
-    bg: '#11100C',
-    text: '#E7D5A4',
-    accent: '#B94717',
+    bg: '#181614',
+    text: '#EFE2C0',
+    accent: '#B5532A',
     format: 'FILMSTRIP'
   },
   {
@@ -98,9 +98,9 @@ const CHRONOLOGY_DATA = [
     description: 'Tangy Sessions featured across independent music publications as a benchmark for heritage acoustic preservation.',
     image: '/media/gallery/tangy5.jpg',
     archiveNo: 'NO. 022',
-    bg: '#C99A2E',
-    text: '#11100C',
-    accent: '#5A120D',
+    bg: '#C89D35',
+    text: '#181614',
+    accent: '#4A171D',
     format: 'MAGAZINE'
   },
   {
@@ -111,9 +111,9 @@ const CHRONOLOGY_DATA = [
     description: 'Tangy Sessions Vol. 1, Vol. 2 & Solstice sold out completely within 48 hours of ticket release.',
     image: '/media/gallery/tangy9.jpg',
     archiveNo: 'NO. 028',
-    bg: '#B94717',
-    text: '#E7D5A4',
-    accent: '#C99A2E',
+    bg: '#B5532A',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     format: 'POSTER_WALL'
   },
   {
@@ -125,8 +125,8 @@ const CHRONOLOGY_DATA = [
     image: '/media/gallery/tangy10.jpg',
     archiveNo: 'NO. 032',
     bg: '#41261B',
-    text: '#E7D5A4',
-    accent: '#C99A2E',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     format: 'PRESENT'
   }
 ];
@@ -195,9 +195,8 @@ export const History = () => {
   };
 
   return (
-    <section ref={sectionRef} id="history" className="relative w-full bg-[#11100C] text-[#E7D5A4] overflow-hidden border-t-8 border-[#5A120D]">
+    <section ref={sectionRef} id="history" className="relative w-full bg-[#181614] printNoise text-[#E7D5A4] overflow-hidden border-t-8 border-[#5A120D]">
       
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
       <RetroGrain index={1} opacity={0.1} blend="overlay" />
 
       {/* GIANT FADED BACKGROUND TYPOGRAPHY "HISTORY" AT 4% OPACITY */}
@@ -214,7 +213,7 @@ export const History = () => {
       </div>
 
       {/* SECTION HEADER */}
-      <div className="relative w-full py-28 md:py-36 px-6 text-center bg-[#E7D5A4] text-[#11100C] border-b-8 border-[#11100C] flex flex-col items-center justify-center">
+      <div className="relative w-full py-28 md:py-36 px-6 text-center bg-[#EFE2C0] paperTexture text-[#11100C] border-b-8 border-[#11100C] flex flex-col items-center justify-center">
         
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-10">
           <span className="display text-[16vw] md:text-[22vw] leading-none text-[#11100C]">2016—2026</span>
@@ -233,10 +232,10 @@ export const History = () => {
           <ArchiveStamp text="EXHIBITION PANEL" rotation="-3deg" color="red" className="mb-4" />
 
           <h2 className="display text-5xl md:text-9xl text-[#11100C] leading-[0.85] tracking-tighter ink-bleed mb-6">
-            <RisographOffset colors={['#D91E18']} offsets={[[5, -4]]} opacity={0.28}>ARCHIVE / 2016–2026</RisographOffset><br/>
+            <RisographOffset colors={['#B5532A']} offsets={[[5, -4]]} opacity={0.28}>ARCHIVE / 2016–2026</RisographOffset><br/>
             <span className="italic text-[#B94717] font-normal">THE CHRONOLOGY</span>
           </h2>
-          <HandDrawnUnderline color="#B94717" className="w-44 h-2.5 mx-auto -mt-3 mb-3 opacity-60" />
+          <HandDrawnUnderline color="#B5532A" className="w-44 h-2.5 mx-auto -mt-3 mb-3 opacity-60" />
 
           <p className="font-mono text-xs md:text-sm text-[#11100C]/80 tracking-[0.25em] max-w-xl mx-auto uppercase border-t-2 border-[#11100C]/30 pt-4">
             TEN YEARS OF MUSIC, PEOPLE, PLACES & STORIES.
@@ -257,14 +256,13 @@ export const History = () => {
             className="chronology-era-block relative w-full py-16 md:py-36 px-5 md:px-16 flex flex-col items-center justify-center border-b-4 border-[#11100C] overflow-hidden"
             style={{ backgroundColor: era.bg, color: era.text }}
           >
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
             {/* Intentional era-accent exception: a low-opacity multiply tint that blends the
                 photo INTO this era's own accent color rather than showing it as the section's
                 dominant background photo — that's the solid era.bg color above. */}
             <PatternBackground category="bandhani" index={index} opacity={0.24} size="cover" blend="multiply" className="z-0" />
             
             <LotusStamp index={index} bg="transparent" border={era.text} className="md:hidden absolute top-4 right-4 w-8 h-8 opacity-90 z-10" />
-            <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={7} colorA={era.accent} colorB="#11100C" />
+            <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-10" height={7} colorA={era.accent} colorB="#181614" />
 
             <div className="bg-year-text absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
               <span 
@@ -279,7 +277,7 @@ export const History = () => {
               
               <div 
                 className="w-8 h-8 rounded-full border-4 border-[#11100C] mb-8 flex items-center justify-center shadow-xl font-mono text-[9px] font-bold z-30"
-                style={{ backgroundColor: era.accent, color: '#E7D5A4' }}
+                style={{ backgroundColor: era.accent, color: '#EFE2C0' }}
               >
                 ✦
               </div>
@@ -290,7 +288,7 @@ export const History = () => {
                   <ArchiveStamp text={`ENTRY ${era.archiveNo}`} rotation="-8deg" color="red" className="era-stamp absolute -top-4 right-6 z-30" />
                   <span className="font-mono text-xs font-bold text-[#B94717] tracking-widest uppercase block mb-2">{era.year} // {era.venue}</span>
                   <h3 className="display text-4xl md:text-6xl text-[#11100C] mb-4 ink-bleed">{era.title}</h3>
-                  <div className="my-6 relative inline-block bg-[#11100C] p-2 border-2 border-[#11100C] shadow-lg rotate-[-3deg]">
+                  <div className="my-6 relative inline-block bg-[#181614] p-2 border-2 border-[#11100C] shadow-lg rotate-[-3deg]">
                     <PaperTape rotation="-2deg" width="w-16" className="absolute -top-3 left-1/3 z-20" />
                     <img src={era.image} alt={era.title} className="w-full max-w-[320px] aspect-[4/3] object-cover filter grayscale sepia-[0.4]" />
                     <span className="absolute bottom-2 left-3 font-mono text-[8px] text-[#E7D5A4]">✎ the beginning.</span>
@@ -305,7 +303,7 @@ export const History = () => {
               {era.format === 'SCRAPBOOK' && (
                 <div className="era-card w-full max-w-[340px] sm:max-w-4xl flex flex-col md:flex-row items-center gap-6 sm:gap-10 paper-surface p-6 md:p-12 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] text-[#11100C] relative">
                   <ArchiveStamp text={`FILED ${era.archiveNo}`} rotation="5deg" color="orange" className="era-stamp absolute top-4 right-4 z-30" />
-                  <div className="w-full md:w-1/2 relative bg-[#11100C] p-3 shadow-xl border-2 border-[#11100C] rotate-[-2deg]">
+                  <div className="w-full md:w-1/2 relative bg-[#181614] p-3 shadow-xl border-2 border-[#11100C] rotate-[-2deg]">
                     <img src={era.image} alt={era.title} className="w-full aspect-[4/3] object-cover filter grayscale contrast-125" />
                   </div>
                   <div className="w-full md:w-1/2 flex flex-col">
@@ -327,7 +325,7 @@ export const History = () => {
                   </div>
                   <div className="w-full aspect-[16/9] bg-black overflow-hidden border-2 border-[#11100C] mb-4 relative">
                     <img src={era.image} alt={era.title} className="w-full h-full object-cover filter grayscale contrast-125" />
-                    <span className="absolute top-2 right-2 bg-[#5A120D] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5">BANSILALPET STEPWELL</span>
+                    <span className="absolute top-2 right-2 bg-[#4A171D] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5">BANSILALPET STEPWELL</span>
                   </div>
                   <h3 className="display text-4xl md:text-5xl text-[#11100C] mb-2 ink-bleed">{era.title}</h3>
                   <p className="font-mono text-xs text-[#B94717] font-bold tracking-widest uppercase mb-4">{era.venue}</p>
@@ -344,7 +342,7 @@ export const History = () => {
                   <h3 className="display text-5xl md:text-7xl text-[#E7D5A4] mb-4 leading-none ink-bleed">
                     THE WORLD<br/><span className="italic text-[#5A120D]">WENT QUIET.</span>
                   </h3>
-                  <div className="my-6 w-16 h-[2px] bg-[#5A120D] mx-auto" />
+                  <div className="my-6 w-16 h-[2px] bg-[#4A171D] mx-auto" />
                   <p className="font-mono text-xs text-[#E7D5A4]/70 tracking-widest uppercase max-w-md mx-auto">
                     "{era.description}"
                   </p>
@@ -376,17 +374,17 @@ export const History = () => {
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
-                      <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-60" />
+                      <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy8.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 031</span>
                     </div>
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
-                      <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-60" />
+                      <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy1.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 032</span>
                     </div>
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black hidden md:block">
-                      <VintageFilmFrame color="#11100C" holeColor="#11100C" className="opacity-60" />
+                      <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy3.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
                       <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 033</span>
                     </div>

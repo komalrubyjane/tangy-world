@@ -9,9 +9,9 @@ const COLLABORATION_TRACKS = [
     title: 'VENDOR COLLABORATION',
     category: 'FOOD, CRAFT & PRINT ARTISANS',
     path: '/apply/vendors',
-    bg: '#E7D7AC',
-    text: '#17120D',
-    accent: '#315B66',
+    bg: '#EFE2C0',
+    text: '#181614',
+    accent: '#465667',
     image: '/media/gallery/tangy3.jpg',
     desc: 'Bring your handcrafted food, clay chai, vintage printmaking, or artisanal products to our heritage sessions.',
     perks: ['Direct access to 300+ cultural enthusiasts', 'Featured in printed session programmes', 'Dedicated vintage stall space']
@@ -21,9 +21,9 @@ const COLLABORATION_TRACKS = [
     title: 'SPONSOR PARTNERSHIPS',
     category: 'BRAND & CULTURAL PATRONS',
     path: '/apply/sponsors',
-    bg: '#191410',
-    text: '#E7D5A4',
-    accent: '#C69A32',
+    bg: '#181614',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     image: '/media/gallery/tangy5.jpg',
     desc: 'Align your brand with independent music preservation, authentic storytelling, and ancient monument revival.',
     perks: ['Title & stage naming rights', 'Custom audio-visual brand integration', 'VIP inner circle hospitality']
@@ -33,9 +33,9 @@ const COLLABORATION_TRACKS = [
     title: 'VENUE & HERITAGE HOSTING',
     category: 'STEPWELLS, PALACES & HAVELIS',
     path: '/apply/venue-host',
-    bg: '#315B66',
-    text: '#E7D5A4',
-    accent: '#C69A32',
+    bg: '#465667',
+    text: '#EFE2C0',
+    accent: '#C89D35',
     image: '/media/gallery/tngy7.jpg',
     desc: 'Transform your historic property, courtyard, or monument into a pulsating sanctuary of unamplified sound.',
     perks: ['Full acoustic structural assessment', 'Zero structural impact guarantee', 'National media & documentary spotlight']
@@ -47,12 +47,11 @@ export const CollaboratePage = () => {
   const { playSFX } = useAudio();
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* PAGE HERO */}
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
         <div className="relative z-10">
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 block">
@@ -68,7 +67,7 @@ export const CollaboratePage = () => {
       </section>
 
       {/* STATS BANNER */}
-      <section className="bg-[#E7D5A4] border-y-4 border-[#11100C] py-5 sm:py-7 px-4 overflow-x-auto">
+      <section className="bg-[#EFE2C0] paperTexture border-y-4 border-[#11100C] py-5 sm:py-7 px-4 overflow-x-auto">
         <div className="flex gap-6 sm:gap-0 sm:grid sm:grid-cols-4 max-w-5xl mx-auto text-center min-w-max sm:min-w-0">
           {[
             { num: '32+', label: 'SESSIONS PRODUCED' },

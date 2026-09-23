@@ -73,12 +73,12 @@ export const AdminArtistPreviewInner = () => {
           {artist.avatar_url ? (
             <img src={artist.avatar_url} alt={artist.name} className="w-16 h-16 rounded-full object-cover border-2 border-[#B94717]" />
           ) : (
-            <div className="w-16 h-16 shrink-0 rounded-full bg-[#E7D5A4] text-[#11100C] flex items-center justify-center font-display text-xl font-bold border-2 border-[#B94717]">
+            <div className="w-16 h-16 shrink-0 rounded-full bg-[#E7D5A4] text-[#11100C] flex items-center justify-center font-condensed text-xl font-bold border-2 border-[#B94717]">
               {artist.name?.[0] || 'A'}
             </div>
           )}
           <div>
-            <h1 className="font-display text-2xl font-bold uppercase">{artist.name}</h1>
+            <h1 className="font-condensed text-2xl font-bold uppercase">{artist.name}</h1>
             <p className="font-mono text-[10px] text-[#E7D5A4]/60">{artist.email}</p>
             <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-0.5">{artist.genre || 'Genre not set'} · {artist.city || 'City not set'}</p>
             <div className="mt-2"><Badge status={artist.status} /></div>
@@ -94,7 +94,7 @@ export const AdminArtistPreviewInner = () => {
 
         {artist.bio && (
           <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-            <h3 className="font-display text-base font-bold uppercase mb-2 text-[#C99A2E]">Bio</h3>
+            <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#C99A2E]">Bio</h3>
             <p className="font-mono text-xs text-[#E7D5A4]/80 whitespace-pre-wrap">{artist.bio}</p>
             <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-[#E7D5A4]/60">
               {artist.instagram && <span>IG: {artist.instagram}</span>}
@@ -105,12 +105,12 @@ export const AdminArtistPreviewInner = () => {
         )}
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Upcoming Performances</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Upcoming Performances</h3>
           {upcomingPerformances.length === 0 ? <Empty>NO UPCOMING PERFORMANCES CONFIRMED.</Empty> : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {upcomingPerformances.map((p) => (
                 <div key={p.name + p.event_date} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                  <h4 className="font-display font-bold uppercase">{p.name}</h4>
+                  <h4 className="font-condensed font-bold uppercase">{p.name}</h4>
                   <p className="font-mono text-[10px] mt-1">{fmtDate(p.event_date)} · {p.venue}</p>
                 </div>
               ))}
@@ -119,7 +119,7 @@ export const AdminArtistPreviewInner = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Availability (next 20 entries)</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Availability (next 20 entries)</h3>
           {availability.length === 0 ? <Empty>NO AVAILABILITY SET.</Empty> : (
             <div className="flex flex-wrap gap-2">
               {availability.map((a) => (
@@ -130,7 +130,7 @@ export const AdminArtistPreviewInner = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Media Uploads</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Media Uploads</h3>
           {media.length === 0 ? <Empty>NO MEDIA UPLOADED.</Empty> : (
             <div className="flex flex-col gap-2">
               {media.map((m) => (
@@ -144,7 +144,7 @@ export const AdminArtistPreviewInner = () => {
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-          <h3 className="font-display text-base font-bold uppercase mb-3 text-[#C99A2E]">Assignment Requests</h3>
+          <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#C99A2E]">Assignment Requests</h3>
           {requests.length === 0 ? <Empty>NO ASSIGNMENT REQUESTS ON FILE.</Empty> : (
             <div className="flex flex-col gap-2">
               {requests.map((r) => (

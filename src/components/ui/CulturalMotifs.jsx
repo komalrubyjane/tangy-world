@@ -5,29 +5,8 @@
 
 // 1. Bandhani-inspired dot field — deliberately irregular dot sizes/offsets
 // within the repeating tile so it reads as hand-tied fabric, not a grid.
-export const BandhaniDotField = ({
-  color = '#ECDCAF',
-  opacity = 0.08,
-  size = 46,
-  className = '',
-}) => (
-  <div className={`absolute inset-0 pointer-events-none z-0 ${className}`} style={{ opacity }} aria-hidden="true">
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="bandhani-dots" width={size} height={size} patternUnits="userSpaceOnUse" patternTransform="rotate(6)">
-          <circle cx={size * 0.22} cy={size * 0.24} r={size * 0.05} fill={color} />
-          <circle cx={size * 0.62} cy={size * 0.18} r={size * 0.035} fill={color} />
-          <circle cx={size * 0.82} cy={size * 0.52} r={size * 0.06} fill={color} />
-          <circle cx={size * 0.4} cy={size * 0.56} r={size * 0.04} fill={color} />
-          <circle cx={size * 0.14} cy={size * 0.78} r={size * 0.045} fill={color} />
-          <circle cx={size * 0.7} cy={size * 0.86} r={size * 0.035} fill={color} />
-          <circle cx={size * 0.94} cy={size * 0.92} r={size * 0.05} fill={color} />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#bandhani-dots)" />
-    </svg>
-  </div>
-);
+// Retired: full-section dot-pattern backgrounds (visual noise). No-op.
+export const BandhaniDotField = () => null;
 
 // 2. Rangoli medallion — original 8-fold symmetric radial geometry (petals,
 // dots, concentric rings). `drawClassName` tags the outer stroke path so a
@@ -73,24 +52,9 @@ export const LotusMotif = ({ color = '#ECDCAF', className = '' }) => (
 
 // 4. Textile border strip — a woven-trim diamond repeat, thin full-width
 // divider standing in for a plain rule/border.
-export const TextileBorderStrip = ({
-  colorA = '#D19A24',
-  colorB = '#11100C',
-  height = 12,
-  className = '',
-}) => (
-  <div className={`w-full overflow-hidden pointer-events-none select-none ${className}`} style={{ height }} aria-hidden="true">
-    <svg width="100%" height="100%" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="textile-diamond" width="22" height={height} patternUnits="userSpaceOnUse">
-          <rect width="22" height={height} fill={colorB} />
-          <path d={`M11 1 L20 ${height / 2} L11 ${height - 1} L2 ${height / 2} Z`} fill={colorA} />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#textile-diamond)" />
-    </svg>
-  </div>
-);
+// Retired: woven-trim strips framed nearly every section top and bottom,
+// adding a second pattern language to every seam. No-op.
+export const TextileBorderStrip = () => null;
 
 // 5. Sketchy hand-drawn accents — wobbly, slightly-doubled strokes rather
 // than perfect geometry, for sparing editorial annotation use.
@@ -178,12 +142,9 @@ export const HalftoneTexture = ({ color = '#11100C', opacity = 0.5, dotSize = 4,
 
 // 9. Film grain — formalises the site's noise.png texture as a reusable, subtle
 // atmospheric layer (never targeted at a specific photo).
-export const FilmGrain = ({ opacity = 0.1, blend = 'overlay', className = '' }) => (
-  <div
-    className={`absolute inset-0 pointer-events-none bg-[url('/noise.png')] ${className}`}
-    style={{ opacity, mixBlendMode: blend }}
-    aria-hidden="true"
-  />
+// Film grain → the shared static grain (no blend mode). Legacy props ignored.
+export const FilmGrain = ({ className = '' }) => (
+  <div className={`tangy-grain ${className}`} aria-hidden="true" />
 );
 
 // 10. Retro poster frame — an inset border with four registration marks at the
@@ -203,7 +164,7 @@ export const RetroPosterFrame = ({ color = '#ECDCAF', inset = 14, className = ''
 // never placed as a filled block over a photograph.
 export const ArchiveNumber = ({ children, color = '#ECDCAF', size = 'clamp(70px,12vw,180px)', strokeWidth = '2px', className = '' }) => (
   <span
-    className={`font-display font-black leading-none text-transparent pointer-events-none select-none ${className}`}
+    className={`font-condensed font-black leading-none text-transparent pointer-events-none select-none ${className}`}
     style={{ fontSize: size, WebkitTextStroke: `${strokeWidth} ${color}` }}
     aria-hidden="true"
   >

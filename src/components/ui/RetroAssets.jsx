@@ -58,68 +58,17 @@ export const RetroImage = ({
   );
 };
 
-// 2. PatternBackground — a real textile/Bandhani/Rangoli photograph tiled or
-// cropped as a section/card background layer, replacing a generated pattern.
-//
-// DEFAULT CONTRACT: full visual PRESENCE (opacity 1 — never a faint hint
-// behind the section's solid accent color), but dimmed/muted in tone via a
-// filter rather than transparency — a deliberate moody/aesthetic treatment,
-// not the section-color wash this used to have. Callers using this as an
-// actual section/page background photo should NOT pass a low `opacity` —
-// leave it at the default. A caller may still pass an explicit low
-// `opacity` when it is a genuinely small, localized decorative accent (a
-// tiled strip, a per-card texture, an era-accent tint) rather than the
-// section's background photo — those exceptions stay documented at their
-// call site.
-export const PatternBackground = ({
-  category,
-  index = 0,
-  src,
-  opacity = 1,
-  size = 'cover', // 'cover' or a CSS background-size value (e.g. '220px')
-  repeat = false,
-  blend = 'normal',
-  dim = true, // set false to opt a specific caller out of the dim treatment
-  className = '',
-}) => {
-  const resolvedSrc = src || pickAsset(category, index);
-  if (!resolvedSrc) return null;
-  return (
-    <>
-      <div
-        className={`absolute inset-0 pointer-events-none ${className}`}
-        style={{
-          backgroundImage: `url(${resolvedSrc})`,
-          backgroundSize: size,
-          backgroundRepeat: repeat ? 'repeat' : 'no-repeat',
-          backgroundPosition: 'center',
-          opacity,
-          mixBlendMode: blend,
-          filter: dim ? 'brightness(0.62) saturate(0.82)' : 'none',
-        }}
-        aria-hidden="true"
-      />
-      {/* Very light readability tint directly over the photo — 1% black, per
-          explicit request after the full-strength photo made overlaid text
-          hard to read on some sections. Kept in the shared component so
-          every background photo gets the same minimal treatment instead of
-          per-section tweaks. */}
-      <div className={`absolute inset-0 pointer-events-none bg-black/[0.01] ${className}`} aria-hidden="true" />
-    </>
-  );
-};
+// 2. PatternBackground — RETIRED as a background system (visual feedback,
+// 23 Sep 2026: "the fabric background adds visual noise"). Sections now pick
+// one solid background family (.bg-family-* in globals.css) with at most the
+// static .tangy-grain texture. Kept as a no-op so existing call sites across
+// portals and subpages don't need to change; don't add new ones.
+export const PatternBackground = () => null;
 
-// 3. RangoliDecoration — a real Rangoli/geometric photograph cropped into a
-// circular medallion, optionally slowly rotating.
-export const RangoliDecoration = ({ index = 0, src, spin = true, className = '' }) => {
-  const resolvedSrc = src || pickAsset('rangoli', index);
-  if (!resolvedSrc) return null;
-  return (
-    <div className={`rounded-full overflow-hidden pointer-events-none ${spin ? 'animate-[spin_140s_linear_infinite]' : ''} ${className}`} aria-hidden="true">
-      <img src={resolvedSrc} alt="" className="w-full h-full object-cover" />
-    </div>
-  );
-};
+// 3. RangoliDecoration — RETIRED. These were large, slowly spinning photo
+// medallions in section corners: decoration with no meaning, plus a
+// continuous animation. No-op so existing call sites stay valid.
+export const RangoliDecoration = () => null;
 
 // 4. LotusStamp — a real lotus image cropped into a small circular stamp/seal,
 // for corners, archive labels, tickets, footers.
@@ -194,16 +143,10 @@ export const FilmCutout = ({ index = 0, src, rotate = 0, className = '' }) => {
   );
 };
 
-// 7. RetroGrain — a real supplied paper/film-grain texture photograph layered
-// as a subtle atmospheric overlay (never targeted at a specific photograph).
-export const RetroGrain = ({ index = 0, src, opacity = 0.1, blend = 'overlay', className = '' }) => {
-  const resolvedSrc = src || pickAsset('textures', index);
-  if (!resolvedSrc) return null;
-  return (
-    <div
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      style={{ backgroundImage: `url(${resolvedSrc})`, backgroundSize: 'cover', opacity, mixBlendMode: blend }}
-      aria-hidden="true"
-    />
-  );
-};
+// 7. RetroGrain — the single texture in the design system: a static,
+// low-opacity paper grain with NO blend mode. Legacy props (index, src,
+// opacity, blend) are accepted and ignored so every caller gets the same
+// restrained treatment instead of each stacking its own overlay strength.
+export const RetroGrain = ({ className = '' }) => (
+  <div className={`tangy-grain ${className}`} aria-hidden="true" />
+);

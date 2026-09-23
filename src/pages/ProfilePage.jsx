@@ -16,7 +16,7 @@ const STATUS_COLORS = {
 };
 
 const Badge = ({ status }) => (
-  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#E7D5A4]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
+  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#EFE2C0]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
     {status || 'n/a'}
   </span>
 );
@@ -62,10 +62,10 @@ const Empty = ({ children }) => (
 );
 
 const BookingCard = ({ b }) => (
-  <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3 flex gap-3">
+  <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-3 flex gap-3">
     <div className="min-w-0 flex-1">
       <div className="flex justify-between items-start gap-2">
-        <h4 className="font-display font-bold uppercase text-sm leading-tight">{b.events?.name || 'Unknown session'}</h4>
+        <h4 className="font-condensed font-bold uppercase text-sm leading-tight">{b.events?.name || 'Unknown session'}</h4>
         <Badge status={b.status} />
       </div>
       <p className="font-mono text-[10px] mt-1 opacity-80">{fmtDate(b.events?.event_date)} · {b.events?.venue || '—'}</p>
@@ -108,7 +108,7 @@ export const ProfilePage = () => {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
+      <div className="min-h-screen bg-[#181614] text-[#E7D5A4] flex items-center justify-center font-mono text-xs printNoise">
         LOADING PASSPORT...
       </div>
     );
@@ -151,25 +151,24 @@ export const ProfilePage = () => {
   const isAdmin = user.role === 'admin' || user.role === 'super_admin';
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
 
       <main className="pt-24 sm:pt-28 pb-20 px-4 sm:px-6 max-w-5xl mx-auto">
         {/* HEADER */}
         <Section delay={0}>
-          <div className="bg-[#3c0f0e] border-4 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
+          <div className="bg-[#4A171D] border-4 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] relative overflow-hidden">
             <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-[#E7D5A4] text-[#11100C] rounded-full border-2 border-[#B94717] flex items-center justify-center">
-                <span className="font-display text-xl sm:text-2xl font-bold">{initials(displayName)}</span>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-[#EFE2C0] text-[#11100C] rounded-full border-2 border-[#B94717] flex items-center justify-center">
+                <span className="font-condensed text-xl sm:text-2xl font-bold">{initials(displayName)}</span>
               </div>
               <div className="min-w-0 flex-1">
                 <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-[0.25em] block mb-1">
                   ✦ TANGY DIGITAL PASSPORT
                 </span>
-                <h1 className="font-display text-2xl sm:text-3xl font-bold uppercase leading-tight truncate">{displayName}</h1>
+                <h1 className="font-condensed text-2xl sm:text-3xl font-bold uppercase leading-tight truncate">{displayName}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="px-2 py-0.5 text-[9px] font-bold uppercase border border-[#C99A2E] text-[#C99A2E] bg-[#11100C]">
+                  <span className="px-2 py-0.5 text-[9px] font-bold uppercase border border-[#C99A2E] text-[#C99A2E] bg-[#181614]">
                     {user.role === 'user' ? 'Patron' : user.role}
                   </span>
                   <span className="font-mono text-[10px] text-[#E7D5A4]/70">Member since {fmtDate(user.member_since?.slice ? user.member_since.slice(0, 10) : user.member_since)}</span>
@@ -195,15 +194,15 @@ export const ProfilePage = () => {
         {/* DETAILS */}
         <Section title="Details" delay={0.05}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-[#191410] border border-[#C99A2E]/40 p-4">
+            <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
               <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Email</span>
               <div className="font-mono text-xs mt-1 break-all">{user.email}</div>
             </div>
-            <div className="bg-[#191410] border border-[#C99A2E]/40 p-4">
+            <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
               <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Phone</span>
               <div className="font-mono text-xs mt-1">{user.phone || '—'}</div>
             </div>
-            <div className="bg-[#191410] border border-[#C99A2E]/40 p-4">
+            <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
               <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Passport ID</span>
               <div className="font-mono text-xs mt-1">{user.passport_id || '—'}</div>
             </div>
@@ -214,17 +213,17 @@ export const ProfilePage = () => {
         {!isAdmin && (
           <Section title="Activity" delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-              <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
-                <div className="font-display text-3xl font-bold mt-1">{bookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{bookings.length}</div>
               </div>
-              <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming</span>
-                <div className="font-display text-3xl font-bold mt-1">{upcomingBookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{upcomingBookings.length}</div>
               </div>
-              <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Past Sessions</span>
-                <div className="font-display text-3xl font-bold mt-1">{pastBookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{pastBookings.length}</div>
               </div>
             </div>
 
@@ -232,7 +231,7 @@ export const ProfilePage = () => {
               <div className="p-6 text-center font-mono text-[11px] text-[#E7D5A4]/50">LOADING BOOKINGS...</div>
             ) : (
               <>
-                <h3 className="font-display text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Upcoming bookings</h3>
+                <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Upcoming bookings</h3>
                 {upcomingBookings.length === 0 ? (
                   <Empty>NO UPCOMING BOOKINGS. BROWSE SESSIONS AND BOOK YOUR NEXT NIGHT AT THE STEPWELL.</Empty>
                 ) : (
@@ -241,7 +240,7 @@ export const ProfilePage = () => {
                   </div>
                 )}
 
-                <h3 className="font-display text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Ticket history</h3>
+                <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Ticket history</h3>
                 {pastBookings.length === 0 ? (
                   <Empty>NO PAST TICKETS ON RECORD.</Empty>
                 ) : (
@@ -257,7 +256,7 @@ export const ProfilePage = () => {
         {/* ADMIN */}
         {isAdmin && (
           <Section title="Admin" delay={0.1}>
-            <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="bg-[#181614] border-2 border-[#C99A2E]/40 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <p className="font-mono text-xs text-[#E7D5A4]/80 leading-relaxed max-w-md">
                 Full management tools — bookings, events, applications, inbox and more — live in the admin console.
               </p>
@@ -275,10 +274,10 @@ export const ProfilePage = () => {
         <Section title="Account" delay={0.15}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Edit profile */}
-            <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
-              <h3 className="font-display text-base font-bold uppercase mb-3">Edit profile</h3>
+            <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
+              <h3 className="font-condensed text-base font-bold uppercase mb-3">Edit profile</h3>
               {!editing ? (
-                <button onClick={startEdit} className="w-full py-2.5 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">
+                <button onClick={startEdit} className="w-full py-2.5 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">
                   EDIT NAME &amp; PHONE
                 </button>
               ) : (
@@ -292,7 +291,7 @@ export const ProfilePage = () => {
                     <input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="w-full p-2.5 bg-[#F5E9C9] border-2 border-[#11100C] outline-none" />
                   </div>
                   <div className="flex gap-2">
-                    <button type="submit" className="flex-1 py-2.5 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">SAVE</button>
+                    <button type="submit" className="flex-1 py-2.5 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">SAVE</button>
                     <button type="button" onClick={() => setEditing(false)} className="flex-1 py-2.5 bg-transparent text-[#11100C] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">CANCEL</button>
                   </div>
                 </form>
@@ -301,18 +300,18 @@ export const ProfilePage = () => {
             </div>
 
             {/* Change password */}
-            <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-              <h3 className="font-display text-base font-bold uppercase mb-3 text-[#E7D5A4]">Change password</h3>
+            <div className="bg-[#181614] border-2 border-[#C99A2E]/40 p-5">
+              <h3 className="font-condensed text-base font-bold uppercase mb-3 text-[#E7D5A4]">Change password</h3>
               <form onSubmit={handlePasswordChange} className="flex flex-col gap-3 text-xs">
                 <input type="password" required minLength={6} placeholder="New password" value={pwForm.next} onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} className="w-full p-2.5 bg-[#11100C] border border-[#C99A2E]/60 text-[#E7D5A4] outline-none" />
                 <input type="password" required placeholder="Confirm new password" value={pwForm.confirm} onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} className="w-full p-2.5 bg-[#11100C] border border-[#C99A2E]/60 text-[#E7D5A4] outline-none" />
-                <button type="submit" className="py-2.5 bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">UPDATE PASSWORD</button>
+                <button type="submit" className="py-2.5 bg-[#C89D35] text-[#11100C] hover:bg-[#EFE2C0] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">UPDATE PASSWORD</button>
               </form>
               {pwMsg && <div className="mt-3 p-2 bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] text-[10px] font-bold">{pwMsg}</div>}
 
               <button
                 onClick={handleLogout}
-                className="w-full mt-5 py-2.5 bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border border-[#B94717] font-mono text-[10px] font-bold uppercase tracking-widest"
+                className="w-full mt-5 py-2.5 bg-[#B5532A] text-[#E7D5A4] hover:bg-[#181614] border border-[#B94717] font-mono text-[10px] font-bold uppercase tracking-widest"
               >
                 LOG OUT ✕
               </button>

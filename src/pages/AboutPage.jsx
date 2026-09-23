@@ -7,16 +7,15 @@ import { Spaces } from '../components/sections/Spaces';
 
 export const AboutPage = () => {
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#B94717] selection:text-[#E7D5A4] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* ABOUT HERO — Responsive */}
       <section className="relative pt-24 sm:pt-32 pb-14 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
 
         {/* Giant faded watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
-          <span className="font-display text-[20vw] leading-none text-[#E7D5A4] font-bold uppercase">ABOUT</span>
+          <span className="font-condensed text-[20vw] leading-none text-[#E7D5A4] font-bold uppercase">ABOUT</span>
         </div>
 
         <div className="relative z-10">
@@ -41,7 +40,7 @@ export const AboutPage = () => {
               <a
                 key={link.hash}
                 href={link.hash}
-                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
+                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors"
               >
                 {link.label} {link.hash.startsWith('/') ? '→' : '↓'}
               </a>
@@ -51,7 +50,7 @@ export const AboutPage = () => {
       </section>
 
       {/* TANGY NUMBERS STRIP */}
-      <section className="bg-[#E7D5A4] border-y-4 border-[#11100C] py-5 sm:py-7 px-4 overflow-x-auto">
+      <section className="bg-[#EFE2C0] paperTexture border-y-4 border-[#11100C] py-5 sm:py-7 px-4 overflow-x-auto">
         <div className="flex gap-6 sm:gap-0 sm:grid sm:grid-cols-4 max-w-5xl mx-auto text-center min-w-max sm:min-w-0">
           {[
             { num: '2016', label: 'FOUNDED' },
@@ -80,8 +79,8 @@ export const AboutPage = () => {
       <Founders />
 
       {/* MISSION & VISION SUMMARY CARD */}
-      <section className="py-16 sm:py-24 bg-[#1C0E08] border-t-8 border-[#11100C] px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto bg-[#F5E9C9] text-[#11100C] p-6 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
+      <section className="py-16 sm:py-24 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-[#11100C] pb-3 mb-4 sm:mb-6 font-mono text-xs font-bold uppercase gap-1">
             <span>MISSION &amp; VISION</span>
             <span className="hidden sm:block">HYDERABAD CULTURAL ARCHIVE</span>
@@ -104,7 +103,7 @@ export const AboutPage = () => {
             <span>DISPATCH NO. 1974-AB</span>
             <a
               href="/sessions"
-              className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border-2 border-[#11100C] px-4 py-2 font-mono font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
+              className="bg-[#B5532A] text-[#E7D5A4] hover:bg-[#181614] border-2 border-[#11100C] px-4 py-2 font-mono font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#11100C] shrink-0"
             >
               EXPLORE SESSIONS →
             </a>

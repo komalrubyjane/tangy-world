@@ -1,9 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Special+Elite&family=Caveat:wght@700&display=swap');
+/* Fonts are loaded once from index.html (a <link>, not a chained @import,
+   so they don't block this stylesheet). */
 @import "tailwindcss";
 @import "./animations.css";
 @import "./cursor.css";
 
+/* =====================================================================
+   TANGY DESIGN SYSTEM — "one physical publication"
+   One palette, one type system, one grid. Each homepage section is a
+   different page/exhibit of the same archive: it gets its own MATERIAL
+   (oxblood textile, catalogue paper, espresso table, olive file cabinet,
+   botanical print, film stock, field-journal blue) via a .theme-* class,
+   while type, rules, metadata, stamps and tape stay shared.
+   Textures are pre-baked at their final opacity (4–13%) in
+   /public/textures and stacked as background-image layers — no blend
+   modes, no overlay DIVs, no stacking contexts.
+   ===================================================================== */
+
 @theme {
+  /* ── Editorial palette ─────────────────────────────────────────────── */
+  --color-tangy-burgundy: #4a171d;
+  --color-tangy-umber: #211915;     /* dark brown — "archive" family */
+  --color-tangy-charcoal: #181614;
+  --color-tangy-ivory: #efe2c0;     /* warm cream — "paper" family */
+  --color-tangy-aged: #d8c69f;      /* aged paper */
+  --color-tangy-olive: #3f4735;
+  --color-tangy-dusk: #465667;      /* dusty blue */
+  --color-tangy-clay: #a64a2b;      /* muted rust */
+  --color-tangy-gold: #c89d35;
+  --color-tangy-ink: #181614;
+
+  /* Legacy names — still referenced across portals/dashboards. */
   --color-tangy-black: #191410;
   --color-tangy-oxblood: #4c1210;
   --color-tangy-rust: #8a2320;
@@ -14,103 +40,556 @@
   --color-tangy-vermilion: #d91e18;
   --color-tangy-magenta: #d81b73;
 
-  --font-poster: 'Anton', 'Oswald', system-ui, sans-serif;
-  --font-display: 'Oswald', sans-serif;
+  /* ── Type system ───────────────────────────────────────────────────────
+     DISPLAY    Anton            — H1/H2 poster headlines
+     CONDENSED  Oswald           — H3, card titles, subheads
+     BODY       DM Sans          — all running text
+     MONO       DM Mono          — archive metadata, labels, captions
+     ACCENT     Cormorant italic — pull quotes only                      */
+  --font-display: 'Anton', 'Oswald', Impact, sans-serif;
+  --font-condensed: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-accent: 'Cormorant Garamond', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-hand: 'Caveat', cursive;
+  /* Legacy aliases */
+  --font-poster: 'Anton', 'Oswald', Impact, sans-serif;
   --font-editorial: 'Oswald', sans-serif;
-  --font-archive: 'Special Elite', 'Courier New', monospace;
+  --font-archive: 'DM Mono', ui-monospace, monospace;
+}
+
+:root {
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 7rem;
+
+  /* Grid: 4 cols mobile / 8 tablet / 12 desktop */
+  --grid-cols: 4;
+  --gutter: 16px;          /* page side margin */
+  --grid-gap: 16px;
+  --max-width: 1320px;
+  --section-pad: var(--space-xl);
+
+  /* Borders & shadows — print-style, used sparingly */
+  --rule: 1px solid currentColor;
+  --shadow-print: 4px 4px 0 rgba(24, 22, 20, 0.85);
+  --shadow-print-soft: 3px 3px 0 rgba(24, 22, 20, 0.25);
+  --radius: 2px;
+
+  /* Fixed chrome: mobile bottom dock height incl. safe area */
+  --dock-space: calc(84px + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  :root { --grid-cols: 8; --gutter: 32px; --grid-gap: 24px; --section-pad: 5.5rem; }
+}
+@media (min-width: 1024px) {
+  :root { --grid-cols: 12; --gutter: 76px; --grid-gap: 24px; --section-pad: var(--space-2xl); --dock-space: 76px; }
 }
 
 @layer base {
-  /* "Printed paper laid over fabric" — a translucent card surface that lets
-     the bandhani/textile PatternBackground show through instead of hiding it
-     behind a flat opaque rectangle. Two variants match the two content-card
-     tones already used across the site (light cream cards, dark ink cards).
-     Kept deliberately opaque enough (78-84%) to stay readable over a busy
-     pattern — see PatternBackground's own low 0.24-0.42 opacity, which is
-     already faint before this layers on top of it. */
-  .paper-surface {
-    background: rgba(231, 213, 164, 0.82);
-    border: 1px solid rgba(17, 16, 12, 0.35);
-    box-shadow: 4px 4px 0px rgba(17, 16, 12, 0.22);
-  }
-  .paper-surface-dark {
-    background: rgba(17, 16, 12, 0.84);
-    border: 1px solid rgba(201, 154, 46, 0.35);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.35);
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  :root {
-    --red-1: #8a2320;
-    --red-2: #6e1a19;
-    --red-3: #4c1210;
-    --red-bright: #c2272a;
-    --cream: #ecdcaf;
-    --cream-2: #e2cd97;
-    --paper: #e9decb;
-    --ink: #241a12;
-    --black: #191410;
-    --gold: #d1a437;
-    --vermilion: #d91e18;
-    --magenta: #d81b73;
-
-    --f-poster: 'Anton', 'Oswald', system-ui, sans-serif;
-    --f-display: 'Oswald', sans-serif;
-    --f-editorial: 'Oswald', sans-serif;
-    --f-archive: 'Special Elite', 'Courier New', monospace;
-  }
-
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  /* The secondary nav bar is fixed on every public page. Pages that end in
+     the shared <footer> already pad for it; everything else pads here. */
+  body[data-dock="on"] #root:not(:has(footer)) { padding-bottom: var(--dock-space); }
 
   html, body {
     margin: 0;
     padding: 0;
-    background: var(--black);
-    color: var(--paper);
-    font-family: 'Oswald', sans-serif;
+    background: var(--color-tangy-charcoal);
+    color: var(--color-tangy-ivory);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
     overflow-x: hidden;
     overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  #root {
+  #root { width: 100%; min-height: 100%; overflow-x: hidden; }
+
+  h1, h2 { font-family: var(--font-display); font-weight: 400; }
+  h3, h4 { font-family: var(--font-condensed); font-weight: 600; }
+
+  :focus-visible { outline: 2px solid var(--color-tangy-gold); outline-offset: 3px; }
+
+  img { max-width: 100%; }
+}
+
+@layer components {
+  /* ── Type scale ────────────────────────────────────────────────────── */
+  .display,
+  .t-h1,
+  .t-h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: 0.005em;
+  }
+  .t-h1 { font-size: clamp(3.25rem, 11vw, 10rem); line-height: 0.84; }
+  .t-h2 { font-size: clamp(2.5rem, 6.4vw, 5.75rem); }
+  .t-h3 {
+    font-family: var(--font-condensed);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+  }
+  .t-body { font-family: var(--font-body); font-size: 1rem; line-height: 1.65; }
+  .t-lead { font-family: var(--font-body); font-size: clamp(1.05rem, 1.4vw, 1.25rem); line-height: 1.6; }
+  .t-small { font-family: var(--font-body); font-size: 0.875rem; line-height: 1.55; }
+  .t-quote {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    line-height: 1.3;
+  }
+  .t-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    line-height: 1.4;
+  }
+  .t-meta,
+  .t-caption {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    line-height: 1.45;
+  }
+
+  /* ── Layout ────────────────────────────────────────────────────────── */
+  .t-container {
     width: 100%;
-    min-height: 100%;
-    overflow-x: hidden;
+    max-width: calc(var(--max-width) + var(--gutter) * 2);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .t-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+    gap: var(--grid-gap);
+  }
+  .t-section { position: relative; padding-block: var(--section-pad); }
+  .t-rule { border: 0; border-top: 1px solid currentColor; opacity: 0.35; margin: 0; }
+
+  /* ── Background families ───────────────────────────────────────────── */
+  .bg-family-paper   { background-color: var(--color-tangy-ivory); color: var(--color-tangy-ink); }
+  .bg-family-aged    { background-color: var(--color-tangy-aged); color: var(--color-tangy-ink); }
+  .bg-family-archive { background-color: var(--color-tangy-umber); color: var(--color-tangy-ivory); }
+  .bg-family-ink     { background-color: var(--color-tangy-charcoal); color: var(--color-tangy-ivory); }
+  .bg-family-burgundy{ background-color: var(--color-tangy-burgundy); color: var(--color-tangy-ivory); }
+  .bg-family-olive   { background-color: var(--color-tangy-olive); color: var(--color-tangy-ivory); }
+  .bg-family-dusk    { background-color: var(--color-tangy-dusk); color: var(--color-tangy-ivory); }
+
+  /* Legacy grain overlay DIV (RetroGrain) — same baked tile, no blend. */
+  .tangy-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('/textures/grain-soft.webp');
+    background-size: 160px;
   }
 
-  /* ==================================
-     GLOBAL MOBILE BREATHING ROOM
-     Keeps all sections from feeling
-     congested on small screens.
-   ================================== */
-  @media (max-width: 640px) {
-    /* Universal safe horizontal padding */
-    .mobile-px {
-      padding-left: 1.25rem;
-      padding-right: 1.25rem;
-    }
+  /* ── MATERIALS ─────────────────────────────────────────────────────────
+     Background-image stacks only; the element's own background-color
+     shows through. Usable on sections, page roots and cards alike.     */
+  .paperTexture   { background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp');   background-size: 160px, 720px; }
+  .printNoise     { background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .textileTexture { background-image: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 160px, 420px; }
+  .botanicalTexture { background-image: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 160px, 560px; }
+  .grainTexture   { background-image: url('/textures/grain-soft.webp'); background-size: 160px; }
 
-    /* Reduce heavy box-shadows on mobile */
-    .shadow-\[20px_20px_0px_\#11100C\] {
-      box-shadow: 8px 8px 0px #11100C;
-    }
-    .shadow-\[15px_15px_0px_\#11100C\] {
-      box-shadow: 6px 6px 0px #11100C;
-    }
-    .shadow-\[25px_25px_0px_\#11100C\] {
-      box-shadow: 10px 10px 0px #11100C;
-    }
+  /* Film grain that drifts — Private Sessions only. A single oversized
+     pseudo-element moved with transform (compositor-only), stepped at a
+     film-like cadence, and only while the section is in view (.in-view is
+     set by useReveal). */
+  .filmGrain { position: relative; overflow: hidden; }
+  .filmGrain::before {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    pointer-events: none;
+    background-image: url('/textures/grain-film.webp');
+    background-size: 180px;
+  }
+  .filmGrain.in-view::before { animation: grainDrift 0.9s steps(3) infinite; }
 
-    /* Breathable section vertical spacing */
-    .section-py-mobile {
-      padding-top: 4rem;
-      padding-bottom: 4rem;
+  /* ── SECTION THEMES (tokens + material) ─────────────────────────────
+     --sec-bg      page material colour      --sec-fg     default ink
+     --sec-paper   documents on this page    --sec-ink    ink on documents
+     --sec-accent  numbers/labels            --sec-accent-2  secondary   */
+  .theme-hero, .theme-inner {
+    --sec-bg: #4a171d; --sec-fg: #efe2c0; --sec-paper: #efe2c0; --sec-ink: #181614;
+    --sec-accent: #c89d35; --sec-accent-2: #b5532a;
+  }
+  .theme-about {
+    --sec-bg: #ebddb9; --sec-fg: #181614; --sec-paper: #f4ead0; --sec-ink: #181614;
+    --sec-accent: #b5532a; --sec-accent-2: #4a171d;
+  }
+  .theme-sessions {
+    --sec-bg: #211915; --sec-fg: #efe2c0; --sec-paper: #f2e6c8; --sec-ink: #181614;
+    --sec-accent: #c89d35; --sec-accent-2: #b5532a;
+  }
+  .theme-archive {
+    --sec-bg: #d8c69f; --sec-fg: #181614; --sec-paper: #181614; --sec-ink: #efe2c0;
+    --sec-accent: #b5532a; --sec-accent-2: #c89d35;
+  }
+  .theme-crew {
+    --sec-bg: #3f4735; --sec-fg: #efe2c0; --sec-paper: #f2e7cb; --sec-ink: #181614;
+    --sec-accent: #c89d35; --sec-accent-2: #b5532a;
+  }
+  .theme-collab {
+    --sec-bg: #262b22; --sec-fg: #efe2c0; --sec-paper: #f2e7cb; --sec-ink: #181614;
+    --sec-accent: #c89d35; --sec-accent-2: #b5532a; --sec-accent-3: #5a6e80;
+  }
+  .theme-private, .theme-contact {
+    --sec-bg: #181614; --sec-fg: #efe2c0; --sec-paper: #efe2c0; --sec-ink: #181614;
+    --sec-accent: #c89d35; --sec-accent-2: #4a171d;
+  }
+  .theme-diary {
+    --sec-bg: #465667; --sec-fg: #efe2c0; --sec-paper: #5a4032; --sec-ink: #efe2c0;
+    --sec-accent: #e4c77a; --sec-accent-2: #c89d35;
+  }
+  .theme-footer {
+    --sec-bg: #211915; --sec-fg: #efe2c0; --sec-accent: #c89d35;
+  }
+  [class*='theme-'] { background-color: var(--sec-bg); color: var(--sec-fg); }
+  .theme-hero, .theme-inner { background-image: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 160px, 420px; }
+  .theme-about, .theme-archive { background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp'); background-size: 160px, 720px; }
+  .theme-sessions, .theme-crew, .theme-diary, .theme-footer { background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .theme-collab { background-image: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 160px, 560px; }
+  .theme-private, .theme-contact { background-image: url('/textures/grain-soft.webp'); background-size: 160px; }
+
+  /* Section accent helpers */
+  .sec-accent { color: var(--sec-accent); }
+  .sec-accent-2 { color: var(--sec-accent-2); }
+  .sec-muted { color: color-mix(in srgb, var(--sec-fg) 72%, transparent); }
+
+  /* ── Print surfaces ────────────────────────────────────────────────── */
+  .paper-surface {
+    background-color: #f2e7cb;
+    background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp');
+    background-size: 160px, 720px;
+    border: 1px solid rgba(24, 22, 20, 0.8);
+    box-shadow: var(--shadow-print-soft);
+  }
+  .paper-surface-dark {
+    background: #1d1916;
+    border: 1px solid rgba(200, 157, 53, 0.35);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+  }
+
+  /* ── Buttons ───────────────────────────────────────────────────────── */
+  .btn-ticket,
+  .t-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    min-height: 44px;
+    padding: 0.8rem 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-decoration: none;
+    background: var(--color-tangy-ink);
+    color: var(--color-tangy-ivory);
+    border: 1px solid var(--color-tangy-ink);
+    border-radius: var(--radius);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-ticket:hover,
+  .t-btn:hover { background: var(--color-tangy-clay); border-color: var(--color-tangy-clay); color: var(--color-tangy-ivory); }
+  .btn-ticket:disabled,
+  .t-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .t-btn-light { background: var(--color-tangy-ivory); color: var(--color-tangy-ink); border-color: var(--color-tangy-ivory); }
+  .t-btn-light:hover { background: var(--color-tangy-gold); border-color: var(--color-tangy-gold); color: var(--color-tangy-ink); }
+  .t-btn-ghost { background: transparent; color: inherit; border-color: currentColor; }
+  .t-btn-ghost:hover { background: rgba(239, 226, 192, 0.08); border-color: currentColor; color: inherit; }
+
+  .t-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+  }
+
+  /* ── Print details (use sparingly: one per composition) ───────────── */
+  .t-stamp {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border: 1.5px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .t-tape {
+    position: absolute;
+    width: 72px;
+    height: 18px;
+    background: rgba(239, 226, 192, 0.8);
+    border: 1px solid rgba(24, 22, 20, 0.15);
+    pointer-events: none;
+  }
+
+  /* ── ARCHIVAL PRIMITIVES ─────────────────────────────────────────── */
+  .archivalRule { border: 0; border-top: 1px solid currentColor; opacity: 0.35; margin: 0; }
+  .archivalRule--double { border-top: 3px double currentColor; opacity: 0.5; }
+  .archiveMetadata { font-family: var(--font-mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.45; }
+  .filmCaption { font-family: var(--font-mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; }
+  .filmCaption::before { content: '▸ '; opacity: 0.6; }
+  .folio { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.3em; opacity: 0.55; }
+
+  /* Print misregistration: an offset second ink, as text-shadow (no extra DOM). */
+  .registrationOffset { text-shadow: 0.014em 0.008em 0 var(--reg-ink, rgba(192, 57, 43, 0.45)); }
+
+  /* Paper lying on a surface: contact shadow + soft falloff. */
+  .paperShadow {
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.18),
+      0 2px 3px rgba(0, 0, 0, 0.12),
+      0 14px 28px -12px rgba(0, 0, 0, 0.55);
+  }
+  /* Hover lift uses the individual `translate`/`rotate` properties, so it
+     composes with the reveal classes' `transform` (resting angle) instead of
+     overwriting it. */
+  .paperLift { transition: translate 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), rotate 0.35s ease, box-shadow 0.35s ease; }
+  .paperLift .archiveStamp { transition: opacity 0.3s ease; }
+  .paperLift .photoFrame-img img { transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  @media (hover: hover) and (pointer: fine) {
+    .paperLift:hover {
+      translate: 0 -5px;
+      rotate: 0.25deg;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.18), 0 24px 36px -14px rgba(0, 0, 0, 0.6);
     }
+    .paperLift:hover .archiveStamp { opacity: 1; }
+    .paperLift:hover .photoFrame-img img { transform: scale(1.03) translateY(-2px); }
+  }
+
+  /* Masking tape: translucent, torn ends. */
+  .tapeStrip {
+    position: absolute;
+    width: 76px;
+    height: 20px;
+    background: rgba(236, 222, 184, 0.72);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+    clip-path: polygon(3% 8%, 97% 0, 100% 30%, 96% 58%, 99% 100%, 2% 94%, 0 62%, 4% 34%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Rubber stamp: bordered mono label, slightly rotated, slightly faded ink. */
+  .archiveStamp {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border: 1.5px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    opacity: 0.88;
+    transform: rotate(var(--rest-rot, -4deg));
+  }
+
+  /* Physical photograph: a print border, a contact shadow, and a grain pass
+     over the image so it reads as printed, not rendered. */
+  .photoFrame { position: relative; background: #f4ecd6; padding: 8px 8px 10px; }
+  .photoFrame--dark { background: #111; }
+  .photoFrame-img { position: relative; overflow: hidden; }
+  .photoFrame-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('/textures/grain-film.webp');
+    background-size: 160px;
+  }
+
+  /* Photographic treatments — chosen per archive environment. */
+  .photo-bw    { filter: grayscale(1) contrast(1.08); }
+  .photo-aged  { filter: grayscale(1) sepia(0.32) contrast(1.05) brightness(0.97); }
+  .photo-muted { filter: saturate(0.6) sepia(0.12) contrast(1.03); }
+
+  /* Folder tab on top of a document. */
+  .documentTab {
+    position: absolute;
+    left: 1.5rem;
+    top: 0;
+    transform: translateY(-100%);
+    height: 1.75rem;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    border: 1px solid rgba(24, 22, 20, 0.7);
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+  }
+
+  /* Contact sheet: black film panel with sprocket rows. */
+  .contactSheet { position: relative; background: #151311; color: #efe2c0; }
+  .contactSheet::before,
+  .contactSheet::after {
+    content: '';
+    display: block;
+    height: 7px;
+    margin: 0 12px;
+    background-image: repeating-linear-gradient(90deg, transparent 0 10px, rgba(239, 226, 192, 0.55) 10px 20px, transparent 20px 30px);
+  }
+  .contactSheet::before { margin-top: 12px; }
+  .contactSheet::after { margin-bottom: 12px; }
+
+  /* Perforated edge (mailing card, ticket stub). */
+  .paperEdge-perf {
+    -webkit-mask: radial-gradient(circle 3.5px at 50% 0, transparent 97%, #000) 0 0 / 14px 100% repeat-x;
+    mask: radial-gradient(circle 3.5px at 50% 0, transparent 97%, #000) 0 0 / 14px 100% repeat-x;
+  }
+
+  /* Registration crosshair for page corners. */
+  .regMark { position: absolute; width: 14px; height: 14px; opacity: 0.4; pointer-events: none; }
+  .regMark::before, .regMark::after { content: ''; position: absolute; background: currentColor; }
+  .regMark::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+  .regMark::after { top: 50%; left: 0; right: 0; height: 1px; }
+  .regMark > i { position: absolute; inset: 3px; border: 1px solid currentColor; border-radius: 50%; }
+
+  /* ── Archive index panel (mobile menu) ───────────────────────────── */
+  .index-panel {
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+    transition: clip-path 0.5s cubic-bezier(0.7, 0, 0.2, 1) 0.12s, visibility 0s linear 0.62s;
+  }
+  .index-panel.is-open {
+    clip-path: inset(0 0 0 0);
+    visibility: visible;
+    transition: clip-path 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s;
+  }
+  .index-panel .index-item {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.25s ease, transform 0.3s ease;
+  }
+  .index-panel.is-open .index-item {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(140ms + var(--i, 0) * 40ms);
+  }
+
+  /* ── Desktop photo handling: a print you can almost pick up ───────── */
+  @media (hover: hover) and (pointer: fine) {
+    .photoFrame { transition: translate 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), scale 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.4s ease; }
+    .photoFrame:hover {
+      translate: 0 -3px;
+      scale: 1.015;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.18), 0 22px 34px -14px rgba(0, 0, 0, 0.6);
+    }
+    /* Contact sheet: the frame under the loupe stands out, its neighbours recede. */
+    .contactSheet ol > li { transition: opacity 0.3s ease, scale 0.3s ease; position: relative; }
+    .contactSheet ol:hover > li { opacity: 0.6; }
+    .contactSheet ol > li:hover { opacity: 1; scale: 1.03; z-index: 1; }
+  }
+
+  /* ── Scroll reveal (IntersectionObserver-driven, see useReveal) ───── */
+  /* Section entrance order: metadata (d0) → heading (d1) → supporting
+     copy (d2) → images/cards (d3). */
+  .d1 { --d: 1; } .d2 { --d: 2; } .d3 { --d: 3; }
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: calc(var(--d, 0) * 110ms); }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  /* Headline "printing": the observed element is the heading; its inner
+     .rt block unclips top-down while rising slightly. The final inset is
+     negative so the registration offset/text-shadow is never cropped. */
+  .reveal-type > .rt {
+    display: block;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.14em);
+    transition: clip-path 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(var(--d, 1) * 110ms);
+  }
+  .reveal-type.is-visible > .rt { clip-path: inset(-0.25em -0.3em -0.3em -0.3em); transform: none; }
+  /* Paper sliding onto the table and settling at its resting angle. */
+  .reveal-paper { opacity: 0; transform: translateY(28px) rotate(calc(var(--rest-rot, 0deg) - 2deg)) scale(1.02); transition: opacity 0.8s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: calc(var(--d, 3) * 110ms); }
+  /* Tape goes on after the print is placed. */
+  .reveal-paper .tapeStrip { opacity: 0; transform: scaleX(0.5); transition: opacity 0.3s ease 0.9s, transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) 0.9s; }
+  .reveal-paper.is-visible .tapeStrip { opacity: 1; transform: none; }
+  .reveal-paper.is-visible { opacity: 1; transform: rotate(var(--rest-rot, 0deg)); }
+  /* A stamp landing once. */
+  .reveal-stamp { opacity: 0; transform: scale(1.3) rotate(-12deg); transition: opacity 0.25s ease 0.8s, transform 0.4s cubic-bezier(0.25, 1.25, 0.5, 1) 0.8s; }
+  .reveal-stamp.is-visible { opacity: 0.88; transform: rotate(var(--rest-rot, -4deg)); }
+  /* Film frames exposing top-down. The class goes on the FIGURE (observed);
+     the photo inside is what's clipped — a fully clipped element has no
+     visible area, so IntersectionObserver would never fire on it directly. */
+  .reveal-frame .photoFrame-img { clip-path: inset(0 0 100% 0); transition: clip-path 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: inherit; }
+  .reveal-frame.is-visible .photoFrame-img { clip-path: inset(0 0 0 0); }
+
+  /* Subtle scroll-linked drift, CSS-only (scroll-driven animations);
+     browsers without support simply show the element static. */
+  @supports (animation-timeline: view()) {
+    .drift-soft { animation: driftSoft linear both; animation-timeline: view(); animation-range: cover; }
+    /* Image moving inside its print frame (over-scaled so no edge shows). */
+    .drift-img { animation: driftImg linear both; animation-timeline: view(); animation-range: cover; }
   }
 }
 
-/* Custom 1970s Vintage Poster Typography Classes */
-.font-poster {
-  font-family: 'Anton', 'Oswald', system-ui, sans-serif;
+@keyframes grainDrift {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-22px, 14px); }
+  66% { transform: translate(16px, -20px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes driftImg {
+  from { transform: translateY(12px) scale(1.1); }
+  to { transform: translateY(-12px) scale(1.1); }
+}
+@keyframes driftSoft {
+  from { transform: translateY(28px); }
+  to { transform: translateY(-28px); }
+}
+
+/* Phones / touch: less movement, faster reveals, no continuous motion. */
+@media (max-width: 767px), (pointer: coarse) {
+  .reveal { transition-duration: 0.5s, 0.55s; transition-delay: calc(var(--d, 0) * 70ms); }
+  .reveal:not(.is-visible) { transform: translateY(14px); }
+  .reveal-paper { transition-duration: 0.55s, 0.6s; }
+  .reveal-paper:not(.is-visible) { transform: translateY(18px) rotate(var(--rest-rot, 0deg)); }
+  .reveal-type > .rt { transition-duration: 0.6s; transition-delay: calc(var(--d, 1) * 70ms); }
+  .drift-soft, .drift-img, .filmGrain.in-view::before { animation: none !important; }
+  .drift-img { transform: scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-paper, .reveal-stamp, .reveal-frame .photoFrame-img { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .reveal-type > .rt { clip-path: none; transform: none; transition: none; }
+  .reveal-paper .tapeStrip { opacity: 1; transform: none; transition: none; }
+  .index-panel, .index-panel .index-item { transition: none !important; transform: none !important; }
+  .reveal-paper, .reveal-stamp { transform: rotate(var(--rest-rot, 0deg)); }
+  .filmGrain.in-view::before, .drift-soft, .drift-img { animation: none; }
+  .paperLift, .photoFrame, .contactSheet ol > li { transition: none !important; }
 }

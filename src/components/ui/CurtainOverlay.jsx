@@ -12,7 +12,15 @@ export const CurtainOverlay = ({ onComplete }) => {
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
+    // The curtain is an opening ceremony, not a per-page-load toll: it plays
+    // once per browser session, then the homepage opens straight to content.
+    let alreadyPlayed = false;
+    try {
+      alreadyPlayed = sessionStorage.getItem('tangyCurtainPlayed') === '1';
+    } catch {
+      // storage unavailable — just play it
+    }
+    if (prefersReducedMotion || alreadyPlayed) {
       setIsFinished(true);
       if (onComplete) onComplete();
       return;
@@ -33,6 +41,7 @@ export const CurtainOverlay = ({ onComplete }) => {
 
     const tl = gsap.timeline({
       onComplete: () => {
+        try { sessionStorage.setItem('tangyCurtainPlayed', '1'); } catch { /* ignore */ }
         restoreScroll();
         setIsFinished(true);
         if (onComplete) onComplete();
@@ -98,7 +107,6 @@ export const CurtainOverlay = ({ onComplete }) => {
         style={{ willChange: 'transform' }}
       >
         <div className="w-full h-full bg-[repeating-linear-gradient(90deg,#11100C_0%,#5A120D_12%,#320407_25%,#6E1711_38%,#11100C_50%)] opacity-95" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay" />
         <div className="absolute bottom-0 inset-x-0 h-40 bg-[linear-gradient(0deg,#11100C_0%,transparent_100%)] opacity-80" />
       </div>
 
@@ -116,7 +124,6 @@ export const CurtainOverlay = ({ onComplete }) => {
         style={{ willChange: 'transform' }}
       >
         <div className="w-full h-full bg-[repeating-linear-gradient(90deg,#11100C_0%,#320407_12%,#5A120D_25%,#6E1711_38%,#11100C_50%)] opacity-95" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay" />
         <div className="absolute bottom-0 inset-x-0 h-40 bg-[linear-gradient(0deg,#11100C_0%,transparent_100%)] opacity-80" />
       </div>
     </div>

@@ -63,7 +63,7 @@ export const BaodiSangam = () => {
 
         {/* Oversized outline edition numeral, poster-feature style */}
         <span
-          className="absolute top-[6%] right-[6%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+          className="absolute top-[6%] right-[6%] font-condensed font-black leading-none text-transparent pointer-events-none select-none"
           style={{ fontSize: 'clamp(90px,16vw,220px)', WebkitTextStroke: '2px rgba(95,168,184,0.3)' }}
           aria-hidden="true"
         >
@@ -84,7 +84,7 @@ export const BaodiSangam = () => {
             <p className="eyebrow-mono text-tangy-dusty-blue">SPECIAL PROJECT — VOL. 03</p>
             <HandDrawnCircle color="#5FA8B8" className="absolute -inset-x-3 -inset-y-2 opacity-40 pointer-events-none" />
           </div>
-          <h2 className="relative font-display font-black text-[clamp(46px,9vw,130px)] leading-[0.86] text-tangy-cream mb-5 -rotate-1 origin-left">
+          <h2 className="relative font-condensed font-black text-[clamp(46px,9vw,130px)] leading-[0.86] text-tangy-cream mb-5 -rotate-1 origin-left">
             <span className="absolute inset-0 text-[#5FA8B8] opacity-35 translate-x-[6px] -translate-y-[4px] mix-blend-screen pointer-events-none select-none -z-10" aria-hidden="true">
               BAODI<br />SANGAM
             </span>

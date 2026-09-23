@@ -1,86 +1,67 @@
-import { useGSAPContext } from '../../hooks/useGSAPContext';
-import gsap from 'gsap';
-import { TextileBorderStrip, RisographOffset } from '../ui/CulturalMotifs';
-import { PatternBackground, LotusStamp, RetroGrain } from '../ui/RetroAssets';
+import { useReveal } from '../../hooks/useReveal';
 
+const DETAILS = [
+  { label: 'Location', value: 'Hyderabad · Telangana, India' },
+  { label: 'Dispatch', value: 'hello@tangysessions.com', href: 'mailto:hello@tangysessions.com' },
+  { label: 'Archive', value: 'Instagram: @tangysessions' },
+];
+
+// 10 — CONTACT. The back page of the magazine: one monochrome photograph
+// supporting the type, a short colophon, one call to action.
 export const Closing = () => {
-  const sectionRef = useGSAPContext((ctx) => {
-    gsap.from('.contact-back-page', {
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top 75%'
-      },
-      y: 60,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    });
-  }, []);
+  const sectionRef = useReveal();
 
   return (
-    <section ref={sectionRef} id="contact" className="relative w-full py-20 sm:py-32 bg-[#11100C] text-[#E7D5A4] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#5A120D]">
-      
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
-      <RetroGrain index={0} opacity={0.12} blend="overlay" />
+    <section ref={sectionRef} id="contact" className="t-section theme-contact overflow-hidden">
 
-      {/* Background Archival Photo — kept at full strength like every other section's
-          background photo; only the grayscale/contrast filter (the site's established
-          archival-photo treatment, not a translucency wash) gives it its dark mood. */}
-      <div className="absolute inset-0 pointer-events-none">
-        <img src="/media/gallery/tangy9.jpg" alt="After Hours" className="w-full h-full object-cover filter grayscale contrast-150" />
-      </div>
+      <div className="t-container relative">
+        <div className="t-grid items-center gap-y-12">
+          <figure className="reveal-paper col-span-4 md:col-span-4 lg:col-span-5 m-0 max-w-[380px] md:max-w-none w-full mx-auto md:mx-0" style={{ '--rest-rot': '-1deg' }}>
+            <div className="photoFrame paperShadow">
+            <span className="tapeStrip -top-2.5 left-8 rotate-[-6deg]" aria-hidden="true" />
+            <div className="photoFrame-img">
+            <picture>
+              <source type="image/webp" srcSet="/media/opt/gallery-tangy9-480.webp 480w, /media/opt/gallery-tangy9-800.webp 800w" sizes="(min-width: 1024px) 38vw, (min-width: 768px) 45vw, 92vw" />
+              <img
+                src="/media/gallery/tangy9.jpg"
+                alt="After hours"
+                loading="lazy"
+                decoding="async"
+                className="photo-bw drift-img block w-full aspect-[4/5] object-cover"
+              />
+            </picture>
+            </div>
+            </div>
+            <figcaption className="filmCaption text-[#EFE2C0]/55 mt-4">Fig. 10 — After hours</figcaption>
+          </figure>
 
-      {/* Small decorative textile accent over the photo — intentionally kept subtle, not the section's background image. */}
-      <PatternBackground category="bandhani" index={1} opacity={0.26} size="cover" blend="normal" className="z-10" />
-      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C99A2E" colorB="#11100C" />
-      
-      
-      
-      <LotusStamp index={3} bg="transparent" border="#C99A2E" className="lg:hidden absolute bottom-4 right-4 w-10 h-10 opacity-90 z-20 pointer-events-none" />
+          <div className="col-span-4 md:col-span-4 lg:col-span-6 lg:col-start-7">
+            <p className="reveal t-label sec-accent m-0">10 — Contact // Magazine back page</p>
+            <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">
+              Come<br /><span className="text-[#C89D35]">find us.</span>
+            </span></h2>
+            <p className="reveal d2 t-quote text-[#EFE2C0]/85 mt-5 mb-0">&ldquo;Every journey begins somewhere.&rdquo;</p>
 
-      <div className="contact-back-page relative z-30 text-center px-4 max-w-4xl">
-        <span className="font-mono text-[#C99A2E] text-[11px] tracking-[0.4em] mb-4 uppercase block font-bold">
-          CONTACT // MAGAZINE BACK PAGE
-        </span>
+            <dl className="reveal d2 mt-10 m-0 border-t-[3px] border-double border-[#EFE2C0]/25">
+              {DETAILS.map((d) => (
+                <div key={d.label} className="grid grid-cols-[7rem_1fr] gap-4 py-4 border-b border-[#EFE2C0]/20">
+                  <dt className="archiveMetadata text-[#C89D35]">{d.label}</dt>
+                  <dd className="m-0 font-mono text-sm text-[#EFE2C0]/90 break-words">
+                    {d.href ? <a href={d.href} className="hover:text-[#C89D35]">{d.value}</a> : d.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
 
-        <h2 className="display text-4xl sm:text-7xl md:text-9xl text-[#E7D5A4] mb-3 leading-tight sm:leading-none ink-bleed">
-          <RisographOffset colors={['#D91E18']} offsets={[[6, -4]]} opacity={0.28}>COME</RisographOffset><br/>
-          <span className="italic text-[#C99A2E] font-normal">FIND US.</span>
-        </h2>
-
-        <p className="font-serif italic text-sm md:text-base text-[#E7D5A4]/90 mb-6">
-          "Every journey begins somewhere."
-        </p>
-
-        {/* Contact Info Cards & Contact Us CTA */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 font-mono text-xs text-[#E7D5A4] tracking-widest mt-6 border-t-2 border-[#E7D5A4]/30 pt-6 sm:pt-8">
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">LOCATION</span>
-            <span>HYDERABAD · TELANGANA<br/>INDIA</span>
-          </div>
-
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">DISPATCH</span>
-            <span className="break-all">HELLO@TANGYSESSIONS.COM</span>
-          </div>
-
-          <div className="bg-[#11100C]/80 border-2 border-[#E7D5A4]/40 p-4 sm:p-6 backdrop-blur-xs">
-            <span className="text-[#C99A2E] font-bold block mb-2 uppercase">ARCHIVE</span>
-            <span>INSTAGRAM: @TANGYSESSIONS</span>
+            <a href="/contact" className="reveal d2 t-btn t-btn-light mt-10">Contact → Visit Tangy</a>
           </div>
         </div>
 
-        <div className="mt-10">
-          <a 
-            href="/contact" 
-            className="btn-ticket inline-block text-xs font-mono font-bold uppercase tracking-widest py-3.5 px-8 !bg-[#C99A2E] !text-[#11100C] hover:!bg-[#E7D5A4] shadow-[6px_6px_0px_#5A120D]"
-          >
-            CONTACT → VISIT TANGY
-          </a>
+        <div className="flex justify-between gap-4 mt-16 pt-4 border-t border-[#EFE2C0]/15 archiveMetadata text-[#EFE2C0]/45">
+          <span>Tangy Sessions · Hyderabad · Est. 2016</span>
+          <span className="folio !opacity-100">— 10 —</span>
         </div>
-
       </div>
-
     </section>
   );
 };

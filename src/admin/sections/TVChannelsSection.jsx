@@ -115,7 +115,7 @@ export const TVChannelsSection = () => {
                     {c.status}
                   </span>
                 </div>
-                <h4 className="font-display text-lg font-bold text-[#E7D5A4] mt-1">{c.title}</h4>
+                <h4 className="font-condensed text-lg font-bold text-[#E7D5A4] mt-1">{c.title}</h4>
                 <p className="text-[9px] opacity-50 mt-1 break-all">{c.url}</p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#C99A2E]/20 flex flex-wrap gap-1.5">

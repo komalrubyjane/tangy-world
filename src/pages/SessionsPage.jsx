@@ -85,16 +85,15 @@ export const SessionsPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#B94717] text-[#E7D5A4] font-mono selection:bg-[#11100C] selection:text-[#E7D5A4] overflow-x-hidden">
+    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#181614] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* PAGE HERO */}
       <section className="relative pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#11100C]">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
 
         {/* Giant faded year watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.08]">
-          <span className="font-display text-[22vw] leading-none text-[#11100C] font-bold">2026</span>
+          <span className="font-condensed text-[22vw] leading-none text-[#11100C] font-bold">2026</span>
         </div>
 
         <div className="relative z-10">
@@ -119,7 +118,7 @@ export const SessionsPage = () => {
               <a
                 key={link.hash}
                 href={link.hash}
-                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#11100C] bg-[#E7D5A4] text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] transition-colors"
+                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#11100C] bg-[#EFE2C0] text-[#11100C] hover:bg-[#181614] hover:text-[#E7D5A4] transition-colors"
               >
                 {link.label} ↓
               </a>
@@ -130,7 +129,7 @@ export const SessionsPage = () => {
 
       {/* 1. UPCOMING SESSIONS GRID */}
       <section id="upcoming" className="pt-10 pb-16">
-        <div className="bg-[#11100C] border-b-2 border-[#B94717] py-3 px-4 sm:px-6 mb-8">
+        <div className="bg-[#181614] border-b-2 border-[#B94717] py-3 px-4 sm:px-6 mb-8">
           <div className="max-w-7xl mx-auto flex justify-between items-center font-mono text-[10px] text-[#E7D5A4]/60 uppercase tracking-widest">
             <span>{filteredEvents.length} SESSION{filteredEvents.length !== 1 ? 'S' : ''} AVAILABLE</span>
             <span>HYDERABAD // HERITAGE CONCERT SERIES</span>
@@ -155,13 +154,13 @@ export const SessionsPage = () => {
         </div>
 
         {eventsLoading && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#EFE2C0] paperTexture border-2 border-dashed border-[#11100C]">
             LOADING SESSIONS...
           </div>
         )}
 
         {!eventsLoading && filteredEvents.length === 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#E7D5A4] border-2 border-dashed border-[#11100C]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center font-mono text-xs font-bold text-[#11100C] bg-[#EFE2C0] paperTexture border-2 border-dashed border-[#11100C]">
             NO SESSIONS MATCH THIS FILTER YET — CHECK BACK SOON.
           </div>
         )}
@@ -179,7 +178,7 @@ export const SessionsPage = () => {
       </section>
 
       {/* 2. CONCERT CULTURE SECTION */}
-      <section id="culture" className="py-16 bg-[#11100C] text-[#E7D5A4] border-t-8 border-[#11100C] px-4 sm:px-6">
+      <section id="culture" className="py-16 bg-[#181614] printNoise text-[#E7D5A4] border-t-8 border-[#11100C] px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-3 text-center">
             THE TANGY PHILOSOPHY
@@ -192,7 +191,7 @@ export const SessionsPage = () => {
               { title: 'NO PHONES IN THE AIR', desc: 'We ask all attendees to put away screens during performances. Be completely present in the physical room.' },
               { title: 'COLLECTIBLE TICKETS', desc: 'Every ticket is a physical hand-screenprinted artefact on 300gsm cotton paper for your archive.' }
             ].map((c, i) => (
-              <div key={i} className="bg-[#1C0E08] border-2 border-[#C99A2E]/40 p-6">
+              <div key={i} className="bg-[#211915] border-2 border-[#C99A2E]/40 p-6">
                 <span className="font-mono text-xs font-bold text-[#C99A2E] block mb-2">RULE #0{i+1}</span>
                 <h3 className="display text-2xl text-[#E7D5A4] mb-2">{c.title}</h3>
                 <p className="font-mono text-xs text-[#E7D5A4]/75 leading-relaxed">{c.desc}</p>
@@ -203,14 +202,14 @@ export const SessionsPage = () => {
       </section>
 
       {/* 3. SESSION CALENDAR SECTION */}
-      <section id="calendar" className="py-16 bg-[#E7D5A4] text-[#11100C] border-t-8 border-[#11100C] px-4 sm:px-6">
+      <section id="calendar" className="py-16 bg-[#EFE2C0] paperTexture text-[#11100C] border-t-8 border-[#11100C] px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <span className="font-mono text-xs text-[#B94717] tracking-[0.35em] uppercase font-bold block mb-2 text-center">
             2026 SEASON SCHEDULE
           </span>
           <h2 className="display text-4xl sm:text-6xl text-[#11100C] text-center mb-8">SESSION CALENDAR</h2>
 
-          <div className="bg-[#F5E9C9] border-4 border-[#11100C] p-4 sm:p-8 shadow-[10px_10px_0px_#11100C]">
+          <div className="bg-[#EFE2C0] paperTexture border-4 border-[#11100C] p-4 sm:p-8 shadow-[10px_10px_0px_#11100C]">
             {events.length === 0 ? (
               <div className="text-center py-10 font-mono text-xs font-bold text-[#11100C]/60">
                 NO SESSIONS ON THE CALENDAR YET — CHECK BACK SOON.
@@ -228,7 +227,7 @@ export const SessionsPage = () => {
                       <span className="font-mono text-[9px] font-bold text-[#B94717] block mb-1 uppercase">{evt.date}</span>
                       <h4 className="display text-xl text-[#11100C] mb-1">{evt.title}</h4>
                       <p className="font-mono text-[10px] text-[#11100C]/70 mb-2">{evt.venue}</p>
-                      <span className="inline-block bg-[#11100C] text-[#E7D5A4] font-mono text-[8px] font-bold px-2 py-0.5">
+                      <span className="inline-block bg-[#181614] text-[#E7D5A4] font-mono text-[8px] font-bold px-2 py-0.5">
                         {evt.status}
                       </span>
                     </button>
@@ -240,8 +239,8 @@ export const SessionsPage = () => {
       </section>
 
       {/* 4. JOIN WAITLIST SECTION */}
-      <section id="waitlist" className="py-16 bg-[#11100C] text-[#E7D5A4] border-t-8 border-[#B94717] px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto bg-[#E7D5A4] text-[#11100C] p-6 sm:p-10 border-4 border-[#11100C] shadow-[12px_12px_0px_#B94717]">
+      <section id="waitlist" className="py-16 bg-[#181614] printNoise text-[#E7D5A4] border-t-8 border-[#B94717] px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 border-4 border-[#11100C] shadow-[12px_12px_0px_#B94717]">
           <div className="text-center mb-6">
             <span className="font-mono text-[10px] text-[#B94717] tracking-[0.3em] uppercase font-bold block mb-2">
               PRIORITY TICKET RESERVATIONS
@@ -253,7 +252,7 @@ export const SessionsPage = () => {
           </div>
 
           {waitlistSubmitted ? (
-            <div className="text-center py-8 border-2 border-[#11100C] bg-[#F5E9C9]">
+            <div className="text-center py-8 border-2 border-[#11100C] bg-[#EFE2C0] paperTexture">
               <h3 className="display text-3xl text-[#11100C] mb-2">YOU ARE ON THE WAITLIST!</h3>
               <p className="font-mono text-xs text-[#11100C]/70 uppercase">We'll email you the moment tickets open.</p>
             </div>
@@ -297,7 +296,7 @@ export const SessionsPage = () => {
               </select>
 
               {waitlistError && (
-                <div className="p-3 bg-[#B94717] text-[#E7D5A4] font-bold border border-[#11100C]">
+                <div className="p-3 bg-[#B5532A] text-[#E7D5A4] font-bold border border-[#11100C]">
                   ✕ {waitlistError}
                 </div>
               )}
@@ -305,7 +304,7 @@ export const SessionsPage = () => {
               <button
                 type="submit"
                 disabled={waitlistSubmitting}
-                className="py-3 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
+                className="py-3 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
               >
                 {waitlistSubmitting ? 'JOINING...' : 'JOIN SESSION WAITLIST →'}
               </button>

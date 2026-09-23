@@ -69,8 +69,7 @@ export const CrewApplyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#8a2320] text-[#ecdcaf] font-mono selection:bg-[#ecdcaf] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20">
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
+    <div className="min-h-screen bg-[#4A171D] text-[#ecdcaf] font-mono selection:bg-[#EFE2C0] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20 textileTexture">
       <Navbar />
 
       <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -93,7 +92,7 @@ export const CrewApplyPage = () => {
           </p>
         </div>
 
-        <div className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
           {submitted ? (
             <ApplicationReceivedNotice roleLabel="Crew" statusRoute="/crew/dashboard" />
           ) : (
@@ -114,8 +113,8 @@ export const CrewApplyPage = () => {
                   </select>
                 </div>
                 <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-                {crewError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
-                <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+                {crewError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
+                <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
                   {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
                 </button>
               </form>

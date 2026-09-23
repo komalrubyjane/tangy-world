@@ -9,7 +9,6 @@ export const AudioEntryModal = () => {
     <div className="fixed inset-0 z-[200] bg-tangy-black flex flex-col items-center justify-center p-6 text-center">
       {/* Background Texture & Warm Spotlight */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(231,217,181,0.18)_0%,rgba(9,8,6,0.98)_80%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none mix-blend-overlay" />
 
       {/* Hanging Microphone Silhouette */}
       <div className="w-1 h-20 bg-[#444] mb-2" />

@@ -42,15 +42,14 @@ export const ContactPage = () => {
   const INQUIRY_TYPES = ['GENERAL', 'PRESS', 'COLLABORATION', 'VENUE', 'PRIVATE EVENT'];
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* PAGE HERO */}
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
-          <span className="font-display text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">CONTACT</span>
+          <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">CONTACT</span>
         </div>
 
         <div className="relative z-10">
@@ -94,7 +93,7 @@ export const ContactPage = () => {
           ].map((card, i) => (
             <div
               key={i}
-              className={`bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] sm:shadow-[8px_8px_0px_#11100C] ${card.href ? 'cursor-pointer hover:-translate-y-1 transition-transform' : ''}`}
+              className={`bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] sm:shadow-[8px_8px_0px_#11100C] ${card.href ? 'cursor-pointer hover:-translate-y-1 transition-transform' : ''}`}
               onClick={() => card.href && window.open(card.href, '_blank', 'noopener,noreferrer')}
             >
               <div className="text-2xl mb-2">{card.icon}</div>
@@ -106,7 +105,7 @@ export const ContactPage = () => {
         </div>
 
         {/* MAP LOCATION DISPLAY */}
-        <div className="bg-[#1C0E08] border-4 border-[#C99A2E] p-4 sm:p-8 mb-10 text-center">
+        <div className="bg-[#211915] border-4 border-[#C99A2E] p-4 sm:p-8 mb-10 text-center">
           <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
             PRIMARY HERITAGE SANCTUARY
           </span>
@@ -115,7 +114,7 @@ export const ContactPage = () => {
         </div>
 
         {/* CONTACT FORM / EMAIL DISPATCH */}
-        <div id="dispatch" className="bg-[#E7D5A4] text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] relative">
+        <div id="dispatch" className="bg-[#EFE2C0] paperTexture text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] relative">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center font-mono text-[9px] sm:text-xs font-bold text-[#B94717] border-b-2 border-[#11100C] pb-3 mb-5 sm:mb-6 uppercase gap-1">
             <span>TANGY SESSIONS // CORRESPONDENCE FORM</span>
             <span className="hidden sm:block">DISPATCH DESK · HYDERABAD</span>
@@ -172,12 +171,12 @@ export const ContactPage = () => {
                 <textarea required rows={5} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="YOUR MESSAGE..." className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717] resize-none" />
               </div>
 
-              {error && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#11100C]">{error}</div>}
+              {error && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#11100C]">{error}</div>}
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="py-3 sm:py-4 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
+                className="py-3 sm:py-4 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
               >
                 {submitting ? 'SENDING...' : 'SEND DISPATCH →'}
               </button>
@@ -187,7 +186,7 @@ export const ContactPage = () => {
       </section>
 
       {/* SOCIAL LINKS STRIP */}
-      <section id="instagram" className="bg-[#1C0E08] border-t-4 border-[#C99A2E]/30 py-10 sm:py-12 px-4 sm:px-6 text-center">
+      <section id="instagram" className="bg-[#211915] printNoise border-t-4 border-[#C99A2E]/30 py-10 sm:py-12 px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-4">
           FIND US ONLINE // INSTAGRAM &amp; MEDIA DISPATCHES
         </span>
@@ -204,7 +203,7 @@ export const ContactPage = () => {
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-[#E7D5A4] text-[#11100C] font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C] hover:bg-[#C99A2E] hover:border-[#C99A2E] transition-colors shadow-[3px_3px_0px_#11100C]"
+                className="flex items-center gap-2 bg-[#EFE2C0] text-[#11100C] font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C] hover:bg-[#C89D35] hover:border-[#C99A2E] transition-colors shadow-[3px_3px_0px_#11100C]"
               >
                 <span>{s.icon}</span>
                 <span>{s.label}</span>
@@ -213,7 +212,7 @@ export const ContactPage = () => {
               <span
                 key={s.label}
                 title="Channel launching soon"
-                className="flex items-center gap-2 bg-[#E7D5A4]/40 text-[#11100C]/50 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C]/30 cursor-default select-none"
+                className="flex items-center gap-2 bg-[#EFE2C0]/40 text-[#11100C]/50 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C]/30 cursor-default select-none"
               >
                 <span className="opacity-60">{s.icon}</span>
                 <span>{s.label}</span>

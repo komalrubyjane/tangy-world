@@ -56,7 +56,7 @@ export const ReadOnlyNote = ({ children }) => (
 export const StatTile = ({ label, value, sub }) => (
   <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-5 shadow-[5px_5px_0px_#11100C]">
     <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">{label}</span>
-    <div className="font-display text-3xl font-bold mt-1">{value}</div>
+    <div className="font-condensed text-3xl font-bold mt-1">{value}</div>
     {sub && <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">{sub}</p>}
   </div>
 );
@@ -97,7 +97,7 @@ export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tab
           </div>
           <div>
             <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-widest block">{roleLabel}</span>
-            <h1 className="font-display text-xl sm:text-2xl font-bold uppercase">{title}</h1>
+            <h1 className="font-condensed text-xl sm:text-2xl font-bold uppercase">{title}</h1>
             {subtitle && <span className="font-mono text-[10px] text-[#E7D5A4]/60">{subtitle}</span>}
           </div>
         </div>

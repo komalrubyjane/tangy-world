@@ -72,15 +72,14 @@ export const CrewPage = () => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full min-h-[100dvh] bg-[#8a2320] text-[#ecdcaf] font-sans antialiased overflow-x-hidden pt-16 pb-20 select-none"
+      className="w-full min-h-[100dvh] bg-[#4A171D] text-[#ecdcaf] font-sans antialiased overflow-x-hidden pt-16 pb-20 select-none textileTexture"
     >
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
       <Navbar onOpenProgramme={() => navigate('/')} />
 
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {/* HERO BANNER */}
-        <div id="volunteer" className="w-full bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="volunteer" className="w-full bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">
               JOIN THE TANGY CREW // RECRUITMENT DESK
@@ -93,7 +92,7 @@ export const CrewPage = () => {
             </p>
           </div>
 
-          <div className="bg-[#c2272a] text-[#ecdcaf] p-3 font-mono text-xs font-bold border border-[#ecdcaf] shadow-md -rotate-2">
+          <div className="bg-[#B5532A] text-[#ecdcaf] p-3 font-mono text-xs font-bold border border-[#ecdcaf] shadow-md -rotate-2">
             SEASON 2026 RECRUITMENT OPEN
           </div>
         </div>
@@ -109,7 +108,7 @@ export const CrewPage = () => {
             <a
               key={link.hash}
               href={link.hash}
-              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#191410] text-[#ecdcaf] hover:bg-[#ecdcaf] hover:text-[#191410] transition-colors"
+              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#181614] text-[#ecdcaf] hover:bg-[#EFE2C0] hover:text-[#191410] transition-colors"
             >
               {link.label} ↓
             </a>
@@ -127,7 +126,7 @@ export const CrewPage = () => {
             {volunteerRoles.map((role, idx) => (
               <div 
                 key={idx}
-                className="bg-[#ecdcaf] text-[#191410] p-5 border-2 border-[#191410] shadow-[6px_6px_0px_#191410] flex flex-col text-left justify-between group hover:-translate-y-1 transition-transform"
+                className="bg-[#EFE2C0] paperTexture text-[#191410] p-5 border-2 border-[#191410] shadow-[6px_6px_0px_#191410] flex flex-col text-left justify-between group hover:-translate-y-1 transition-transform"
               >
                 <div>
                   <div className="flex justify-between items-center mb-2">
@@ -147,7 +146,7 @@ export const CrewPage = () => {
         </div>
 
         {/* PRODUCTION TEAM SECTION */}
-        <div id="production" className="mb-12 bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+        <div id="production" className="mb-12 bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase block mb-1">
             02 // PRODUCTION TEAM
           </span>
@@ -156,15 +155,15 @@ export const CrewPage = () => {
             Our production team handles vintage ribbon microphones, custom subwoofer rigs, acoustic baffling, and warm tungsten lighting setups tailored for ancient stone monuments.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+            <div className="bg-[#211915] p-3 border border-[#ecdcaf]/30">
               <span className="text-[#c2272a] font-bold block mb-1">AUDIO ENGINEERING</span>
               <span className="text-[#ecdcaf]/70">Sub-bass calibration &amp; room acoustic resonance mapping.</span>
             </div>
-            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+            <div className="bg-[#211915] p-3 border border-[#ecdcaf]/30">
               <span className="text-[#c2272a] font-bold block mb-1">LIGHTING DIRECTION</span>
               <span className="text-[#ecdcaf]/70">Warm vintage candlelight and low-voltage architectural spots.</span>
             </div>
-            <div className="bg-[#241a12] p-3 border border-[#ecdcaf]/30">
+            <div className="bg-[#211915] p-3 border border-[#ecdcaf]/30">
               <span className="text-[#c2272a] font-bold block mb-1">TAPE RECORDING</span>
               <span className="text-[#ecdcaf]/70">Live 2-track analogue magnetic tape capture.</span>
             </div>
@@ -172,7 +171,7 @@ export const CrewPage = () => {
         </div>
 
         {/* STAGE OPERATIONS SECTION */}
-        <div id="stage" className="mb-12 bg-[#ecdcaf] text-[#191410] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+        <div id="stage" className="mb-12 bg-[#EFE2C0] paperTexture text-[#191410] border-4 border-[#191410] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase block mb-1">
             03 // STAGE OPERATIONS
           </span>
@@ -183,14 +182,14 @@ export const CrewPage = () => {
         </div>
 
         {/* APPLY NOW FORM */}
-        <div id="apply" className="bg-[#191410] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div id="apply" className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
           <div className="mb-6">
             <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">04 // CREW APPLICATION FORM</span>
             <h2 className="font-poster text-3xl text-[#ecdcaf]">SUBMIT YOUR APPLICATION</h2>
           </div>
 
           {submitted ? (
-            <div className="bg-[#241a12] border-2 border-[#ecdcaf] p-8 text-center">
+            <div className="bg-[#211915] border-2 border-[#ecdcaf] p-8 text-center">
               <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">APPLICATION TRANSMITTED!</h3>
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our crew desk will review your submission and contact you via phone/email within 48 hours.</p>
             </div>
@@ -211,8 +210,8 @@ export const CrewPage = () => {
                 </select>
               </div>
               <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              {crewError && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
-              <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#ecdcaf] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
+              {crewError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
+              <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
                 {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
               </button>
             </form>

@@ -89,7 +89,7 @@ export const Spaces = () => {
   return (
     <>
       {/* DESKTOP: Cinematic Pinned Hero Section */}
-      <section ref={sectionRef} id="spaces" className="relative w-full h-screen overflow-hidden bg-[#59613A] hidden lg:block">
+      <section ref={sectionRef} id="spaces" className="relative w-full h-screen overflow-hidden bg-[#3F4735] printNoise hidden lg:block">
         <img
           src="/media/gallery/tngy7.jpg"
           alt="Bansilalpet Stepwell"
@@ -100,7 +100,6 @@ export const Spaces = () => {
         {/* Light top/bottom vignette only — just enough to keep the title and card
             legible at the very edges; the photograph itself stays clearly visible. */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#11100C]/40 via-transparent to-[#11100C]/50 pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
         {/* Typography */}
         <div className="heritage-title absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4 text-center">
@@ -116,7 +115,7 @@ export const Spaces = () => {
 
         {/* Heritage Card */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none px-4">
-          <div className="heritage-card bg-[#E3D4AC] p-14 border-4 border-[#11100C] text-center max-w-2xl pointer-events-auto opacity-0 shadow-[20px_20px_0px_#11100C] text-[#11100C]">
+          <div className="heritage-card bg-[#EFE2C0] p-14 border-4 border-[#11100C] text-center max-w-2xl pointer-events-auto opacity-0 shadow-[20px_20px_0px_#11100C] text-[#11100C]">
             <p className="font-mono text-[11px] tracking-[0.3em] text-tangy-orange mb-4 font-bold uppercase">17TH CENTURY MONUMENT</p>
             <h3 className="display text-6xl text-[#11100C] mb-6 ink-bleed">BANSILALPET<br/>STEPWELL</h3>
             <p className="font-body text-[#11100C]/90 text-lg leading-relaxed mb-8 border-l-2 border-tangy-orange pl-4">
@@ -131,8 +130,7 @@ export const Spaces = () => {
       </section>
 
       {/* MOBILE: Static Venue Cards Stack */}
-      <section id="spaces-mobile" className="relative w-full bg-[#11100C] text-[#E7D5A4] py-16 px-4 border-t-8 border-[#5A120D] lg:hidden">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
+      <section id="spaces-mobile" className="relative w-full bg-[#181614] printNoise text-[#E7D5A4] py-16 px-4 border-t-8 border-[#5A120D] lg:hidden">
 
         <div className="relative z-10 text-center mb-10">
           <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.35em] font-bold uppercase block mb-2">
@@ -147,17 +145,17 @@ export const Spaces = () => {
 
         <div className="flex flex-col gap-6 relative z-10">
           {VENUES.map((venue, idx) => (
-            <div key={venue.id} className="venue-mobile-card bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] overflow-hidden">
+            <div key={venue.id} className="venue-mobile-card bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] overflow-hidden">
               <div className="w-full h-44 overflow-hidden relative">
                 <img
                   src={venue.image}
                   alt={venue.name}
                   className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125"
                 />
-                <div className="absolute top-2 left-2 bg-[#B94717] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold uppercase">
+                <div className="absolute top-2 left-2 bg-[#B5532A] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold uppercase">
                   {venue.type}
                 </div>
-                <div className="absolute bottom-2 right-2 bg-[#11100C] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold">
+                <div className="absolute bottom-2 right-2 bg-[#181614] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold">
                   {venue.sessions}
                 </div>
               </div>

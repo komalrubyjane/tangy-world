@@ -95,13 +95,12 @@ export const ArtistPortalPage = () => {
       transition={{ duration: 0.5 }}
       className="w-full min-h-[100dvh] bg-[#191410] text-[#ecdcaf] font-sans antialiased overflow-x-hidden pt-16 pb-20 select-none"
     >
-      <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
       <Navbar onOpenProgramme={() => navigate('/')} />
 
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {/* TOP HERO BANNER */}
-        <div className="w-full bg-[#8a2320] border-4 border-[#d1a437] p-6 shadow-[10px_10px_0px_#191410] mb-8 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="w-full bg-[#4A171D] border-4 border-[#d1a437] p-6 shadow-[10px_10px_0px_#191410] mb-8 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-[10px] font-bold text-[#ecdcaf] tracking-[0.3em] uppercase">
               ARTIST PORTAL // SONIC ARCHIVE RECRUITMENT DESK
@@ -117,7 +116,7 @@ export const ArtistPortalPage = () => {
           {currentUser && (
             <button 
               onClick={handleLogout}
-              className="px-4 py-2 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold border border-[#ecdcaf] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
+              className="px-4 py-2 bg-[#181614] text-[#ecdcaf] font-mono text-xs font-bold border border-[#ecdcaf] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
             >
               LOGOUT ➔
             </button>
@@ -126,7 +125,7 @@ export const ArtistPortalPage = () => {
 
         {/* LOGGED OUT STATE: AUTHENTICATION PORTAL (LOGIN / REGISTER / FORGOT) */}
         {!currentUser ? (
-          <div className="max-w-xl mx-auto bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[12px_12px_0px_#8a2320] text-left flex flex-col gap-6">
+          <div className="max-w-xl mx-auto bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[12px_12px_0px_#8a2320] text-left flex flex-col gap-6">
             
             {/* AUTH TABS */}
             <div className="flex border-b-2 border-[#191410] pb-2 font-mono text-xs font-bold">
@@ -169,7 +168,7 @@ export const ArtistPortalPage = () => {
 
                 <button 
                   type="submit" 
-                  className="w-full py-3 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all"
+                  className="w-full py-3 bg-[#181614] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all"
                 >
                   ENTER ARTIST PORTAL →
                 </button>
@@ -221,7 +220,7 @@ export const ArtistPortalPage = () => {
 
                 <button 
                   type="submit" 
-                  className="w-full py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
+                  className="w-full py-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
                 >
                   SUBMIT AUDITION APPLICATION →
                 </button>
@@ -238,7 +237,7 @@ export const ArtistPortalPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* DASHBOARD SIDEBAR NAVIGATION (COL-3) */}
-            <div className="lg:col-span-3 bg-[#191410] border-2 border-[#d1a437] p-4 shadow-[6px_6px_0px_#191410] flex flex-col gap-2 text-left">
+            <div className="lg:col-span-3 bg-[#181614] border-2 border-[#d1a437] p-4 shadow-[6px_6px_0px_#191410] flex flex-col gap-2 text-left">
               <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase tracking-widest px-2 mb-1">DASHBOARD NAVIGATION</span>
               
               {[
@@ -259,7 +258,7 @@ export const ArtistPortalPage = () => {
             </div>
 
             {/* DASHBOARD MAIN CONTENT (COL-9) */}
-            <div className="lg:col-span-9 bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[10px_10px_0px_#8a2320] text-left flex flex-col gap-6">
+            <div className="lg:col-span-9 bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 shadow-[10px_10px_0px_#8a2320] text-left flex flex-col gap-6">
               
               {savedSuccess && (
                 <div className="p-3 bg-emerald-800 text-emerald-100 font-mono text-xs font-bold border border-[#191410]">
@@ -276,9 +275,9 @@ export const ArtistPortalPage = () => {
                   </div>
 
                   {/* COVER & AVATAR UPLOAD STUBS */}
-                  <div className="relative w-full h-36 bg-[#191410] border-2 border-[#191410] overflow-hidden flex items-center justify-center">
+                  <div className="relative w-full h-36 bg-[#181614] border-2 border-[#191410] overflow-hidden flex items-center justify-center">
                     <img src="/media/gallery/tangy3.jpg" alt="Cover" className="w-full h-full object-cover opacity-60" />
-                    <button type="button" className="absolute bottom-2 right-2 px-3 py-1 bg-[#ecdcaf] text-[#191410] font-mono text-[9px] font-bold border border-[#191410]">
+                    <button type="button" className="absolute bottom-2 right-2 px-3 py-1 bg-[#EFE2C0] text-[#191410] font-mono text-[9px] font-bold border border-[#191410]">
                       📷 CHANGE COVER
                     </button>
                   </div>
@@ -337,7 +336,7 @@ export const ArtistPortalPage = () => {
 
                   <button 
                     type="submit" 
-                    className="w-full py-3 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all mt-2"
+                    className="w-full py-3 bg-[#181614] text-[#ecdcaf] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all mt-2"
                   >
                     SAVE PROFILE CHANGES →
                   </button>
@@ -351,7 +350,7 @@ export const ArtistPortalPage = () => {
                     <h3 className="font-poster text-2xl text-[#191410]">DEMOS & MEDIA UPLOADS</h3>
                     <button 
                       onClick={handleAddTrack}
-                      className="px-3 py-1 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold border border-[#191410] shadow-sm active:scale-95"
+                      className="px-3 py-1 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold border border-[#191410] shadow-sm active:scale-95"
                     >
                       + UPLOAD NEW DEMO
                     </button>
@@ -359,7 +358,7 @@ export const ArtistPortalPage = () => {
 
                   <div className="flex flex-col gap-3">
                     {audioTracks.map((track) => (
-                      <div key={track.id} className="p-3 bg-[#ecdcaf] border border-[#191410] flex justify-between items-center">
+                      <div key={track.id} className="p-3 bg-[#EFE2C0] paperTexture border border-[#191410] flex justify-between items-center">
                         <div className="flex items-center gap-3">
                           <span className="font-mono text-base font-bold">🎵</span>
                           <div>
@@ -381,7 +380,7 @@ export const ArtistPortalPage = () => {
                 <div className="flex flex-col gap-4">
                   <h3 className="font-poster text-2xl text-[#191410] border-b-2 border-[#191410] pb-2">SESSION INVITATIONS</h3>
                   
-                  <div className="p-4 bg-[#191410] text-[#ecdcaf] border-2 border-[#191410] flex flex-col gap-2">
+                  <div className="p-4 bg-[#181614] text-[#ecdcaf] border-2 border-[#191410] flex flex-col gap-2">
                     <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase">INVITATION #TS-INV-402</span>
                     <h4 className="font-poster text-xl text-[#ecdcaf]">BANSILALPET STEPWELL MONSOON SESSION</h4>
                     <p className="font-mono text-xs text-[#ecdcaf]/80">Date: August 15, 2026 · Stage: Main Stepwell Sanctuary</p>
@@ -397,10 +396,10 @@ export const ArtistPortalPage = () => {
               {dashTab === 'notifications' && (
                 <div className="flex flex-col gap-3">
                   <h3 className="font-poster text-2xl text-[#191410] border-b-2 border-[#191410] pb-2">NOTIFICATIONS CENTER</h3>
-                  <div className="p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs">
+                  <div className="p-3 bg-[#EFE2C0] paperTexture border border-[#191410] font-mono text-xs">
                     🔔 Your demo track "Stepwell Echoes" was approved by Curator Arjuna.
                   </div>
-                  <div className="p-3 bg-[#ecdcaf] border border-[#191410] font-mono text-xs">
+                  <div className="p-3 bg-[#EFE2C0] paperTexture border border-[#191410] font-mono text-xs">
                     🔔 Soundcheck scheduled for 05:00 PM at Bansilalpet Stepwell.
                   </div>
                 </div>

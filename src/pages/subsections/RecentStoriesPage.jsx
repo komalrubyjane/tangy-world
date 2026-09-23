@@ -5,11 +5,10 @@ import { RetroGrain, LotusStamp } from '../../components/ui/RetroAssets';
 
 export const RecentStoriesPage = () => {
   return (
-    <div className="min-h-screen bg-[#1C0E08] text-[#E7D5A4] font-mono selection:bg-[#D19A24] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/diary" className="font-mono text-[10px] text-[#D19A24]/70 tracking-widest uppercase hover:text-[#D19A24] transition-colors">← BACK TO DIARY</a>
           <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -26,7 +25,7 @@ export const RecentStoriesPage = () => {
 
       <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
         {diaryStories.map((story, idx) => (
-          <article key={story.id} className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
+          <article key={story.id} className="relative bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
             <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
             
             <div className="relative w-full h-40 overflow-hidden border-b-4 border-[#11100C]">
@@ -42,11 +41,11 @@ export const RecentStoriesPage = () => {
         ))}
       </section>
 
-      <section className="py-12 sm:py-16 bg-[#11100C] border-t-4 border-[#D19A24]/40 px-4 sm:px-6 text-center">
+      <section className="py-12 sm:py-16 bg-[#181614] printNoise border-t-4 border-[#D19A24]/40 px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#D19A24] tracking-[0.3em] uppercase font-bold block mb-4">MORE FROM THE DIARY</span>
         <div className="flex flex-wrap justify-center gap-3">
-          <a href="/diary/journal" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#D19A24] hover:text-[#11100C] transition-colors">MUSEUM JOURNAL →</a>
-          <a href="/diary/behind-the-scenes" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#D19A24] hover:text-[#11100C] transition-colors">BEHIND THE SCENES →</a>
+          <a href="/diary/journal" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">MUSEUM JOURNAL →</a>
+          <a href="/diary/behind-the-scenes" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">BEHIND THE SCENES →</a>
         </div>
       </section>
 

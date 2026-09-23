@@ -68,7 +68,6 @@ export const Menu = ({ isOpen, onClose }) => {
       className="programme-paper fixed inset-0 bg-[#E7D5A4] border-b-8 border-[#5A120D] z-[150] p-6 md:p-16 flex flex-col justify-between shadow-[0_30px_100px_rgba(0,0,0,0.95)]"
       style={{ transform: 'translateY(-100%)' }}
     >
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
       {/* Top Header */}
       <div className="flex justify-between items-start border-b-2 border-[#11100C] pb-4 relative z-10">

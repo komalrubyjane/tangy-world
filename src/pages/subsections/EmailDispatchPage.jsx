@@ -42,11 +42,10 @@ export const EmailDispatchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/contact" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO CONTACT</a>
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -62,7 +61,7 @@ export const EmailDispatchPage = () => {
       </section>
 
       <section className="py-12 sm:py-20 max-w-3xl mx-auto px-4 sm:px-6">
-        <div className="bg-[#E7D5A4] text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
+        <div className="bg-[#EFE2C0] paperTexture text-[#11100C] p-5 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
           {submitted ? (
             <div className="text-center py-10 sm:py-16">
               <div className="display text-5xl sm:text-7xl text-[#11100C] mb-4">✦</div>
@@ -105,8 +104,8 @@ export const EmailDispatchPage = () => {
                 <label className="font-bold text-[#B94717] block mb-1 uppercase text-[10px]">MESSAGE *</label>
                 <textarea required rows={5} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="YOUR MESSAGE..." className="w-full p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none focus:border-[#B94717] resize-none" />
               </div>
-              {error && <div className="p-3 bg-[#c2272a] text-white font-bold border-2 border-[#11100C]">{error}</div>}
-              <button type="submit" disabled={submitting} className="py-3 sm:py-4 bg-[#11100C] text-[#E7D5A4] hover:bg-[#B94717] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50">
+              {error && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#11100C]">{error}</div>}
+              <button type="submit" disabled={submitting} className="py-3 sm:py-4 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] border-2 border-[#11100C] hover:border-[#B94717] font-bold uppercase tracking-[0.2em] transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50">
                 {submitting ? 'SENDING...' : 'SEND DISPATCH →'}
               </button>
             </form>

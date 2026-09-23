@@ -59,7 +59,7 @@ export const ArtistsDirectoryPage = () => {
 
       {/* HERO HEADER — a poster masthead, not a settings-page banner: a bleeding Rangoli */}
       {/* medallion, a huge outline "01" plate mark, and oversized rotated title type. */}
-      <div className="relative bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
+      <div className="relative bg-[#EFE2C0] paperTexture text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
         <PatternBackground category="textile" index={1} size="cover" blend="normal" />
         <RetroGrain index={0} opacity={0.09} blend="overlay" />
         <div className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] aspect-square opacity-[0.18] animate-[spin_150s_linear_infinite] pointer-events-none">
@@ -71,7 +71,7 @@ export const ArtistsDirectoryPage = () => {
           <RangoliDecoration index={0} spin={false} className="w-full h-full" />
         </div>
         <span
-          className="hidden md:block absolute -left-[1%] -bottom-[18%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+          className="hidden md:block absolute -left-[1%] -bottom-[18%] font-condensed font-black leading-none text-transparent pointer-events-none select-none"
           style={{ fontSize: 'clamp(90px,12vw,190px)', WebkitTextStroke: '2px rgba(90,18,13,0.14)' }}
           aria-hidden="true"
         >
@@ -133,7 +133,7 @@ export const ArtistsDirectoryPage = () => {
 
       {/* ERROR / NOT CONFIGURED STATE */}
       {status === 'error' && (
-        <div className="p-10 text-center font-mono text-xs font-bold text-[#c2272a] border-2 border-dashed border-[#c2272a]/50 bg-[#e9decb]">
+        <div className="p-10 text-center font-mono text-xs font-bold text-[#c2272a] border-2 border-dashed border-[#c2272a]/50 bg-[#EFE2C0] paperTexture">
           COULDN'T LOAD THE ROSTER RIGHT NOW. PLEASE TRY AGAIN SHORTLY.
         </div>
       )}
@@ -177,7 +177,7 @@ export const ArtistsDirectoryPage = () => {
                   />
                   {/* HUGE OUTLINE PLATE NUMBER — bleeds over the top of the photo */}
                   <span
-                    className="absolute -top-[6%] -left-[3%] font-display font-black leading-none text-transparent pointer-events-none select-none"
+                    className="absolute -top-[6%] -left-[3%] font-condensed font-black leading-none text-transparent pointer-events-none select-none"
                     style={{ fontSize: 'clamp(64px,13vw,110px)', WebkitTextStroke: '2px rgba(236,220,175,0.6)' }}
                     aria-hidden="true"
                   >

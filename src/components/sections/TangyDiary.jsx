@@ -4,23 +4,16 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { useAudio } from '../../audio/AudioContext';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import {
-  TextileBorderStrip,
-  HandDrawnUnderline,
-  RisographOffset,
-} from '../ui/CulturalMotifs';
-import {
-  PatternBackground,
-  LotusStamp,
-  RangoliDecoration,
-  RetroGrain,
-  } from '../ui/RetroAssets';
-
+import { useLenis } from '../layout/LenisProvider';
 gsap.registerPlugin(ScrollTrigger);
 
 const PAPER_BG = 'linear-gradient(170deg, #F5EEE0 0%, #EADFC5 45%, #E3D4AC 100%)';
 const SH_R = 'inset -8px 0 20px rgba(90,64,50,0.18), 8px 10px 32px rgba(0,0,0,0.48)';
 const SH_L = 'inset  8px 0 20px rgba(90,64,50,0.18), -8px 10px 32px rgba(0,0,0,0.48)';
+// Phones: lighter page shadows (cheaper to paint during the 3D turn).
+const SH_R_MOBILE = 'inset -5px 0 12px rgba(90,64,50,0.14), 4px 6px 14px rgba(0,0,0,0.32)';
+const SH_L_MOBILE = 'inset  5px 0 12px rgba(90,64,50,0.14), -4px 6px 14px rgba(0,0,0,0.32)';
+const NUM_LEAVES = 6;
 
 const leafStyle = (i, isMobile, mobileTurnedState, reducedMotion = false) => {
   const isTurned = mobileTurnedState !== undefined ? mobileTurnedState : false;
@@ -62,6 +55,16 @@ export const TangyDiary = () => {
   const [currentMobileLeaf, setCurrentMobileLeaf] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  const lenis = useLenis();
+  // Desktop: pages turn with scroll, so the current leaf is derived from the
+  // pinned ScrollTrigger's progress (state only updates when it changes).
+  const [desktopLeaf, setDesktopLeaf] = useState(0);
+  const desktopLeafRef = useRef(0);
+  const stRef = useRef(null);
+  const leaf = isMobile ? currentMobileLeaf : desktopLeaf;
+  const shR = isMobile ? SH_R_MOBILE : SH_R;
+  const shL = isMobile ? SH_L_MOBILE : SH_L;
+
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const isHorizontalSwipe = useRef(false);
@@ -83,20 +86,20 @@ export const TangyDiary = () => {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: '+=600%',
+        end: '+=450%',
         pin: true,
         scrub: 0.6,
         anticipatePin: 1,
         onUpdate: (self) => {
-          // Fade out scroll hint when scrolling starts
-          if (self.progress > 0.05) {
-            gsap.to('.read-hint', { opacity: 0, duration: 0.3 });
-          } else {
-            gsap.to('.read-hint', { opacity: 1, duration: 0.3 });
+          const turned = Math.round(self.progress * NUM_LEAVES);
+          if (turned !== desktopLeafRef.current) {
+            desktopLeafRef.current = turned;
+            setDesktopLeaf(turned);
           }
-        }
+        },
       }
     });
+    stRef.current = tl.scrollTrigger;
 
     // 1. Fade in left base cover board as book opens
     tl.to('.diary-left-base', { opacity: 1, duration: 0.3 }, 0);
@@ -132,10 +135,24 @@ export const TangyDiary = () => {
     }
   };
 
+  // Desktop: the buttons scroll the pinned timeline to the neighbouring
+  // leaf (previously they only changed mobile state, so did nothing here).
+  const scrollToDesktopLeaf = (target) => {
+    const st = stRef.current;
+    if (!st) return;
+    const y = st.start + (st.end - st.start) * (target / NUM_LEAVES);
+    if (lenis) lenis.scrollTo(y, { duration: 1.1 });
+    else window.scrollTo({ top: y, behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+
   const handleNextLeaf = () => {
     playSFX('ticketClick');
     setHasInteracted(true);
-    if (currentMobileLeaf < 6) {
+    if (!isMobile) {
+      scrollToDesktopLeaf(Math.min(NUM_LEAVES, desktopLeafRef.current + 1));
+      return;
+    }
+    if (currentMobileLeaf < NUM_LEAVES) {
       setCurrentMobileLeaf((prev) => prev + 1);
     }
   };
@@ -143,6 +160,10 @@ export const TangyDiary = () => {
   const handlePrevLeaf = () => {
     playSFX('ticketClick');
     setHasInteracted(true);
+    if (!isMobile) {
+      scrollToDesktopLeaf(Math.max(0, desktopLeafRef.current - 1));
+      return;
+    }
     if (currentMobileLeaf > 0) {
       setCurrentMobileLeaf((prev) => prev - 1);
     }
@@ -181,31 +202,11 @@ export const TangyDiary = () => {
 
   return (
     <section ref={sectionRef} id="diary"
-      className="relative w-full bg-[#241A14] overflow-hidden flex flex-col items-center justify-center border-t-8 border-[#4A3529]"
-      style={{ minHeight: isMobile ? 'auto' : '100svh', padding: isMobile ? '44px 0 20px' : '0' }}>
+      className="relative w-full theme-diary overflow-hidden flex flex-col items-center justify-center"
+      style={{ minHeight: isMobile ? 'auto' : '100svh', padding: isMobile ? '44px 0 20px' : '132px 0 calc(var(--dock-space) + 12px)' }}>
 
-      {/* Parchment noise overlay */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.14] pointer-events-none mix-blend-overlay" />
-      <RetroGrain index={0} opacity={0.12} blend="overlay" />
-      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_120px_rgba(0,0,0,0.7)]" />
-
-      {/* RETRO CHROME — kept entirely outside the 3D book stage (its perspective/ */}
-      {/* z-index leaf stacking is precisely tuned) and layered on the section */}
-      {/* background instead: a real textile field, framing strips, registration */}
-      {/* marks and a lotus bookplate stamp. */}
-      <PatternBackground category="textile" index={2} size="cover" blend="normal" className="z-0" />
-      <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
-      <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
-      
-      
-      <LotusStamp index={2} bg="transparent" border="#A68853" className="hidden md:block absolute top-10 left-10 w-10 h-10 opacity-60 z-20 pointer-events-none" />
-      {/* REAL ILLUSTRATION FRAGMENT — a small hand-drawn print scrap pinned near the header. */}
-      {/* MOBILE — kept entirely outside the 3D book stage: a real film cutout corner and */}
-      {/* cropped Rangoli photo, standing in for the desktop registration marks/lotus above. */}
-      
-      <div className="md:hidden absolute bottom-0 left-0 w-[34%] max-w-[130px] aspect-square opacity-[0.18] pointer-events-none z-0">
-        <RangoliDecoration index={0} spin={false} className="w-full h-full" />
-      </div>
+      {/* Field-journal blue with paper fibres (theme-diary). The book is the
+          object; nothing else competes with it. */}
 
       {/* SVG Definitions */}
       <svg className="hidden">
@@ -224,15 +225,10 @@ export const TangyDiary = () => {
       </svg>
 
       {/* Section Header */}
-      <div className="pt-4 lg:pt-0 lg:absolute lg:top-5 left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-4 lg:mb-0">
+      <div className="pt-4 lg:pt-0 lg:absolute lg:top-[76px] left-10 right-10 flex flex-col lg:flex-row justify-between items-center z-20 text-center lg:text-left pointer-events-none mb-4 lg:mb-0">
         <div>
-          <div className="font-mono text-[9px] md:text-[10px] text-[#A68853] tracking-[0.25em] font-bold uppercase opacity-85">
-            <RisographOffset colors={['#D91E18']} offsets={[[3, -2]]} opacity={0.4}>
-              ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
-            </RisographOffset>
-          </div>
-          <p className="font-serif italic text-xs text-[#EADFC5]/75 mt-0.5">"Every room has a memory."</p>
-          <HandDrawnUnderline color="#A68853" className="w-32 h-2 mt-1 mx-auto lg:mx-0 opacity-60" />
+          <p className="t-label sec-accent m-0">08 — Archival field journal // File no. 1974-TS</p>
+          <p className="t-quote text-[#EFE2C0]/85 mt-1 mb-0">&ldquo;Every room has a memory.&rdquo;</p>
         </div>
       </div>
 
@@ -248,7 +244,7 @@ export const TangyDiary = () => {
       >
         <div 
           style={{ 
-            perspective: '2200px', 
+            perspective: isMobile ? '1500px' : '2200px', 
             perspectiveOrigin: '50% 40%', 
             position: 'relative',
             width: '100%',
@@ -261,17 +257,17 @@ export const TangyDiary = () => {
           }}
         >
           {/* Desk shadow */}
-          <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 bg-black blur-[55px] opacity-[0.22]"
-            style={{ width: isMobile ? 'min(76vw, 480px)' : '72%', height: '54px' }}/>
+          <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 pointer-events-none"
+            style={{ width: isMobile ? 'min(76vw, 480px)' : '72%', height: '54px', background: 'radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.28), transparent)' }}/>
 
           {/* Book Container */}
           <div
             id="diary-book"
             style={{
               position: 'relative',
-              width: isMobile ? 'clamp(230px, 76vw, 480px)' : 'min(880px, 94vw)',
-              height: isMobile ? 'auto' : 'min(620px, 70vh)',
-              minHeight: isMobile ? undefined : '520px',
+              width: isMobile ? 'clamp(230px, 76vw, 480px)' : 'min(880px, 94vw, calc((100svh - 132px - var(--dock-space) - 170px) * 1.42))',
+              height: isMobile ? 'auto' : 'min(580px, calc(100svh - 132px - var(--dock-space) - 170px))',
+              minHeight: isMobile ? undefined : '380px',
               aspectRatio: isMobile ? '880 / 620' : undefined,
               transformStyle: 'preserve-3d',
             }}
@@ -373,7 +369,7 @@ export const TangyDiary = () => {
                   </div>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="flex flex-col items-center justify-center text-center text-[#2E221B]">
                   <div className="font-serif italic text-lg">Field Journal</div>
@@ -396,7 +392,7 @@ export const TangyDiary = () => {
               style={leafStyle(1, isMobile, currentMobileLeaf >= 2, reducedMotion)}
               onClick={() => handleLeafClick(1)}
             >
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="flex justify-between font-mono text-[8.5px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
                     <span>Spread #01</span>
@@ -418,7 +414,7 @@ export const TangyDiary = () => {
                   </figure>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #02 — Left
@@ -437,7 +433,7 @@ export const TangyDiary = () => {
               style={leafStyle(2, isMobile, currentMobileLeaf >= 3, reducedMotion)}
               onClick={() => handleLeafClick(2)}
             >
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
                     <span>Spread #02</span>
@@ -450,7 +446,7 @@ export const TangyDiary = () => {
                   </p>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #03 — Left
@@ -465,7 +461,7 @@ export const TangyDiary = () => {
               style={leafStyle(3, isMobile, currentMobileLeaf >= 4, reducedMotion)}
               onClick={() => handleLeafClick(3)}
             >
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
                     <span>Spread #03</span>
@@ -481,7 +477,7 @@ export const TangyDiary = () => {
                   </div>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #04 — Left
@@ -496,7 +492,7 @@ export const TangyDiary = () => {
               style={leafStyle(4, isMobile, currentMobileLeaf >= 5, reducedMotion)}
               onClick={() => handleLeafClick(4)}
             >
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-serif italic text-lg leading-tight">Backstage Notes &amp;<br/>Hidden Spaces</div>
                   <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 opacity-88">
@@ -505,7 +501,7 @@ export const TangyDiary = () => {
                   </p>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #05 — Left
@@ -520,7 +516,7 @@ export const TangyDiary = () => {
               style={leafStyle(5, isMobile, currentMobileLeaf >= 6, reducedMotion)}
               onClick={() => handleLeafClick(5)}
             >
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:12 }} className="text-[#2E221B]">
                   <div className="relative mx-auto" style={{
                     background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
@@ -539,7 +535,7 @@ export const TangyDiary = () => {
                   </div>
                 </div>
               </div>
-              <div style={backFace({ background:PAPER_BG, boxShadow:SH_L })}>
+              <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                   <div className="font-serif italic text-base">The story continues.</div>
@@ -549,7 +545,7 @@ export const TangyDiary = () => {
 
             {/* ── LEAF 6: Static final right page ──────────── */}
             <div className="diary-leaf" style={leafStyle(6, isMobile, false, reducedMotion)}>
-              <div style={frontFace({ background:PAPER_BG, boxShadow:SH_R })}>
+              <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
                 <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                   <div className="font-serif italic text-xl">More stories<br/>are waiting.</div>
@@ -568,33 +564,35 @@ export const TangyDiary = () => {
         {/* here made the controls overlap it. */}
         <div className={isMobile ? "flex flex-col items-center gap-1.5 z-30 mt-20" : "flex flex-col items-center gap-2 z-30 mt-4 lg:mt-6"}>
           <div className={isMobile
-            ? "flex items-center gap-2.5 bg-[#2E1E14]/95 border border-[#A68853]/40 rounded-sm px-3 py-1.5 shadow-[0_8px_18px_rgba(0,0,0,0.5)]"
+            ? "flex items-center gap-2 bg-[#2E1E14]/95 border border-[#A68853]/40 rounded-sm px-2 py-1.5 shadow-[0_6px_12px_rgba(0,0,0,0.35)]"
             : "flex items-center gap-3"}
           >
             <button
               onClick={handlePrevLeaf}
-              disabled={currentMobileLeaf === 0}
-              className="font-mono text-[10px] sm:text-xs font-bold text-[#EADFC5] border border-[#A68853] px-3.5 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
+              disabled={leaf === 0}
+              aria-label="Previous page"
+              className="min-h-[44px] font-mono text-[10px] sm:text-xs font-bold tracking-[0.1em] text-[#EADFC5] border border-[#A68853] px-3.5 rounded-sm disabled:opacity-30 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
             >
               ← PREV PAGE
             </button>
 
-            <span className="font-mono text-[10px] sm:text-xs text-[#A68853] font-bold">
-              LEAF {currentMobileLeaf} / 6
+            <span className="font-mono text-[10px] sm:text-xs text-[#E4C77A] font-bold tabular-nums" aria-live="polite">
+              LEAF {leaf} / {NUM_LEAVES}
             </span>
 
             <button
               onClick={handleNextLeaf}
-              disabled={currentMobileLeaf === 6}
-              className="font-mono text-[10px] sm:text-xs font-bold text-[#EADFC5] border border-[#A68853] px-3.5 py-1.5 rounded-sm disabled:opacity-30 active:scale-95 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
+              disabled={leaf === NUM_LEAVES}
+              aria-label="Next page"
+              className="min-h-[44px] font-mono text-[10px] sm:text-xs font-bold tracking-[0.1em] text-[#EADFC5] border border-[#A68853] px-3.5 rounded-sm disabled:opacity-30 bg-[#2E1E14] hover:bg-[#A68853] hover:text-[#1F1713] transition-colors"
             >
               NEXT PAGE →
             </button>
           </div>
           {isMobile ? (
             !hasInteracted && (
-              <div className="font-mono text-[9px] tracking-[0.15em] text-[#A68853]/65 text-center uppercase">
-                ‹ swipe to turn ›
+              <div className="font-mono text-[10px] tracking-[0.15em] text-[#EFE2C0]/70 text-center uppercase">
+                ‹ swipe or tap a page to turn ›
               </div>
             )
           ) : (
@@ -606,24 +604,16 @@ export const TangyDiary = () => {
       </div>
 
       {/* Read More CTA */}
-      <div className="read-more-cta mt-6 lg:mt-0 lg:absolute lg:bottom-8 left-1/2 lg:-translate-x-1/2 z-30 flex flex-col items-center">
-        <p className={isMobile ? "font-serif italic text-[11px] text-[#EADFC5]/70 mb-1.5 text-center" : "font-serif italic text-xs text-[#EADFC5]/70 mb-2 text-center"}>
+      <div className="read-more-cta mt-6 lg:mt-3 z-30 flex flex-col items-center">
+        <p className="t-quote text-[#EFE2C0]/85 mb-3 text-center !text-base max-w-[22rem] lg:hidden">
           Every Tangy Session leaves another page waiting to be written.
         </p>
         <a
           href="/blogs"
-          className={isMobile
-            ? "bg-[#A68853] text-[#1F1713] hover:bg-[#EADFC5] border-2 border-[#1F1713] px-5 py-2 font-mono text-[10px] font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#2E221B]"
-            : "bg-[#A68853] text-[#1F1713] hover:bg-[#EADFC5] border-2 border-[#1F1713] px-6 py-2.5 font-mono text-xs font-bold tracking-widest uppercase transition-colors shadow-[4px_4px_0px_#2E221B]"}
+          className="t-btn t-btn-light"
         >
           Read the Complete Tangy Diary →
         </a>
-      </div>
-
-      {/* Desktop Scroll hint */}
-      <div className="read-hint hidden lg:block absolute bottom-6 left-1/2 -translate-x-1/2 text-center pointer-events-none" style={{ zIndex: 10000 }}>
-        <div className="font-serif italic text-sm tracking-wider text-[#A68853]">Scroll to Open Journal</div>
-        <div className="text-xs text-[#A68853] opacity-75 mt-0.5 animate-bounce">↓</div>
       </div>
 
     </section>

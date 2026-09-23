@@ -198,14 +198,14 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
         <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 shrink-0 bg-[#E7D5A4] text-[#11100C] rounded-full border-2 border-[#B94717] flex flex-col items-center justify-center text-center">
-              <span className="font-display text-base font-bold leading-none">TS</span>
+              <span className="font-condensed text-base font-bold leading-none">TS</span>
               <span className="font-mono text-[6px] font-bold">PATRON</span>
             </div>
             <div>
               <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-widest block">
                 MEMBER PASSPORT NO. {passportId}
               </span>
-              <h1 className="font-display text-xl sm:text-2xl font-bold uppercase">{user.full_name || user.email}</h1>
+              <h1 className="font-condensed text-xl sm:text-2xl font-bold uppercase">{user.full_name || user.email}</h1>
               <span className="font-mono text-[10px] text-[#E7D5A4]/60">{user.email} · Member since {fmtDate(memberSince?.slice ? memberSince.slice(0, 10) : memberSince)}</span>
             </div>
           </div>
@@ -243,28 +243,28 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
-              <div className="font-display text-4xl font-bold mt-1">{stampsCount}</div>
+              <div className="font-condensed text-4xl font-bold mt-1">{stampsCount}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">confirmed bookings</p>
             </div>
             <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming Bookings</span>
-              <div className="font-display text-4xl font-bold mt-1">{upcomingBookings.length}</div>
+              <div className="font-condensed text-4xl font-bold mt-1">{upcomingBookings.length}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">tickets on file</p>
             </div>
             <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Waitlist</span>
-              <div className="font-display text-4xl font-bold mt-1">{waitlist.length}</div>
+              <div className="font-condensed text-4xl font-bold mt-1">{waitlist.length}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">sessions you're waiting on</p>
             </div>
             <div className="sm:col-span-3 bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-              <h3 className="font-display text-lg font-bold uppercase mb-3 text-[#C99A2E]">Next up</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-3 text-[#C99A2E]">Next up</h3>
               {upcomingBookings.length === 0 ? (
                 <Empty>NO UPCOMING BOOKINGS YET — BROWSE SESSIONS AND BOOK YOUR NEXT NIGHT AT THE STEPWELL.</Empty>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {upcomingBookings.slice(0, 2).map((b) => (
                     <div key={b.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                      <h4 className="font-display font-bold uppercase">{b.events?.name}</h4>
+                      <h4 className="font-condensed font-bold uppercase">{b.events?.name}</h4>
                       <p className="font-mono text-[10px] mt-1">{fmtDate(b.events?.event_date)} · {b.events?.venue}</p>
                       <Badge status={b.status} />
                     </div>
@@ -294,7 +294,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
         {activeTab === 'bookings' && (
           <div className="flex flex-col gap-6">
             <div>
-              <h3 className="font-display text-lg font-bold uppercase mb-3">Upcoming</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-3">Upcoming</h3>
               {upcomingBookings.length === 0 ? (
                 <Empty>NO UPCOMING TICKETS. BOOK A SESSION TO SEE IT HERE.</Empty>
               ) : (
@@ -302,7 +302,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
                   {upcomingBookings.map((b) => (
                     <div key={b.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
                       <div className="flex justify-between items-start gap-2">
-                        <h4 className="font-display font-bold uppercase">{b.events?.name}</h4>
+                        <h4 className="font-condensed font-bold uppercase">{b.events?.name}</h4>
                         <Badge status={b.status} />
                       </div>
                       <p className="font-mono text-[10px] mt-1">{fmtDate(b.events?.event_date)} · {b.events?.event_time} · {b.events?.venue}</p>
@@ -314,7 +314,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
               )}
             </div>
             <div>
-              <h3 className="font-display text-lg font-bold uppercase mb-3">Ticket History</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-3">Ticket History</h3>
               {pastBookings.length === 0 ? (
                 <Empty>NO PAST TICKETS ON RECORD.</Empty>
               ) : (
@@ -322,7 +322,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
                   {pastBookings.map((b) => (
                     <div key={b.id} className="bg-[#191410] border-2 border-[#C99A2E]/30 p-3">
                       <div className="flex justify-between items-start gap-2">
-                        <h4 className="font-display font-bold uppercase">{b.events?.name}</h4>
+                        <h4 className="font-condensed font-bold uppercase">{b.events?.name}</h4>
                         <Badge status={b.status} />
                       </div>
                       <p className="font-mono text-[10px] mt-1 text-[#E7D5A4]/70">{fmtDate(b.events?.event_date)} · {b.events?.venue}</p>
@@ -336,14 +336,14 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
 
         {activeTab === 'waitlist' && (
           <div>
-            <h3 className="font-display text-lg font-bold uppercase mb-3">Waitlist Status</h3>
+            <h3 className="font-condensed text-lg font-bold uppercase mb-3">Waitlist Status</h3>
             {waitlist.length === 0 ? (
               <Empty>YOU'RE NOT ON ANY WAITLISTS RIGHT NOW. WHEN A SESSION SELLS OUT, YOU CAN JOIN ITS WAITLIST FROM THE SESSION PAGE.</Empty>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {waitlist.map((w) => (
                   <div key={w.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                    <h4 className="font-display font-bold uppercase">{w.events?.name || 'Session'}</h4>
+                    <h4 className="font-condensed font-bold uppercase">{w.events?.name || 'Session'}</h4>
                     <p className="font-mono text-[10px] mt-1">{fmtDate(w.events?.event_date)} · {w.events?.venue}</p>
                   </div>
                 ))}
@@ -358,7 +358,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
           ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-3xl">
             <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C]">
-              <h3 className="font-display text-lg font-bold uppercase mb-4">Account Settings</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-4">Account Settings</h3>
               <form onSubmit={handleSettingsSave} className="flex flex-col gap-4 text-xs">
                 <div>
                   <label className="block text-[10px] font-bold uppercase mb-1">Full Name</label>
@@ -378,7 +378,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             </div>
 
             <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-6">
-              <h3 className="font-display text-lg font-bold uppercase mb-4 text-[#E7D5A4]">Change Password</h3>
+              <h3 className="font-condensed text-lg font-bold uppercase mb-4 text-[#E7D5A4]">Change Password</h3>
               <form onSubmit={handlePasswordChange} className="flex flex-col gap-3 text-xs">
                 <input type="password" required minLength={6} placeholder="New password" value={pwForm.next} onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })} className="w-full p-2.5 bg-[#11100C] border border-[#C99A2E]/60 text-[#E7D5A4] outline-none" />
                 <input type="password" required placeholder="Confirm new password" value={pwForm.confirm} onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} className="w-full p-2.5 bg-[#11100C] border border-[#C99A2E]/60 text-[#E7D5A4] outline-none" />
@@ -397,7 +397,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             ) : (
               <>
                 <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
-                  <h3 className="font-display text-lg font-bold uppercase mb-2">Need help?</h3>
+                  <h3 className="font-condensed text-lg font-bold uppercase mb-2">Need help?</h3>
                   <p className="font-mono text-[11px] text-[#E7D5A4]/70 mb-3">Tangy AI can answer questions about bookings, sessions and your passport instantly.</p>
                   <Link to="/ai" className="inline-block px-4 py-2 bg-[#C99A2E] text-[#11100C] font-bold uppercase text-[10px] tracking-widest">✦ ASK TANGY AI →</Link>
                 </div>

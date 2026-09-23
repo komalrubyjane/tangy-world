@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 import { useUserAuth } from '../../context/UserAuthContext';
+import { useLenis } from './LenisProvider';
+import { HOME_CHAPTERS } from '../../data/homeChapters';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -16,6 +18,18 @@ export const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const leaveTimeoutRef = useRef(null);
+  const menuToggleRef = useRef(null);
+  const menuPanelRef = useRef(null);
+  const lenis = useLenis();
+  // Current homepage chapter, broadcast by MicNavRail — shown as a compact
+  // indicator in the mobile header (the full 01–10 rail is desktop-only).
+  const [chapter, setChapter] = useState(null);
+
+  useEffect(() => {
+    const onChapter = (e) => setChapter(e.detail);
+    window.addEventListener('tangy:chapter', onChapter);
+    return () => window.removeEventListener('tangy:chapter', onChapter);
+  }, []);
 
   // NAVIGATION CATEGORIES (Includes ARTISTS section with distinct Artist Portal links)
   const navCategories = [
@@ -153,34 +167,41 @@ export const Navbar = () => {
     }, 180);
   };
 
-  // Lock body overflow only while mobile menu is open, and restore on close/unmount
+  // While the index panel is open: lock page scroll (body AND Lenis, which
+  // otherwise keeps scrolling on wheel), close on Escape, move focus into the
+  // panel, and hand focus back to the toggle on close.
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isMobileMenuOpen) return undefined;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+    const onKey = (e) => { if (e.key === 'Escape') setIsMobileMenuOpen(false); };
+    window.addEventListener('keydown', onKey);
+    const focusTimer = setTimeout(() => menuPanelRef.current?.querySelector('button')?.focus(), 60);
+    const toggle = menuToggleRef.current;
     return () => {
       document.body.style.overflow = '';
+      lenis?.start();
+      window.removeEventListener('keydown', onKey);
+      clearTimeout(focusTimer);
+      toggle?.focus({ preventScroll: true });
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, lenis]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#11100C]/95 border-b-2 border-[#C99A2E]/40 px-4 md:px-8 py-3 flex items-center justify-between text-[#E7D5A4] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#181614] border-b border-[#EFE2C0]/12 px-4 md:px-8 py-3 flex items-center justify-between text-[#EFE2C0] font-mono text-[10px] md:text-[11px] tracking-widest">
       
       {/* LEFT: BRAND LOGO */}
       <div 
         onClick={() => handleNav('/')}
         className="flex items-center gap-2 cursor-pointer group"
       >
-        <span className="w-2.5 h-2.5 rounded-full bg-[#B94717] group-hover:scale-125 transition-transform" />
-        <span className="font-display font-bold text-sm md:text-base tracking-tight text-[#E7D5A4] group-hover:text-[#C99A2E] transition-colors uppercase">
+        <span className="font-display text-base md:text-lg leading-none tracking-[0.04em] text-[#EFE2C0] group-hover:text-[#C89D35] transition-colors uppercase">
           TANGY SESSIONS
         </span>
       </div>
 
       {/* CENTER: DESKTOP EDITORIAL DROPDOWN MENU */}
-      <nav className="hidden xl:flex items-center gap-4 xl:gap-5 text-[#E7D5A4]">
+      <nav className="hidden xl:flex items-center text-[#E7D5A4]">
         {navCategories.map((cat, idx) => {
           const isOpen = activeDropdown === cat.title;
           const isRightAligned = idx >= navCategories.length - 2;
@@ -188,14 +209,16 @@ export const Navbar = () => {
           return (
             <div 
               key={cat.title}
-              className="relative group"
+              className="relative group flex items-center"
               onMouseEnter={() => handleMouseEnter(cat.title)}
               onMouseLeave={handleMouseLeave}
             >
+              {/* Hairline separator between index entries, like a printed contents strip */}
+              {idx > 0 && <span className="w-px h-3 bg-[#EFE2C0]/20 mx-4" aria-hidden="true" />}
               {/* Category Header Button */}
               <button 
                 onClick={() => handleNav(cat.path)}
-                className={`py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] ${isOpen ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/90'}`}
+                className={`relative py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] after:absolute after:left-0 after:right-3 after:-bottom-0.5 after:h-px after:bg-current after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 ${isOpen ? 'text-[#C99A2E] after:scale-x-100' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
                 <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
@@ -203,13 +226,10 @@ export const Navbar = () => {
 
               {/* Cream Paper Dropdown Menu */}
               <div 
-                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-2 w-52 bg-[#F5E9C9] text-[#11100C] p-3 border-2 border-[#C99A2E]/80 rounded-md shadow-[0_15px_35px_rgba(17,16,12,0.9)] z-[10001] transition-all duration-200 ease-out origin-top ${
+                className={`absolute top-full ${isRightAligned ? 'right-0' : 'left-0'} mt-3 w-52 bg-[#EFE2C0] text-[#181614] p-2 border border-[#181614] shadow-[4px_4px_0_rgba(24,22,20,0.6)] z-[10001] transition-all duration-200 ease-out origin-top ${
                   isOpen ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' : 'opacity-0 translate-y-2 pointer-events-none scale-95'
                 }`}
               >
-                {/* Paper Fiber Noise Overlay */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none rounded-md" />
-                
                 {/* Dropdown Items List */}
                 <div className="relative z-10 flex flex-col gap-1">
                   {cat.items.map((item) => (
@@ -229,15 +249,16 @@ export const Navbar = () => {
         })}
       </nav>
 
-      {/* RIGHT: TANGY AI + MOBILE MENU TOGGLE */}
+      {/* RIGHT: CHAPTER INDICATOR (mobile, homepage) + MENU TOGGLE — Tangy AI lives
+          in the floating assistant launcher, so it isn't duplicated here. */}
       <div className="flex items-center gap-2 sm:gap-3">
-        <button
-          onClick={() => handleNav('/ai')}
-          className="inline-flex items-center gap-1.5 px-2 py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-[#C99A2E] bg-[#C99A2E]/10 border border-[#C99A2E]/40 rounded-sm hover:bg-[#C99A2E]/20 hover:text-[#E7D5A4] transition-colors"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C99A2E] animate-pulse" />
-          Tangy AI
-        </button>
+        {chapter !== null && HOME_CHAPTERS[chapter] && (
+          <span className="lg:hidden flex items-center gap-1.5 font-mono text-[10px] tracking-[0.14em] uppercase text-[#EFE2C0]/75" aria-live="polite">
+            <span className="text-[#C89D35] tabular-nums">{String(chapter + 1).padStart(2, '0')}</span>
+            <span className="w-3 h-px bg-[#EFE2C0]/30" aria-hidden="true" />
+            <span className="hidden min-[360px]:inline max-w-[6.5rem] truncate">{HOME_CHAPTERS[chapter].label}</span>
+          </span>
+        )}
 
         {isLoggedIn && (
           <div className="hidden xl:flex items-center gap-2">
@@ -261,87 +282,90 @@ export const Navbar = () => {
 
         <div className="xl:hidden">
           <button
+            ref={menuToggleRef}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="border border-[#C99A2E] text-[#C99A2E] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest active:scale-95 z-[10002] relative"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="archive-index-panel"
+            className="min-h-[36px] border border-[#C99A2E] text-[#C99A2E] px-3 font-mono text-[10px] font-bold uppercase tracking-widest z-[10002] relative"
           >
-            {isMobileMenuOpen ? 'CLOSE ✕' : 'MENU ☰'}
+            {isMobileMenuOpen ? 'Close ✕' : 'Index ☰'}
           </button>
         </div>
       </div>
 
-      {/* MOBILE ACCORDION NAV DRAWER OVERLAY (<1280px) */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] bg-[#11100C]/98 text-[#E7D5A4] p-6 z-[10000] overflow-y-auto flex flex-col gap-4 border-t-2 border-[#C99A2E]/50 xl:hidden">
-          {/* The dock's own PROFILE/LOGIN button (bottom nav, always visible on mobile)
-              covers this now — a duplicate entry used to live here from when TV
-              temporarily replaced PROFILE in the dock instead of sitting alongside it. */}
-          {isLoggedIn && (
-            <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
-              <button
-                onClick={() => handleNav('/profile')}
-                className="text-left font-mono text-sm font-bold text-[#E7D5A4] hover:text-[#C99A2E] uppercase"
-              >
-                🛂 PROFILE / PASSPORT
-              </button>
-            </div>
-          )}
-
-          {isAdminUser && (
-            <div className="flex flex-col gap-2 pb-4 mb-2 border-b border-[#C99A2E]/30">
-              <button
-                onClick={() => handleNav('/admin')}
-                className="text-left font-mono text-sm font-bold text-[#C99A2E] uppercase"
-              >
-                ADMIN PORTAL
-              </button>
-            </div>
-          )}
-
-          <div className="font-mono text-xs text-[#C99A2E] font-bold tracking-[0.25em] uppercase border-b border-[#C99A2E]/30 pb-2">
-            NAVIGATION MENU
+      {/* ARCHIVE INDEX PANEL (<1280px) — always mounted so it can animate
+          both ways: the sheet unrolls top-down (clip-path) and the numbered
+          entries stagger in; closing reverses it. `inert` keeps it out of the
+          tab order and away from assistive tech while closed. */}
+      <div
+        id="archive-index-panel"
+        ref={menuPanelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Archive index"
+        inert={!isMobileMenuOpen}
+        className={`index-panel ${isMobileMenuOpen ? 'is-open' : ''} fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] theme-hero z-[10000] overflow-y-auto overscroll-contain xl:hidden`}
+      >
+        <div className="t-container py-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+          <div className="index-item flex justify-between items-center archiveMetadata text-[#EFE2C0]/60 pb-3 border-b-[3px] border-double border-[#EFE2C0]/25" style={{ '--i': 0 }}>
+            <span>Archive index</span>
+            <span>Hyderabad · Est. 2016</span>
           </div>
 
-          <div className="flex flex-col gap-3 mt-2 pb-12">
-            {navCategories.map((cat) => {
+          <ol className="list-none m-0 p-0">
+            {navCategories.map((cat, idx) => {
               const isCatOpen = activeDropdown === cat.title;
-
               return (
-                <div key={cat.title} className="border-b border-[#E7D5A4]/10 pb-2">
-                  <div className="w-full flex justify-between items-center py-1">
+                <li key={cat.title} className="index-item border-b border-[#EFE2C0]/12" style={{ '--i': idx + 1 }}>
+                  <div className="flex items-center gap-4">
+                    <span className="archiveMetadata text-[#C89D35] w-6 shrink-0 tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
                     <button
                       onClick={() => handleNav(cat.path)}
-                      className="font-mono text-sm font-bold text-[#E7D5A4] hover:text-[#C99A2E] uppercase text-left flex-1"
+                      className="flex-1 text-left font-display uppercase text-[clamp(1.9rem,9vw,2.75rem)] leading-none py-3 text-[#EFE2C0] hover:text-[#C89D35] focus-visible:text-[#C89D35]"
                     >
                       {cat.title}
                     </button>
                     <button
                       onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
-                      className="text-xs text-[#C99A2E] px-3 py-1 font-bold"
+                      aria-expanded={isCatOpen}
+                      aria-label={`${isCatOpen ? 'Hide' : 'Show'} ${cat.title} pages`}
+                      className="w-11 h-11 shrink-0 flex items-center justify-center font-mono text-lg text-[#C89D35] border border-[#EFE2C0]/15"
                     >
-                      {isCatOpen ? '▲' : '▼'}
+                      {isCatOpen ? '−' : '+'}
                     </button>
                   </div>
 
                   {isCatOpen && (
-                    <div className="mt-2 pl-4 flex flex-col gap-2 bg-[#F5E9C9] text-[#11100C] p-3 rounded-md border border-[#C99A2E]">
+                    <ul className="list-none m-0 mb-4 ml-10 p-0 border-l border-[#C89D35]/40">
                       {cat.items.map((item) => (
-                        <button
-                          key={item.label}
-                          onClick={() => handleNav(item)}
-                          className="text-left font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] py-1.5 flex justify-between items-center border-b border-[#11100C]/10 last:border-0"
-                        >
-                          <span>{item.label}</span>
-                          <span className="text-[#C2272A]">→</span>
-                        </button>
+                        <li key={item.label}>
+                          <button
+                            onClick={() => handleNav(item)}
+                            className="w-full min-h-[44px] pl-4 pr-2 text-left font-mono text-xs uppercase tracking-[0.14em] text-[#EFE2C0]/85 hover:text-[#C89D35] flex justify-between items-center"
+                          >
+                            <span>{item.label}</span>
+                            <span className="text-[#C89D35]" aria-hidden="true">→</span>
+                          </button>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   )}
-                </div>
+                </li>
               );
             })}
+          </ol>
+
+          {/* Utilities that live in the desktop header */}
+          <div className="index-item flex flex-wrap gap-3 mt-8" style={{ '--i': navCategories.length + 1 }}>
+            {isLoggedIn && (
+              <button onClick={() => handleNav('/profile')} className="t-btn t-btn-ghost text-[#EFE2C0]">Profile / Passport</button>
+            )}
+            {isAdminUser && (
+              <button onClick={() => handleNav('/admin')} className="t-btn t-btn-ghost text-[#C89D35]">Admin portal</button>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
     </header>
   );

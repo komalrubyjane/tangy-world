@@ -107,7 +107,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
             {deliverables.map((d) => (
               <div key={d.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-4 flex justify-between items-start gap-3">
                 <div>
-                  <h4 className="font-display font-bold uppercase">{d.title}</h4>
+                  <h4 className="font-condensed font-bold uppercase">{d.title}</h4>
                   {d.events?.name && <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{d.events.name} · {fmtDate(d.events.event_date)}</p>}
                   {d.due_date && <p className="font-mono text-[10px] text-[#E7D5A4]/50 mt-1">Due {fmtDate(d.due_date)}</p>}
                   {d.description && <p className="font-mono text-[11px] text-[#E7D5A4]/80 mt-2">{d.description}</p>}
@@ -127,7 +127,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
               <div className="flex justify-between items-start gap-3 mb-2">
                 <div>
-                  <h3 className="font-display text-lg font-bold uppercase">{a.business_name}</h3>
+                  <h3 className="font-condensed text-lg font-bold uppercase">{a.business_name}</h3>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
                 </div>
                 <Badge status={a.status} />

@@ -1,124 +1,18 @@
 // Modular SVG & CSS Decorative Texture & Print Archive Utilities for Tangy World
 
-// 1. Notebook / Graph Grid Pattern (Faint 24px Grid)
-export const NotebookGridPattern = ({ opacity = 0.08, className = "" }) => (
-  <div className={`absolute inset-0 pointer-events-none z-0 ${className}`} style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="notebook-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#11100C" strokeWidth="0.75" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#notebook-grid)" />
-    </svg>
-  </div>
-);
-
-// 2. Music Manuscript 5-Line Staff Pattern
-export const MusicManuscriptPattern = ({ opacity = 0.06, color = "#E7D5A4", className = "" }) => (
-  <div className={`absolute inset-0 pointer-events-none z-0 ${className}`} style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="music-staff" width="100" height="72" patternUnits="userSpaceOnUse">
-          <line x1="0" y1="12" x2="100" y2="12" stroke={color} strokeWidth="1" />
-          <line x1="0" y1="20" x2="100" y2="20" stroke={color} strokeWidth="1" />
-          <line x1="0" y1="28" x2="100" y2="28" stroke={color} strokeWidth="1" />
-          <line x1="0" y1="36" x2="100" y2="36" stroke={color} strokeWidth="1" />
-          <line x1="0" y1="44" x2="100" y2="44" stroke={color} strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#music-staff)" />
-    </svg>
-  </div>
-);
-
-// 3. Backstage Blueprint Grid Pattern
-export const BlueprintGridPattern = ({ opacity = 0.08, className = "" }) => (
-  <div className={`absolute inset-0 pointer-events-none z-0 ${className}`} style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="blueprint-small" width="16" height="16" patternUnits="userSpaceOnUse">
-          <path d="M 16 0 L 0 0 0 16" fill="none" stroke="#E7D5A4" strokeWidth="0.5" />
-        </pattern>
-        <pattern id="blueprint-grid" width="80" height="80" patternUnits="userSpaceOnUse">
-          <rect width="80" height="80" fill="url(#blueprint-small)" />
-          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#E7D5A4" strokeWidth="1.2" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#blueprint-grid)" />
-    </svg>
-  </div>
-);
-
-// 4. Warped Retro Checkerboard Ribbon Pattern Accent (8% Opacity)
-export const WarpedCheckerPattern = ({ opacity = 0.08, className = "" }) => (
-  <div className={`absolute inset-0 pointer-events-none z-0 mix-blend-overlay ${className}`} style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="checker-pattern" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
-          <rect width="20" height="20" fill="#11100C" />
-          <rect x="20" width="20" height="20" fill="#E7D5A4" />
-          <rect y="20" width="20" height="20" fill="#E7D5A4" />
-          <rect x="20" y="20" width="20" height="20" fill="#11100C" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#checker-pattern)" />
-    </svg>
-  </div>
-);
-
-// 5. Red-and-White Gingham Fabric Ribbon Pattern
-export const GinghamRibbonPattern = ({ opacity = 0.85, className = "" }) => (
-  <div className={`pointer-events-none z-10 ${className}`} style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="gingham-check" width="16" height="16" patternUnits="userSpaceOnUse">
-          <rect width="16" height="16" fill="#F5E9C9" />
-          <rect width="8" height="16" fill="#C2272A" fillOpacity="0.45" />
-          <rect y="0" width="16" height="8" fill="#C2272A" fillOpacity="0.45" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#gingham-check)" />
-    </svg>
-  </div>
-);
-
-// 6. Sound Wave Frequency Graphic (Replaces Botanical Stems with Sonic Frequency Waves)
-export const SoundWaveGraphic = ({ color = "#E7D5A4", opacity = 0.25, className = "" }) => (
-  <svg 
-    viewBox="0 0 240 360" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg" 
-    className={`pointer-events-none z-0 ${className}`}
-    style={{ opacity }}
-  >
-    <g stroke={color} strokeWidth="2" strokeLinecap="round">
-      <line x1="20" y1="180" x2="20" y2="200" />
-      <line x1="35" y1="160" x2="35" y2="220" />
-      <line x1="50" y1="120" x2="50" y2="260" />
-      <line x1="65" y1="80" x2="65" y2="290" />
-      <line x1="80" y1="40" x2="80" y2="330" />
-      <line x1="95" y1="10" x2="95" y2="350" strokeWidth="3" />
-      <line x1="110" y1="50" x2="110" y2="320" />
-      <line x1="125" y1="90" x2="125" y2="280" />
-      <line x1="140" y1="130" x2="140" y2="240" />
-      <line x1="155" y1="150" x2="155" y2="220" />
-      <line x1="170" y1="110" x2="170" y2="270" />
-      <line x1="185" y1="70" x2="185" y2="300" />
-      <line x1="200" y1="120" x2="200" y2="250" />
-      <line x1="215" y1="160" x2="215" y2="210" />
-    </g>
-  </svg>
-);
-
-// Fallback compatibility aliases for any legacy references
-export const BotanicalRoseStem = ({ className = "" }) => (
-  <SoundWaveGraphic color="#B94717" opacity={0.35} className={className} />
-);
-
-export const BotanicalRoseInk = ({ color = "#E7D5A4", opacity = 0.12, className = "" }) => (
-  <SoundWaveGraphic color={color} opacity={opacity} className={className} />
-);
+// 1–6. Full-area background patterns (notebook grid, music staff, blueprint
+// grid, warped checker, gingham, sound-wave) — RETIRED. Each section used to
+// layer one of these behind its content on top of a textile photo and grain;
+// the system is now one solid background family + optional static grain.
+// Kept as no-ops so existing imports across pages stay valid.
+export const NotebookGridPattern = () => null;
+export const MusicManuscriptPattern = () => null;
+export const BlueprintGridPattern = () => null;
+export const WarpedCheckerPattern = () => null;
+export const GinghamRibbonPattern = () => null;
+export const SoundWaveGraphic = () => null;
+export const BotanicalRoseStem = () => null;
+export const BotanicalRoseInk = () => null;
 
 // 7. Vintage Cassette Tape & Reel Label Graphic
 export const CassetteTapeGraphic = ({ className = "" }) => (
@@ -174,13 +68,8 @@ export const TapeStrip = ({ className = "", style = {} }) => (
   />
 );
 
-// 11. Vintage Coffee Ring Stain Accent
-export const CoffeeStain = ({ className = "", style = {} }) => (
-  <div 
-    className={`absolute rounded-full border-[12px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-multiply ${className}`}
-    style={style}
-  />
-);
+// 11. Coffee ring stain — retired (pure decoration, used a blend mode). No-op.
+export const CoffeeStain = () => null;
 
 // 12. Paper Clip Graphic Accent
 export const PaperClip = ({ className = "" }) => (

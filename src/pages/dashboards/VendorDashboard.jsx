@@ -122,7 +122,7 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-4">
               <div className="flex justify-between items-start gap-3">
                 <div>
-                  <h4 className="font-display font-bold uppercase">{a.events?.name}</h4>
+                  <h4 className="font-condensed font-bold uppercase">{a.events?.name}</h4>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{fmtDate(a.events?.event_date)} · {a.events?.event_time} · {a.events?.venue}</p>
                   <p className="font-mono text-[10px] text-[#C99A2E] font-bold mt-1">{a.title}</p>
                 </div>
@@ -147,7 +147,7 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div key={a.id} className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
               <div className="flex justify-between items-start gap-3 mb-2">
                 <div>
-                  <h3 className="font-display text-lg font-bold uppercase">{a.business_name}</h3>
+                  <h3 className="font-condensed text-lg font-bold uppercase">{a.business_name}</h3>
                   <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Submitted {fmtDate(a.created_at)}</p>
                 </div>
                 <Badge status={a.status} />
