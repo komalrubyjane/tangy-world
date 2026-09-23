@@ -61,14 +61,16 @@ export const RetroImage = ({
 // 2. PatternBackground — a real textile/Bandhani/Rangoli photograph tiled or
 // cropped as a section/card background layer, replacing a generated pattern.
 //
-// DEFAULT CONTRACT: full visual strength, no built-in tint — the photo itself
-// is meant to be the dominant thing seen, not a faint hint behind the
-// section's solid accent color. Callers using this as an actual section/page
-// background photo should NOT pass a low `opacity` — leave it at the
-// default. A caller may still pass an explicit low `opacity` when it is a
-// genuinely small, localized decorative accent (a tiled strip, a per-card
-// texture, an era-accent tint) rather than the section's background photo —
-// those exceptions stay documented at their call site.
+// DEFAULT CONTRACT: full visual PRESENCE (opacity 1 — never a faint hint
+// behind the section's solid accent color), but dimmed/muted in tone via a
+// filter rather than transparency — a deliberate moody/aesthetic treatment,
+// not the section-color wash this used to have. Callers using this as an
+// actual section/page background photo should NOT pass a low `opacity` —
+// leave it at the default. A caller may still pass an explicit low
+// `opacity` when it is a genuinely small, localized decorative accent (a
+// tiled strip, a per-card texture, an era-accent tint) rather than the
+// section's background photo — those exceptions stay documented at their
+// call site.
 export const PatternBackground = ({
   category,
   index = 0,
@@ -77,6 +79,7 @@ export const PatternBackground = ({
   size = 'cover', // 'cover' or a CSS background-size value (e.g. '220px')
   repeat = false,
   blend = 'normal',
+  dim = true, // set false to opt a specific caller out of the dim treatment
   className = '',
 }) => {
   const resolvedSrc = src || pickAsset(category, index);
@@ -92,6 +95,7 @@ export const PatternBackground = ({
           backgroundPosition: 'center',
           opacity,
           mixBlendMode: blend,
+          filter: dim ? 'brightness(0.62) saturate(0.82)' : 'none',
         }}
         aria-hidden="true"
       />
