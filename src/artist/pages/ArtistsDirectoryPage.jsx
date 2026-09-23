@@ -60,8 +60,8 @@ export const ArtistsDirectoryPage = () => {
       {/* HERO HEADER — a poster masthead, not a settings-page banner: a bleeding Rangoli */}
       {/* medallion, a huge outline "01" plate mark, and oversized rotated title type. */}
       <div className="relative bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
-        <PatternBackground category="textile" index={1} opacity={0.34} size="cover" blend="normal" />
-        <RetroGrain index={0} opacity={0.09} blend="multiply" />
+        <PatternBackground category="textile" index={1} size="cover" blend="normal" />
+        <RetroGrain index={0} opacity={0.09} blend="overlay" />
         <div className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] aspect-square opacity-[0.18] animate-[spin_150s_linear_infinite] pointer-events-none">
           <RangoliDecoration index={0} spin={false} className="w-full h-full" />
         </div>
@@ -162,7 +162,7 @@ export const ArtistsDirectoryPage = () => {
               >
                 {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection, subtly more visible */}
                 {/* on hover like the texture catching the light. */}
-                <RetroGrain index={idx % 2} opacity={0.13} blend="multiply" />
+                <RetroGrain index={idx % 2} opacity={0.13} blend="overlay" />
                 
                 {/* FULL-BLEED PORTRAIT — top ~64% of the card, original colour, no padding */}
                 <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden border-b-2 sm:border-b-4 border-[#191410]">

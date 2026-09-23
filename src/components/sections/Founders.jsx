@@ -107,7 +107,7 @@ export const Founders = () => {
       </div>
 
       {/* REAL BANDHANI TEXTILE LAYER + FRAME */}
-      <PatternBackground category="textile" index={0} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="textile" index={0} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#D19A24" colorB="#1C140E" />
       

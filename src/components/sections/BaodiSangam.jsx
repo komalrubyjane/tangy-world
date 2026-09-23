@@ -36,7 +36,7 @@ export const BaodiSangam = () => {
       {/* motifs at real scale, not a background hint. Split-page poster composition instead */}
       {/* of a single centered field. */}
       <div className="relative w-full lg:w-[42%] h-[34%] lg:h-full shrink-0 overflow-hidden bg-[#16323A] border-b-4 lg:border-b-0 lg:border-r-4 border-[#0d1a1f]">
-        <PatternBackground category="bandhani" index={1} opacity={0.38} size="cover" blend="normal" />
+        <PatternBackground category="bandhani" index={1} size="cover" blend="normal" />
         {/* REAL RANGOLI PHOTOGRAPH standing in for the stepwell's concentric ripples */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[74%] aspect-square max-w-none opacity-45 animate-[spin_110s_linear_infinite] pointer-events-none">
           <RangoliDecoration index={1} spin={false} className="w-full h-full" />

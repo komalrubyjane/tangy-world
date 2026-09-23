@@ -219,7 +219,7 @@ export const History = () => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-10">
           <span className="display text-[16vw] md:text-[22vw] leading-none text-[#11100C]">2016—2026</span>
         </div>
-        <PatternBackground category="bandhani" index={1} opacity={0.4} size="cover" blend="normal" className="z-0" />
+        <PatternBackground category="bandhani" index={1} size="cover" blend="normal" className="z-0" />
         <div className="hidden lg:block absolute -top-[10vw] -left-[8vw] w-[36vw] h-[36vw] max-w-none opacity-[0.12] animate-[spin_150s_linear_infinite] pointer-events-none">
           <RangoliDecoration index={2} spin={false} className="w-full h-full" />
         </div>
@@ -257,7 +257,10 @@ export const History = () => {
             className="chronology-era-block relative w-full py-16 md:py-36 px-5 md:px-16 flex flex-col items-center justify-center border-b-4 border-[#11100C] overflow-hidden"
             style={{ backgroundColor: era.bg, color: era.text }}
           >
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
+            {/* Intentional era-accent exception: a low-opacity multiply tint that blends the
+                photo INTO this era's own accent color rather than showing it as the section's
+                dominant background photo — that's the solid era.bg color above. */}
             <PatternBackground category="bandhani" index={index} opacity={0.24} size="cover" blend="multiply" className="z-0" />
             
             <LotusStamp index={index} bg="transparent" border={era.text} className="md:hidden absolute top-4 right-4 w-8 h-8 opacity-90 z-10" />

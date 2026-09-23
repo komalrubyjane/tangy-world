@@ -12,7 +12,7 @@ export const VintageDiaryShell = ({
 
       {/* RIPPED/DECKLE PAPER STACK DEPTH UNDERNEATH (TOP, RIGHT, BOTTOM EDGES) */}
       <div className="absolute -top-3 -right-4 -bottom-3 -left-3 bg-[#E7D5A4] rounded-lg border-2 border-[#120A06] shadow-2xl opacity-90 pointer-events-none z-0 rotate-[-0.5deg]">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay" />
         <div className="absolute top-0 right-0 bottom-0 w-5 bg-[repeating-linear-gradient(180deg,#D6C19A_0px,#D6C19A_3px,#B8A37C_3px,#B8A37C_6px)] border-l border-[#120A06]/40" />
       </div>
 

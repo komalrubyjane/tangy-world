@@ -423,7 +423,7 @@ export const Hero = () => {
 
         {/* REAL BANDHANI TEXTILE LAYER — the poster's actual physical surface: a supplied */}
         {/* tie-dye photograph clearly visible behind the performers, not a faint hint. */}
-        <PatternBackground category="bandhani" index={0} opacity={0.4} size="cover" blend="normal" className="z-5" />
+        <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-5" />
 
         {/* POSTER BORDER FRAME — bold woven textile strips top and bottom, turning the whole */}
         {/* hero into a framed printed sheet rather than an edge-to-edge background. */}

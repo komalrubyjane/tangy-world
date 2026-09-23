@@ -183,7 +183,7 @@ export const ArchivePage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {MUSEUM_MILESTONES.map((m, i) => (
             <div key={i} className="relative bg-[#E7D5A4] text-[#11100C] p-4 sm:p-5 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] overflow-hidden">
-              <RetroGrain index={i % 2} opacity={0.1} blend="multiply" />
+              <RetroGrain index={i % 2} opacity={0.1} blend="overlay" />
               <span className="relative font-mono text-xs font-bold text-[#B94717] block mb-1">{m.year}</span>
               <h3 className="relative display text-lg text-[#11100C] mb-2">{m.event}</h3>
               <p className="relative font-mono text-[10px] text-[#11100C]/80 leading-relaxed">{m.details}</p>
@@ -201,7 +201,7 @@ export const ArchivePage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
           {archiveItems.map((item, i) => (
             <div key={item.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start overflow-hidden">
-              <RetroGrain index={i % 2} opacity={0.1} blend="multiply" />
+              <RetroGrain index={i % 2} opacity={0.1} blend="overlay" />
               
               <div className="relative w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
                 <img src={item.image} alt={item.title} className="w-full aspect-[3/4] object-cover filter grayscale sepia-[0.4]" />
@@ -229,7 +229,7 @@ export const ArchivePage = () => {
         <div className="flex flex-col gap-5 sm:gap-6">
           {PRESS_CLIPS.map((clip, i) => (
             <div key={clip.id} className="relative bg-[#F5E9C9] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-8 shadow-[4px_4px_0px_#11100C] sm:shadow-[10px_10px_0px_#11100C] grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 items-center overflow-hidden">
-              <RetroGrain index={i % 2} opacity={0.09} blend="multiply" />
+              <RetroGrain index={i % 2} opacity={0.09} blend="overlay" />
               <div className="relative sm:col-span-1 w-full h-28 sm:h-full overflow-hidden border-2 border-[#11100C]">
                 <img src={clip.image} alt={clip.title} className="w-full h-full object-cover filter grayscale sepia-[0.4]" />
               </div>

@@ -57,14 +57,14 @@ export const Manifesto = () => {
       className="relative w-full min-h-screen lg:h-screen bg-[#E7D5A4] text-[#11100C] overflow-hidden flex items-center justify-center border-t-8 border-[#11100C] p-4 sm:p-8 md:p-12 py-20 lg:py-0">
       
       {/* NOISE & AGED HANDMADE PAPER FIBER TEXTURE */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-multiply pointer-events-none z-10" />
-      <RetroGrain index={0} opacity={0.12} blend="multiply" className="z-10" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-10" />
+      <RetroGrain index={0} opacity={0.12} blend="overlay" className="z-10" />
 
       {/* MUSEUM ARCHIVE NOTEBOOK GRID PATTERN */}
       <NotebookGridPattern opacity={0.07} />
 
       {/* BANDHANI DOT FIELD — a real textile layer across the section, not a hint */}
-      <PatternBackground category="bandhani" index={2} opacity={0.38} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="bandhani" index={2} size="cover" blend="normal" className="z-0" />
 
       {/* CASSETTE TAPE ACCENTS */}
       <CassetteTapeGraphic className="absolute top-10 right-10 w-44 hidden md:block" />
@@ -93,7 +93,7 @@ export const Manifesto = () => {
       <div className="manifesto-newspaper relative w-full max-w-[1100px] paper-surface border-4 border-[#11100C] p-5 sm:p-8 md:p-14 shadow-[14px_14px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] z-10 my-auto">
 
         {/* COFFEE STAIN GRAPHIC ACCENT */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[14px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-multiply rotate-12 hidden sm:block" />
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-[14px] border-[#5A2B15]/20 opacity-30 pointer-events-none mix-blend-overlay rotate-12 hidden sm:block" />
 
         {/* REAL RISOGRAPH PRINT FRAGMENT — a pinned offset-print scrap, tucked into the */}
         {/* newspaper's own top-right corner. */}

@@ -40,7 +40,7 @@ export const Gallery = () => {
 
   return (
     <section ref={sectionRef} id="gallery" className="scene relative w-full h-screen overflow-hidden bg-tangy-wine border-t border-[rgba(231,223,181,.1)] perspective-1000">
-      <PatternBackground category="textile" index={2} opacity={0.32} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="textile" index={2} size="cover" blend="normal" className="z-0" />
       <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] max-w-none opacity-[0.08] animate-[spin_160s_linear_infinite] pointer-events-none z-0">
         <RangoliDecoration index={0} spin={false} className="w-full h-full" />
       </div>

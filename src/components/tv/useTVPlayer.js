@@ -12,6 +12,18 @@ function getChannelPlaylist() {
   return tvChannelService.getPlaylist().map((c) => ({ filename: c.title, url: c.url }));
 }
 
+// Admin-entered channel URLs (tvChannels.js) are raw local paths, unlike
+// FIRST_VIDEO/MIDDLE_VIDEO which come pre-encoded from Vite's import.meta.glob.
+// A raw path with spaces/commas/@ etc. plays fine from Vite's dev server but
+// can fail to resolve against the static host in production, silently
+// falling through to the SPA rewrite — so encode local paths before use.
+// Shared by both the reactive src-derivation below and triggerSwitch's
+// imperative write, so the two always agree on the exact same string.
+function toPlayableSrc(url) {
+  const raw = url || '';
+  return raw.startsWith('/') ? encodeURI(raw) : raw;
+}
+
 export const TV_STATE = {
   BOOTING:   'BOOTING',    // playing first.mp4
   PLAYING:   'PLAYING',    // playing shuffled playlist video
@@ -21,6 +33,11 @@ export const TV_STATE = {
 
 export function useTVPlayer() {
   const videoRef = useRef(null);
+  // The exact src string last actually applied to the <video> element (via
+  // either the reactive effect below or triggerSwitch's imperative write) —
+  // lets both paths agree on "has this source already been loaded" instead
+  // of racing each other. See the "Load and play" effect for why this matters.
+  const lastAppliedSrcRef = useRef('');
 
   // ── Playlist ──────────────────────────────────────────────────────────────
   const [shuffled,      setShuffled]      = useState([]);
@@ -31,6 +48,10 @@ export function useTVPlayer() {
   const [tvState,    setTvState]    = useState(TV_STATE.OFF);
   const [isPowered,  setIsPowered]  = useState(false);
   const [isPlaying,  setIsPlaying]  = useState(false);
+  // The src that most recently fired 'loadeddata' (an actual paintable
+  // frame decoded) — see `isVideoReady` below, derived from this every
+  // render, for why this is a src comparison rather than a plain boolean.
+  const [readySrc,   setReadySrc]   = useState('');
   const [isMuted,    setIsMuted]    = useState(true);
   const [volume,     setVolume]     = useState(0.8);
   const [currentTime,setCurrentTime]= useState(0);
@@ -54,15 +75,24 @@ export function useTVPlayer() {
     return null;
   })();
 
-  // Admin-entered channel URLs (tvChannels.js) are raw local paths, unlike
-  // FIRST_VIDEO/MIDDLE_VIDEO which come pre-encoded from Vite's import.meta.glob.
-  // A raw path with spaces/commas/@ etc. plays fine from Vite's dev server but
-  // can fail to resolve against the static host in production, silently
-  // falling through to the SPA rewrite — so encode local paths before use.
-  const rawUrl           = currentVideo?.url || '';
-  const currentSrc       = rawUrl.startsWith('/') ? encodeURI(rawUrl) : rawUrl;
+  const currentSrc       = toPlayableSrc(currentVideo?.url);
   const channelNumber   = currentIndex + 1;
   const totalVideos     = shuffled.length;
+
+  // Derived, not a separately-toggled boolean: true only when the src we
+  // actually WANT playing right now (`currentSrc`) is the one that has
+  // already decoded a frame (`readySrc`). Deriving it this way means it
+  // automatically becomes false the instant `currentSrc` changes — for
+  // ANY reason (channel switch, auto-advance, admin playlist edit) — on
+  // the exact same render, with no call site needing to remember to reset
+  // a flag. A plain `useState(false)` reset from inside an effect was
+  // tried first and had a real gap: the effect resetting it always runs
+  // one render AFTER the state change that flips tvState/currentIndex, so
+  // there was one paintable frame where the covering UI had already
+  // dropped (because it read the OLD, stale "ready" value) before the new
+  // source's un-readiness caught up — i.e. exactly the flash this exists
+  // to prevent.
+  const isVideoReady = !!currentSrc && readySrc === currentSrc;
 
   // ── Load and play whenever the source changes ──────────────────────────────
   useEffect(() => {
@@ -70,6 +100,18 @@ export function useTVPlayer() {
     if (!video || !isPowered) return;
     if (tvState === TV_STATE.OFF) { video.pause(); return; }
     if (!currentSrc) return;
+
+    // triggerSwitch() (below) applies the middle.mp4 src imperatively and
+    // synchronously, the instant the user changes channel, so the transition
+    // clip starts with no extra render round-trip. This effect then also
+    // runs afterwards, because `tvState` changing to SWITCHING is itself one
+    // of its dependencies — even though `currentSrc` didn't change. Without
+    // this guard it would call `.load()` a second time on the video that
+    // triggerSwitch had JUST started loading, which aborts the in-flight
+    // fetch/decode and restarts it — that abort-and-restart is what showed
+    // up as a static/blank flash before playback recovered.
+    if (lastAppliedSrcRef.current === currentSrc) return;
+    lastAppliedSrcRef.current = currentSrc;
 
     video.src         = currentSrc;
     video.muted       = isMuted;
@@ -99,6 +141,12 @@ export function useTVPlayer() {
     const onDurationChange = () => setDuration(isFinite(video.duration) ? video.duration : 0);
     const onPlay           = () => setIsPlaying(true);
     const onPause          = () => setIsPlaying(false);
+    // Fires once the CURRENT src has decoded an actual paintable frame.
+    // Records which src that was (lastAppliedSrcRef, set right before this
+    // src was assigned) rather than just `true` — see `isVideoReady`'s own
+    // derivation above for why that comparison is what actually closes the
+    // gap, not a plain boolean.
+    const onLoadedData      = () => setReadySrc(lastAppliedSrcRef.current);
 
     const onEnded = () => {
       // BOOTING: first.mp4 loops continuously until user changes channel
@@ -124,6 +172,7 @@ export function useTVPlayer() {
     video.addEventListener('durationchange', onDurationChange);
     video.addEventListener('play',           onPlay);
     video.addEventListener('pause',          onPause);
+    video.addEventListener('loadeddata',     onLoadedData);
     video.addEventListener('ended',          onEnded);
 
     return () => {
@@ -131,6 +180,7 @@ export function useTVPlayer() {
       video.removeEventListener('durationchange', onDurationChange);
       video.removeEventListener('play',           onPlay);
       video.removeEventListener('pause',          onPause);
+      video.removeEventListener('loadeddata',     onLoadedData);
       video.removeEventListener('ended',          onEnded);
     };
   }, [tvState, pendingIndex, shuffled]);
@@ -141,11 +191,20 @@ export function useTVPlayer() {
     setPendingIndex(safeIdx);
     setKnobAngle(prev => prev + 36);
 
-    // Immediately stop current video and load middle.mp4
+    // Immediately stop current video and load middle.mp4 — pause() first so
+    // the outgoing channel's audio/decode stops before we touch .src at all
+    // (setting .src while still playing is what can expose a stray frame of
+    // the previous video during the swap).
     const video = videoRef.current;
     if (video && MIDDLE_VIDEO?.url) {
+      const middleSrc = toPlayableSrc(MIDDLE_VIDEO.url);
       video.pause();
-      video.src = MIDDLE_VIDEO.url;
+      video.src = middleSrc;
+      // Record this as already-applied so the "Load and play" effect (which
+      // still fires right after, since it also depends on `tvState`) sees a
+      // match and skips re-loading a source that's already mid-fetch —
+      // see that effect's own comment for why a second .load() here glitches.
+      lastAppliedSrcRef.current = middleSrc;
       video.load();
       video.play().catch(() => {});
     }
@@ -224,7 +283,7 @@ export function useTVPlayer() {
 
   return {
     videoRef,
-    tvState, isPowered,
+    tvState, isPowered, isVideoReady,
     currentVideo, currentIndex, channelNumber, totalVideos,
     isPlaying, isMuted, volume, currentTime, duration, knobAngle,
     play, pause, seek, changeVolume, toggleMute,

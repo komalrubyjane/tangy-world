@@ -47,7 +47,7 @@ export const PastMemoriesPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
           {archiveItems.map((item, ii) => (
             <div key={item.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start overflow-hidden">
-              <RetroGrain index={ii % 2} opacity={0.1} blend="multiply" />
+              <RetroGrain index={ii % 2} opacity={0.1} blend="overlay" />
               
               <div className="relative w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
                 <img src={item.image} alt={item.title} className="w-full aspect-[3/4] object-cover filter grayscale sepia-[0.4]" />

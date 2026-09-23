@@ -27,7 +27,7 @@ export const RecentStoriesPage = () => {
       <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
         {diaryStories.map((story, idx) => (
           <article key={story.id} className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
-            <RetroGrain index={idx % 2} opacity={0.1} blend="multiply" />
+            <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
             
             <div className="relative w-full h-40 overflow-hidden border-b-4 border-[#11100C]">
               <img src={story.image} alt={story.title} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125" />

@@ -56,7 +56,7 @@ export const MicDrop = () => {
         style={{ backgroundImage: 'radial-gradient(circle, #ECDCAF 38%, transparent 40%)', backgroundSize: '12px 12px' }}
         aria-hidden="true"
       />
-      <PatternBackground category="bandhani" index={0} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-0" />
 
       <div className="absolute inset-[10px] sm:inset-[18px] z-10 border-2 border-[#D19A24]/40 pointer-events-none" />
 

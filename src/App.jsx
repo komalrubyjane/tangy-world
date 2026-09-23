@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
@@ -164,6 +164,20 @@ function MainWorld() {
     }
   }, []);
 
+  // Stable references — CurtainOverlay/TangySpaceIntro's own effects depend
+  // on `onComplete` (see those files). Passed as an inline arrow function
+  // here before, every one of those was a NEW function identity on every
+  // MainWorld re-render (e.g. the resize listener above firing on mobile
+  // viewport changes — address bar show/hide, keyboard open, rotation —
+  // which happens often during the first few seconds of a real page load).
+  // Each new identity re-ran that effect, which starts by calling
+  // `tl.kill()` on the in-flight GSAP timeline and building a fresh one —
+  // so a resize mid-animation could restart the curtain/intro before its
+  // own `onComplete` ever fired, leaving that fixed, high-z-index, colored
+  // overlay stuck on screen instead of cleanly finishing and unmounting.
+  const handleCurtainComplete = useCallback(() => setShowUiControls(true), []);
+  const handleIntroComplete = useCallback(() => setIsIntroActive(false), []);
+
   const handleNavigateBooking = (evt) => {
     navigate(`/book/${evt.slug || evt.id}`);
   };
@@ -241,14 +255,14 @@ function MainWorld() {
       {/* UNIFIED SINGLE MASTER SITE EXPERIENCE FOR ALL SCREEN SIZES */}
       <>
         {/* Temporary Theatre Curtain Opening Overlay */}
-        <CurtainOverlay onComplete={() => setShowUiControls(true)} />
+        <CurtainOverlay onComplete={handleCurtainComplete} />
 
         {/* Global Continuous Hanging Microphone Experience */}
         <GlobalMicrophoneJourney active={showUiControls} />
 
         {/* Cinematic Deep Space Intro */}
         {isIntroActive && (
-          <TangySpaceIntro onComplete={() => setIsIntroActive(false)} />
+          <TangySpaceIntro onComplete={handleIntroComplete} />
         )}
 
         {/* Floating Retro Sound Control */}
@@ -266,8 +280,14 @@ function MainWorld() {
         {/* Lightweight Grain Texture */}
         <div className="fixed inset-0 pointer-events-none z-[90] opacity-[0.04] bg-[url('/noise.png')] bg-repeat" />
         
-        {/* Vignette */}
-        <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
+        {/* Vignette — kept subtle deliberately: this sits `fixed`/`inset-0` above
+            EVERY section on the site at all times (z-[80]), so its strength affects
+            every background/photo, not just whichever section is in view. It was
+            previously 0.85 alpha at a 140px spread, which is heavy enough to
+            visibly wash out a full-bleed photo section (e.g. the Spaces/"Where
+            Heritage Meets Music" background) even after that section's own local
+            overlay was already fixed — this was the actual remaining source. */}
+        <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_90px_rgba(0,0,0,0.3)]" />
 
         {/* Scroll Progress Rail */}
         <div className="fixed right-0 top-0 w-1 h-[100vh] bg-[rgba(231,213,164,0.05)] z-[110] hidden md:block pointer-events-none">

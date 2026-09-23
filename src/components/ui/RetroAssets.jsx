@@ -60,11 +60,20 @@ export const RetroImage = ({
 
 // 2. PatternBackground — a real textile/Bandhani/Rangoli photograph tiled or
 // cropped as a section/card background layer, replacing a generated pattern.
+//
+// DEFAULT CONTRACT: full visual strength, no built-in tint — the photo itself
+// is meant to be the dominant thing seen, not a faint hint behind the
+// section's solid accent color. Callers using this as an actual section/page
+// background photo should NOT pass a low `opacity` — leave it at the
+// default. A caller may still pass an explicit low `opacity` when it is a
+// genuinely small, localized decorative accent (a tiled strip, a per-card
+// texture, an era-accent tint) rather than the section's background photo —
+// those exceptions stay documented at their call site.
 export const PatternBackground = ({
   category,
   index = 0,
   src,
-  opacity = 0.16,
+  opacity = 1,
   size = 'cover', // 'cover' or a CSS background-size value (e.g. '220px')
   repeat = false,
   blend = 'normal',
@@ -73,18 +82,26 @@ export const PatternBackground = ({
   const resolvedSrc = src || pickAsset(category, index);
   if (!resolvedSrc) return null;
   return (
-    <div
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      style={{
-        backgroundImage: `url(${resolvedSrc})`,
-        backgroundSize: size,
-        backgroundRepeat: repeat ? 'repeat' : 'no-repeat',
-        backgroundPosition: 'center',
-        opacity,
-        mixBlendMode: blend,
-      }}
-      aria-hidden="true"
-    />
+    <>
+      <div
+        className={`absolute inset-0 pointer-events-none ${className}`}
+        style={{
+          backgroundImage: `url(${resolvedSrc})`,
+          backgroundSize: size,
+          backgroundRepeat: repeat ? 'repeat' : 'no-repeat',
+          backgroundPosition: 'center',
+          opacity,
+          mixBlendMode: blend,
+        }}
+        aria-hidden="true"
+      />
+      {/* Very light readability tint directly over the photo — 1% black, per
+          explicit request after the full-strength photo made overlaid text
+          hard to read on some sections. Kept in the shared component so
+          every background photo gets the same minimal treatment instead of
+          per-section tweaks. */}
+      <div className={`absolute inset-0 pointer-events-none bg-black/[0.01] ${className}`} aria-hidden="true" />
+    </>
   );
 };
 

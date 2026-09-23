@@ -23,11 +23,14 @@ export const Closing = () => {
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
       <RetroGrain index={0} opacity={0.12} blend="overlay" />
 
-      {/* Background Archival Photo */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
+      {/* Background Archival Photo — kept at full strength like every other section's
+          background photo; only the grayscale/contrast filter (the site's established
+          archival-photo treatment, not a translucency wash) gives it its dark mood. */}
+      <div className="absolute inset-0 pointer-events-none">
         <img src="/media/gallery/tangy9.jpg" alt="After Hours" className="w-full h-full object-cover filter grayscale contrast-150" />
       </div>
 
+      {/* Small decorative textile accent over the photo — intentionally kept subtle, not the section's background image. */}
       <PatternBackground category="bandhani" index={1} opacity={0.26} size="cover" blend="normal" className="z-10" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C99A2E" colorB="#11100C" />
       

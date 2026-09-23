@@ -11,9 +11,9 @@ export const Footer = () => {
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={14} colorA="#D19A24" colorB="#11100C" />
 
       {/* NOISE + REAL PRINT-TEXTURE PHOTOGRAPH — the back cover's aged-paper surface. */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply pointer-events-none z-0" />
-      <RetroGrain index={0} opacity={0.14} blend="multiply" />
-      <PatternBackground category="bandhani" index={0} opacity={0.32} size="cover" blend="normal" className="z-0" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none z-0" />
+      <RetroGrain index={0} opacity={0.14} blend="overlay" />
+      <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-0" />
 
       {/* REAL TEXTILE PANEL — a large cropped textile photograph occupying the left third of */}
       {/* the back cover, the footer's second physical surface material alongside the Bandhani */}

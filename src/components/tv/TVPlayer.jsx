@@ -93,6 +93,7 @@ export default function TVPlayer() {
             videoRef={tv.videoRef}
             tvState={tv.tvState}
             isPowered={tv.isPowered}
+            isVideoReady={tv.isVideoReady}
             channelNumber={tv.channelNumber}
           />
         </div>

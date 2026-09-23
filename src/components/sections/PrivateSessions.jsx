@@ -78,7 +78,7 @@ export const PrivateSessions = ({ onRequestPrivate }) => {
       <SoundWaveGraphic color="#E7D7AC" opacity={0.15} className="absolute left-6 top-1/2 -translate-y-1/2 w-64 md:w-80 h-[80%] hidden md:block" />
 
       {/* BANDHANI TEXTILE LAYER + FRAME */}
-      <PatternBackground category="bandhani" index={2} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="bandhani" index={2} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#C69A32" colorB="#17120D" />
       

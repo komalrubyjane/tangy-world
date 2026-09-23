@@ -20,9 +20,9 @@ export const Newsletter = () => {
 
   return (
     <section className="relative w-full py-16 sm:py-24 bg-[#694323] border-t-8 border-[#11100C] text-center flex flex-col items-center justify-center">
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
-      <RetroGrain index={1} opacity={0.13} blend="multiply" />
-      <PatternBackground category="bandhani" index={0} opacity={0.3} size="cover" blend="normal" className="z-0" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
+      <RetroGrain index={1} opacity={0.13} blend="overlay" />
+      <PatternBackground category="bandhani" index={0} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={9} colorA="#C99A2E" colorB="#11100C" />
       <LotusStamp index={0} bg="transparent" border="#C99A2E" className="hidden md:block absolute top-8 left-8 w-9 h-9 opacity-90 z-10 pointer-events-none" />
       <div className="md:hidden absolute top-0 right-0 w-[30%] max-w-[110px] aspect-square opacity-[0.18] pointer-events-none z-0 rotate-90">

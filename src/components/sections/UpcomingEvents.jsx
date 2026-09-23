@@ -10,41 +10,6 @@ import { PosterEventCard } from '../ui/PosterEventCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* --- Shared editorial card inner --- */
-const EditorialCardInner = () => (
-  <div className="w-full h-full paper-surface p-4 sm:p-5 border-4 border-[#11100C] flex flex-col relative shadow-[16px_16px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C] transition-transform duration-300 group-hover:-translate-y-2 overflow-hidden rotate-1"
-    style={{ backgroundImage:"url('/noise.png')", backgroundBlendMode:'multiply', backgroundSize:'180px' }}>
-    <div className="absolute -right-[20%] -bottom-[15%] w-[65%] max-w-none aspect-square opacity-[0.14] pointer-events-none animate-[spin_120s_linear_infinite]">
-      <RangoliDecoration index={2} spin={false} className="w-full h-full" />
-    </div>
-    <RetroGrain index={1} opacity={0.14} blend="multiply" />
-    
-    <div className="absolute -top-3 right-12 sm:right-16 w-8 h-3 bg-[#B94717] border-b-2 border-x-2 border-[#11100C] rounded-b-full z-20" />
-    <div className="absolute -bottom-3 right-12 sm:right-16 w-8 h-3 bg-[#B94717] border-t-2 border-x-2 border-[#11100C] rounded-t-full z-20" />
-    <div className="absolute top-0 bottom-0 right-16 sm:right-20 w-[2px] border-r-2 border-dashed border-[#11100C]/40 z-20 pointer-events-none" />
-    <div className="absolute -top-3 left-1/4 w-24 h-5 bg-[rgba(231,213,164,0.75)] rotate-[1.5deg] border border-black/20 z-30 pointer-events-none" />
-
-    <div className="relative flex justify-between items-center font-mono text-[8.5px] sm:text-[9px] font-bold text-[#11100C] border-b-2 border-[#11100C] pb-1.5 mb-3">
-      <span>TANGY SESSIONS</span><span className="text-[#B94717]">EST. 2016 · HYD</span>
-    </div>
-
-    <div className="relative font-mono text-[9px] sm:text-[10px] text-[#B94717] font-bold tracking-[0.25em] uppercase mb-2">✦ About This Series</div>
-
-    <h3 className="relative display font-bold text-3xl sm:text-4xl text-[#11100C] leading-[0.85] mb-3 -rotate-1 origin-left">Music.<br/>Heritage.<br/>Culture.</h3>
-
-    <p className="relative font-serif italic text-xs sm:text-sm text-[#2A1A0E] leading-relaxed opacity-90 mb-3">
-      "Live sessions, intimate gatherings and cultural experiences rooted in the soul of Hyderabad."
-    </p>
-
-    <div className="relative font-mono text-[8.5px] sm:text-[9px] tracking-widest text-[#11100C] border-y border-[#11100C]/30 py-2 mb-auto">HYDERABAD • LIVE • INDEPENDENT</div>
-
-    <a href="/sessions"
-      className="relative mt-3 w-full flex items-center justify-center gap-2 font-mono text-xs font-bold uppercase tracking-widest bg-[#c2272a] text-[#ecdcaf] border-2 border-[#11100C] py-2.5 sm:py-3 transition-colors shadow-[3px_3px_0px_#11100C] active:scale-95">
-      <span>VIEW OUR SESSIONS</span><span>→</span>
-    </a>
-  </div>
-);
-
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
   const { events: allEvents } = useEvents();
@@ -91,9 +56,9 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
     <section ref={sectionRef} id="sessions"
       className="relative w-full bg-[#B94717] border-t-8 border-[#11100C] overflow-hidden lg:h-screen lg:flex lg:items-center isolate">
 
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-multiply pointer-events-none z-0" />
-      <RetroGrain index={0} opacity={0.1} blend="multiply" />
-      <PatternBackground category="textile" index={1} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-13 mix-blend-overlay pointer-events-none z-0" />
+      <RetroGrain index={0} opacity={0.1} blend="overlay" />
+      <PatternBackground category="textile" index={1} size="cover" blend="normal" className="z-0" />
       <div className="absolute top-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5"><WarpedCheckerPattern opacity={0.12} /></div>
       <div className="absolute bottom-0 left-0 right-0 h-10 overflow-hidden pointer-events-none z-5"><WarpedCheckerPattern opacity={0.12} /></div>
       <RetroPosterFrame color="#11100C" inset={14} className="hidden md:block z-10" />
@@ -149,9 +114,6 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
             <PosterEventCard event={event} idx={idx} onBook={() => handleBookClick(event)} />
           </div>
         ))}
-        <div className="mobile-session-card w-full relative group">
-          <EditorialCardInner />
-        </div>
         <div className="flex justify-center pt-2">
           <a href="/sessions"
             className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase shadow-[4px_4px_0px_#11100C] active:scale-95">
@@ -167,9 +129,6 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
             <PosterEventCard event={event} idx={idx} onBook={() => handleBookClick(event)} />
           </div>
         ))}
-        <div className="shrink-0 w-[450px] h-[660px] relative group">
-          <EditorialCardInner />
-        </div>
       </div>
     </section>
   );

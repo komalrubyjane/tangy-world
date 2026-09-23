@@ -25,7 +25,7 @@ export const UpcomingSessionsPage = () => {
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#11100C]">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-multiply pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-12 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10">
           <a href="/sessions" className="font-mono text-[10px] text-[#E7D5A4]/70 tracking-widest uppercase hover:text-[#E7D5A4] transition-colors">← BACK TO SESSIONS</a>
           <span className="font-mono text-xs text-[#E7D5A4]/80 tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">

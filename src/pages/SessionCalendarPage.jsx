@@ -251,7 +251,7 @@ export const SessionCalendarPage = () => {
                 const isSoldOut = evt.status === 'sold-out' || spotsLeft <= 0;
                 return (
                   <div key={evt.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 overflow-hidden">
-                    <RetroGrain index={evtIdx % 2} opacity={0.1} blend="multiply" />
+                    <RetroGrain index={evtIdx % 2} opacity={0.1} blend="overlay" />
                     
                     <div className="relative sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square overflow-hidden border-2 border-[#11100C]">
                       <img src={evt.image} alt={evt.name} className="w-full h-full object-cover filter grayscale contrast-125" />

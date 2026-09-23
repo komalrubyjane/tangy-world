@@ -36,7 +36,7 @@ export const BehindTheScenesPage = () => {
           const isExpanded = expanded === entry.id;
           return (
             <article key={entry.id} className="relative bg-[#F2E5C6] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden">
-              <RetroGrain index={idx % 2} opacity={0.1} blend="multiply" />
+              <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
               
               
               <div className="relative flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">

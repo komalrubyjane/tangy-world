@@ -193,7 +193,7 @@ export const TangyDiary = () => {
       {/* z-index leaf stacking is precisely tuned) and layered on the section */}
       {/* background instead: a real textile field, framing strips, registration */}
       {/* marks and a lotus bookplate stamp. */}
-      <PatternBackground category="textile" index={2} opacity={0.34} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="textile" index={2} size="cover" blend="normal" className="z-0" />
       <TextileBorderStrip className="absolute top-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
       <TextileBorderStrip className="absolute bottom-0 left-0 right-0 z-20" height={10} colorA="#A68853" colorB="#241A14" />
       

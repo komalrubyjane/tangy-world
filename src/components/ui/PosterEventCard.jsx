@@ -1,18 +1,17 @@
-// A single, richly-detailed poster-ticket composition built to the user's own
-// reference mock-up: a torn black mounting frame around an aged paper poster,
-// a real lotus-photograph medallion overlapping the (full-colour, unfiltered)
-// event photo, a taped real print fragment, an oversized date numeral bleeding
-// off the photo's base, and a torn ticket-stub panel below carrying a 3-column
-// info table, tag pills, a perforated price stub and a printed "book" bar.
+// A single, richly-detailed poster-ticket composition: a torn black mounting
+// frame around an aged paper poster, an oversized date numeral bleeding off
+// the (full-colour, unfiltered) event photo's base, and a torn ticket-stub
+// panel below carrying a 3-column info table, tag pills, a perforated price
+// stub and a printed "book" bar.
 //
 // HARD RULE: the event photograph itself never receives a colour-altering
 // filter — it renders in its original colours, exactly like the reference.
-// Every retro cue instead comes from real lotus/textile/Bandhani/Rangoli/
-// cutout assets layered around it, never a CSS-invented substitute.
+// No decorative element is ever placed on top of the photo itself (a lotus
+// medallion and a taped print fragment used to overlap it — removed as
+// unwanted sticker overlays; retro cues stay in the surrounding frame/strip).
 
 import { TornPaperEdgeTop } from './BackgroundDecorations';
-import { RetroGrain, LotusStamp, PatternBackground } from './RetroAssets';
-import { pickAsset } from '../../data/retroAssets';
+import { RetroGrain, PatternBackground } from './RetroAssets';
 
 const STATUS_STYLES = {
   'SOLD OUT': { bg: '#5A120D', text: '#E7D5A4' },
@@ -26,7 +25,6 @@ const CORNER_MARK = 'absolute text-[#E7D5A4]/70 text-[9px] sm:text-[10px] leadin
 export const PosterEventCard = ({ event: evt, idx, onBook }) => {
   const isSoldOut = evt.status === 'SOLD OUT';
   const statusStyle = STATUS_STYLES[evt.status] || STATUS_STYLES.AVAILABLE;
-  const tapedFragment = idx % 2 === 0 ? pickAsset('cutout', idx) : pickAsset('halftone', idx);
   const [dateMain, dateYear] = (() => {
     const parts = evt.date?.split(',') || [];
     return parts.length > 1 ? [parts[0], parts[1].trim()] : [evt.date, ''];
@@ -43,11 +41,13 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
 
       {/* AGED PAPER BODY */}
       <div className="relative bg-[#EDE0C0] text-[#11100C] overflow-hidden flex">
-        <RetroGrain index={idx % 2} opacity={0.14} blend="multiply" />
+        <RetroGrain index={idx % 2} opacity={0.14} blend="overlay" />
 
         {/* REAL BANDHANI SIDE STRIP — vertical spot-colour panel carrying the event's tags, */}
         {/* a genuine textile photograph rather than a CSS pattern. */}
         <div className="relative w-5 sm:w-6 shrink-0 bg-[#B94717] overflow-hidden">
+          {/* Intentional exception: a narrow (~24px) accent strip, not the card's background
+              photo — low opacity + multiply tints it into the strip's own accent color. */}
           <PatternBackground category="bandhani" index={idx % 3} opacity={0.4} size="cover" blend="multiply" />
           <span
             className="absolute inset-0 flex items-center justify-center font-mono text-[7px] sm:text-[7.5px] font-bold text-[#E7D5A4] uppercase tracking-[0.25em] whitespace-nowrap"
@@ -80,22 +80,6 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
           <div className="relative w-full aspect-[4/3] overflow-hidden">
             <img src={evt.image} alt={evt.title} className="w-full h-full object-cover" />
 
-            {/* REAL LOTUS MEDALLION — overlapping the photo's top-left corner. */}
-            <div className="absolute top-2 left-2 z-20 w-12 h-12 sm:w-16 sm:h-16 -rotate-6">
-              <LotusStamp index={idx} bg="transparent" border="#B94717" className="w-full h-full shadow-lg" />
-            </div>
-
-            {/* TAPED REAL PRINT FRAGMENT — a genuine supplied photograph, taped at an angle */}
-            {/* onto the poster, top-right. */}
-            {tapedFragment && (
-              <div className="hidden sm:block absolute top-2 right-2 z-20 w-11 rotate-6">
-                <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-[rgba(231,213,164,0.85)] border border-black/25 rotate-[-3deg] z-10" />
-                <div className="border-2 border-[#11100C] shadow-[3px_3px_0px_rgba(17,16,12,0.7)] overflow-hidden aspect-[3/4]">
-                  <img src={tapedFragment} alt="" aria-hidden="true" className="w-full h-full object-cover" />
-                </div>
-              </div>
-            )}
-
             {/* OVERSIZED DATE NUMERAL bleeding off the photo's base. */}
             <div className="absolute -bottom-1 left-2 sm:left-3 z-20">
               <h2 className="display font-black text-[#EDE0C0] leading-[0.78] ink-bleed uppercase drop-shadow-[2px_2px_0_#11100C]" style={{ fontSize: 'clamp(28px,7vw,46px)' }}>
@@ -103,15 +87,16 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
               </h2>
               <div className="w-2/3 h-[3px] bg-[#B94717] mt-0.5" />
             </div>
-
-            {/* SMALL RED LOTUS INK STAMP */}
-            <LotusStamp index={(idx + 2) % 4} bg="transparent" border="transparent" className="absolute bottom-2 right-2 z-20 w-8 h-8 sm:w-9 sm:h-9 opacity-90" />
           </div>
 
           {/* TORN TICKET PANEL */}
           <div className="relative z-20">
             <TornPaperEdgeTop fill="#F5E9C9" />
-            <div className="bg-[#F5E9C9] px-2.5 sm:px-4 pt-2 pb-3 sm:pb-4">
+            {/* pt cleared to sit below TornPaperEdgeTop's own height (h-4/md:h-6) — that
+                strip is `position:absolute` with its own z-10, so it paints above this
+                panel's normal-flow content regardless of padding; the previous pt-2 left
+                the title's top ~8-16px underneath the wavy edge graphic, distorting it. */}
+            <div className="bg-[#F5E9C9] px-2.5 sm:px-4 pt-5 md:pt-7 pb-3 sm:pb-4">
               <h3 className="display text-xl sm:text-2xl leading-[0.85] uppercase mb-0.5 line-clamp-2">
                 {evt.title}
               </h3>

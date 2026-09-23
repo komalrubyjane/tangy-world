@@ -76,8 +76,8 @@ export const Spaces = () => {
       duration: 1
     }, 0)
     .fromTo('.heritage-bg',
-      { scale: 1, filter: 'contrast(110%) brightness(75%)' },
-      { scale: 1.25, filter: 'contrast(125%) brightness(95%)', ease: 'none', duration: 2.5 }, 0
+      { scale: 1, filter: 'contrast(110%)' },
+      { scale: 1.25, filter: 'contrast(125%)', ease: 'none', duration: 2.5 }, 0
     )
     .fromTo('.heritage-card',
       { opacity: 0, y: 80, scale: 0.9 },
@@ -97,8 +97,10 @@ export const Spaces = () => {
           decoding="async"
           className="heritage-bg absolute inset-0 w-full h-full object-cover origin-center pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#11100C]/80 via-[#59613A]/40 to-[#11100C]/90 pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-multiply pointer-events-none" />
+        {/* Light top/bottom vignette only — just enough to keep the title and card
+            legible at the very edges; the photograph itself stays clearly visible. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#11100C]/40 via-transparent to-[#11100C]/50 pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-15 mix-blend-overlay pointer-events-none" />
 
         {/* Typography */}
         <div className="heritage-title absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4 text-center">

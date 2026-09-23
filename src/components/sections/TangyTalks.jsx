@@ -56,7 +56,7 @@ export const TangyTalks = () => {
       />
 
       {/* REAL BANDHANI PHOTOGRAPH — the supplied textile reference, low-opacity full-bleed */}
-      <PatternBackground category="bandhani" index={2} opacity={0.36} size="cover" blend="normal" className="z-0" />
+      <PatternBackground category="bandhani" index={2} size="cover" blend="normal" className="z-0" />
 
       {/* GIANT REAL RANGOLI PHOTOGRAPH — bleeds off the top-right corner, the actual */}
       {/* supplied reference image rather than a generated pattern. */}

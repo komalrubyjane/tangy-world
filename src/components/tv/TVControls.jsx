@@ -164,7 +164,19 @@ export default function TVControls({
   const titleText  = currentVideo?.filename
     ? currentVideo.filename.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).slice(0, 35)
     : '— — —';
-  const progress   = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // currentTime/duration are driven by whichever clip is CURRENTLY loaded in
+  // the shared <video> element — during BOOTING/SWITCHING that's first.mp4 or
+  // middle.mp4, not a real channel. Without this guard the bar raced toward
+  // 100% as the transition clip neared its (much shorter) end and then
+  // snapped back down once the new channel loaded — the "shooting out of the
+  // TV" glitch. Freeze it at empty outside PLAYING, and clamp regardless so a
+  // stale duration/currentTime pairing can never push the fill past 100%
+  // width (the track has no overflow:hidden, so an unclamped value visibly
+  // overshoots its rounded edge).
+  const showProgress = tvState === 'PLAYING';
+  const progress   = showProgress && duration > 0
+    ? Math.min(100, Math.max(0, (currentTime / duration) * 100))
+    : 0;
 
   return (
     <div style={{
@@ -201,10 +213,10 @@ export default function TVControls({
       {/* Row 2 — Progress bar */}
       <div style={{ display:'flex', alignItems:'center', gap:8 }}>
         <span style={{ fontSize:'0.45rem', color:'rgba(255,255,255,0.3)', minWidth:28 }}>
-          {formatTime(currentTime)}
+          {showProgress ? formatTime(currentTime) : '0:00'}
         </span>
         <div
-          style={{ flex:1, height:5, background:'rgba(255,255,255,0.06)', borderRadius:3, cursor: canSeek ? 'pointer' : 'default', position:'relative' }}
+          style={{ flex:1, height:5, background:'rgba(255,255,255,0.06)', borderRadius:3, overflow:'hidden', cursor: canSeek ? 'pointer' : 'default', position:'relative' }}
           onClick={e => {
             if (!canSeek || !duration) return;
             const r = e.currentTarget.getBoundingClientRect();
@@ -215,7 +227,7 @@ export default function TVControls({
             width:`${progress}%`, background: canSeek ? '#C99A2E' : '#2a2a2a', transition:'width 0.2s linear' }} />
         </div>
         <span style={{ fontSize:'0.45rem', color:'rgba(255,255,255,0.3)', minWidth:28, textAlign:'right' }}>
-          {formatTime(duration)}
+          {showProgress ? formatTime(duration) : '0:00'}
         </span>
       </div>
 

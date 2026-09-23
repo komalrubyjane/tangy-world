@@ -25,7 +25,14 @@ function CRTLayer() {
 }
 
 // ─── OSD overlay text ─────────────────────────────────────────────────────────
-function OSD({ tvState, channelNumber }) {
+// `isTuning` covers BOTH the real SWITCHING state (playing middle.mp4) AND
+// the brief extra window right after tvState flips back to PLAYING but the
+// new channel's video hasn't decoded a frame yet (isVideoReady still
+// false), so the "SWITCHING CHANNEL..." text stays up across both. Note
+// this text has no background fill — it does NOT by itself hide the <video>
+// underneath. The actual cover for the unready-frame gap is the video's own
+// `opacity` in TVScreen below (see `isChannelPending` there).
+function OSD({ tvState, isTuning, channelNumber }) {
   if (tvState === TV_STATE.BOOTING) {
     return (
       <div style={{ position:'absolute', inset:0, zIndex:6, pointerEvents:'none',
@@ -45,7 +52,7 @@ function OSD({ tvState, channelNumber }) {
       </div>
     );
   }
-  if (tvState === TV_STATE.SWITCHING) {
+  if (isTuning) {
     return (
       <div style={{ position:'absolute', inset:0, zIndex:6, pointerEvents:'none',
         display:'flex', flexDirection:'column', padding:'8% 7%', gap:4 }}>
@@ -63,7 +70,31 @@ function OSD({ tvState, channelNumber }) {
 }
 
 // ─── TVScreen ─────────────────────────────────────────────────────────────────
-export default function TVScreen({ videoRef, tvState, isPowered, channelNumber }) {
+export default function TVScreen({ videoRef, tvState, isPowered, isVideoReady, channelNumber }) {
+  // Two DIFFERENT sub-states were both being called "isTuning" and treated the
+  // same way — that conflation is what let the glitch survive the previous
+  // fix. Only ONE of them should actually hide the <video> element:
+  //
+  //   isTuningClip   — tvState === SWITCHING: middle.mp4, the INTENTIONAL
+  //                    retro tuning clip, is loaded and playing. It must
+  //                    stay visible — this is content, not a gap.
+  //   isChannelPending — tvState flipped back to PLAYING but the new
+  //                    channel's video hasn't decoded a paintable frame yet
+  //                    (isVideoReady is still false). The <video> element
+  //                    has no defined frame to show here — the previous fix
+  //                    only extended the OSD *text*, which has no background
+  //                    fill (see OSD below) and never actually covered the
+  //                    element, so whatever the browser paints for an
+  //                    unready video (blank/black/a stale frame) was still
+  //                    exposed. THIS is the real gap the glitch came from.
+  //
+  // Both sub-states still show the same "SWITCHING CHANNEL..." OSD text, but
+  // only isChannelPending hides the raw video — an instant, state-driven
+  // opacity toggle (no transition/fade, no timer), revealing the black
+  // chassis background the container already has behind it.
+  const isTuningClip = tvState === TV_STATE.SWITCHING;
+  const isChannelPending = tvState === TV_STATE.PLAYING && !isVideoReady;
+  const isTuning = isTuningClip || isChannelPending;
   return (
     <div style={{
       position: 'relative',
@@ -86,11 +117,12 @@ export default function TVScreen({ videoRef, tvState, isPowered, channelNumber }
               width:'100%', height:'100%',
               objectFit:'cover', display:'block',
               filter:'brightness(1.06) contrast(1.1) saturate(1.08)',
-              animation: tvState !== TV_STATE.PLAYING ? 'tvFlicker 4s infinite' : 'none',
+              opacity: isChannelPending ? 0 : 1,
+              animation: (tvState !== TV_STATE.PLAYING || isTuning) ? 'tvFlicker 4s infinite' : 'none',
             }}
           />
           <CRTLayer />
-          <OSD tvState={tvState} channelNumber={channelNumber} />
+          <OSD tvState={tvState} isTuning={isTuning} channelNumber={channelNumber} />
         </>
       ) : (
         <div style={{
