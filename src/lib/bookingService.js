@@ -26,14 +26,20 @@ export const bookingService = {
   // trusted from this call). Requires a real Supabase session regardless of
   // the app's global AUTH_MODE — there is no mock equivalent, since a mock
   // session has no JWT for the Edge Function to verify.
-  createPaymentOrder: async ({ eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone }) => {
+  createPaymentOrder: async ({ eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone, attendeeNames, details }) => {
     if (!isSupabaseConfigured) {
       return { success: false, error: 'Payment is not available right now — please try again shortly.' };
     }
     const { data, error } = await supabase.functions.invoke('razorpay-create-order', {
-      body: { eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone },
+      body: { eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone, attendeeNames, details },
     });
-    if (error) return { success: false, error: error.message || 'Could not start payment.' };
+    if (error) {
+      // A 4xx from the function carries a user-safe reason in its JSON body
+      // (e.g. "Enter a valid email address."); show that, not the SDK's
+      // generic "non-2xx status code".
+      const body = await error.context?.json?.().catch(() => null);
+      return { success: false, error: body?.error || 'Could not start payment.' };
+    }
     if (data?.error) return { success: false, error: data.error };
     return { success: true, order: data };
   },

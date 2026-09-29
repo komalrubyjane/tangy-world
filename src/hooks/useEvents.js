@@ -25,6 +25,10 @@ function mapDbEvent(row) {
     capacity: row.capacity,
     story: row.story || '',
     featured: row.featured,
+    // Booking form (0024): tickets per booking and the event's own questions.
+    bookingMin: row.booking_min_quantity ?? 1,
+    bookingMax: row.booking_max_quantity ?? 10,
+    bookingQuestions: Array.isArray(row.booking_questions) ? row.booking_questions : [],
   };
 }
 

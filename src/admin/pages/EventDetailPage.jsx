@@ -11,6 +11,7 @@ import {
   Textarea, Field, Icon, fmt, useToast,
 } from '../ui';
 import { EventForm } from '../components/EventForm';
+import { BookingFormEditor } from '../components/BookingFormEditor';
 import { HEALTH } from './DashboardPage';
 import { BookingsTable } from '../components/Bookings';
 import { AttendeesTable } from '../components/Attendees';
@@ -445,9 +446,12 @@ export default function EventDetailPage() {
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
       {tab === 'overview' && <OverviewTab evt={evt} perf={perf.data} stats={stats.data} onTab={setTab} health={health.data} />}
       {tab === 'details' && (
-        <Panel title="Event details">
-          {can(P.EVENTS_MANAGE) ? <EventForm key={evt.updated_at} initial={evt} onSaved={() => { toast('Event saved'); refresh(); }} /> : <p className="text-[13px]">Read only.</p>}
-        </Panel>
+        <div className="flex flex-col gap-4">
+          <Panel title="Event details">
+            {can(P.EVENTS_MANAGE) ? <EventForm key={evt.updated_at} initial={evt} onSaved={() => { toast('Event saved'); refresh(); }} /> : <p className="text-[13px]">Read only.</p>}
+          </Panel>
+          {can(P.EVENTS_MANAGE) && <BookingFormEditor evt={evt} onSaved={refresh} />}
+        </div>
       )}
       {tab === 'artists' && <ArtistsTab evt={evt} />}
       {tab === 'venue' && <VenueTab evt={evt} />}

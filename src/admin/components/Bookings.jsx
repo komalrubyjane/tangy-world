@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { bookingService } from '../../lib/bookingService';
 import { generateQrDataUrl } from '../../lib/qr';
+import { checkinService, partyState } from '../../lib/checkinService';
+import { collabLabel } from '../../lib/bookingForm';
 import { useAdminSession } from '../AdminSession';
 import { adminApi, orIlike, friendlyError } from '../api';
 import { useServerTable, useDebounced, useAsync } from '../hooks';
@@ -9,7 +11,7 @@ import { P, TICKET_TIERS } from '../rbac';
 import { auditLabel, auditSummary } from '../auditLabels';
 import {
   Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Drawer, KeyValue, Button, ConfirmDialog,
-  Modal, Field, Input, Select, Textarea, fmt, useToast,
+  Modal, Field, Input, Select, Textarea, Icon, fmt, useToast,
 } from '../ui';
 
 const TIER_NAME = Object.fromEntries(TICKET_TIERS.map((t) => [t.id, t.name]));
@@ -52,14 +54,15 @@ export const EventFilter = ({ value, onChange, events, allLabel = 'All events' }
     options={[{ value: '', label: allLabel }, ...events.map((e) => ({ value: e.id, label: `${e.name} · ${fmt.date(e.event_date)}` }))]} />
 );
 
-const TicketQr = ({ token }) => {
+const TicketQr = ({ token, kind = 'TICKET' }) => {
   const [url, setUrl] = useState(null);
   useEffect(() => {
     let cancelled = false;
-    generateQrDataUrl(`TANGY:TICKET:${token}`).then((u) => { if (!cancelled) setUrl(u); });
+    generateQrDataUrl(`TANGY:${kind}:${token}`).then((u) => { if (!cancelled) setUrl(u); });
     return () => { cancelled = true; };
-  }, [token]);
-  return url ? <img src={url} alt="Ticket QR code" className="w-40 h-40 rounded" /> : <div className="w-40 h-40 bg-[#E7D5A4]/5 rounded" />;
+  }, [token, kind]);
+  const alt = kind === 'BOOKING' ? 'Group check-in QR code' : 'Ticket QR code';
+  return url ? <img src={url} alt={alt} className="w-40 h-40 rounded" /> : <div className="w-40 h-40 bg-[#E7D5A4]/5 rounded" />;
 };
 
 export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
@@ -70,12 +73,20 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
   const { data: b, loading, error, reload } = useAsync(async () => {
     const { data, error: err } = await supabase
       .from('bookings')
-      .select('*, events(id, name, event_date), tickets(id, ticket_number, tier, status, token, created_at), checkins(id, ticket_id, checked_in_at, method)')
+      .select('*, events(id, name, event_date, booking_questions), tickets(id, ticket_number, tier, status, token, created_at, attendee_name), checkins(id, ticket_id, checked_in_at, method)')
       .eq('id', bookingId)
       .maybeSingle();
     if (err) throw friendlyError(err);
     return data;
   }, [bookingId]);
+  const arrivals = useAsync(() => checkinService.bookingHistory(bookingId), [bookingId]);
+  // Previous Tangy attendance is derived from booking history, never asked.
+  const returning = useAsync(async () => {
+    if (!b?.user_id) return null;
+    const { count } = await supabase.from('bookings').select('id', { count: 'exact', head: true })
+      .eq('user_id', b.user_id).eq('status', 'confirmed').neq('id', b.id);
+    return count ?? 0;
+  }, [b?.id, b?.user_id]);
   const history = useAsync(async () => {
     if (!can(P.AUDIT)) return [];
     const { data } = await supabase.from('audit_logs').select('id, created_at, actor_email, action, metadata, resource_id')
@@ -83,7 +94,10 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
     return data || [];
   }, [bookingId]);
 
-  const changed = () => { reload(); history.reload(); onChanged?.(); };
+  const changed = () => { reload(); history.reload(); arrivals.reload(); onChanged?.(); };
+  const party = (b?.tickets || []).filter((t) => t.status !== 'cancelled').length;
+  const inCount = (b?.tickets || []).filter((t) => t.status === 'checked_in').length;
+  const partyStatus = partyState(inCount, party);
   const checkinByTicket = Object.fromEntries((b?.checkins || []).map((c) => [c.ticket_id, c]));
   const paid = b && b.source === 'online' && b.razorpay_payment_id;
   const canManage = can(P.BOOKINGS_MANAGE);
@@ -113,16 +127,31 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
       ) : (
         <>
           <div className="flex flex-wrap gap-2"><Badge status={b.status} />{b.source === 'complimentary' && <Badge status="complimentary" />}</div>
-          <Panel title="Attendee">
+          <Panel title="Primary booker">
             <KeyValue items={[
               ['Name', b.attendee_name],
+              ['Mobile / WhatsApp', b.attendee_phone],
               ['Email', b.attendee_email],
-              ['Phone', b.attendee_phone],
+              b.contact_instagram && ['Instagram', `@${b.contact_instagram}`],
+              ['Previous bookings', b.user_id ? (returning.data == null ? '…' : returning.data === 0 ? 'First Tangy booking' : `${returning.data} other confirmed booking${returning.data === 1 ? '' : 's'}`) : 'Guest (no account)'],
               ['Event', b.events ? `${b.events.name} · ${fmt.date(b.events.event_date)}` : '—'],
               ['Tickets', `${b.quantity} × ${TIER_NAME[b.tier] || b.tier || 'General'}`],
               ['Booked', fmt.dateTime(b.created_at)],
             ]} />
           </Panel>
+          {(() => {
+            // Answers to this event's questions (0024), in the event's order.
+            const qs = b.events?.booking_questions || [];
+            const fmtAnswer = (q, v) => (Array.isArray(v) ? v.join(', ') : q?.type === 'boolean' ? (v ? 'Yes' : 'No') : q?.type === 'date' ? fmt.date(v) : String(v));
+            const answered = Object.entries(b.booking_answers || {});
+            const rows = [
+              ...answered.map(([k, v]) => { const q = qs.find((x) => x.id === k); return [q?.label || k, fmtAnswer(q, v)]; }),
+              b.collab_interests?.length && ['Interested in collaborating', b.collab_interests.map(collabLabel).join(', ')],
+              b.collab_note && ['About that', b.collab_note],
+              b.customer_note && ['Note from booker', b.customer_note],
+            ].filter(Boolean);
+            return rows.length > 0 && <Panel title="Booking details" subtitle="From the booking form — visible to the Tangy team only"><div data-booking-details><KeyValue items={rows} /></div></Panel>;
+          })()}
           {can(P.PAYMENTS) && (
             <Panel title="Payment" subtitle="Payment state is written only by the Razorpay functions">
               <KeyValue items={[
@@ -156,7 +185,7 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
                     <li key={t.id} className="px-4 py-2.5">
                       <div className="flex items-center gap-3 text-[12.5px]">
                         <span className="font-mono text-[#C99A2E]">{t.ticket_number}</span>
-                        <span className="text-[#E7D5A4]/50 flex-1">{TIER_NAME[t.tier] || t.tier}</span>
+                        <span className="text-[#EFE2C0] flex-1 min-w-0 truncate">{t.attendee_name || <span className="text-[#E7D5A4]/50">Name not recorded</span>} <span className="text-[#E7D5A4]/45">· {TIER_NAME[t.tier] || t.tier}</span></span>
                         <Badge status={t.status} />
                         {t.status === 'valid' && <Button size="sm" variant="ghost" icon="QrCode" aria-label="Show QR" onClick={() => setQrFor(qrFor === t.id ? null : t.id)} />}
                         {canManage && t.status === 'valid' && <Button size="sm" variant="ghost" icon="Ban" aria-label="Cancel ticket" onClick={() => setDialog({ ticket: t })} />}
@@ -169,6 +198,29 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
               </ul>
             )}
           </Panel>
+          {party > 0 && (
+            <Panel title="Check-in history" subtitle={`${inCount} / ${party} checked in`} flush
+              actions={partyStatus && <Badge tone={partyStatus.tone}><span className="inline-flex items-center gap-1"><Icon name={partyStatus.icon} size={11} />{partyStatus.label}</span></Badge>}>
+              {b.status === 'confirmed' && inCount < party && (
+                <div className="px-4 py-3 border-b border-[#E7D5A4]/[0.06] flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex-1 text-[12.5px] text-[#E7D5A4]/65">One booking QR — staff pick which of the {party - inCount} pending attendees are present.</div>
+                  <Button size="sm" variant="ghost" icon="QrCode" onClick={() => setQrFor(qrFor === 'group' ? null : 'group')}>{qrFor === 'group' ? 'Hide booking QR' : 'Booking QR'}</Button>
+                </div>
+              )}
+              {qrFor === 'group' && b.group_token && <div className="px-4 py-3"><TicketQr token={b.group_token} kind="BOOKING" /></div>}
+              {(arrivals.data || []).length === 0 ? <div className="px-4 py-3 text-[12.5px] text-[#E7D5A4]/50">No one has checked in yet.</div> : (
+                <ul className="divide-y divide-[#E7D5A4]/[0.06]" data-arrivals>
+                  {arrivals.data.map((a) => (
+                    <li key={a.ticket_number} className="px-4 py-2.5 text-[12.5px] flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                      <span className="font-mono text-[#E7D5A4]/60">{fmt.time(a.checked_in_at)}</span>
+                      <span className="text-[#EFE2C0]">{a.attendee_name || `Guest ${Number(a.ticket_number.slice(-2))}`}</span>
+                      <span className="text-[#E7D5A4]/50">checked in by {a.checked_in_by_name || 'unknown'}{a.method === 'manual' ? ' · manual' : ''}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
+          )}
           {can(P.AUDIT) && (history.data || []).length > 0 && (
             <Panel title="History" flush>
               <ul className="divide-y divide-[#E7D5A4]/[0.06]">

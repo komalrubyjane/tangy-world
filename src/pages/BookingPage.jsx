@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { artists, gallery } from '../data/mockData';
@@ -9,6 +9,7 @@ import { generateQrDataUrl } from '../lib/qr';
 import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { CheckoutSteps } from '../components/booking/CheckoutSteps';
 
 export const BookingPage = () => {
   const { sessionId } = useParams();
@@ -33,33 +34,32 @@ export const BookingPage = () => {
     { id: 'premium', name: 'Backstage Collective Pass', price: basePrice + 1200, desc: 'Access to post-midnight artist jam session, vinyl record & signed ticket stub.' }
   ];
 
-  const [selectedTier, setSelectedTier] = useState(ticketTiers[0]);
-  const [ticketQuantity, setTicketQuantity] = useState(1);
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  // Checkout form (see components/booking/CheckoutSteps). One object so nothing
+  // typed is lost moving between steps.
+  const [form, setForm] = useState(() => ({
+    fullName: '', phone: '', email: '', instagram: '', quantity: 1, tierId: 'gen', names: [''],
+    answers: {}, collabInterests: [], collabNote: '', note: '',
+  }));
+  const [step, setStep] = useState(1);
+  // idle | processing | failed | dismissed — payment itself is only ever
+  // confirmed by the server (verify-payment / webhook).
+  const [pay, setPay] = useState({ status: 'idle', message: '' });
+  // The Razorpay order for the current details: retrying reopens it instead of
+  // creating another pending booking.
+  const orderRef = useRef(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingError, setBookingError] = useState('');
   const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [groupQr, setGroupQr] = useState('');
   const [confirmedTickets, setConfirmedTickets] = useState([]);
+  const selectedTier = ticketTiers.find((t) => t.id === form.tierId) || ticketTiers[0];
 
   useEffect(() => {
-    setSelectedTier(ticketTiers[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.id]);
-
-  useEffect(() => {
-    if (user) {
-      setFullName((n) => n || user.full_name || '');
-      setEmail((e) => e || user.email || '');
-    }
+    if (user) setForm((f) => ({ ...f, fullName: f.fullName || user.full_name || '', email: f.email || user.email || '' }));
   }, [user]);
-
-  // Price Calculations
-  const subtotal = selectedTier.price * ticketQuantity;
-  const taxes = Math.round(subtotal * 0.18);
-  const totalAmount = subtotal + taxes;
+  // Start inside this event's per-booking range.
+  useEffect(() => {
+    if (session) setForm((f) => ({ ...f, quantity: Math.min(Math.max(f.quantity, session.bookingMin ?? 1), session.bookingMax ?? 10) }));
+  }, [session]);
 
   const loadRazorpayScript = () => new Promise((resolve, reject) => {
     if (window.Razorpay) { resolve(); return; }
@@ -70,98 +70,105 @@ export const BookingPage = () => {
     document.body.appendChild(script);
   });
 
-  // QR is generated client-side from each ISSUED TICKET's own random token
-  // (never the registration_code, never a database id) — see `tickets` in
-  // 0016_payments_tickets_checkin.sql. Tickets only exist once the booking
-  // is genuinely confirmed server-side, so there's no unverified-state QR.
+  // ONE QR for the whole booking (0023), generated client-side from the
+  // booking's opaque group token (never the registration_code, a database id
+  // or a name). It only identifies the booking — staff see the attendee list
+  // after scanning and check people in by name. Tickets (the named attendees)
+  // only exist once the booking is genuinely confirmed server-side, so there
+  // is no unverified-state QR.
   const finalizeConfirmedBooking = async (booking, tickets) => {
     setConfirmedBooking(booking);
     setIsSubmitted(true);
-    const withQr = await Promise.all(
-      (tickets || []).map(async (t) => ({ ...t, qrDataUrl: await generateQrDataUrl(`TANGY:TICKET:${t.token}`) }))
-    );
-    setConfirmedTickets(withQr);
+    setConfirmedTickets(tickets || []);
+    setGroupQr(booking.group_token ? await generateQrDataUrl(`TANGY:BOOKING:${booking.group_token}`) : '');
     // Best-effort — the booking is already fully confirmed regardless of
     // whether this email send succeeds; see sendTicketEmail's own comment.
     bookingService.sendTicketEmail(booking.id);
   };
 
-  const handleProceedPayment = async (e) => {
-    e.preventDefault();
-    if (!fullName || !phone || !email || !session) return;
-    setBookingError('');
-    playSFX('ticketClick');
-    setIsSubmitting(true);
+  const fail = (message) => setPay({ status: 'failed', message: message || 'The payment did not go through.' });
 
-    // Real payment flow: server computes the authoritative amount and
-    // creates the Razorpay order; nothing here is trusted for pricing.
-    const orderRes = await bookingService.createPaymentOrder({
-      eventId: session.id,
-      quantity: ticketQuantity,
-      tierId: selectedTier.id,
-      attendeeName: fullName,
-      attendeeEmail: email,
-      attendeePhone: phone,
-    });
-
-    if (!orderRes.success) {
-      setIsSubmitting(false);
-      setBookingError(orderRes.error || 'Could not start payment.');
-      return;
-    }
-
+  const openCheckout = async (order) => {
     try {
       await loadRazorpayScript();
     } catch (err) {
-      setIsSubmitting(false);
-      setBookingError(err.message);
+      fail(err.message);
       return;
     }
-
-    const { order_id, amount, currency, key_id, booking_id } = orderRes.order;
-
+    const { order_id, amount, currency, key_id, booking_id } = order;
     const rzp = new window.Razorpay({
       key: key_id,
       amount,
       currency,
       order_id,
       name: 'Tangy Sessions',
-      description: `${selectedTier.name} — ${session.title}`,
-      prefill: { name: fullName, email, contact: phone },
+      description: `${selectedTier.name} × ${form.quantity} — ${session.title}`,
+      prefill: { name: form.fullName, email: form.email, contact: form.phone },
       theme: { color: '#c2272a' },
       handler: async (response) => {
+        // Razorpay's success callback is not proof of payment: the server
+        // verifies the signature before confirming anything.
         const verifyRes = await bookingService.verifyPayment({
           bookingId: booking_id,
           razorpayOrderId: response.razorpay_order_id,
           razorpayPaymentId: response.razorpay_payment_id,
           razorpaySignature: response.razorpay_signature,
         });
-        setIsSubmitting(false);
         if (!verifyRes.success) {
-          setBookingError(verifyRes.error || 'Payment verification failed — please contact support before retrying.');
+          fail(verifyRes.error || 'We could not verify the payment — please contact support before retrying.');
           return;
         }
+        orderRef.current = null;
+        setPay({ status: 'idle', message: '' });
         await finalizeConfirmedBooking(verifyRes.booking, verifyRes.tickets);
       },
       modal: {
-        ondismiss: () => setIsSubmitting(false),
+        ondismiss: () => setPay((p) => (p.status === 'failed' ? p : { status: 'dismissed', message: '' })),
       },
     });
-    rzp.on('payment.failed', (resp) => {
-      setIsSubmitting(false);
-      setBookingError(resp.error?.description || 'Payment failed. Please try again.');
-    });
+    rzp.on('payment.failed', (resp) => fail(resp.error?.description));
     rzp.open();
   };
 
-  const handleQuantityChange = (delta) => {
+  // Server computes the authoritative amount; nothing here is trusted for
+  // pricing. The same details retried reuse the same order (no duplicate
+  // pending bookings); changed details start a new one and the old unpaid
+  // hold expires on its own (bookings.pending_timeout_minutes).
+  const handlePay = async () => {
+    if (!session || pay.status === 'processing') return;
     playSFX('ticketClick');
-    setTicketQuantity(prev => Math.max(1, Math.min(10, prev + delta)));
-  };
-
-  const handleTierSelect = (tier) => {
-    playSFX('ticketClick');
-    setSelectedTier(tier);
+    const payload = {
+      eventId: session.id,
+      quantity: form.quantity,
+      tierId: selectedTier.id,
+      attendeeName: form.fullName.trim(),
+      attendeeEmail: form.email.trim(),
+      attendeePhone: form.phone.trim(),
+      attendeeNames: form.names.map((n) => n.trim()),
+      details: {
+        answers: Object.fromEntries(Object.entries(form.answers).filter(([, v]) => v != null && v !== '' && !(Array.isArray(v) && v.length === 0))),
+        instagram: form.instagram.trim() || null,
+        note: form.note.trim() || null,
+        collabInterests: form.collabInterests,
+        collabNote: form.collabNote.trim() || null,
+      },
+    };
+    const fingerprint = JSON.stringify(payload);
+    setPay({ status: 'processing', message: '' });
+    if (orderRef.current?.fingerprint === fingerprint) {
+      setPay({ status: 'idle', message: '' });
+      openCheckout(orderRef.current.order);
+      return;
+    }
+    const orderRes = await bookingService.createPaymentOrder(payload);
+    if (!orderRes.success) {
+      orderRef.current = null;
+      fail(orderRes.error || 'We could not start the payment.');
+      return;
+    }
+    orderRef.current = { fingerprint, order: orderRes.order };
+    setPay({ status: 'idle', message: '' });
+    openCheckout(orderRes.order);
   };
 
   if (eventsLoading) {
@@ -357,7 +364,7 @@ export const BookingPage = () => {
                 <div>
                   <span className="font-mono text-[9px] font-bold text-[#c2272a] uppercase tracking-widest">BOX OFFICE ADMIT</span>
                   <h3 className="font-poster text-2xl text-[#191410] leading-none">
-                    {isSubmitted ? 'YOUR TICKET' : 'SELECT TICKET TIER'}
+                    {isSubmitted ? 'YOUR BOOKING' : 'BOOK YOUR PLACE'}
                   </h3>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#B5532A] text-[#ecdcaf] flex items-center justify-center font-poster text-sm shadow-md">
@@ -366,35 +373,36 @@ export const BookingPage = () => {
               </div>
 
               {isSubmitted && confirmedBooking ? (
-                <div className="flex flex-col items-center gap-4 text-center py-2">
-                  <div className="font-mono text-lg font-bold tracking-widest text-[#191410]">
-                    {confirmedBooking.registration_code}
+                <div className="flex flex-col items-center gap-4 text-center py-2" data-booking-confirmed>
+                  <div className="w-full p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-xs font-bold border-2 border-[#191410]" role="status">
+                    BOOKING CONFIRMED 🎉
                   </div>
-
-                  {confirmedTickets.length > 0 ? (
-                    <div className="w-full flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
-                      {confirmedTickets.map((t) => (
-                        <div key={t.id} className="flex flex-col items-center gap-2 border-t-2 border-dashed border-[#191410]/30 pt-4 first:border-t-0 first:pt-0">
-                          <img src={t.qrDataUrl} alt={`QR code for ${t.ticket_number}`} className="w-40 h-40 border-4 border-[#191410]" />
-                          <span className="font-mono text-xs font-bold text-[#191410]">{t.ticket_number}</span>
-                        </div>
+                  <dl className="w-full grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-left font-mono text-[11px] text-[#191410] m-0">
+                    <dt className="font-bold">Booking ID</dt><dd className="m-0 tracking-widest">{confirmedBooking.registration_code}</dd>
+                    <dt className="font-bold">Event</dt><dd className="m-0">{session.title}</dd>
+                    <dt className="font-bold">Attendees</dt><dd className="m-0">{confirmedTickets.length || confirmedBooking.quantity}</dd>
+                  </dl>
+                  {confirmedTickets.length > 0 && (
+                    <ol className="w-full text-left flex flex-col gap-1 border-t-2 border-dashed border-[#191410]/30 pt-3 m-0 pl-0 list-none" aria-label="Attendees" data-confirmed-attendees>
+                      {confirmedTickets.map((t, i) => (
+                        <li key={t.id} className="font-mono text-xs text-[#191410] flex gap-2"><span aria-hidden="true">✓</span>{t.attendee_name || `Guest ${i + 1}`}</li>
                       ))}
-                    </div>
-                  ) : (
-                    <p className="font-mono text-[10px] text-[#241a12]/70">Issuing your ticket QR codes — refresh your Passport in a moment if they don't appear here.</p>
+                    </ol>
                   )}
-
-                  <p className="font-mono text-[10px] text-[#241a12]/70 uppercase leading-relaxed">
-                    Show each QR code at check-in — one scan per ticket. A copy is saved to your Passport, and we've emailed them to you.
+                  {groupQr ? (
+                    <img src={groupQr} alt="Booking QR code" className="w-48 h-48 border-4 border-[#191410]" data-booking-qr />
+                  ) : (
+                    <p className="font-mono text-[10px] text-[#241a12]/70">Issuing your booking QR — refresh your Passport in a moment if it doesn't appear here.</p>
+                  )}
+                  <p className="font-mono text-[10px] text-[#241a12]/80 leading-relaxed m-0">
+                    Your QR represents the entire booking. Each attendee can arrive separately — the same QR can be scanned again until everyone is checked in.
+                    It's saved in your Passport, and we've emailed it to you.
                   </p>
-                  <div className="w-full p-3 bg-[#2e6834] text-[#ecdcaf] font-mono text-[10px] font-bold border-2 border-[#191410]">
-                    ✓ BOOKING CONFIRMED — {ticketQuantity}x {selectedTier.name}
-                  </div>
                   <button
-                    onClick={() => { playSFX('ticketClick'); navigate('/sessions'); }}
+                    onClick={() => { playSFX('ticketClick'); navigate('/dashboard'); }}
                     className="w-full py-3 bg-[#191410] text-[#ecdcaf] hover:bg-[#c2272a] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410]"
                   >
-                    BACK TO SESSIONS →
+                    VIEW MY BOOKINGS →
                   </button>
                 </div>
               ) : !isLoggedIn ? (
@@ -418,113 +426,8 @@ export const BookingPage = () => {
                   THIS SESSION HAS ALREADY TAKEN PLACE.
                 </div>
               ) : (
-                <>
-              {/* TIER SELECTION BUTTONS */}
-              <div className="flex flex-col gap-3">
-                {ticketTiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    onClick={() => handleTierSelect(tier)}
-                    className={`p-3.5 border-2 cursor-pointer transition-all ${selectedTier.id === tier.id ? 'bg-[#191410] text-[#ecdcaf] border-[#191410] shadow-md scale-[1.01]' : 'bg-[#ecdcaf] text-[#191410] border-[#191410]/30 hover:border-[#191410]'}`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-poster text-base">{tier.name}</h4>
-                      <span className="font-poster text-lg text-[#d1a437]">₹{tier.price}</span>
-                    </div>
-                    <p className={`font-mono text-[10px] mt-1 ${selectedTier.id === tier.id ? 'text-[#ecdcaf]/80' : 'text-[#191410]/80'}`}>
-                      {tier.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* QUANTITY SELECTOR */}
-              <div className="flex items-center justify-between bg-[#181614] text-[#ecdcaf] p-3 border border-[#191410]">
-                <span className="font-mono text-xs font-bold">NUMBER OF TICKETS:</span>
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => handleQuantityChange(-1)}
-                    className="w-8 h-8 bg-[#c2272a] text-[#ecdcaf] font-bold text-lg flex items-center justify-center border border-[#ecdcaf] active:scale-95 transition-transform"
-                  >
-                    -
-                  </button>
-                  <span className="font-poster text-xl text-[#d1a437]">{ticketQuantity}</span>
-                  <button 
-                    onClick={() => handleQuantityChange(1)}
-                    className="w-8 h-8 bg-[#c2272a] text-[#ecdcaf] font-bold text-lg flex items-center justify-center border border-[#ecdcaf] active:scale-95 transition-transform"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* BOOKING FORM INPUTS */}
-              <form onSubmit={handleProceedPayment} className="flex flex-col gap-3 border-t-2 border-dashed border-[#191410]/40 pt-4">
-                <span className="font-mono text-[9.5px] font-bold text-[#c2272a] tracking-wider uppercase">ATTENDEE INFORMATION</span>
-                
-                <input 
-                  type="text" 
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="FULL NAME"
-                  className="w-full p-2.5 bg-[#ecdcaf] text-[#191410] font-mono text-xs border border-[#191410] placeholder:text-[#191410]/60 outline-none"
-                />
-
-                <input 
-                  type="tel" 
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="PHONE NUMBER (+91)"
-                  className="w-full p-2.5 bg-[#ecdcaf] text-[#191410] font-mono text-xs border border-[#191410] placeholder:text-[#191410]/60 outline-none"
-                />
-
-                <input 
-                  type="email" 
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="EMAIL ADDRESS"
-                  className="w-full p-2.5 bg-[#ecdcaf] text-[#191410] font-mono text-xs border border-[#191410] placeholder:text-[#191410]/60 outline-none"
-                />
-
-                {/* PRICE BREAKDOWN SUMMARY */}
-                <div className="bg-[#181614] text-[#ecdcaf] p-4 border border-[#191410] flex flex-col gap-1.5 font-mono text-xs my-1">
-                  <div className="flex justify-between text-[#ecdcaf]/80">
-                    <span>Subtotal ({ticketQuantity}x {selectedTier.name})</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-[#ecdcaf]/80">
-                    <span>GST Taxes (18%)</span>
-                    <span>₹{taxes.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-sm text-[#d1a437] pt-2 border-t border-[#ecdcaf]/20 mt-1">
-                    <span>TOTAL AMOUNT DUE</span>
-                    <span>₹{totalAmount.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                {bookingError && (
-                  <div className="p-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-[10px] font-bold border-2 border-[#191410]">
-                    ✕ {bookingError}
-                  </div>
-                )}
-
-                <div className="p-2 bg-[#C89D35]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
-                  🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy's servers.
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-[#181614] text-[#ecdcaf] hover:bg-[#B5532A] font-mono text-xs font-bold tracking-[0.2em] uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#c2272a] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? 'PROCESSING...' : `PAY & CONFIRM (₹${totalAmount.toLocaleString()}) →`}
-                </button>
-
-              </form>
-              </>
+                <CheckoutSteps event={session} tiers={ticketTiers} form={form} setForm={setForm} step={step} setStep={setStep}
+                  pay={pay} onPay={handlePay} onRetry={handlePay} />
               )}
 
             </div>
@@ -534,24 +437,6 @@ export const BookingPage = () => {
         </div>
 
       </main>
-
-      {/* MOBILE STICKY BOTTOM PAYMENT BAR (<1024px) */}
-      {!isSubmitted && !isSoldOut && !isPast && (
-        <div className="fixed bottom-0 left-0 right-0 z-[150] bg-[#181614] border-t-2 border-[#d1a437] p-3 flex lg:hidden items-center justify-between gap-3 shadow-2xl">
-          <div className="flex flex-col text-left">
-            <span className="font-mono text-[9px] text-[#d1a437] font-bold">{ticketQuantity}x {selectedTier.name}</span>
-            <span className="font-poster text-xl text-[#ecdcaf]">₹{totalAmount.toLocaleString()}</span>
-          </div>
-
-          <button
-            onClick={(e) => { isLoggedIn ? handleProceedPayment(e) : openLoginModal(); }}
-            disabled={isSubmitting}
-            className="px-5 py-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold tracking-widest uppercase border border-[#ecdcaf] active:scale-95 transition-transform disabled:opacity-50"
-          >
-            {isLoggedIn ? (isSubmitting ? 'CONFIRMING...' : 'CONFIRM BOOKING →') : 'SIGN IN TO BOOK →'}
-          </button>
-        </div>
-      )}
 
       <Footer />
     </motion.div>

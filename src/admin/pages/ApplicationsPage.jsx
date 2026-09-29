@@ -10,6 +10,41 @@ import {
   Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Drawer, KeyValue, Button,
   ConfirmDialog, Input, fmt, useToast,
 } from '../ui';
+import { collabLabel } from '../../lib/bookingForm';
+
+// Collaboration interest ticked at checkout (0024). These are leads, not
+// applications: nothing here grants a role — the team reaches out and invites
+// the person to apply through the normal flow.
+function BookingLeads() {
+  const leads = useAsync(async () => {
+    const { data, error } = await supabase.from('bookings')
+      .select('id, registration_code, attendee_name, attendee_email, attendee_phone, contact_instagram, collab_interests, collab_note, created_at, events(name)')
+      .not('collab_interests', 'is', null).eq('status', 'confirmed').order('created_at', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data || [];
+  }, []);
+  if (!leads.data?.length) return null;
+  return (
+    <Panel title="Interest from bookings" subtitle="People who ticked “interested in collaborating” at checkout — reach out and invite them to apply." flush>
+      <ul className="divide-y divide-[#E7D5A4]/[0.06]" data-booking-leads>
+        {leads.data.map((l) => (
+          <li key={l.id} className="px-4 py-3 flex flex-col gap-1 text-[13px]" data-lead={l.registration_code}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[#EFE2C0]">{l.attendee_name}</span>
+              {l.collab_interests.map((k) => <Badge key={k} tone="gold">{collabLabel(k)}</Badge>)}
+              <span className="ml-auto font-mono text-[11px] text-[#E7D5A4]/45">{l.events?.name} · {fmt.date(l.created_at)}</span>
+            </div>
+            {l.collab_note && <p className="text-[12.5px] text-[#E7D5A4]/70 m-0">“{l.collab_note}”</p>}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#E7D5A4]/55">
+              <span>{l.attendee_email}</span>{l.attendee_phone && <span>{l.attendee_phone}</span>}{l.contact_instagram && <span>@{l.contact_instagram}</span>}
+              <Button size="sm" variant="ghost" icon="Ticket" to={`/admin-portal/bookings?q=${l.registration_code}`}>{l.registration_code}</Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
+}
 
 const TYPES = [
   { value: '', label: 'All types' },
@@ -150,6 +185,7 @@ const ApplicationDrawer = ({ app, reviewer, onClose, onChanged }) => {
 };
 
 export default function ApplicationsPage() {
+  const { can } = useAdminSession();
   const [params, setParams] = useSearchParams();
   const type = params.get('type') || '';
   const status = params.get('status') ?? 'pending';
@@ -192,6 +228,7 @@ export default function ApplicationsPage() {
 
   return (
     <Page title="Applications" subtitle="Artist, partner, crew and volunteer applications. Approval activates the applicant's role; rejected applications stay on record.">
+      {can(P.BOOKINGS_ALL) && <BookingLeads />}
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
           <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} result{table.count === 1 ? '' : 's'}</span>}>

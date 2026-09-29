@@ -34,38 +34,46 @@ const Badge = ({ status }) => (
   </span>
 );
 
-// Ticket QR is generated client-side from the ticket's own random `token`
-// (never the registration_code, never a database id) — tickets only exist
-// on a booking once it's genuinely confirmed server-side, so a
-// pending/failed booking has none to show here at all.
-const TicketQr = ({ token }) => {
+// QR images are generated client-side from an opaque random token (the
+// booking's group_token here — never the registration_code, a database id or
+// a name). Tickets only exist once a booking is genuinely confirmed
+// server-side, so a pending/failed booking has nothing to show at all.
+const TicketQr = ({ token, kind = 'TICKET', size = 'w-20 h-20' }) => {
   const [qr, setQr] = useState('');
   useEffect(() => {
     let cancelled = false;
-    generateQrDataUrl(`TANGY:TICKET:${token}`).then((url) => { if (!cancelled) setQr(url); });
+    generateQrDataUrl(`TANGY:${kind}:${token}`).then((url) => { if (!cancelled) setQr(url); });
     return () => { cancelled = true; };
-  }, [token]);
-  if (!qr) return <div className="w-20 h-20 bg-[#11100C]/10 animate-pulse" />;
-  return <img src={qr} alt="Ticket QR code" className="w-20 h-20 border-2 border-[#11100C]" />;
+  }, [token, kind]);
+  if (!qr) return <div className={`${size} bg-[#11100C]/10 animate-pulse`} />;
+  return <img src={qr} alt={kind === 'BOOKING' ? 'Group pass QR code' : 'Ticket QR code'} className={`${size} border-2 border-[#11100C]`} />;
 };
 
-const TicketList = ({ booking }) => {
+const TicketList = ({ booking, showQr = true }) => {
   if (booking.status !== 'confirmed' && booking.status !== 'paid') return null;
-  const tickets = booking.tickets || [];
+  const tickets = [...(booking.tickets || [])].sort((a, b) => a.ticket_number.localeCompare(b.ticket_number));
   if (tickets.length === 0) {
     return <p className="font-mono text-[9px] text-[#B94717] mt-2">Issuing tickets — check back in a moment.</p>;
   }
+  const active = tickets.filter((t) => t.status !== 'cancelled');
+  const arrived = active.filter((t) => t.status === 'checked_in').length;
+  // ONE QR for the whole booking (0023): it identifies the booking only; staff
+  // check each named attendee in after scanning, however the party arrives.
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-      {tickets.map((t) => (
-        <div key={t.id} className="flex items-center gap-2 bg-[#11100C]/5 border border-[#11100C]/20 p-2">
-          <TicketQr token={t.token} />
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-[10px] font-bold">{t.ticket_number}</span>
-            <span className="font-mono text-[9px] uppercase text-[#B94717]">{t.status === 'checked_in' ? '✓ Checked in' : 'Not checked in'}</span>
-          </div>
-        </div>
-      ))}
+    <div className="flex flex-col sm:flex-row gap-3 bg-[#11100C]/5 border-2 border-[#11100C]/40 p-3 mt-3" data-booking-pass>
+      {showQr && booking.group_token && <TicketQr token={booking.group_token} kind="BOOKING" size="w-32 h-32" />}
+      <div className="flex flex-col gap-1 min-w-0 flex-1">
+        <span className="font-mono text-[10px] font-bold uppercase">{active.length} attendee{active.length === 1 ? '' : 's'} · {arrived} / {active.length} checked in</span>
+        {showQr && <span className="font-mono text-[9px] text-[#11100C]/70">Show this QR at the entrance — everyone on the booking uses it, and it works again for anyone arriving later.</span>}
+        <ol className="flex flex-col gap-0.5 mt-1" aria-label="Attendees">
+          {tickets.map((t, i) => (
+            <li key={t.id} className={`flex items-center justify-between gap-2 font-mono text-[10px] ${t.status === 'cancelled' ? 'line-through opacity-50' : ''}`}>
+              <span className="truncate">{t.attendee_name || `Guest ${i + 1}`}</span>
+              <span className="uppercase text-[9px] text-[#B94717] shrink-0">{t.status === 'checked_in' ? '✓ Checked in' : t.status === 'cancelled' ? 'Cancelled' : 'Pending'}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   );
 };
@@ -143,12 +151,13 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
     setSettingsForm({ fullName: user?.full_name || '', phone: user?.phone || '' });
   }, [user]);
 
+  // Failed / expired checkout attempts were never bookings — don't list them.
   const upcomingBookings = bookings
-    .filter((b) => b.events && b.status !== 'cancelled')
+    .filter((b) => b.events && !['cancelled', 'failed', 'expired'].includes(b.status))
     .filter((b) => !b.events.event_date || b.events.event_date >= new Date().toISOString().slice(0, 10))
     .sort((a, b) => (a.events?.event_date || '').localeCompare(b.events?.event_date || ''));
 
-  const pastBookings = bookings.filter((b) => b.events?.event_date && b.events.event_date < new Date().toISOString().slice(0, 10));
+  const pastBookings = bookings.filter((b) => b.events?.event_date && b.events.event_date < new Date().toISOString().slice(0, 10) && !['failed', 'expired'].includes(b.status));
 
   const stampsCount = bookings.filter((b) => b.status === 'confirmed' || b.status === 'paid').length;
   const passportId = user?.passport_id || '—';
@@ -306,7 +315,9 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
                         <Badge status={b.status} />
                       </div>
                       <p className="font-mono text-[10px] mt-1">{fmtDate(b.events?.event_date)} · {b.events?.event_time} · {b.events?.venue}</p>
-                      <p className="font-mono text-[9px] mt-2 text-[#B94717] font-bold">{b.registration_code} · {b.tier ? `${b.tier.toUpperCase()} · ` : ''}QTY {b.quantity} · ₹{b.amount}</p>
+                      <p className="font-mono text-[9px] mt-2 text-[#B94717] font-bold">
+                        Booking {b.registration_code} · {b.quantity} attendee{b.quantity === 1 ? '' : 's'} · ₹{b.amount} · {b.status === 'confirmed' ? 'Paid' : b.status === 'pending' ? 'Payment pending' : b.status}
+                      </p>
                       <TicketList booking={b} />
                     </div>
                   ))}
@@ -326,6 +337,8 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
                         <Badge status={b.status} />
                       </div>
                       <p className="font-mono text-[10px] mt-1 text-[#E7D5A4]/70">{fmtDate(b.events?.event_date)} · {b.events?.venue}</p>
+                      <p className="font-mono text-[9px] mt-1 text-[#E7D5A4]/60">Booking {b.registration_code} · {b.quantity} attendee{b.quantity === 1 ? '' : 's'}</p>
+                      <TicketList booking={b} showQr={false} />
                     </div>
                   ))}
                 </div>

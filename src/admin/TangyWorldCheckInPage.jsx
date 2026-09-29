@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { StaffAuthGate } from './StaffAuthGate';
 import { useAdminSession, useSetting } from './AdminSession';
-import { checkinService } from '../lib/checkinService';
+import { checkinService, parseCheckinCode, partyState } from '../lib/checkinService';
 import { useAudio } from '../audio/AudioContext';
 import { useDebounced } from './hooks';
 import { TICKET_TIERS } from './rbac';
@@ -11,10 +11,13 @@ import { Icon, Button, Badge, cx, fmt } from './ui';
 const TIER_NAME = Object.fromEntries(TICKET_TIERS.map((t) => [t.id, t.name]));
 
 // Every `result` is exactly what check_in_ticket() returns — this page only
-// renders it; it never decides validity itself.
+// renders it; it never decides validity, counts or who is checked in.
 const RESULTS = {
   valid: { tone: 'good', icon: 'CircleCheck', title: 'Checked in', sound: 'ticketClick' },
   already_checked_in: { tone: 'warn', icon: 'TriangleAlert', title: 'Already checked in' },
+  attendee_already_checked_in: { tone: 'warn', icon: 'TriangleAlert', title: 'Already checked in by someone else' },
+  invalid_selection: { tone: 'bad', icon: 'CircleX', title: 'Select who is here' },
+  invalid_attendee: { tone: 'bad', icon: 'CircleX', title: 'Not on this booking' },
   wrong_event: { tone: 'bad', icon: 'CircleX', title: 'Wrong event' },
   cancelled: { tone: 'bad', icon: 'CircleX', title: 'Ticket cancelled' },
   payment_not_confirmed: { tone: 'bad', icon: 'CircleX', title: 'Payment not confirmed' },
@@ -30,10 +33,28 @@ const TONE = {
   bad: 'bg-[#40150f] border-[#ef6b5e] text-[#ffc4bd]',
 };
 
+// Unnamed attendees (tickets issued before names were collected) are never
+// given invented names — they read "Guest N".
+const attendeeLabel = (a, i) => a.name || `Guest ${i + 1}`;
+
+// Booking results carry the attendee list; a one-person booking keeps the
+// original wording ("Checked in" / "Already checked in").
+function resultTitle(res, base) {
+  if (!res.group || !(res.party_size > 1)) return base.title;
+  if (res.result === 'valid') return res.remaining > 0 ? 'Check-in successful' : 'Check-in complete';
+  if (res.result === 'already_checked_in') return 'All attendees already checked in';
+  return base.title;
+}
+
 function detailLine(r) {
   switch (r.result) {
-    case 'wrong_event': return `This ticket is for ${r.ticket_event_name || 'another event'}.`;
-    case 'already_checked_in': return `First checked in at ${fmt.time(r.checked_in_at)}${r.checked_in_by_name ? ` by ${r.checked_in_by_name}` : ''}${r.method === 'manual' ? ' (manual)' : ''}.`;
+    case 'attendee_already_checked_in': return `${(r.already || []).join(', ') || 'Someone you selected'} ${(r.already || []).length === 1 ? 'was' : 'were'} checked in a moment ago — nothing was changed. Review the list and try again.`;
+    case 'invalid_selection': return 'Select at least one pending attendee.';
+    case 'invalid_attendee': return 'That person is not a pending attendee on this booking — nothing was changed.';
+    case 'wrong_event': return `This ${r.group ? 'booking' : 'ticket'} is for ${r.ticket_event_name || 'another event'}. Nobody was checked in.`;
+    case 'already_checked_in':
+      if (r.group) return r.party_size > 1 ? `${r.checked_in} / ${r.party_size} attendees checked in. No remaining check-ins.` : 'This attendee is already checked in.';
+      return `First checked in at ${fmt.time(r.checked_in_at)}${r.checked_in_by_name ? ` by ${r.checked_in_by_name}` : ''}${r.method === 'manual' ? ' (manual)' : ''}.`;
     case 'not_found': return 'This code is not a Tangy ticket.';
     case 'cancelled': return 'This ticket was cancelled or refunded.';
     case 'payment_not_confirmed': return 'The booking has no confirmed payment. Send the guest to the help desk.';
@@ -43,6 +64,90 @@ function detailLine(r) {
     case 'error': return r.error || 'Check the connection and try again.';
     default: return null;
   }
+}
+
+// Every attendee on the booking with their own state: who's in (and who let
+// them in), who's pending.
+function AttendeeStatusList({ attendees }) {
+  return (
+    <ul className="flex flex-col gap-1 mt-2" aria-label="Attendees" data-attendee-status>
+      {attendees.map((a, i) => (
+        <li key={a.id} className="flex items-center justify-between gap-2 text-[14px]">
+          <span className="truncate">{attendeeLabel(a, i)}</span>
+          {a.status === 'checked_in'
+            ? <span className="inline-flex items-center gap-1 shrink-0"><Icon name="CircleCheck" size={14} />Checked in</span>
+            : <span className="inline-flex items-center gap-1 shrink-0 opacity-80"><Icon name="Hourglass" size={14} />Pending</span>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// After scanning a booking (or opening it from manual search): the named
+// attendees with their state; staff tick the pending people who are here.
+// Checked-in people can't be selected. The server re-checks everything —
+// this list is only what it told us a moment ago.
+function AttendeePanel({ party, method, busy, onConfirm, onCancel, notice }) {
+  const pending = party.attendees.filter((a) => a.status === 'valid');
+  const single = party.party_size === 1;
+  const [selected, setSelected] = useState(() => new Set(single ? pending.map((a) => a.id) : []));
+  useEffect(() => { setSelected(new Set(single ? pending.map((a) => a.id) : [])); },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [party]);
+  const toggle = (id) => setSelected((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  const n = selected.size;
+  const state = partyState(party.checked_in, party.party_size);
+  return (
+    <section aria-label={`Booking ${party.registration_code}`} data-group-panel
+      className="rounded-md border-2 border-[#C99A2E] bg-[#17130F] p-4 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="font-mono text-[12px] tracking-[0.12em] text-[#C99A2E]">{party.registration_code}</div>
+          <div className="text-[15px] text-[#E7D5A4]/80 truncate">{party.event_name}</div>
+          <div className="text-[14px] text-[#E7D5A4]/70">{party.party_size} attendee{party.party_size === 1 ? '' : 's'}{method === 'manual' ? ' · manual' : ''}</div>
+        </div>
+        {state && <Badge tone={state.tone}><span className="inline-flex items-center gap-1"><Icon name={state.icon} size={12} />{state.label}</span></Badge>}
+      </div>
+      {!single && (
+        <dl className="grid grid-cols-2 gap-2 m-0">
+          <div className="rounded border border-[#C99A2E]/20 px-3 py-2">
+            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/50">Checked in</dt>
+            <dd className="m-0 font-condensed text-3xl tabular-nums text-[#5fd3a0]" data-party-progress>{party.checked_in} / {party.party_size}</dd>
+          </div>
+          <div className="rounded border border-[#C99A2E]/20 px-3 py-2">
+            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/50">Remaining</dt>
+            <dd className="m-0 font-condensed text-3xl tabular-nums text-[#f5b544]" data-party-remaining>{party.remaining}</dd>
+          </div>
+        </dl>
+      )}
+      {notice && <p role="alert" className="text-[13px] text-[#ffe0a3] m-0">{notice}</p>}
+      <fieldset className="flex flex-col gap-1.5 m-0 p-0 border-0">
+        <legend className="font-mono text-[10.5px] uppercase tracking-[0.15em] text-[#C99A2E] mb-1.5">{single ? 'Attendee' : 'Attendees — select who is here'}</legend>
+        {party.attendees.map((a, i) => {
+          const done = a.status === 'checked_in';
+          return (
+            <label key={a.id} data-attendee={attendeeLabel(a, i)}
+              className={cx('min-h-[52px] rounded-md border px-3 flex items-center gap-3', done ? 'border-[#2fb877]/30 bg-[#123d2a]/40' : selected.has(a.id) ? 'border-[#C99A2E] bg-[#C99A2E]/10' : 'border-[#E7D5A4]/15')}>
+              <input type="checkbox" checked={done || selected.has(a.id)} disabled={done || busy} onChange={() => toggle(a.id)}
+                aria-label={`${attendeeLabel(a, i)} — ${done ? 'checked in' : 'pending'}`} className="h-6 w-6 accent-[#C99A2E] shrink-0" />
+              <span className="flex-1 min-w-0">
+                <span className="block text-[16px] text-[#EFE2C0] truncate">{attendeeLabel(a, i)}</span>
+                {done && <span className="block text-[11.5px] text-[#E7D5A4]/55">{fmt.time(a.checked_in_at)}{a.checked_in_by_name ? ` · ${a.checked_in_by_name}` : ''}</span>}
+              </span>
+              <span className={cx('shrink-0 inline-flex items-center gap-1 font-mono text-[10.5px] uppercase', done ? 'text-[#5fd3a0]' : 'text-[#E7D5A4]/60')}>
+                <Icon name={done ? 'CircleCheck' : 'Hourglass'} size={13} />{done ? 'Checked in' : 'Pending'}
+              </span>
+            </label>
+          );
+        })}
+      </fieldset>
+      <button type="button" onClick={() => onConfirm([...selected])} disabled={busy || n === 0}
+        className="h-14 rounded-md bg-[#2fb877] text-[#0b1f15] font-condensed text-xl uppercase tracking-wide disabled:opacity-40">
+        {busy ? 'Checking in…' : single ? 'Check in' : `Check in selected (${n})`}
+      </button>
+      <button type="button" onClick={onCancel} disabled={busy} className="h-11 rounded-md border border-[#C99A2E]/30 text-[13px] text-[#E7D5A4]/75">Cancel</button>
+    </section>
+  );
 }
 
 function QrScanner({ onDecoded, active }) {
@@ -98,6 +203,8 @@ function CheckInWorkspace() {
   const eventId = params.get('event') || '';
   const [mode, setMode] = useState('scan');
   const [result, setResult] = useState(null);
+  // A booking QR waiting for "who is here?": the server's attendee list + how it was opened.
+  const [pending, setPending] = useState(null);
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState('');
   const q = useDebounced(search, 300);
@@ -122,20 +229,53 @@ function CheckInWorkspace() {
   }, [eventId]);
   useEffect(() => { refresh(); }, [refresh]);
 
-  const run = async (token, method = 'qr', attendeeHint = null) => {
+  const offline = () => {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       setResult({ result: 'error', error: 'You are offline. Reconnect and scan again.' });
-      return;
+      return true;
     }
+    return false;
+  };
+
+  const run = async (token, method = 'qr', attendeeHint = null, attendeeIds = null) => {
+    if (offline()) return;
     inFlight.current = true;
     setBusy(true);
-    const res = await checkinService.checkInByToken(token, eventId, { method });
+    const res = await checkinService.checkInByToken(token, eventId, { method, attendeeIds });
     inFlight.current = false;
     setBusy(false);
-    setResult({ ...res, attendee_name: res.attendee_name || attendeeHint });
+    // Refused selection (e.g. another gate just admitted someone you ticked):
+    // nothing changed — re-open the list with the server's current state.
+    const retry = ['attendee_already_checked_in', 'invalid_attendee', 'invalid_selection'].includes(res.result) && res.remaining > 0 && res.attendees;
+    if (retry) {
+      setResult(null);
+      setPending({ ...res, token, method, notice: detailLine(res) });
+    } else {
+      setPending(null);
+      setResult({ ...res, attendee_name: res.guest_name || res.attendee_name || attendeeHint });
+    }
     if (res.result === 'valid') playSFX('ticketClick');
     if (navigator.vibrate) navigator.vibrate(res.result === 'valid' ? 60 : [80, 60, 80]);
     refresh();
+  };
+
+  // Booking QR: ask the server for the attendee list first (no write), then
+  // staff tick who is here. Anything but `ready` is final.
+  const openGroup = async (token, method, attendeeHint = null) => {
+    if (offline()) return;
+    inFlight.current = true;
+    setBusy(true);
+    const res = await checkinService.checkInByToken(token, eventId, { method, preview: true });
+    inFlight.current = false;
+    setBusy(false);
+    if (res.result === 'ready') {
+      setResult(null);
+      setPending({ ...res, token, method });
+    } else {
+      setPending(null);
+      setResult({ ...res, attendee_name: res.attendee_name || attendeeHint });
+      if (navigator.vibrate) navigator.vibrate(res.result === 'already_checked_in' ? [60] : [80, 60, 80]);
+    }
   };
 
   const onDecoded = (text) => {
@@ -147,9 +287,11 @@ function CheckInWorkspace() {
       lastScan.current.at = now;
       return;
     }
-    if (inFlight.current) return;
+    if (inFlight.current || pending) return;
     lastScan.current = { code: text, at: now };
-    run(text, 'qr');
+    const code = parseCheckinCode(text);
+    if (code.kind === 'group') openGroup(text, 'qr');
+    else run(text, 'qr');
   };
 
   useEffect(() => {
@@ -169,6 +311,19 @@ function CheckInWorkspace() {
   const accessOver = accessEnds != null && clock >= accessEnds;
   const homePath = user?.role === 'volunteer' ? '/volunteer/dashboard' : '/admin-portal';
   const r = result && (RESULTS[result.result] || RESULTS.error);
+  // Manual search returns ticket rows; staff act on bookings.
+  const bookings = Object.values(matches.reduce((acc, t) => { (acc[t.booking_id] ||= t); return acc; }, {}));
+  // Recent check-ins, one line per arrival (rows of one action share a batch),
+  // naming the attendees who came in.
+  const arrivals = Object.values(recent.reduce((acc, c) => {
+    const k = c.batch_id || c.id;
+    acc[k] = acc[k] ? { ...acc[k], people: [...acc[k].people, c] } : { ...c, people: [c] };
+    return acc;
+  }, {})).map((a) => ({
+    ...a,
+    // Rows of one arrival share a timestamp: list them in booking order.
+    names: [...a.people].sort((x, y) => (x.ticket_number || '').localeCompare(y.ticket_number || '')).map((c) => c.guest_name || c.ticket_number),
+  }));
   const pct = stats?.tickets_issued ? Math.round((100 * stats.checked_in) / stats.tickets_issued) : 0;
 
   return (
@@ -220,19 +375,37 @@ function CheckInWorkspace() {
               <div role="status" className={cx('rounded-md border-2 p-4 flex gap-3 items-start', TONE[r.tone])}>
                 <Icon name={r.icon} size={30} className="shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <div className="font-condensed text-2xl uppercase leading-tight">{r.title}</div>
-                  {result.attendee_name && <div className="text-[17px] mt-1 font-medium">{result.attendee_name}</div>}
-                  <div className="font-mono text-[12px] opacity-80 mt-1">{[result.ticket_number, TIER_NAME[result.tier] || result.tier, result.registration_code].filter(Boolean).join(' · ')}</div>
+                  <div className="font-condensed text-2xl uppercase leading-tight">{resultTitle(result, r)}</div>
+                  {result.group && result.party_size === 1 && result.attendees?.[0]
+                    ? <div className="text-[17px] mt-1 font-medium">{attendeeLabel(result.attendees[0], 0)}</div>
+                    : !result.group && result.attendee_name && <div className="text-[17px] mt-1 font-medium">{result.attendee_name}</div>}
+                  <div className="font-mono text-[12px] opacity-80 mt-1">{[result.ticket_number, TIER_NAME[result.tier] || result.tier, result.registration_code, result.group && result.event_name].filter(Boolean).join(' · ')}</div>
+                  {result.group && result.party_size > 1 && result.result === 'valid' && (
+                    <div className="mt-2 text-[15px]" data-result-party>
+                      <div className="font-medium">{result.quantity} attendee{result.quantity === 1 ? '' : 's'} checked in: {(result.admitted || []).join(', ')}</div>
+                      <div>Progress <span className="font-condensed text-xl tabular-nums">{result.checked_in} / {result.party_size}</span></div>
+                      <div>{result.remaining > 0 ? <>Remaining <span className="font-condensed text-xl tabular-nums">{result.remaining}</span> — the booking QR stays valid</> : 'All attendees have arrived.'}</div>
+                    </div>
+                  )}
+                  {result.group && result.party_size > 1 && ['valid', 'already_checked_in'].includes(result.result) && result.attendees && <AttendeeStatusList attendees={result.attendees} />}
                   {result.result === 'valid' && <div className="text-[12.5px] opacity-80 mt-1">{fmt.time(result.checked_in_at)}{result.checked_in_by_name ? ` · by ${result.checked_in_by_name}` : ''}{result.method === 'manual' ? ' · manual' : ''}</div>}
                   {detailLine(result) && <div className="text-[13px] mt-1.5">{detailLine(result)}</div>}
                 </div>
-                <button onClick={() => setResult(null)} className="h-9 w-9 inline-flex items-center justify-center rounded hover:bg-black/20" aria-label="Dismiss"><Icon name="X" size={18} /></button>
+                {/* Dismiss = ready for the next scan, including the same booking QR
+                    again (the rest of a party arriving later). */}
+                <button onClick={() => { setResult(null); lastScan.current = { code: '', at: 0 }; }} className="h-11 w-11 inline-flex items-center justify-center rounded hover:bg-black/20" aria-label="Dismiss"><Icon name="X" size={20} /></button>
               </div>
+            )}
+
+            {pending && (
+              <AttendeePanel party={pending} method={pending.method} busy={busy} notice={pending.notice}
+                onConfirm={(ids) => run(pending.token, pending.method, null, ids)}
+                onCancel={() => { setPending(null); lastScan.current = { code: '', at: 0 }; }} />
             )}
 
             <div className="grid grid-cols-2 gap-2">
               {[{ id: 'scan', label: 'Scan QR', icon: 'ScanLine' }, ...(allowManual ? [{ id: 'manual', label: 'Manual', icon: 'Search' }] : [])].map((m) => (
-                <button key={m.id} onClick={() => { setMode(m.id); setResult(null); }}
+                <button key={m.id} onClick={() => { setMode(m.id); setResult(null); setPending(null); }}
                   className={cx('h-12 rounded-md border inline-flex items-center justify-center gap-2 font-mono text-[12px] uppercase tracking-[0.1em]', mode === m.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E]' : 'border-[#C99A2E]/30 text-[#E7D5A4]/70')}>
                   <Icon name={m.icon} size={17} /> {m.label}
                 </button>
@@ -242,7 +415,7 @@ function CheckInWorkspace() {
             {mode === 'scan' && eventId ? (
               <div className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3">
                 <QrScanner active onDecoded={onDecoded} />
-                <p className="text-center text-[12px] text-[#E7D5A4]/45 mt-3">{busy ? 'Verifying…' : 'Point the camera at the ticket QR code.'}</p>
+                <p className="text-center text-[12px] text-[#E7D5A4]/45 mt-3">{busy ? 'Verifying…' : pending ? 'Select who is here above.' : 'Point the camera at the booking QR code.'}</p>
               </div>
             ) : mode === 'manual' && (
               <div className="flex flex-col gap-2">
@@ -254,18 +427,32 @@ function CheckInWorkspace() {
                 {searching && <div className="text-[12px] text-[#E7D5A4]/45 px-1">Searching…</div>}
                 {!searching && q && matches.length === 0 && <div className="text-[13px] text-[#E7D5A4]/50 px-1 py-3">No attendees found for "{q}".</div>}
                 <ul className="flex flex-col gap-2">
-                  {matches.map((t) => (
-                    <li key={t.ticket_id} className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3 flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[15px] text-[#EFE2C0] truncate">{t.attendee_name}</div>
-                        <div className="font-mono text-[11.5px] text-[#E7D5A4]/50">{t.ticket_number} · {TIER_NAME[t.tier] || 'General'}</div>
-                      </div>
-                      {t.ticket_status === 'checked_in' ? <Badge status="checked_in">In {fmt.time(t.checked_in_at)}</Badge>
-                        : t.ticket_status === 'cancelled' ? <Badge status="cancelled" />
-                        : t.booking_status !== 'confirmed' ? <Badge status={t.booking_status} />
-                        : <Button variant="success" size="lg" disabled={busy} onClick={() => run(t.token, 'manual', t.attendee_name)}>Check in</Button>}
-                    </li>
-                  ))}
+                  {bookings.map((t) => {
+                    const state = partyState(t.party_checked_in, t.party_size);
+                    const open = t.booking_status === 'confirmed' && t.party_remaining > 0 && t.group_token;
+                    return (
+                      <li key={t.booking_id} data-manual-booking={t.registration_code} className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3 flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[15px] text-[#EFE2C0] truncate">{t.party_size === 1 ? (t.guest_name || t.attendee_name) : t.attendee_name}</div>
+                          <div className="font-mono text-[11.5px] text-[#E7D5A4]/50">{t.registration_code} · {t.party_size} attendee{t.party_size === 1 ? '' : 's'} · {TIER_NAME[t.tier] || 'General'}</div>
+                          {t.party_size > 0 && (
+                            <div className="text-[12.5px] text-[#E7D5A4]/75 mt-0.5 flex flex-wrap items-center gap-x-2">
+                              <span><span className="tabular-nums">{t.party_checked_in} / {t.party_size}</span> checked in{t.party_remaining > 0 && t.party_checked_in > 0 ? ` · ${t.party_remaining} remaining` : ''}</span>
+                              {state && <span className="inline-flex items-center gap-1 text-[11px]"><Icon name={state.icon} size={12} />{state.label}</span>}
+                            </div>
+                          )}
+                        </div>
+                        {t.booking_status !== 'confirmed' ? <Badge status={t.booking_status} />
+                          : !t.party_size ? <Badge status="cancelled" />
+                          : !open ? <Badge tone={state.tone}>{state.label}</Badge>
+                          : t.party_size === 1
+                            // One named person: one tap, same server function.
+                            ? <Button variant="success" size="lg" disabled={busy} onClick={() => run(t.group_token, 'manual', t.guest_name || t.attendee_name, [t.ticket_id])}>Check in</Button>
+                            : <Button variant="success" size="lg" disabled={busy} onClick={() => openGroup(t.group_token, 'manual', t.attendee_name)}
+                                aria-label={`Select attendees for ${t.registration_code} (${t.party_remaining} pending)`}>Select…</Button>}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
@@ -274,9 +461,9 @@ function CheckInWorkspace() {
               <section className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md">
                 <h2 className="px-4 py-2.5 border-b border-[#C99A2E]/15 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#C99A2E] m-0">Recent check-ins</h2>
                 <ul className="divide-y divide-[#E7D5A4]/[0.06]">
-                  {recent.map((c) => (
-                    <li key={c.id} className="px-4 py-2 flex items-center gap-2 text-[13px]">
-                      <span className="flex-1 min-w-0 truncate">{c.attendee_name} <span className="text-[#E7D5A4]/40 font-mono text-[11px]">{c.ticket_number}</span></span>
+                  {arrivals.map((c) => (
+                    <li key={c.batch_id || c.id} className="px-4 py-2 flex items-center gap-2 text-[13px]">
+                      <span className="flex-1 min-w-0 truncate">{c.names.join(', ')} <span className="text-[#E7D5A4]/40 font-mono text-[11px]">{c.registration_code}</span></span>
                       {c.method === 'manual' && <Badge status="manual" />}
                       <span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.time(c.checked_in_at)}</span>
                     </li>
