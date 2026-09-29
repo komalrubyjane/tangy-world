@@ -141,6 +141,11 @@ select tt.check((artist_profile_completion() ->> 'done')::int = 9 and artist_pro
 select tt.login('00000000-0000-0000-0000-0000000c0006');
 select tt.expect_error($$select artist_profile_completion('00000000-0000-0000-0000-00000000ac01')$$, '%do not have access%', 'another artist cannot read someone else''s completion');
 
+select tt.login('00000000-0000-0000-0000-0000000c0005');
+select tt.expect_error($$insert into artist_availability (artist_id, date, status) values ('00000000-0000-0000-0000-00000000ac01', current_date + 2, 'unavailable')$$, '%confirmed performance on this date%', 'artist cannot overwrite a booked date with availability');
+insert into artist_availability (artist_id, date, status) values ('00000000-0000-0000-0000-00000000ac01', current_date + 5, 'tentative');
+select tt.check((select status from artist_availability where artist_id = '00000000-0000-0000-0000-00000000ac01' and date = current_date + 5) = 'tentative', 'artist sets availability on a free date');
+
 \echo '--- 3. Media curation'
 select tt.login('00000000-0000-0000-0000-0000000c0005');
 insert into artist_media (id, artist_id, storage_path, file_name, media_type, status)
@@ -149,6 +154,7 @@ select tt.expect_error($$update artist_media set status = 'approved' where id = 
 select tt.expect_error($$insert into artist_media (artist_id, storage_path, file_name, status) values ('00000000-0000-0000-0000-00000000ac01', 'x/y.mp3', 'y.mp3', 'approved')$$, '%starts as uploaded%', 'artist cannot insert pre-approved media');
 update artist_media set status = 'under_review' where id = '00000000-0000-0000-0000-0000000d0001';
 select tt.check((select status from artist_media) = 'under_review', 'artist submits media for review');
+select tt.check(tt.notes('00000000-0000-0000-0000-0000000c0002', 'media.submitted') = 1, 'curators notified when media is submitted for review');
 select tt.login('00000000-0000-0000-0000-0000000c0002');
 update artist_media set status = 'approved', review_note = 'Lovely' where id = '00000000-0000-0000-0000-0000000d0001';
 select tt.check((select reviewed_by from artist_media) = '00000000-0000-0000-0000-0000000c0002' and tt.notes('00000000-0000-0000-0000-0000000c0005', 'media.reviewed') = 1, 'curator approves; reviewer stamped; artist notified');

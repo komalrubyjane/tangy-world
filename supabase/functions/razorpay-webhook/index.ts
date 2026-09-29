@@ -16,7 +16,9 @@
 // Razorpay dashboard under Settings -> Webhooks -> your webhook -> recent
 // deliveries. In particular, confirm `payload.payment.entity.order_id` is
 // actually present on a `payment.failed` event the same way it is on
-// `payment.captured` — this was not verified against a live payload.
+// `payment.captured` — this was not verified against a live payload. The
+// same applies to `payment.authorized` and `refund.processed` (amounts are in
+// paise; `payment.entity.amount_refunded` is used when present).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 async function hmacSha256Hex(secret: string, message: string): Promise<string> {
@@ -78,20 +80,29 @@ Deno.serve(async (req) => {
     }
 
     const orderId = paymentEntity?.order_id ?? orderEntity?.id;
+    const refundEntity = payload.payload?.refund?.entity;
+    const now = new Date().toISOString();
+    const failures: string[] = [];
+
     if ((eventType === 'payment.captured' || eventType === 'order.paid') && orderId) {
+      // Includes bookings that expired before the payment landed: moving
+      // expired -> confirmed fires flag_late_payment (0020), which audits and
+      // alerts payments staff to review capacity.
       const { data: confirmedBookings, error: updateError } = await admin
         .from('bookings')
         .update({
           status: 'confirmed',
           razorpay_payment_id: paymentEntity?.id ?? null,
           razorpay_signature_verified: true,
+          payment_status: 'captured',
+          payment_updated_at: now,
         })
         .eq('razorpay_order_id', orderId)
         .neq('status', 'confirmed')
         .select('id');
 
       if (updateError) {
-        console.error('razorpay-webhook: booking update failed', updateError);
+        failures.push(`booking update failed: ${updateError.message}`);
       } else {
         // This is the authoritative confirmation path — independent of
         // whether the client's own razorpay-verify-payment call ever ran
@@ -100,20 +111,47 @@ Deno.serve(async (req) => {
         // these same tickets, and safe against this same webhook retrying.
         for (const b of confirmedBookings ?? []) {
           const { error: ticketError } = await admin.rpc('confirm_booking_and_issue_tickets', { p_booking_id: b.id });
-          if (ticketError) console.error('razorpay-webhook: ticket issuance failed', b.id, ticketError);
+          if (ticketError) failures.push(`ticket issuance failed for ${b.id}: ${ticketError.message}`);
         }
       }
+    } else if (eventType === 'payment.authorized' && orderId) {
+      const { error } = await admin.from('bookings')
+        .update({ payment_status: 'authorized', payment_updated_at: now })
+        .eq('razorpay_order_id', orderId).eq('payment_status', 'created');
+      if (error) failures.push(`authorize update failed: ${error.message}`);
     } else if (eventType === 'payment.failed' && orderId) {
       const { error: failError } = await admin
         .from('bookings')
-        .update({ status: 'failed' })
+        .update({ status: 'failed', payment_status: 'failed', payment_updated_at: now })
         .eq('razorpay_order_id', orderId)
         .eq('status', 'pending'); // never overwrite an already-confirmed booking
 
-      if (failError) console.error('razorpay-webhook: booking fail-update failed', failError);
+      if (failError) failures.push(`booking fail-update failed: ${failError.message}`);
+    } else if ((eventType === 'refund.processed' || eventType === 'refund.created') && (refundEntity?.payment_id || paymentEntity?.id)) {
+      // Refunds are issued manually in the Razorpay dashboard. This only
+      // mirrors the refunded amount onto the booking for reporting; the
+      // booking's status changes when an admin records the refund.
+      const paymentId = refundEntity?.payment_id ?? paymentEntity?.id;
+      const refunded = Number(paymentEntity?.amount_refunded ?? refundEntity?.amount ?? 0);
+      const total = Number(paymentEntity?.amount ?? 0);
+      const { error } = await admin.from('bookings')
+        .update({
+          refunded_amount: Math.round(refunded / 100),
+          payment_status: total > 0 && refunded < total ? 'partially_refunded' : 'refunded',
+          payment_updated_at: now,
+        })
+        .eq('razorpay_payment_id', paymentId);
+      if (error) failures.push(`refund mirror failed: ${error.message}`);
     }
 
-    await admin.from('payment_webhook_events').update({ processed: true }).eq('event_id', eventId);
+    if (failures.length) {
+      console.error('razorpay-webhook: processing failed', eventId, failures);
+      // Stored on the event + alerts payments.view holders; Razorpay gets 200
+      // because the event is already recorded (a retry would be a duplicate).
+      await admin.rpc('record_webhook_failure', { p_event_id: eventId, p_error: failures.join('; ') });
+    } else {
+      await admin.from('payment_webhook_events').update({ processed: true, processed_at: now }).eq('event_id', eventId);
+    }
 
     return new Response('ok', { status: 200 });
   } catch (err) {

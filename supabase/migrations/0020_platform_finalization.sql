@@ -210,6 +210,27 @@ alter table event_artist_details
   add column if not exists hotel text,
   add column if not exists transport_notes text;
 
+-- Booked dates belong to the confirmed performance: an artist cannot mark
+-- them available/tentative/unavailable (admins still can, e.g. to correct data).
+create or replace function guard_artist_availability()
+returns trigger
+language plpgsql security definer set search_path = public
+as $$
+begin
+  if is_admin() or coalesce(auth.role(), '') not in ('authenticated', 'anon') then
+    return new;
+  end if;
+  if exists (select 1 from event_artists ea join events e on e.id = ea.event_id
+             where ea.artist_id = new.artist_id and e.event_date = new.date and e.status <> 'cancelled') then
+    raise exception 'You have a confirmed performance on this date, so its availability can''t be changed.';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists artist_availability_guard on artist_availability;
+create trigger artist_availability_guard before insert or update on artist_availability
+  for each row execute function guard_artist_availability();
+
 -- ===========================================================================
 -- 5. MEDIA CURATION
 -- ===========================================================================
@@ -277,6 +298,11 @@ drop trigger if exists guard_artist_media_status on artist_media;
 drop policy if exists "artist_media: curators" on artist_media;
 create policy "artist_media: curators" on artist_media for all
   using (has_permission('entities.manage')) with check (has_permission('entities.manage'));
+-- Curators preview files through signed URLs, which Storage only issues to
+-- callers passing the SELECT policy (0013 allowed only is_admin()).
+drop policy if exists "artist-media: curators read" on storage.objects;
+create policy "artist-media: curators read" on storage.objects for select to authenticated
+  using (bucket_id = 'artist-media' and public.has_permission('entities.manage'));
 
 -- ===========================================================================
 -- 6. BOOKING REQUESTS (assignment_requests)
@@ -889,6 +915,7 @@ as $$
     ('application.approved',    'applications', 'applications',         'important', false, true),
     ('application.rejected',    'applications', 'applications',         'normal',    false, true),
     ('media.reviewed',          'events',       'document_updates',     'normal',    false, false),
+    ('media.submitted',         'events',       'document_updates',     'normal',    false, false),
     ('asset.submitted',         'events',       'document_updates',     'normal',    false, false),
     ('asset.reviewed',          'events',       'document_updates',     'normal',    true,  false),
     ('invoice.issued',          'payments',     'payment_updates',      'normal',    true,  false),
@@ -1298,7 +1325,11 @@ returns trigger
 language plpgsql security definer set search_path = public
 as $$
 begin
-  if new.status is distinct from old.status and new.status in ('approved', 'rejected') then
+  if new.status = 'under_review' and (tg_op = 'INSERT' or old.status is distinct from 'under_review') then
+    perform notify_permission_holders('entities.manage', 'media.submitted',
+      'Media to review: ' || coalesce(new.title, new.file_name), (select name from artists where id = new.artist_id),
+      '/admin-portal/reviews');
+  elsif tg_op = 'UPDATE' and new.status is distinct from old.status and new.status in ('approved', 'rejected') then
     perform notify((select user_id from artists where id = new.artist_id), 'media.reviewed',
       case when new.status = 'approved' then 'Media approved: ' else 'Media not approved: ' end || coalesce(new.title, new.file_name),
       new.review_note, '/artist/media');
@@ -1307,7 +1338,7 @@ begin
 end;
 $$;
 drop trigger if exists artist_media_review_notify on artist_media;
-create trigger artist_media_review_notify after update of status on artist_media
+create trigger artist_media_review_notify after insert or update of status on artist_media
   for each row execute function notify_on_media_review();
 
 create or replace function notify_on_sponsor_asset()
@@ -1318,7 +1349,7 @@ begin
   if tg_op = 'INSERT' then
     perform notify_permission_holders('entities.manage', 'asset.submitted',
       'Brand asset submitted: ' || new.title, (select coalesce(organization_name, '') from sponsor_profiles where id = new.sponsor_id),
-      '/admin-portal/people/sponsors');
+      '/admin-portal/reviews?tab=assets');
   elsif new.status is distinct from old.status and new.status in ('approved', 'changes_requested') then
     perform notify(new.sponsor_id, 'asset.reviewed',
       case when new.status = 'approved' then 'Brand asset approved: ' else 'Changes requested: ' end || new.title,
@@ -1893,6 +1924,75 @@ begin
    order by c.last_message_at desc nulls last limit n);
 end;
 $$;
+
+-- Portal events gain timezone, doors, structured hospitality/travel, vendor
+-- access and venue access details (0018's version plus these columns).
+drop function if exists my_portal_events(boolean);
+create or replace function my_portal_events(p_include_past boolean default false)
+returns table (
+  event_id uuid, name text, event_date date, event_time text, end_time text, event_status text,
+  image_url text, description text, venue_name text, venue_address text, venue_city text,
+  member_kind text, responsibility text, assignment_id uuid, assignment_status text,
+  call_time timestamptz, starts_at timestamptz, ends_at timestamptz, soundcheck_at timestamptz,
+  instructions text, hospitality text, travel text, fee_amount integer, fee_status text,
+  open_requirements integer, tangy_contact text,
+  timezone text, doors_at timestamptz, wrap_at timestamptz, accommodation text, meals text, green_room text, rider_notes text,
+  pickup text, dropoff text, hotel text, transport_notes text, setup_at timestamptz, breakdown_at timestamptz,
+  loading_access text, venue_access text, onsite_contact text, team text, package text,
+  venue_access_info text, venue_parking text, venue_loading_bay text, venue_map_url text
+)
+language sql stable security definer set search_path = public
+as $$
+  with mine as (
+    select ea.event_id, 'artist'::text as kind, 'Performing artist'::text as resp, null::uuid as asg_id, 'confirmed'::text as asg_status,
+           d.call_time, d.performance_start as starts_at, d.performance_end as ends_at, d.soundcheck_at,
+           d.instructions, d.hospitality, d.travel, d.fee_amount, coalesce(d.fee_status, 'not_applicable') as fee_status,
+           d.wrap_at, d.accommodation, d.meals, d.green_room, d.rider_notes, d.pickup, d.dropoff, d.hotel, d.transport_notes,
+           null::timestamptz as setup_at, null::timestamptz as breakdown_at, null::text as loading_access, null::text as venue_access,
+           null::text as onsite_contact, null::text as team, null::text as package
+    from event_artists ea
+    join artists a on a.id = ea.artist_id and a.user_id = auth.uid() and a.status = 'approved'
+    left join event_artist_details d on d.event_id = ea.event_id and d.artist_id = ea.artist_id
+    union all
+    select x.event_id, x.assignee_role, x.title, x.id, x.status::text, x.call_time, x.starts_at, x.ends_at, null,
+           x.instructions, null, null, x.fee_amount, x.fee_status,
+           null, null, null, null, null, null, null, null, null,
+           x.setup_at, x.breakdown_at, x.loading_access, x.venue_access, x.onsite_contact, x.team, x.package
+    from event_assignments x
+    where x.assignee_id = auth.uid() and x.status <> 'declined'
+    union all
+    select e.id, 'venue', 'Venue host', null, 'confirmed', null, null, null, null, null, null, null, null, 'not_applicable',
+           null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null
+    from events e left join venues v on v.id = e.venue_id
+    where e.venue_partner_id = auth.uid() or v.partner_profile_id = auth.uid()
+    union all
+    select distinct sd.event_id, 'sponsor', 'Sponsor', null::uuid, 'confirmed', null::timestamptz, null::timestamptz, null::timestamptz,
+           null::timestamptz, null, null, null, null::int, 'not_applicable',
+           null::timestamptz, null, null, null, null, null, null, null, null, null::timestamptz, null::timestamptz, null, null, null, null, null
+    from sponsor_deliverables sd
+    where sd.sponsor_profile_id = auth.uid() and sd.event_id is not null
+      and not exists (select 1 from event_assignments x where x.event_id = sd.event_id and x.assignee_id = auth.uid()
+                      and x.assignee_role = 'sponsor' and x.status <> 'declined')
+  )
+  select e.id, e.name, e.event_date, e.event_time, e.end_time, e.status, e.image_url, e.description,
+         coalesce(v.name, e.venue), v.address, v.city,
+         m.kind, m.resp, m.asg_id, m.asg_status, m.call_time, m.starts_at, m.ends_at, m.soundcheck_at,
+         m.instructions, m.hospitality, m.travel, m.fee_amount, m.fee_status,
+         (select count(*)::int from event_requirements r where r.event_id = e.id and r.user_id = auth.uid()
+            and r.status in ('requested', 'changes_requested')),
+         (select coalesce(p.full_name, 'Tangy team') from profiles p where p.id = e.created_by),
+         e.timezone, e.doors_at, m.wrap_at, m.accommodation, m.meals, m.green_room, m.rider_notes,
+         m.pickup, m.dropoff, m.hotel, m.transport_notes, m.setup_at, m.breakdown_at,
+         m.loading_access, m.venue_access, m.onsite_contact, m.team, m.package,
+         v.access_info, v.parking, v.loading_bay, v.map_url
+  from mine m
+  join events e on e.id = m.event_id
+  left join venues v on v.id = e.venue_id
+  where exists (select 1 from profiles where id = auth.uid() and is_active)
+    and (p_include_past or e.event_date >= current_date - 1)
+  order by e.event_date, e.name;
+$$;
+grant execute on function my_portal_events(boolean) to authenticated;
 
 -- ===========================================================================
 -- 19. SCHEDULING (pg_cron when available; every job is also safe to call manually)

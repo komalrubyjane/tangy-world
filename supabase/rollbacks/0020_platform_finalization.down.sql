@@ -28,6 +28,7 @@ end $$;
 
 -- Triggers added to existing tables
 drop trigger if exists events_validate_timezone on events;
+drop trigger if exists artist_availability_guard on artist_availability;
 drop trigger if exists events_notify_change on events;
 drop trigger if exists artist_media_guard on artist_media;
 drop trigger if exists artist_media_review_notify on artist_media;
@@ -62,6 +63,7 @@ drop policy if exists "sponsor-assets: delete" on storage.objects;
 drop policy if exists "artists: partner managers read" on artists;
 create policy "artists: public read approved" on artists for select using (status = 'approved');
 drop policy if exists "artist_media: curators" on artist_media;
+drop policy if exists "artist-media: curators read" on storage.objects;
 drop policy if exists "venues: hosts read own" on venues;
 drop policy if exists "event_tasks: event staff read" on event_tasks;
 drop policy if exists "event_tasks: event staff update" on event_tasks;
@@ -150,6 +152,7 @@ drop function if exists create_booking_request(uuid, uuid, text, timestamptz, ti
 drop function if exists guard_artist_media();
 drop function if exists artist_profile_completion(uuid);
 drop function if exists validate_event_timezone();
+drop function if exists guard_artist_availability();
 drop function if exists setting_number(text, numeric);
 
 -- Functions restored to their 0018 signatures
@@ -397,6 +400,59 @@ begin
   return new;
 end;
 $$;
+
+-- Restore 0018's my_portal_events
+drop function if exists my_portal_events(boolean);
+create or replace function my_portal_events(p_include_past boolean default false)
+returns table (
+  event_id uuid, name text, event_date date, event_time text, end_time text, event_status text,
+  image_url text, description text, venue_name text, venue_address text, venue_city text,
+  member_kind text, responsibility text, assignment_id uuid, assignment_status text,
+  call_time timestamptz, starts_at timestamptz, ends_at timestamptz, soundcheck_at timestamptz,
+  instructions text, hospitality text, travel text, fee_amount integer, fee_status text,
+  open_requirements integer, tangy_contact text
+)
+language sql stable security definer set search_path = public
+as $$
+  with mine as (
+    select ea.event_id, 'artist'::text as kind, 'Performing artist'::text as resp, null::uuid as asg_id, 'confirmed'::text as asg_status,
+           d.call_time, d.performance_start as starts_at, d.performance_end as ends_at, d.soundcheck_at,
+           d.instructions, d.hospitality, d.travel, d.fee_amount, coalesce(d.fee_status, 'not_applicable') as fee_status
+    from event_artists ea
+    join artists a on a.id = ea.artist_id and a.user_id = auth.uid() and a.status = 'approved'
+    left join event_artist_details d on d.event_id = ea.event_id and d.artist_id = ea.artist_id
+    union all
+    select x.event_id, x.assignee_role, x.title, x.id, x.status::text, x.call_time, x.starts_at, x.ends_at, null,
+           x.instructions, null, null, x.fee_amount, x.fee_status
+    from event_assignments x
+    where x.assignee_id = auth.uid() and x.status <> 'declined'
+    union all
+    select e.id, 'venue', 'Venue host', null, 'confirmed', null, null, null, null, null, null, null, null, 'not_applicable'
+    from events e left join venues v on v.id = e.venue_id
+    where e.venue_partner_id = auth.uid() or v.partner_profile_id = auth.uid()
+    union all
+    select distinct sd.event_id, 'sponsor', 'Sponsor', null::uuid, 'confirmed', null::timestamptz, null::timestamptz, null::timestamptz,
+           null::timestamptz, null, null, null, null::int, 'not_applicable'
+    from sponsor_deliverables sd
+    where sd.sponsor_profile_id = auth.uid() and sd.event_id is not null
+      and not exists (select 1 from event_assignments x where x.event_id = sd.event_id and x.assignee_id = auth.uid()
+                      and x.assignee_role = 'sponsor' and x.status <> 'declined')
+  )
+  select e.id, e.name, e.event_date, e.event_time, e.end_time, e.status, e.image_url, e.description,
+         coalesce(v.name, e.venue), v.address, v.city,
+         m.kind, m.resp, m.asg_id, m.asg_status, m.call_time, m.starts_at, m.ends_at, m.soundcheck_at,
+         m.instructions, m.hospitality, m.travel, m.fee_amount, m.fee_status,
+         (select count(*)::int from event_requirements r where r.event_id = e.id and r.user_id = auth.uid()
+            and r.status in ('requested', 'changes_requested')),
+         (select coalesce(p.full_name, 'Tangy team') from profiles p where p.id = e.created_by)
+  from mine m
+  join events e on e.id = m.event_id
+  left join venues v on v.id = e.venue_id
+  where exists (select 1 from profiles where id = auth.uid() and is_active)
+    and (p_include_past or e.event_date >= current_date - 1)
+  order by e.event_date, e.name;
+$$;
+grant execute on function my_portal_events(boolean) to authenticated;
 
 -- Restore 0008's respond_to_assignment_request (as originally written)
 create or replace function respond_to_assignment_request(p_request_id uuid, p_accept boolean)
