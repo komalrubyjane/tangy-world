@@ -154,13 +154,61 @@ original unnamed constraint, which wasn't verified against a live database.
 17. `migrations/0017_admin_system.sql` — role-based admin system: `role_permissions` (Super Admin / Admin / Staff permission matrix, `has_permission()` / `my_permissions()`), append-only `audit_logs`, event-scoped staff access (fixes staff previously having global access), `venues`, `announcements`, `system_settings`, admin booking/refund/ticket RPCs, `check_in_ticket()` event authorization, and dashboard/report RPCs. Reverse: `rollbacks/0017_admin_system.down.sql`.
 18. `migrations/0018_operations_platform.sql` — operations platform: partner portal data (`event_member_kind()`, `my_portal_events()`, private `event_artist_details`, `event_requirements`, link-based `event_documents`, partner/volunteer announcement audiences — and closes the old `audience <> 'staff'` public-read policy), central `notifications` with triggers, partner ↔ admin messaging (`start_partner_conversation` / `send_message` / inboxes; no user-to-user messaging), time-boxed volunteer check-in (`temporary_access`, `access_requests`, grant/revoke/request RPCs; `check_in_ticket()` honours an active grant for that event only), artist approval now activates the `artist` role, event command center, platform analytics, and `set_role_permission()`. Reverse: `rollbacks/0018_operations_platform.down.sql`. **Optional:** with the `pg_cron` extension enabled, 0018 schedules `log_expired_access()` every 5 minutes to write `access.expired` audit rows; access itself ends at `expires_at` regardless.
 
-Database tests for 0017/0018 live in `tests/` and run against a local stack with `scripts/test-db.sh` (never production).
+19. `migrations/0019_platform_enum_values.sql` — adds `'expired'` to `booking_status` and `assignment_status` (own file: a new enum value can't be used in the transaction that adds it). Reverse: `rollbacks/0019_platform_enum_values.down.sql` (a no-op by design — Postgres can't drop an enum value; 0020's rollback moves every row off `'expired'` first).
+20. `migrations/0020_platform_finalization.sql` — platform finalization (additive; no historical migration edited, no existing row deleted). Reverse: `rollbacks/0020_platform_finalization.down.sql`. Details in [0019–0022 in detail](#0019-0022-in-detail) below.
+21. `migrations/0021_canonical_admin_links.sql` — new notifications and queued emails link to `/admin-portal/...` instead of the legacy `/admin/...`. Reverse: `rollbacks/0021_canonical_admin_links.down.sql`.
+22. `migrations/0022_artist_storage_policies.sql` — fixes the artist-media / artist-avatars ownership policies from 0013 (artists could not use their own files). Reverse: `rollbacks/0022_artist_storage_policies.down.sql`.
+
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+
+### Production application order (0017 → 0022)
+
+None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
+
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql`
+
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+
+### 0019–0022 in detail
+
+**0020 — platform finalization**
+
+- **Schema / features**: `system_settings` for checkout hold, reminder lead time and booking-request deadline; `events.timezone` and `events.doors_at`; private `artist_private_profiles` (phone, rider, hospitality — never public) and admin-only `artist_admin_notes`; server-computed `artist_profile_completion()`; the `public_artists` view (the public site reads this — it **closes the old public read of artist email**); structured artist logistics on `event_artist_details`; artist media curation (`media_type`, `uploaded → under_review → approved/rejected`, `archived`; the `guard_artist_media` trigger stops artists approving their own media); booking requests with proposed slot, fee offer, deadline and expiry (`create_booking_request`, `respond_to_booking_request`, `my_booking_requests`); requirement priority, close and attachments; document categories, descriptions and expiry; sponsor package, deliverable kinds and `sponsor_assets`; vendor/venue setup, breakdown, loading/venue access and on-site contact; event-scoped volunteer teams and team-targeted announcements; event-level tasks with blocked/urgent states and a completion trail; `partner_invoices` (drafts internal; partners see only their own issued/paid/void rows); conversation priority and assignment; server-side expiry of stale pending checkouts (`expire_stale_bookings`), payment states and late-payment reconciliation (`flag_late_payment`, `record_webhook_failure`); rule-based `event_health()`, `admin_operations_overview()` and `admin_search()`.
+- **Notifications**: `notifications.category` / `priority`; per-user `notification_preferences` (in-app and email per category, plus a master email switch) checked server-side by `notify()` — critical notices (cancellations, revoked access, payment failures) are always delivered in-app; `email_outbox` queue with de-duplication (chat: one email per thread per 15 min), drained by the `send-notification-emails` Edge Function; new triggers for schedule, document, booking-request, requirement, media-review, sponsor-asset and invoice events; `notify()` is callable only by `service_role` and SECURITY DEFINER code.
+- **Storage** (private buckets, 25 MB limit, served only through short-lived signed URLs — Storage signs a URL only for callers passing the bucket's SELECT policy):
+  - `event-documents` — `events/<event_id>/...` written by `events.manage` holders; `requirements/<requirement_id>/...` written by the requirement's recipient while it's open. Read = `can_read_event_file()`: the same audience rules as the `event_documents` row (one person / everyone on the event / one member kind), honouring `expires_at`.
+  - `sponsor-assets` — `<sponsor_user_id>/...`; a sponsor uploads and reads only their own folder; `entities.manage` holders review.
+  - `artist-media` — adds a curator read policy (`entities.manage`) so curators can preview.
+- **Scheduled jobs**: `run_platform_jobs()` (service_role only) expires stale checkouts and unanswered booking requests, sends event reminders, overdue-task and expiring-access notices, and logs expired access. If `pg_cron` is available 0020 schedules it every 5 minutes as `tangy-platform-jobs`; otherwise schedule `select public.run_platform_jobs()` externally. Every job is idempotent.
+- **Rollback**: `rollbacks/0020_platform_finalization.down.sql` restores every function/policy 0020 replaced to its 0011/0016/0018 definition and **drops** 0020's tables (private artist profiles, admin notes, sponsor assets, partner invoices, notification preferences, email outbox, reminder log — export them first if needed). Rows that only exist because of 0020 are adjusted so older constraints fit (expired bookings/requests → cancelled, closed requirements → accepted, blocked tasks → pending, urgent → high, event-level tasks and storage-backed documents deleted, media statuses mapped back). The `event-documents` and `sponsor-assets` buckets stay (private, with no policies — inaccessible); remove their objects through the Storage API/dashboard before deleting them. Run 0022's and 0021's rollbacks first.
+
+**0021 — canonical console links.** Every in-app notification and queued email goes through `notify()`; 0021 rewrites `/admin`, `/admin/...`, `/admin?...` and `/admin#...` links to `/admin-portal/...` there (helper `canonical_console_link()`), which covers the 0018 generators that still built legacy links (assignment, task, application, message, volunteer access request). Existing rows are **not** rewritten; the app's `/admin/*` → `/admin-portal/*` redirect keeps them working. Rollback restores 0020's `notify()` and drops the helper.
+
+**0022 — artist storage ownership.** 0013's "self" policies on `artist-media` and `artist-avatars` compared the first path segment with `artists.name` (the unqualified `name` inside the subquery resolved to the artist's display name, not the object path), so artists could never upload, preview (sign) or delete their own media or avatar. It failed closed — no one else gained access. 0022 recreates the six policies with `objects.name` qualified (`<artist_id>/<file>`, artist row owned by `auth.uid()`), scoped to `authenticated`, and adds an owner SELECT policy on the **public** avatars bucket so upsert/remove work (no new visibility — avatars are public by design). Admin and curator policies are unchanged. Rollback restores 0013's definitions exactly — i.e. the broken behaviour.
 
 ## What's NOT covered by these migrations
 
 - Diary and Archive content are still static/editorial (`src/data/mockData.js` and the section components) — no CMS tables were added for them in this pass, since the existing authored content was already complete and doesn't need frequent editing.
-- Messaging is partner ↔ Tangy admin (0018), protected by TLS in transit and RLS at rest. It is deliberately **not** end-to-end encrypted — admins must read and reply. File attachments and document uploads are not connected (documents are https links).
-- **Pending-booking expiry**: `create_pending_booking()` counts `pending` bookings against capacity (correctly, to reserve inventory during checkout) but nothing ever expires an abandoned pending booking — someone who starts checkout and never pays holds that inventory indefinitely. No cron/scheduled Edge Function was added for this pass; a real fix needs one (e.g. expire pending bookings older than ~30 minutes, matching the "pending booking expiration if already supported" note in the spec this was built against — it wasn't already supported, and wasn't added here).
-- **Refunds**: 0017 records refunds made in the Razorpay dashboard (`admin_record_refund`); it does not move money through the Razorpay API.
+- Messaging is partner ↔ Tangy admin (0018), protected by TLS in transit and RLS at rest. It is deliberately **not** end-to-end encrypted — authorized admins read and reply. There is no partner-to-partner messaging and no file attachments inside chat (documents are shared through the event's Documents tab, 0020).
+- **Pending-booking expiry** is handled since 0020 (`expire_stale_bookings()`, run by `run_platform_jobs()` and before every new checkout) — but only if the jobs are actually scheduled (pg_cron or an external scheduler, see 0020 above).
+- **Refunds**: 0017 records refunds made in the Razorpay dashboard (`admin_record_refund`); it does not move money through the Razorpay API. The webhook (0020) only mirrors the refunded amount and payment state for reporting.
 - **Ticket cancellation**: available to admins since 0017 (`admin_cancel_ticket`).
-- **Email for 0018 events** (messages, access grants, requirements): in-app notifications only; no new emails are sent.
+- **Notification email** needs `send-notification-emails` deployed and scheduled (section 7); until then `email_outbox` rows simply wait and in-app notifications still work.
+
+## 7. Notification emails and scheduled jobs (0020)
+
+`send-notification-emails` drains `email_outbox` (claimed with `FOR UPDATE SKIP LOCKED`, retried up to 5 times, then marked `failed` for admins to see in the email delivery log). It never accepts an end-user session: callers must send either `Authorization: Bearer <service_role key>` or `x-cron-secret: <CRON_SECRET>`.
+
+```
+supabase functions deploy send-notification-emails --no-verify-jwt   # it checks the service key / CRON_SECRET itself
+supabase secrets set CRON_SECRET=<long random string> SITE_URL=https://tangysessions.com
+# RESEND_API_KEY / RESEND_FROM_EMAIL as in section 5 (shared by every email function)
+```
+
+Schedule a `POST` to the function every minute or two (Supabase dashboard → Integrations → Cron → HTTP request, or any external scheduler) with the `x-cron-secret` header. Links in emails are `SITE_URL` + the notification's path.
+
+`EMAIL_PROVIDER` (default `resend`) and `MAILPIT_URL` exist **only for local verification** (`EMAIL_PROVIDER=mailpit` delivers to the local stack's Mailpit inbox) — never set them in production.
+
+`run_platform_jobs()` (expiries, reminders, overdue/expiring notices) is scheduled by 0020 itself when `pg_cron` is available; otherwise call `select public.run_platform_jobs()` every 5 minutes with the service role.
+
+Also redeploy `razorpay-webhook` (changed in this pass: records `payment.authorized`, mirrors `refund.processed`/`refund.created`, stores processing failures on the event via `record_webhook_failure()` and alerts `payments.view` holders instead of only logging them). Subscribe the Razorpay webhook to those events too. As before, confirm payload field names against Razorpay's live "recent deliveries" before going live.
