@@ -59,7 +59,7 @@ export const AdminPortalPreviewInner = () => {
   if (!Component) {
     return (
       <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
-        Unknown portal type. <Link to="/admin" className="underline ml-2">Back to Control Room</Link>
+        Unknown portal type. <Link to="/admin-portal" className="underline ml-2">Back to Control Room</Link>
       </div>
     );
   }

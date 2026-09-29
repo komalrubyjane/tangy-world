@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Icon, Button, Badge, Select, Input, Textarea, Field, SearchInput, FilterSelect, Modal, EmptyState, ErrorState, Skeleton, cx, fmt } from '../admin/ui';
+import { Icon, Button, Badge, Select, Input, Textarea, Field, SearchInput, Modal, EmptyState, ErrorState, Skeleton, cx, fmt } from '../admin/ui';
 import { useDebounced } from '../admin/hooks';
 import { list } from '../admin/api';
 import { portalApi, subscribeInserts } from './portalApi';
@@ -15,10 +15,18 @@ import { portalApi, subscribeInserts } from './portalApi';
 const TYPE_LABEL = { artist_support: 'Artist', sponsor_support: 'Sponsor', vendor_support: 'Vendor', venue_support: 'Venue host' };
 const STATUS_LABEL = { open: 'Awaiting Tangy', pending: 'Awaiting partner', resolved: 'Resolved', closed: 'Closed' };
 const STATUS_TONE = { open: 'warn', pending: 'info', resolved: 'good', closed: 'muted' };
+const PRIORITY_LABEL = { normal: 'Normal', high: 'High', urgent: 'Urgent' };
+// Quick views over the admin inbox; each maps onto admin_conversations filters.
+const QUICK = [
+  ['all', 'All', {}], ['artist_support', 'Artists', { type: 'artist_support' }], ['sponsor_support', 'Sponsors', { type: 'sponsor_support' }],
+  ['vendor_support', 'Vendors', { type: 'vendor_support' }], ['venue_support', 'Venue hosts', { type: 'venue_support' }],
+  ['unread', 'Unread', { unreadOnly: true }], ['open', 'Open', { status: 'active' }], ['closed', 'Closed', { status: 'closed' }],
+  ['mine', 'Assigned to me', { assigned: 'me' }], ['unassigned', 'Unassigned', { assigned: 'none' }],
+];
 
 export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events = [], eventFilter }) => {
   const admin = mode === 'admin';
-  const [filters, setFilters] = useState({ type: '', status: '', search: '', unreadOnly: false });
+  const [filters, setFilters] = useState({ quick: 'all', search: '' });
   const search = useDebounced(filters.search, 300);
   const [convs, setConvs] = useState(null);
   const [error, setError] = useState(null);
@@ -29,12 +37,12 @@ export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events =
   useEffect(() => {
     let cancelled = false;
     const load = admin
-      ? portalApi.adminConversations({ ...filters, search: search || null, eventId: eventFilter || null, limit: 50 })
+      ? portalApi.adminConversations({ ...(QUICK.find((q) => q[0] === filters.quick)?.[2] || {}), search: search || null, eventId: eventFilter || null, limit: 50 })
       : portalApi.conversations();
     load.then((rows) => { if (!cancelled) { setConvs(rows); setError(null); } }, (err) => { if (!cancelled) setError(err); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [admin, filters.type, filters.status, filters.unreadOnly, search, eventFilter, reloadKey]);
+  }, [admin, filters.quick, search, eventFilter, reloadKey]);
 
   // Keep the list fresh while the panel is open.
   useEffect(() => {
@@ -57,16 +65,14 @@ export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events =
           {admin && (
             <>
               <SearchInput value={filters.search} onChange={(v) => setFilters((f) => ({ ...f, search: v }))} placeholder="Search partner or subject…" />
-              <div className="flex gap-2">
-                <FilterSelect label="Type" className="flex-1 min-w-0" value={filters.type} onChange={(v) => setFilters((f) => ({ ...f, type: v }))}
-                  options={[{ value: '', label: 'All partners' }, ...Object.entries(TYPE_LABEL).map(([value, label]) => ({ value, label }))]} />
-                <FilterSelect label="Status" className="flex-1 min-w-0" value={filters.status} onChange={(v) => setFilters((f) => ({ ...f, status: v }))}
-                  options={[{ value: '', label: 'Any status' }, ...Object.entries(STATUS_LABEL).map(([value, label]) => ({ value, label }))]} />
+              <div role="tablist" aria-label="Inbox views" className="flex flex-wrap gap-1">
+                {QUICK.map(([k, label]) => (
+                  <button key={k} role="tab" aria-selected={filters.quick === k} onClick={() => setFilters((f) => ({ ...f, quick: k }))}
+                    className={cx('h-6 px-2 rounded-full border font-mono text-[10px] uppercase tracking-[0.06em]', filters.quick === k ? 'border-[#C99A2E] bg-[#C99A2E] text-[#11100C]' : 'border-[#E7D5A4]/20 text-[#ecdcaf]/70')}>
+                    {label}
+                  </button>
+                ))}
               </div>
-              <label className="flex items-center gap-2 text-[12px] text-[#E7D5A4]/65">
-                <input type="checkbox" checked={filters.unreadOnly} onChange={(e) => setFilters((f) => ({ ...f, unreadOnly: e.target.checked }))} className="accent-[#C99A2E]" />
-                Unread only
-              </label>
             </>
           )}
         </div>
@@ -96,6 +102,12 @@ export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events =
                           {!admin && (c.event_name || 'General')}
                           {admin && c.event_name && ` · ${c.event_name}`}
                         </span>
+                        {admin && (c.priority !== 'normal' || c.assigned_admin_name) && (
+                          <span className="flex items-center gap-1.5 mt-1">
+                            {c.priority !== 'normal' && <Badge tone={c.priority === 'urgent' ? 'bad' : 'warn'}>{PRIORITY_LABEL[c.priority]}</Badge>}
+                            {c.assigned_admin_name && <span className="font-mono text-[10px] text-[#E7D5A4]/45 truncate">→ {c.assigned_admin_name}</span>}
+                          </span>
+                        )}
                         <span className="flex items-center justify-between gap-2 mt-1">
                           <span className="truncate text-[12px] text-[#E7D5A4]/50">{c.last_message_preview}</span>
                           {c.unread > 0 && <span className="shrink-0 min-w-5 h-5 px-1.5 rounded-full bg-[#B94717] text-white text-[10.5px] font-mono inline-flex items-center justify-center">{c.unread}</span>}
@@ -180,6 +192,9 @@ const Thread = ({ id, conv, admin, onBack, onChanged }) => {
   const setStatus = async (status) => {
     try { await portalApi.setConversationStatus(id, status); onChanged(); } catch (err) { setSendError(err.message); }
   };
+  const setMeta = async (meta) => {
+    try { await portalApi.setConversationMeta(id, meta); onChanged(); } catch (err) { setSendError(err.message); }
+  };
 
   const lastMine = msgs ? [...msgs].reverse().find((m) => m.is_mine) : null;
   const closed = conv?.status === 'closed';
@@ -207,6 +222,21 @@ const Thread = ({ id, conv, admin, onBack, onChanged }) => {
           </Select>
         )}
       </header>
+      {admin && conv && (
+        <div className="px-4 py-2 border-b border-[#C99A2E]/10 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11.5px] text-[#E7D5A4]/55">
+          <label className="flex items-center gap-1.5">Priority
+            <Select aria-label="Conversation priority" value={conv.priority || 'normal'} onChange={(e) => setMeta({ priority: e.target.value })} className="w-28! h-7 text-[11.5px]">
+              {Object.entries(PRIORITY_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </Select>
+          </label>
+          <span className="flex items-center gap-1.5">
+            {conv.assigned_admin_name ? `Assigned to ${conv.assigned_admin_name}` : 'Unassigned'}
+            <Button size="sm" variant="ghost" icon="UserCheck" onClick={() => setMeta({ assignToMe: true })}>Assign to me</Button>
+            {conv.assigned_admin_id && <Button size="sm" variant="ghost" onClick={() => setMeta({ assignToMe: false })}>Unassign</Button>}
+          </span>
+          <span>Partner last wrote {conv.last_partner_message_at ? fmt.relative(conv.last_partner_message_at) : '—'} · Tangy last replied {conv.last_tangy_reply_at ? fmt.relative(conv.last_tangy_reply_at) : '—'}</span>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 min-h-[300px]" aria-live="polite">
         {error ? <ErrorState error={error} onRetry={load} />

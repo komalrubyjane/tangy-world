@@ -28,38 +28,41 @@ function mapDbEvent(row) {
   };
 }
 
-// Fetches live events from Supabase. Falls back to the site's existing
-// editorial mock events whenever Supabase isn't configured, the query fails,
-// or the table is simply empty (e.g. migrations not applied yet) — so every
-// consumer keeps working exactly as before until the real backend is live.
+// Live events from Supabase. The editorial mock events are used ONLY when the
+// app runs fully offline (AUTH_MODE=mock or no Supabase configured). With a
+// real backend, an empty table shows as empty and a failed query surfaces as
+// `error` — never as fabricated sessions someone could try to book.
+const OFFLINE = isMockAuth || !isSupabaseConfigured;
+
 export function useEvents() {
-  const [events, setEvents] = useState(mockEvents);
-  const [source, setSource] = useState('mock');
-  const [loading, setLoading] = useState(!isMockAuth && isSupabaseConfigured);
+  const [events, setEvents] = useState(OFFLINE ? mockEvents : []);
+  const [source, setSource] = useState(OFFLINE ? 'mock' : 'live');
+  const [loading, setLoading] = useState(!OFFLINE);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // AUTH_MODE === 'mock' (src/config/auth.js) means the whole app runs
-    // fully offline — never hit Supabase here even if env credentials happen
-    // to be present, so every consumer of this hook (Sessions page, Booking
-    // page, Check-in desk) stays network-free in mock mode.
-    if (isMockAuth || !isSupabaseConfigured) return;
+    if (OFFLINE) return;
     let cancelled = false;
 
     supabase
       .from('events')
       .select('*')
       .order('event_date', { ascending: true })
-      .then(({ data, error }) => {
+      .then(({ data, error: err }) => {
         if (cancelled) return;
-        if (!error && data && data.length > 0) {
-          setEvents(data.map(mapDbEvent));
-          setSource('live');
+        if (err) {
+          setError(err);
+          setEvents([]);
+        } else {
+          setEvents((data || []).map(mapDbEvent));
+          setError(null);
         }
+        setSource('live');
         setLoading(false);
       });
 
     return () => { cancelled = true; };
   }, []);
 
-  return { events, source, loading };
+  return { events, source, loading, error };
 }

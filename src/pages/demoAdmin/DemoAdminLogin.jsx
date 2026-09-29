@@ -36,7 +36,7 @@ export const DemoAdminLogin = () => {
         {!demoAdminEnabled ? (
           <div className="flex flex-col gap-4 text-center">
             <p className="text-xs text-[#E7D5A4]/80">Demo mode is not enabled in this build.</p>
-            <button onClick={() => navigate('/admin')} className="w-full bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-bold uppercase tracking-widest py-3 border border-[#11100C]">
+            <button onClick={() => navigate('/admin-portal')} className="w-full bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-bold uppercase tracking-widest py-3 border border-[#11100C]">
               GO TO REAL SIGN IN →
             </button>
           </div>

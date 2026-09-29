@@ -273,7 +273,7 @@ export const Navbar = () => {
 
         {isAdminUser && (
           <button
-            onClick={() => handleNav('/admin')}
+            onClick={() => handleNav('/admin-portal')}
             className="hidden xl:inline-flex font-mono text-[10px] font-bold uppercase tracking-widest text-[#C99A2E] border border-[#C99A2E] px-2.5 py-1 hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
           >
             ADMIN PORTAL
@@ -361,7 +361,7 @@ export const Navbar = () => {
               <button onClick={() => handleNav('/profile')} className="t-btn t-btn-ghost text-[#EFE2C0]">Profile / Passport</button>
             )}
             {isAdminUser && (
-              <button onClick={() => handleNav('/admin')} className="t-btn t-btn-ghost text-[#C89D35]">Admin portal</button>
+              <button onClick={() => handleNav('/admin-portal')} className="t-btn t-btn-ghost text-[#C89D35]">Admin portal</button>
             )}
           </div>
         </div>

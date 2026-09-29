@@ -261,7 +261,7 @@ export const ProfilePage = () => {
                 Full management tools — bookings, events, applications, inbox and more — live in the admin console.
               </p>
               <Link
-                to="/admin"
+                to="/admin-portal"
                 className="shrink-0 bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-mono text-xs font-bold uppercase tracking-widest px-4 py-2.5 border-2 border-[#11100C]"
               >
                 OPEN ADMIN CONSOLE →

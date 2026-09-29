@@ -9,6 +9,9 @@ import { MessageBubble } from '../../components/chat/MessageBubble';
 import { MessageComposer } from '../../components/chat/MessageComposer';
 import { usePartnerPortal, partnerTabs, PartnerSection } from '../../portal/PartnerPortal';
 import { Tabs } from '../../admin/ui';
+import { workspaceApi } from '../services/workspaceApi';
+
+const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'GOOD MORNING' : h < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING'; };
 
 // Inline expandable thread — reuses the same conversation architecture as
 // the Admin Inbox and Tangy Assistant rather than a separate mini chat.
@@ -47,6 +50,9 @@ export const DashboardPage = () => {
   const { playSFX } = useAudio();
   // Artist workspace: performances, schedule, requirements, messages with Tangy, documents, notifications.
   const portal = usePartnerPortal('artist');
+  // Real completion (server-computed from 15 defined fields) — never a placeholder.
+  const [completion, setCompletion] = useState(null);
+  useEffect(() => { workspaceApi.profileCompletion().then(setCompletion, () => setCompletion(null)); }, []);
 
   const quickActions = [
     { label: 'UPDATE BIO', icon: '✍', path: '/artist/profile' },
@@ -120,16 +126,21 @@ export const DashboardPage = () => {
 
       {/* HEADER BANNER */}
       <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-4 sm:p-8 shadow-[6px_6px_0px_#4c1210] sm:shadow-[10px_10px_0px_#4c1210] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-full">
+        <div className="flex items-center gap-4">
+          {user?.avatar
+            ? <img src={user.avatar} alt="" className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-[#191410] shrink-0" />
+            : <span className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#191410] text-[#ecdcaf] font-poster text-2xl inline-flex items-center justify-center shrink-0" aria-hidden="true">{(user?.name || 'A').slice(0, 1)}</span>}
         <div>
           <span className="font-mono text-[8.5px] sm:text-[9px] font-bold text-[#c2272a] tracking-[0.25em] sm:tracking-[0.3em] uppercase">
-            ARTIST WORKSPACE // CONTROL CENTER
+            YOUR TANGY SESSIONS WORKSPACE
           </span>
           <h1 className="font-poster text-3xl sm:text-5xl text-[#191410] leading-none mt-1">
-            WELCOME BACK, <span className="text-[#c2272a]">{user?.name || 'ARTIST'}</span>
+            {greeting()}, <span className="text-[#c2272a]">{user?.name || 'ARTIST'}</span>
           </h1>
           <p className="font-mono text-[10.5px] sm:text-xs text-[#241a12]/80 mt-1 uppercase">
-            {user?.genre || 'Techno / Deep House'} · {user?.city || 'Hyderabad'}
+            {[user?.genre, user?.city].filter(Boolean).join(' · ') || 'Add your genre and city in your profile'}
           </p>
+        </div>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -152,8 +163,8 @@ export const DashboardPage = () => {
 
         <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-3 border-[#191410] p-3 sm:p-4 shadow-[4px_4px_0px_#191410]">
           <span className="font-mono text-[8px] sm:text-[9px] font-bold text-[#241a12]/70 uppercase">PROFILE COMPLETE</span>
-          <p className="font-poster text-3xl sm:text-4xl text-[#2e6834] leading-none my-0.5 sm:my-1">{user?.profileComplete || 85}%</p>
-          <span className="font-mono text-[8px] sm:text-[9px] text-[#241a12]/60 uppercase">HIGH QUALITY PROFILE</span>
+          <p className="font-poster text-3xl sm:text-4xl text-[#2e6834] leading-none my-0.5 sm:my-1">{completion == null ? '—' : `${completion.percent}%`}</p>
+          <span className="font-mono text-[8px] sm:text-[9px] text-[#241a12]/60 uppercase">{completion ? `${completion.done} OF ${completion.total} DETAILS` : 'CALCULATING'}</span>
         </div>
 
         <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-3 border-[#191410] p-3 sm:p-4 shadow-[4px_4px_0px_#191410]">

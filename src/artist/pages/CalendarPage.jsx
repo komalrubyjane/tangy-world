@@ -1,190 +1,172 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useAudio } from '../../audio/AudioContext';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
+import { workspaceApi } from '../services/workspaceApi';
+import { ArtistEventDrawer, performanceIcsItem } from '../components/ArtistEventDrawer';
+import { downloadIcs } from '../../lib/ics';
+import { Button, Badge, ErrorState, cx } from '../../admin/ui';
+import '../calendar.css';
 
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+// Artist scheduling workspace: confirmed performances (with call/soundcheck),
+// tentative booking requests, other Tangy events and self-set availability —
+// all real data. Availability writes are RLS-protected and the database
+// refuses to overwrite a date that has a confirmed performance.
+
+const VIEWS = [['dayGridMonth', 'Month'], ['timeGridWeek', 'Week'], ['listMonth', 'Agenda']];
+const AVAIL = [['available', 'Available'], ['tentative', 'Tentative'], ['unavailable', 'Unavailable'], ['clear', 'Clear']];
+const LEGEND = [
+  ['tc-perf', 'Confirmed performance'], ['tc-call', 'Call time'], ['tc-soundcheck', 'Soundcheck'],
+  ['tc-request', 'Booking request (tentative)'], ['tc-other', 'Other Tangy event'],
+  ['tc-avail-available', 'Available'], ['tc-avail-tentative', 'Tentative'], ['tc-avail-unavailable', 'Unavailable'],
 ];
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-const SETTABLE = [
-  { key: 'available', label: 'AVAILABLE FOR BOOKINGS', color: '#2e6834', text: '#ecdcaf' },
-  { key: 'tentative', label: 'TENTATIVE / PENDING', color: '#d1a437', text: '#191410' },
-  { key: 'unavailable', label: 'UNAVAILABLE / BLOCKED', color: '#191410', text: '#ecdcaf' },
-  { key: 'clear', label: 'CLEAR SELECTION', color: '#e9decb', text: '#191410' },
-];
-
-const pad = (n) => String(n).padStart(2, '0');
-const toISODate = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
-
-// Real availability (artist_availability, self-settable) overlaid with real
-// confirmed performances (event_artists — 'booked', never self-settable: an
-// artist can't misrepresent their own booking status). See
-// 0012_artist_availability.sql — this used to be pure local React state
-// with a SAVE button that persisted nothing.
 export const CalendarPage = () => {
-  const { playSFX } = useAudio();
   const { user } = useAuth();
-  const today = new Date();
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
-  const [selected, setSelected] = useState(null);
-  const [availability, setAvailability] = useState({}); // date -> status
-  const [bookedDates, setBookedDates] = useState(new Set());
+  const navigate = useNavigate();
+  const calRef = useRef(null);
+  const [range, setRange] = useState(null);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [notice, setNotice] = useState('');
+  const [title, setTitle] = useState('');
+  const [view, setView] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 640 ? 'listMonth' : 'dayGridMonth'));
   const [mode, setMode] = useState('available');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const monthStart = toISODate(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthEnd = toISODate(year, month, daysInMonth);
+  const [open, setOpen] = useState(null);
 
   const load = useCallback(async () => {
-    if (!user?.id) return;
-    setLoading(true);
-    const [{ data: avail }, { data: performances }] = await Promise.all([
-      supabase.from('artist_availability').select('date, status').eq('artist_id', user.id).gte('date', monthStart).lte('date', monthEnd),
-      supabase.from('event_artists').select('events(event_date)').eq('artist_id', user.id),
-    ]);
-    setAvailability(Object.fromEntries((avail || []).map((a) => [a.date, a.status])));
-    setBookedDates(new Set((performances || []).map((p) => p.events?.event_date).filter(Boolean)));
-    setLoading(false);
-  }, [user?.id, monthStart, monthEnd]);
-
+    if (!user?.id || !range) return;
+    try {
+      setData(await workspaceApi.calendar(user.id, range.from, range.to));
+      setError(null);
+    } catch (err) { setError(err); }
+  }, [user?.id, range]);
   useEffect(() => { load(); }, [load]);
 
-  const handleSetDay = async (day) => {
-    const iso = toISODate(year, month, day);
-    if (bookedDates.has(iso)) return; // booked days aren't self-editable
-    playSFX('ticketClick');
-    setSelected(day);
-    setError('');
-    if (mode === 'clear') {
-      await supabase.from('artist_availability').delete().eq('artist_id', user.id).eq('date', iso);
-    } else {
-      const { error: err } = await supabase.from('artist_availability').upsert({ artist_id: user.id, date: iso, status: mode }, { onConflict: 'artist_id,date' });
-      if (err) { setError(err.message); return; }
+  const booked = useMemo(() => new Set((data?.performances || []).filter((p) => p.event_status !== 'cancelled').map((p) => p.event_date)), [data]);
+
+  const events = useMemo(() => {
+    if (!data) return [];
+    const out = [];
+    for (const p of data.performances) {
+      const cancelled = p.event_status === 'cancelled';
+      const base = { extendedProps: { perf: p }, classNames: cancelled ? ['tc-cancelled'] : [] };
+      if (p.starts_at) out.push({ ...base, id: `perf-${p.event_id}`, title: `${cancelled ? 'Cancelled · ' : ''}${p.name}`, start: p.starts_at, end: p.ends_at || undefined, classNames: [...base.classNames, 'tc-perf'] });
+      else out.push({ ...base, id: `perf-${p.event_id}`, title: `${cancelled ? 'Cancelled · ' : ''}${p.name} (time TBC)`, start: p.event_date, allDay: true, classNames: [...base.classNames, 'tc-perf'] });
+      if (!cancelled && p.call_time) out.push({ ...base, id: `call-${p.event_id}`, title: `Call · ${p.name}`, start: p.call_time, classNames: ['tc-call'] });
+      if (!cancelled && p.soundcheck_at) out.push({ ...base, id: `sc-${p.event_id}`, title: `Soundcheck · ${p.name}`, start: p.soundcheck_at, classNames: ['tc-soundcheck'] });
     }
-    load();
+    for (const r of data.requests) {
+      out.push({ id: `req-${r.id}`, title: `Requested · ${r.event_name}`, start: r.proposed_start || r.event_date, end: r.proposed_end || undefined, allDay: !r.proposed_start, classNames: ['tc-request'], extendedProps: { request: r } });
+    }
+    for (const o of data.otherEvents) {
+      out.push({ id: `other-${o.event_id}-${o.member_kind}`, title: `${o.name} (${o.member_kind})`, start: o.event_date, allDay: true, classNames: ['tc-other'], extendedProps: { perf: o } });
+    }
+    for (const a of data.availability) {
+      if (booked.has(a.date)) continue;
+      out.push({ id: `av-${a.date}`, start: a.date, allDay: true, display: 'background', classNames: [`tc-avail-${a.status}`] });
+    }
+    return out;
+  }, [data, booked]);
+
+  const api = () => calRef.current?.getApi();
+  const changeView = (v) => { setView(v); api()?.changeView(v); };
+
+  const onDateClick = async (info) => {
+    const date = info.dateStr.slice(0, 10);
+    setNotice('');
+    if (booked.has(date)) { setNotice('That date has a confirmed performance — it stays booked.'); return; }
+    try {
+      await workspaceApi.setAvailability(user.id, date, mode === 'clear' ? null : mode);
+      setNotice(mode === 'clear' ? `Cleared ${date}.` : `${date} marked ${mode}.`);
+      load();
+    } catch (err) { setNotice(err.message); }
   };
 
-  const goPrevMonth = () => {
-    if (month === 0) { setMonth(11); setYear((y) => y - 1); } else { setMonth((m) => m - 1); }
-  };
-  const goNextMonth = () => {
-    if (month === 11) { setMonth(0); setYear((y) => y + 1); } else { setMonth((m) => m + 1); }
-  };
-
-  const firstDay = new Date(year, month, 1).getDay();
-
-  const statusFor = (day) => {
-    const iso = toISODate(year, month, day);
-    if (bookedDates.has(iso)) return 'booked';
-    return availability[iso];
-  };
-
-  const getDayBg = (status) => {
-    if (status === 'available') return 'bg-[#2e6834] text-[#ecdcaf] font-bold';
-    if (status === 'booked') return 'bg-[#c2272a] text-[#ecdcaf] font-bold';
-    if (status === 'tentative') return 'bg-[#d1a437] text-[#191410] font-bold';
-    if (status === 'unavailable') return 'bg-[#191410] text-[#ecdcaf]/50';
-    return 'bg-[#ecdcaf] text-[#191410] hover:bg-[#c2272a] hover:text-[#ecdcaf]';
-  };
-
-  const legendItems = [
-    { key: 'available', label: 'AVAILABLE FOR BOOKINGS', color: '#2e6834' },
-    { key: 'booked', label: 'BOOKED / CONFIRMED', color: '#c2272a' },
-    { key: 'tentative', label: 'TENTATIVE / PENDING', color: '#d1a437' },
-    { key: 'unavailable', label: 'UNAVAILABLE / BLOCKED', color: '#191410' },
-  ];
+  const upcoming = (data?.performances || []).filter((p) => p.event_status !== 'cancelled' && p.event_date >= iso(new Date()));
 
   return (
-    <div className="w-full min-h-[calc(100vh-64px)] p-4 sm:p-8 max-w-6xl mx-auto flex flex-col gap-6 text-left">
-
-      <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 sm:p-8 shadow-[10px_10px_0px_#4c1210] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="w-full p-3 sm:p-6 md:p-8 max-w-7xl mx-auto flex flex-col gap-4 text-left font-sans">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">ARTIST WORKSPACE // SCHEDULING</span>
-          <h1 className="font-poster text-4xl sm:text-5xl text-[#191410] leading-none mt-1">AVAILABILITY CALENDAR</h1>
-          <p className="font-mono text-xs text-[#241a12]/80 mt-1 uppercase">
-            Pick a status on the right, then click a date — saved instantly. Booked dates come from confirmed performances and can't be edited here.
-          </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#d1a437]">Artist workspace</p>
+          <h1 className="font-poster text-3xl sm:text-4xl text-[#ecdcaf] m-0 leading-none">Calendar</h1>
+          <p className="text-[13px] text-[#ecdcaf]/65 mt-1">Performances, requests and your availability in one place.</p>
         </div>
-      </div>
+        <Button icon="CalendarDays" disabled={!upcoming.length} onClick={() => downloadIcs(upcoming.map(performanceIcsItem), 'tangy-performances.ics')}>Export performances (.ics)</Button>
+      </header>
 
-      {error && <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold border-2 border-[#191410]">{error}</div>}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[8px_8px_0px_#191410] flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b-2 border-[#191410] pb-4">
-            <button onClick={goPrevMonth} className="px-3 py-1 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold border border-[#191410]">← PREV</button>
-            <h2 className="font-poster text-3xl text-[#191410]">{monthNames[month].toUpperCase()} {year}</h2>
-            <button onClick={goNextMonth} className="px-3 py-1 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold border border-[#191410]">NEXT →</button>
+      <section className="bg-[#11100C] border border-[#C99A2E]/25 rounded-md p-3 sm:p-4 flex flex-col gap-3 text-[#E7D5A4]" data-artist-calendar>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Button size="sm" variant="ghost" icon="ChevronLeft" aria-label="Previous" onClick={() => api()?.prev()} />
+            <Button size="sm" onClick={() => api()?.today()}>Today</Button>
+            <Button size="sm" variant="ghost" icon="ChevronRight" aria-label="Next" onClick={() => api()?.next()} />
           </div>
-
-          <div className="grid grid-cols-7 gap-1 text-center font-mono text-[10px] font-bold text-[#c2272a] uppercase border-b border-[#191410]/20 pb-2">
-            {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d) => <div key={d}>{d}</div>)}
+          <h2 className="font-condensed text-[20px] uppercase tracking-wide text-[#EFE2C0] m-0 mr-auto" aria-live="polite">{title}</h2>
+          <div role="tablist" aria-label="Calendar view" className="flex rounded border border-[#C99A2E]/30 overflow-hidden">
+            {VIEWS.map(([v, label]) => (
+              <button key={v} role="tab" aria-selected={view === v} onClick={() => changeView(v)}
+                className={cx('h-8 px-3 font-mono text-[11px] uppercase tracking-[0.1em]', view === v ? 'bg-[#C99A2E] text-[#11100C]' : 'text-[#E7D5A4]/70 hover:bg-[#C99A2E]/10')}>{label}</button>
+            ))}
           </div>
-
-          {loading ? (
-            <div className="text-center font-mono text-xs opacity-50 py-10">LOADING...</div>
-          ) : (
-            <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} className="aspect-square opacity-0" />)}
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
-                const status = statusFor(day);
-                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
-                return (
-                  <button
-                    key={day}
-                    type="button"
-                    onClick={() => handleSetDay(day)}
-                    disabled={status === 'booked'}
-                    className={`aspect-square border-2 border-[#191410] font-mono text-xs font-bold flex flex-col items-center justify-center relative transition-all active:scale-95 disabled:cursor-not-allowed ${getDayBg(status)} ${selected === day ? 'ring-2 ring-[#c2272a]' : ''}`}
-                  >
-                    <span>{day}</span>
-                    {isToday && <span className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-[#c2272a]" />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
 
-        <div className="flex flex-col gap-6">
-          <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[8px_8px_0px_#191410]">
-            <span className="font-mono text-xs font-bold text-[#c2272a] uppercase block border-b-2 border-[#191410] pb-3 mb-4">SET DATE STATUS</span>
-            <div className="flex flex-col gap-2">
-              {SETTABLE.map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => { playSFX('ticketClick'); setMode(item.key); }}
-                  className={`w-full p-3 font-mono text-[10px] font-bold text-left uppercase border-2 border-[#191410] flex items-center justify-between transition-all ${mode === item.key ? 'shadow-[4px_4px_0px_#191410] scale-[1.02]' : 'opacity-80'}`}
-                  style={{ backgroundColor: item.color, color: item.text }}
-                >
-                  <span>{item.label}</span>
-                  {mode === item.key && <span>● ACTIVE</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-[#e9decb] text-[#241a12] border-4 border-[#191410] p-6 shadow-[8px_8px_0px_#191410]">
-            <span className="font-mono text-xs font-bold text-[#c2272a] uppercase block border-b-2 border-[#191410] pb-3 mb-4">MONTH SUMMARY ({monthNames[month].toUpperCase()})</span>
-            <div className="flex flex-col gap-2 font-mono text-xs font-bold">
-              {legendItems.map((item) => {
-                const count = Array.from({ length: daysInMonth }, (_, i) => i + 1).filter((d) => statusFor(d) === item.key).length;
-                return (
-                  <div key={item.key} className="flex justify-between items-center p-2 bg-[#ecdcaf] border border-[#191410]">
-                    <span className="text-[10px]">{item.label}</span>
-                    <span className="text-[#c2272a]">{count} DAYS</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-2 text-[12.5px]">
+          <span className="text-[#E7D5A4]/55">Click a day to mark it:</span>
+          {AVAIL.map(([k, label]) => (
+            <button key={k} onClick={() => setMode(k)} aria-pressed={mode === k}
+              className={cx('h-8 px-3 rounded-full border font-mono text-[11px] uppercase tracking-[0.08em]', mode === k ? 'border-[#C99A2E] bg-[#C99A2E]/20 text-[#EFE2C0]' : 'border-[#E7D5A4]/20 text-[#E7D5A4]/65')}>{label}</button>
+          ))}
+          {notice && <span role="status" className="ml-1 text-[#f5b544]">{notice}</span>}
         </div>
-      </div>
+
+        {error ? <ErrorState error={error} onRetry={load} /> : (
+          <div className="tangy-cal">
+            <FullCalendar
+              ref={calRef}
+              plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+              initialView={view}
+              headerToolbar={false}
+              height="auto"
+              firstDay={1}
+              nowIndicator
+              dayMaxEvents={3}
+              events={events}
+              eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+              noEventsContent="No performances, requests or availability in this period."
+              datesSet={(arg) => {
+                setTitle(arg.view.title);
+                const from = iso(arg.start); const to = iso(new Date(arg.end.getTime() - 86400000));
+                setRange((r) => (r && r.from === from && r.to === to ? r : { from, to }));
+              }}
+              dateClick={onDateClick}
+              eventClick={(info) => {
+                const p = info.event.extendedProps.perf;
+                if (p) setOpen(p);
+                else if (info.event.extendedProps.request) navigate('/artist/requests');
+              }}
+            />
+          </div>
+        )}
+
+        <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11.5px] text-[#E7D5A4]/65" aria-label="Legend">
+          {LEGEND.map(([cls, label]) => <li key={cls} className="flex items-center gap-1.5"><span className={cx('tc-swatch', cls)} aria-hidden="true" />{label}</li>)}
+        </ul>
+        <p className="text-[11.5px] text-[#E7D5A4]/45">Grid times use your device's timezone; each event's detail shows its local time.</p>
+      </section>
+
+      {data && data.requests.length > 0 && (
+        <div className="flex items-center gap-2 text-[13px] text-[#ecdcaf]">
+          <Badge tone="warn">{data.requests.length} pending</Badge> booking request{data.requests.length === 1 ? '' : 's'} — <Link to="/artist/requests" className="underline">review requests</Link>
+        </div>
+      )}
+      {open && <ArtistEventDrawer event={open} onClose={() => setOpen(null)} />}
     </div>
   );
 };

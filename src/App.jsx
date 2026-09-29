@@ -60,6 +60,7 @@ const ArtistsDirectoryPage = lazy(() => import('./artist/pages/ArtistsDirectoryP
 const ArtistDetailsPage = lazy(() => import('./artist/pages/ArtistDetailsPage').then((m) => ({ default: m.ArtistDetailsPage })));
 const MediaPage = lazy(() => import('./artist/pages/MediaPage').then((m) => ({ default: m.MediaPage })));
 const SettingsPage = lazy(() => import('./artist/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
+const RequestsPage = lazy(() => import('./artist/pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
 
 // Real, role-based account dashboards — backed by Supabase Auth
 // (UserAuthContext) + RLS, gated by ProtectedRoute (not the removed mock
@@ -246,14 +247,27 @@ function RouteFallback() {
 
 // Operational tools (admin console, check-in terminal, demo admin) never get
 // the public assistant or announcement overlay.
-const OPERATIONAL_PREFIXES = ['/admin', '/check-in', '/demo-admin'];
-const PORTAL_PREFIXES = ['/artist/dashboard', '/sponsor/dashboard', '/vendor/dashboard', '/venue/dashboard', '/volunteer/dashboard', '/crew/dashboard', '/dashboard'];
+const OPERATIONAL_PREFIXES = ['/admin-portal', '/admin', '/check-in', '/demo-admin'];
+const PORTAL_PREFIXES = [
+  '/artist/dashboard', '/artist/calendar', '/artist/media', '/artist/requests', '/artist/settings',
+  '/sponsor/dashboard', '/vendor/dashboard', '/venue/dashboard', '/volunteer/dashboard', '/crew/dashboard', '/dashboard',
+];
+// Exact matches only: /artist/profile is the artist's own editor, while
+// /artist/profile/:id is the public artist page and keeps the public overlays.
+const PORTAL_PAGES = ['/artist/profile'];
+
+// /admin/<anything>?q#h → /admin-portal/<anything>?q#h (the /admin/preview/*
+// inspectors are declared as their own, more specific routes).
+function LegacyAdminRedirect() {
+  const { pathname, search, hash } = useLocation();
+  return <Navigate to={`/admin-portal${pathname.replace(/^\/admin/, '')}${search}${hash}`} replace />;
+}
 
 function GlobalOverlays() {
   const { pathname } = useLocation();
   const operational = OPERATIONAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   // Portals are working screens too: no marketing pop-up over their content.
-  const portal = PORTAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const portal = PORTAL_PAGES.includes(pathname) || PORTAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const { announcement, show, dismiss } = useAnnouncementTrigger({ suppressed: operational || portal });
   const devStrip = (import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <DevPortalStrip /> : null;
   if (operational) return <GlobalDock />;
@@ -267,7 +281,9 @@ function GlobalOverlays() {
         character={announcement?.character}
         position="bottom-left"
         duration={6000}
-        isOpen={show}
+        // Suppression only prevents a new pick; one already open (e.g. from a
+        // public sign-in page) must not follow the user into their portal.
+        isOpen={show && !portal}
         onClose={dismiss}
       />
     </>
@@ -315,15 +331,18 @@ export default function App() {
                 <Route path="/book/:sessionId" element={<BookingPage />} />
 
                 {/* ADMIN DASHBOARD DEDICATED ROUTE */}
-                <Route path="/admin/*" element={<AdminPage />} />
+                {/* Tangy Admin Portal — canonical home of the console. */}
+                <Route path="/admin-portal/*" element={<AdminPage />} />
+                {/* Old /admin/* links (bookmarks, emails, notifications) keep working. */}
+                <Route path="/admin/*" element={<LegacyAdminRedirect />} />
                 <Route path="/admin/preview/artist/:id" element={<AdminArtistPreview />} />
                 <Route path="/admin/preview/:role/:id" element={<AdminPortalPreview />} />
                 <Route path="/admin/preview/:role" element={<AdminEntitySelector />} />
 
                 {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
-                {/* In dev mode the role selector at /admin replaces the legacy demo admin. */}
-                <Route path="/demo-admin" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin" replace /> : <DemoAdminLogin />} />
-                <Route path="/demo-admin/control-room" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin" replace /> : <DemoControlRoom />} />
+                {/* In dev mode the role selector at /admin-portal replaces the legacy demo admin. */}
+                <Route path="/demo-admin" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin-portal" replace /> : <DemoAdminLogin />} />
+                <Route path="/demo-admin/control-room" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin-portal" replace /> : <DemoControlRoom />} />
                 {/* One click from any login page's "TEAM DEMO" link — straight into that
                     role's own demo dashboard, no admin detour. Also what the Control
                     Room's "VIEW PORTALS" grid links to in demo mode (see DemoControlRoom.jsx). */}
@@ -357,6 +376,14 @@ export default function App() {
                         <ProfilePage />
                       </ArtistProtectedRoute>
                     } 
+                  />
+                  <Route
+                    path="requests"
+                    element={
+                      <ArtistProtectedRoute>
+                        <RequestsPage />
+                      </ArtistProtectedRoute>
+                    }
                   />
                   <Route 
                     path="calendar" 
@@ -411,7 +438,7 @@ export default function App() {
                 <Route path="/private/dashboard" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
 
                 {/* Legacy/documented aliases from the removed mock account system. */}
-                <Route path="/admin-mock" element={<Navigate to="/admin" replace />} />
+                <Route path="/admin-mock" element={<Navigate to="/admin-portal" replace />} />
                 <Route path="/artist-mock/portal" element={<Navigate to="/artist/dashboard" replace />} />
                 <Route path="/artist/portal" element={<Navigate to="/artist/dashboard" replace />} />
                 <Route path="/crew-mock/dashboard" element={<Navigate to="/crew/dashboard" replace />} />

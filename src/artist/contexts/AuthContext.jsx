@@ -25,7 +25,6 @@ function toPortalUser(sessionUser, artistRow) {
     spotify: artistRow?.spotify || '',
     experience: artistRow?.experience_level || '',
     status: artistRow?.status || 'pending',
-    profileComplete: artistRow ? 100 : 40,
   };
 }
 

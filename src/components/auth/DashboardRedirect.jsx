@@ -18,9 +18,9 @@ const ROLE_DASHBOARD_PATH = {
   crew: '/crew/dashboard',
   venue: '/venue/dashboard',
   artist: '/artist/dashboard',
-  staff: '/admin',
-  admin: '/admin',
-  super_admin: '/admin',
+  staff: '/admin-portal',
+  admin: '/admin-portal',
+  super_admin: '/admin-portal',
 };
 
 export const DashboardRedirect = () => {

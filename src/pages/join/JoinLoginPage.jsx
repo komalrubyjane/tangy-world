@@ -51,7 +51,7 @@ export const JoinLoginPage = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate('/admin-portal')}
               className="text-left border border-[#C99A2E]/50 hover:border-[#C99A2E] bg-[#11100C] hover:bg-[#C99A2E]/10 p-3 flex items-center justify-between gap-3 transition-colors"
             >
               <div>

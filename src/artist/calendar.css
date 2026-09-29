@@ -1,0 +1,47 @@
+/* Tangy dark theme for FullCalendar (artist workspace). Entry types differ in
+   colour AND pattern/weight so status never relies on colour alone. */
+.tangy-cal {
+  --fc-border-color: rgba(231, 213, 164, 0.1);
+  --fc-page-bg-color: #11100C;
+  --fc-neutral-bg-color: rgba(231, 213, 164, 0.04);
+  --fc-list-event-hover-bg-color: rgba(201, 154, 46, 0.12);
+  --fc-today-bg-color: rgba(201, 154, 46, 0.1);
+  --fc-now-indicator-color: #ef6b5e;
+  --fc-event-border-color: transparent;
+  --fc-small-font-size: 0.78rem;
+  color: #E7D5A4;
+  font-size: 13px;
+}
+.tangy-cal .fc-col-header-cell-cushion,
+.tangy-cal .fc-daygrid-day-number,
+.tangy-cal .fc-list-day-text,
+.tangy-cal .fc-list-day-side-text { color: #E7D5A4; text-decoration: none; }
+.tangy-cal .fc-col-header-cell { font-family: 'DM Mono', monospace; text-transform: uppercase; font-size: 10.5px; letter-spacing: .12em; font-weight: 400; }
+.tangy-cal .fc-list-day-cushion { background: rgba(201, 154, 46, 0.08) !important; }
+.tangy-cal .fc-daygrid-day { cursor: pointer; }
+.tangy-cal .fc-event { border-radius: 3px; padding: 1px 4px; font-size: 12px; cursor: pointer; }
+.tangy-cal .fc-event-title, .tangy-cal .fc-event-time { color: inherit; }
+.tangy-cal .fc-list-event-title a { color: #EFE2C0; }
+
+.tangy-cal .tc-perf, .tc-swatch.tc-perf { background: #C99A2E; color: #11100C !important; font-weight: 600; border-left: 3px solid #fff3cf; }
+.tangy-cal .tc-call, .tc-swatch.tc-call { background: #3a2a14; color: #ffe0a3 !important; border-left: 3px solid #f5b544; }
+.tangy-cal .tc-soundcheck, .tc-swatch.tc-soundcheck { background: #1c2c3a; color: #bfe1ff !important; border-left: 3px solid #6fb4ee; }
+.tangy-cal .tc-request, .tc-swatch.tc-request {
+  background: repeating-linear-gradient(135deg, rgba(245,181,68,.28) 0 6px, rgba(245,181,68,.12) 6px 12px);
+  color: #ffe0a3 !important; border: 1px dashed #f5b544 !important;
+}
+.tangy-cal .tc-other, .tc-swatch.tc-other { background: rgba(231,213,164,.12); color: #E7D5A4 !important; border-left: 3px solid rgba(231,213,164,.5); }
+.tangy-cal .tc-cancelled { text-decoration: line-through; opacity: .6; }
+.tangy-cal .tc-avail-available, .tc-swatch.tc-avail-available { background: rgba(47,184,119,.18) !important; opacity: 1; }
+.tangy-cal .tc-avail-tentative, .tc-swatch.tc-avail-tentative { background: repeating-linear-gradient(45deg, rgba(245,181,68,.2) 0 5px, transparent 5px 10px) !important; opacity: 1; }
+.tangy-cal .tc-avail-unavailable, .tc-swatch.tc-avail-unavailable { background: repeating-linear-gradient(45deg, rgba(239,107,94,.22) 0 3px, transparent 3px 9px) !important; opacity: 1; }
+
+.tc-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+
+@media (max-width: 640px) {
+  .tangy-cal .fc-daygrid-day-frame { min-height: 3.2rem; }
+  .tangy-cal .fc-event { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tangy-cal * { transition: none !important; }
+}

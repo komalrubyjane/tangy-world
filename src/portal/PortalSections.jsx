@@ -4,6 +4,9 @@ import { supabase } from '../lib/supabaseClient';
 import { Icon, Button, Badge, Panel, Textarea, EmptyState, ErrorState, Skeleton, Drawer, KeyValue, cx, fmt } from '../admin/ui';
 import { localISODate } from '../admin/rbac';
 import { portalApi, friendlyError } from './portalApi';
+import { tzTime, tzAbbr } from '../lib/time';
+import { downloadIcs } from '../lib/ics';
+import { uploadWithProgress, openPrivateFile, safeFileName, formatBytes } from '../lib/storage';
 
 // Building blocks for the partner and volunteer portals. Every section loads
 // only the caller's own data through RLS / SECURITY DEFINER RPCs (0018), and
@@ -70,38 +73,56 @@ export const Greeting = ({ name, subtitle }) => {
   );
 };
 
-export const NextEventCard = ({ events, loading, error, onRetry, onOpen, emptyTitle = 'No upcoming events', emptyHint }) => {
+export const NextEventCard = ({ events, loading, error, onRetry, onOpen, emptyTitle = 'No upcoming events', emptyHint, emptyAction, messagesTo = '?tab=messages', scheduleTo = '?tab=events' }) => {
   const today = localISODate();
   const next = (events || []).find((e) => e.event_date >= today && e.event_status !== 'cancelled');
   if (loading) return <Panel><Skeleton rows={3} /></Panel>;
   if (error) return <Panel><ErrorState error={error} onRetry={onRetry} /></Panel>;
-  if (!next) return <Panel><EmptyState icon="CalendarDays" title={emptyTitle} hint={emptyHint} /></Panel>;
+  if (!next) return <Panel><EmptyState icon="CalendarDays" title={emptyTitle} hint={emptyHint} action={emptyAction} /></Panel>;
   const artist = next.member_kind === 'artist';
+  const tz = next.timezone || 'Asia/Kolkata';
+  const t = (ts) => tzTime(ts, tz);
   const rows = [
-    artist && next.starts_at && ['Performance', timeRange(next.starts_at, next.ends_at)],
-    next.call_time && ['Call time', fmt.time(next.call_time)],
-    artist && next.soundcheck_at && ['Soundcheck', fmt.time(next.soundcheck_at)],
-    !artist && next.starts_at && ['Your window', timeRange(next.starts_at, next.ends_at)],
+    next.call_time && ['Call time', t(next.call_time)],
+    artist && next.soundcheck_at && ['Soundcheck', t(next.soundcheck_at)],
+    next.doors_at && ['Doors', t(next.doors_at)],
+    artist && next.starts_at && ['Performance', `${t(next.starts_at)}${next.ends_at ? ` – ${t(next.ends_at)}` : ''}`],
+    !artist && next.setup_at && ['Setup', t(next.setup_at)],
+    !artist && next.starts_at && ['Your window', `${t(next.starts_at)}${next.ends_at ? ` – ${t(next.ends_at)}` : ''}`],
   ].filter(Boolean);
+  const where = [next.venue_address, next.venue_city].filter(Boolean).join(', ');
+  const ics = { uid: `ev-${next.event_id}-${next.member_kind}`, title: `Tangy: ${next.name}`, location: [next.venue_name, where].filter(Boolean).join(', '),
+    ...(next.starts_at ? { start: next.starts_at, end: next.ends_at } : { date: next.event_date }) };
   return (
     <section aria-label="Next event" className="bg-[#17130F] border border-[#C99A2E]/35 rounded-md overflow-hidden font-sans grid grid-cols-1 sm:grid-cols-[1fr_auto]">
       <div className="p-5">
         <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#C99A2E]">{artist ? 'Next performance' : 'Next event'}</div>
         <h3 className="font-condensed text-[26px] uppercase tracking-tight text-[#EFE2C0] mt-1.5 mb-0 leading-none">{next.name}</h3>
-        <p className="text-[13.5px] text-[#E7D5A4]/70 mt-2">{eventWhen(next)}</p>
-        <p className="text-[13.5px] text-[#E7D5A4]/70 flex items-center gap-1.5 mt-1"><Icon name="MapPin" size={14} className="text-[#C99A2E]" />{next.venue_name || 'Venue to be confirmed'}</p>
+        <p className="text-[13.5px] text-[#E7D5A4]/70 mt-2">{eventWhen(next)} <span className="text-[#E7D5A4]/40">· {tzAbbr(tz)}</span></p>
+        <p className="text-[13.5px] text-[#E7D5A4]/70 flex items-start gap-1.5 mt-1"><Icon name="MapPin" size={14} className="text-[#C99A2E] mt-0.5 shrink-0" />
+          <span>{next.venue_name || 'Venue to be confirmed'}{where && <span className="text-[#E7D5A4]/50"> · {where}</span>}</span></p>
         {rows.length > 0 && (
-          <dl className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <dl className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {rows.map(([k, v]) => (
               <div key={k} className="bg-[#11100C] border border-[#C99A2E]/20 rounded px-3 py-2">
                 <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#E7D5A4]/50">{k}</dt>
-                <dd className="font-condensed text-[18px] text-[#EFE2C0] m-0 mt-0.5">{v}</dd>
+                <dd className="font-condensed text-[17px] text-[#EFE2C0] m-0 mt-0.5">{v}</dd>
               </div>
             ))}
           </dl>
         )}
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-[#E7D5A4]/65">
+          {(next.hotel || next.accommodation) && <span><Icon name="Hotel" size={13} className="inline mr-1 text-[#C99A2E]" />{next.hotel || next.accommodation}</span>}
+          {next.pickup && <span><Icon name="Plane" size={13} className="inline mr-1 text-[#C99A2E]" />{next.pickup}</span>}
+          {next.fee_status && next.fee_status !== 'not_applicable' && <span><Icon name="Wallet" size={13} className="inline mr-1 text-[#C99A2E]" />{FEE_LABEL[next.fee_status]}</span>}
+          <span><Icon name="User" size={13} className="inline mr-1 text-[#C99A2E]" />Contact: {next.tangy_contact || 'Tangy team'}</span>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button variant="primary" icon="Eye" onClick={() => onOpen(next)}>View event</Button>
+          {next.venue_name && <Button icon="MapPin" onClick={() => window.open(next.venue_map_url || mapsUrl(next), '_blank', 'noopener,noreferrer')}>Open map</Button>}
+          <Button variant="ghost" icon="MessagesSquare" to={messagesTo}>Message Tangy</Button>
+          <Button variant="ghost" icon="CalendarClock" to={scheduleTo}>View schedule</Button>
+          <Button variant="ghost" icon="CalendarDays" onClick={() => downloadIcs([ics], 'tangy-event.ics')}>Add to calendar</Button>
           {next.open_requirements > 0 && <Badge tone="warn">{next.open_requirements} item{next.open_requirements === 1 ? '' : 's'} needed from you</Badge>}
         </div>
       </div>
@@ -186,8 +207,17 @@ export const EventDrawer = ({ event: e, onClose, onChanged, readOnly }) => {
     artist && e.soundcheck_at && ['Soundcheck', fmt.dateTime(e.soundcheck_at)],
     !artist && e.starts_at && ['Your window', `${fmt.dateTime(e.starts_at)}${e.ends_at ? ` – ${fmt.time(e.ends_at)}` : ''}`],
     e.fee_status && e.fee_status !== 'not_applicable' && ['Fee', `${e.fee_amount != null ? fmt.money(e.fee_amount) + ' · ' : ''}${FEE_LABEL[e.fee_status]}`],
+    e.package && ['Package', e.package],
+    e.team && ['Team', e.team[0].toUpperCase() + e.team.slice(1)],
     ['Tangy contact', e.tangy_contact || 'Tangy team'],
+    e.onsite_contact && ['On-site contact', e.onsite_contact],
   ].filter(Boolean);
+  const tz = e.timezone || 'Asia/Kolkata';
+  const logistics = [
+    ['Setup', tzTime(e.setup_at, tz, true)], ['Doors', tzTime(e.doors_at, tz, true)], ['Breakdown', tzTime(e.breakdown_at, tz, true)],
+    ['Loading access', e.loading_access], ['Venue access', e.venue_access],
+    ['Venue access info', e.venue_access_info], ['Parking', e.venue_parking], ['Loading bay', e.venue_loading_bay],
+  ].filter(([, v]) => v);
   return (
     <Drawer title={e.name} subtitle={e.event_status === 'cancelled' ? 'This event has been cancelled' : KIND_LABEL[e.member_kind]} onClose={onClose}
       footer={e.assignment_id && e.assignment_status === 'assigned' && !readOnly && (
@@ -201,9 +231,12 @@ export const EventDrawer = ({ event: e, onClose, onChanged, readOnly }) => {
         <div className="font-sans text-[13.5px] text-[#E7D5A4]/80">
           <div className="text-[#EFE2C0]">{e.venue_name || 'To be confirmed'}</div>
           {(e.venue_address || e.venue_city) && <div className="text-[#E7D5A4]/60 mt-0.5">{[e.venue_address, e.venue_city].filter(Boolean).join(', ')}</div>}
-          {e.venue_name && <a href={mapsUrl(e)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-2 text-[#e4bd5c] underline underline-offset-2">Open in Maps <Icon name="ArrowUpRight" size={13} /></a>}
+          {e.venue_name && <a href={e.venue_map_url || mapsUrl(e)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-2 text-[#e4bd5c] underline underline-offset-2">Open in Maps <Icon name="ArrowUpRight" size={13} /></a>}
         </div>
       </Panel>
+      {!artist && logistics.length > 0 && (
+        <Panel title={`Logistics · ${tzAbbr(tz)}`}><KeyValue items={logistics} /></Panel>
+      )}
       {e.instructions && <Panel title={artist ? 'Performance notes' : 'Operational instructions'}><p className="font-sans text-[13.5px] text-[#E7D5A4]/80 whitespace-pre-line">{e.instructions}</p></Panel>}
       {artist && e.hospitality && <Panel title="Hospitality"><p className="font-sans text-[13.5px] text-[#E7D5A4]/80 whitespace-pre-line">{e.hospitality}</p></Panel>}
       {artist && e.travel && <Panel title="Travel & logistics"><p className="font-sans text-[13.5px] text-[#E7D5A4]/80 whitespace-pre-line">{e.travel}</p></Panel>}
@@ -264,7 +297,9 @@ export const RequirementsPanel = ({ onChanged }) => {
     return () => { c = true; };
   }, [key]);
   const reload = () => { setKey((k) => k + 1); onChanged?.(); };
-  const open = (rows || []).filter((r) => ['requested', 'changes_requested'].includes(r.status));
+  const PRI = { urgent: 0, high: 1, normal: 2, low: 3 };
+  const open = (rows || []).filter((r) => ['requested', 'changes_requested'].includes(r.status))
+    .sort((a, b) => (PRI[a.priority] ?? 2) - (PRI[b.priority] ?? 2));
   const done = (rows || []).filter((r) => !['requested', 'changes_requested'].includes(r.status));
   return (
     <Panel title="What Tangy needs from you" subtitle={rows ? `${open.length} open` : undefined}>
@@ -280,41 +315,82 @@ export const RequirementsPanel = ({ onChanged }) => {
   );
 };
 
-const REQ_LABEL = { requested: 'Needed', changes_requested: 'Changes requested', submitted: 'Submitted', accepted: 'Accepted' };
-const REQ_TONE = { requested: 'warn', changes_requested: 'bad', submitted: 'info', accepted: 'good' };
+const REQ_LABEL = { requested: 'Needed', changes_requested: 'Changes requested', submitted: 'Submitted', accepted: 'Accepted', closed: 'Closed' };
+const REQ_TONE = { requested: 'warn', changes_requested: 'bad', submitted: 'info', accepted: 'good', closed: 'muted' };
+const PRIORITY_TONE = { urgent: 'bad', high: 'warn' };
 
 const RequirementItem = ({ r, onDone }) => {
   const editable = ['requested', 'changes_requested'].includes(r.status);
   const [text, setText] = useState(r.response || '');
+  const [file, setFile] = useState(null);
+  const [progress, setProgress] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const overdue = editable && r.due_at && new Date(r.due_at) < new Date();
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
     setError('');
-    try { await portalApi.submitRequirement(r.id, text); onDone(); } catch (err) { setError(err.message); setBusy(false); }
+    try {
+      let path = null;
+      // Attachments go to the private event-documents bucket under
+      // requirements/<id>/ — the storage policy only allows that path for the
+      // requirement's owner while it is open, and submit_requirement re-checks it.
+      if (file) {
+        path = `requirements/${r.id}/${Date.now()}-${safeFileName(file.name)}`;
+        setProgress(0);
+        await uploadWithProgress('event-documents', path, file, { onProgress: setProgress });
+      }
+      await portalApi.submitRequirement(r.id, text, path);
+      onDone();
+    } catch (err) { setError(err.message); setBusy(false); setProgress(null); }
   };
   return (
-    <li className="bg-[#11100C] border border-[#C99A2E]/20 rounded-md p-4">
+    <li className="bg-[#11100C] border border-[#C99A2E]/20 rounded-md p-4" data-requirement={r.title}>
       <div className="flex items-start justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <div className="text-[14.5px] text-[#EFE2C0]">{r.title}</div>
-          <div className="text-[12px] text-[#E7D5A4]/50">{r.events?.name}{r.due_at ? ` · due ${fmt.dateTime(r.due_at)}` : ''}</div>
+          <div className={cx('text-[12px]', overdue ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/50')}>{r.events?.name}{r.due_at ? ` · ${overdue ? 'overdue since' : 'due'} ${fmt.dateTime(r.due_at)}` : ''}</div>
         </div>
-        <Badge tone={REQ_TONE[r.status]}>{REQ_LABEL[r.status]}</Badge>
+        <div className="flex flex-wrap justify-end gap-1.5">
+          {PRIORITY_TONE[r.priority] && editable && <Badge tone={PRIORITY_TONE[r.priority]}>{r.priority}</Badge>}
+          <Badge tone={REQ_TONE[r.status]}>{REQ_LABEL[r.status] || r.status}</Badge>
+        </div>
       </div>
       {r.details && <p className="text-[13px] text-[#E7D5A4]/70 mt-2 whitespace-pre-line">{r.details}</p>}
       {r.review_note && <p className="text-[12.5px] mt-2 text-[#f5b544]">Tangy: {r.review_note}</p>}
       {editable ? (
         <form onSubmit={submit} className="mt-3 flex flex-col gap-2">
-          <Textarea aria-label={`Response to ${r.title}`} rows={3} maxLength={5000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Your response or a link to the file…" />
+          <Textarea aria-label={`Response to ${r.title}`} rows={3} maxLength={5000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Your response, notes or a link…" />
+          <label className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#E7D5A4]/70">
+            <Icon name="Paperclip" size={14} />
+            <input type="file" aria-label={`Attach a file to ${r.title}`} onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-[12px] file:mr-2 file:h-7 file:px-2 file:rounded file:border file:border-[#C99A2E]/40 file:bg-transparent file:text-[#E7D5A4] file:font-mono file:text-[10.5px] file:uppercase" />
+            {file && <span className="text-[#E7D5A4]/50">{formatBytes(file.size)}</span>}
+          </label>
+          {progress !== null && <div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} className="h-1 rounded bg-[#E7D5A4]/10 overflow-hidden"><div className="h-full bg-[#C99A2E]" style={{ width: `${progress}%` }} /></div>}
           {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
-          <div><Button type="submit" variant="primary" icon="Send" disabled={busy || !text.trim()}>{busy ? 'Sending…' : 'Submit'}</Button></div>
+          <div><Button type="submit" variant="primary" icon="Send" disabled={busy || (!text.trim() && !file)}>{busy ? (progress !== null && progress < 100 ? `Uploading ${progress}%` : 'Sending…') : 'Submit'}</Button></div>
         </form>
-      ) : r.response && (
-        <p className="text-[12.5px] text-[#E7D5A4]/60 mt-2 border-l-2 border-[#C99A2E]/30 pl-3 whitespace-pre-line">{r.response}</p>
+      ) : (r.response || r.attachment_path) && (
+        <div className="text-[12.5px] text-[#E7D5A4]/60 mt-2 border-l-2 border-[#C99A2E]/30 pl-3">
+          {r.response && <p className="whitespace-pre-line m-0">{r.response}</p>}
+          {r.attachment_path && <AttachmentLink path={r.attachment_path} />}
+        </div>
       )}
     </li>
+  );
+};
+
+const AttachmentLink = ({ path }) => {
+  const [error, setError] = useState('');
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2 mt-1">
+      <button type="button" className="inline-flex items-center gap-1 text-[#e4bd5c] underline underline-offset-2"
+        onClick={() => openPrivateFile('event-documents', path).catch((err) => setError(err.message))}>
+        <Icon name="Paperclip" size={13} />{path.split('/').pop().replace(/^\d+-/, '')}
+      </button>
+      {error && <span role="alert" className="text-[#ef6b5e]">{error}</span>}
+    </span>
   );
 };
 
@@ -334,22 +410,41 @@ const useLoad = (fn) => {
   return { ...state, reload: () => setKey((k) => k + 1) };
 };
 
+const DOC_CATEGORY = {
+  tech_rider: 'Tech rider', contract: 'Contract', event_brief: 'Event brief', travel: 'Travel', hospitality: 'Hospitality',
+  venue: 'Venue', schedule: 'Schedule', other: 'Document',
+};
+
 export const DocumentsPanel = () => {
   const { data, error, reload } = useLoad(portalApi.documents);
+  const [fileError, setFileError] = useState('');
+  const open = (d) => {
+    setFileError('');
+    // Private files are only ever opened through short-lived signed URLs.
+    if (d.storage_path) openPrivateFile('event-documents', d.storage_path).catch((err) => setFileError(err.message));
+    else window.open(d.url, '_blank', 'noopener,noreferrer');
+  };
   return (
     <Panel title="Documents" subtitle="Shared with you by the Tangy team">
+      {fileError && <p role="alert" className="text-[12.5px] text-[#ef6b5e] mb-2">{fileError}</p>}
       {error ? <ErrorState error={error} onRetry={reload} /> : data === null ? <Skeleton rows={3} /> : data.length === 0 ? (
-        <EmptyState icon="FileText" title="No documents yet" hint="Stage plots, passes and briefs shared with you appear here." />
+        <EmptyState icon="FileText" title="No documents yet" hint="Riders, contracts, briefs and schedules shared with you appear here." />
       ) : (
         <ul className="divide-y divide-[#E7D5A4]/[0.06] font-sans">
           {data.map((d) => (
-            <li key={d.id} className="py-3 flex items-center gap-3">
+            <li key={d.id} className="py-3 flex items-center gap-3" data-document={d.title}>
               <Icon name="FileText" size={18} className="text-[#C99A2E] shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="text-[14px] text-[#EFE2C0] truncate">{d.title}</div>
-                <div className="text-[12px] text-[#E7D5A4]/50">{d.events?.name} · {fmt.date(d.created_at)}</div>
+                <div className="text-[12px] text-[#E7D5A4]/50">
+                  {[DOC_CATEGORY[d.category] || 'Document', d.events?.name, d.file_size_bytes ? formatBytes(d.file_size_bytes) : null, fmt.date(d.created_at)].filter(Boolean).join(' · ')}
+                  {d.expires_at && <span className="text-[#f5b544]"> · available until {fmt.dateTime(d.expires_at)}</span>}
+                </div>
+                {d.description && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5 line-clamp-2">{d.description}</p>}
               </div>
-              <a href={d.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[12.5px] text-[#e4bd5c] underline underline-offset-2">Open <Icon name="ArrowUpRight" size={13} /></a>
+              <button type="button" onClick={() => open(d)} className="inline-flex items-center gap-1 text-[12.5px] text-[#e4bd5c] underline underline-offset-2">
+                Open <Icon name={d.storage_path ? 'Lock' : 'ArrowUpRight'} size={13} />
+              </button>
             </li>
           ))}
         </ul>
@@ -379,43 +474,67 @@ export const AnnouncementsPanel = ({ limit = 20, compact = false }) => {
   return <Panel title="Announcements">{body}</Panel>;
 };
 
-export const NotificationsPanel = () => {
+export const NOTIFICATION_FILTERS = [
+  ['all', 'All'], ['unread', 'Unread'], ['messages', 'Messages'], ['events', 'Events'], ['requirements', 'Requirements'],
+  ['tasks', 'Tasks'], ['applications', 'Applications'], ['payments', 'Payments'], ['system', 'System'],
+];
+const PRIORITY_BADGE = { urgent: ['Urgent', 'bad'], important: ['Important', 'warn'] };
+
+export const NotificationsPanel = ({ filters = NOTIFICATION_FILTERS, settingsTo = null }) => {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
-  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [filter, setFilter] = useState('all');
   const [more, setMore] = useState(true);
   const load = useCallback(async (before = null) => {
     try {
-      const rows = await portalApi.notifications({ limit: 20, before, unreadOnly });
+      const rows = await portalApi.notifications({
+        limit: 20, before, unreadOnly: filter === 'unread', category: ['all', 'unread'].includes(filter) ? null : filter,
+      });
       setItems((prev) => (before ? [...(prev || []), ...rows] : rows));
       setMore(rows.length === 20);
       setError(null);
     } catch (err) { setError(err); }
-  }, [unreadOnly]);
+  }, [filter]);
   useEffect(() => { setItems(null); load(); }, [load]);
   const markAll = async () => { await portalApi.markNotificationsRead(null); load(); };
+  const markOne = (n) => { if (!n.read_at) portalApi.markNotificationsRead([n.id]).then(() => setItems((p) => p?.map((x) => (x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x))), () => {}); };
   return (
     <Panel title="Notifications" actions={
-      <div className="flex items-center gap-3 font-sans">
-        <label className="flex items-center gap-2 text-[12px] text-[#E7D5A4]/60"><input type="checkbox" className="accent-[#C99A2E]" checked={unreadOnly} onChange={(e) => setUnreadOnly(e.target.checked)} />Unread only</label>
+      <div className="flex items-center gap-1 font-sans">
         <Button size="sm" variant="ghost" icon="CheckCheck" onClick={markAll}>Mark all read</Button>
+        {settingsTo && <Button size="sm" variant="ghost" icon="Settings" to={settingsTo}>Settings</Button>}
       </div>}>
+      <div role="tablist" aria-label="Filter notifications" className="flex gap-1.5 overflow-x-auto pb-3 -mt-1">
+        {filters.map(([k, label]) => (
+          <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
+            className={cx('h-7 px-2.5 rounded-full border font-mono text-[10.5px] uppercase tracking-[0.08em] whitespace-nowrap', filter === k ? 'border-[#C99A2E] bg-[#C99A2E] text-[#11100C]' : 'border-[#E7D5A4]/20 text-[#ecdcaf]/75')}>
+            {label}
+          </button>
+        ))}
+      </div>
       {error ? <ErrorState error={error} onRetry={() => load()} /> : items === null ? <Skeleton rows={4} /> : items.length === 0 ? (
-        <EmptyState icon="Bell" title="No notifications" />
+        <EmptyState icon="Bell" title={filter === 'unread' ? 'All caught up' : 'No notifications'} />
       ) : (
         <>
-          <ul className="divide-y divide-[#E7D5A4]/[0.06] font-sans">
-            {items.map((n) => (
-              <li key={n.id} className="py-3 flex gap-3">
-                <span className={cx('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', n.read_at ? 'bg-transparent' : 'bg-[#e4bd5c]')} />
-                <div className="min-w-0 flex-1">
-                  {n.link ? <Link to={n.link} className="text-[14px] text-[#EFE2C0] hover:underline" onClick={() => { if (!n.read_at) portalApi.markNotificationsRead([n.id]).catch(() => {}); }}>{n.title}</Link>
-                    : <span className="text-[14px] text-[#EFE2C0]">{n.title}</span>}
-                  {n.body && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{n.body}</p>}
-                  <span className="font-mono text-[10.5px] text-[#E7D5A4]/40">{fmt.dateTime(n.created_at)}</span>
-                </div>
-              </li>
-            ))}
+          <ul className="divide-y divide-[#E7D5A4]/[0.06] font-sans" data-notifications>
+            {items.map((n) => {
+              const pb = PRIORITY_BADGE[n.priority];
+              return (
+                <li key={n.id} className="py-3 flex gap-3">
+                  <span aria-label={n.read_at ? undefined : 'Unread'} className={cx('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', n.read_at ? 'bg-transparent' : 'bg-[#e4bd5c]')} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {n.link ? <Link to={n.link} className="text-[14px] text-[#EFE2C0] hover:underline" onClick={() => markOne(n)}>{n.title}</Link>
+                        : <span className="text-[14px] text-[#EFE2C0]">{n.title}</span>}
+                      {pb && <Badge tone={pb[1]}>{pb[0]}</Badge>}
+                    </div>
+                    {n.body && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{n.body}</p>}
+                    <span className="font-mono text-[10.5px] text-[#E7D5A4]/40">{fmt.dateTime(n.created_at)}</span>
+                  </div>
+                  {!n.read_at && !n.link && <button type="button" onClick={() => markOne(n)} className="self-start font-mono text-[10px] uppercase text-[#E7D5A4]/50 hover:text-[#E7D5A4]">Mark read</button>}
+                </li>
+              );
+            })}
           </ul>
           {more && <div className="pt-3"><Button size="sm" onClick={() => load(items[items.length - 1]?.created_at)}>Load more</Button></div>}
         </>
@@ -501,7 +620,7 @@ export const CheckInAccessPanel = ({ events }) => {
         </Panel>
       )}
       {requesting && (
-        <div className="fixed inset-0 z-[450] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label="Request check-in access">
+        <div className="fixed inset-0 z-[10030] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label="Request check-in access">
           <div className="absolute inset-0 bg-black/70" onClick={() => setRequesting(null)} />
           <div className="relative w-full sm:max-w-md bg-[#15110D] border border-[#C99A2E]/35 rounded-t-lg sm:rounded-md p-5 flex flex-col gap-3">
             <h2 className="font-condensed text-base uppercase tracking-wide text-[#EFE2C0] m-0">Request check-in access</h2>

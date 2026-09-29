@@ -4,6 +4,23 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../../audio/AudioContext';
 import { NotificationBell } from '../../portal/NotificationBell';
 
+// Artist workspace navigation. Sections that live as tabs inside the
+// dashboard are deep-linked with ?tab= so every item is a real route.
+const ARTIST_NAV = [
+  { label: 'Overview', to: '/artist/dashboard', desktop: true },
+  { label: 'Calendar', to: '/artist/calendar', desktop: true },
+  { label: 'My events', to: '/artist/dashboard?tab=events' },
+  { label: 'Requests', to: '/artist/requests', desktop: true },
+  { label: 'Requirements', to: '/artist/dashboard?tab=requirements' },
+  { label: 'Documents', to: '/artist/dashboard?tab=documents' },
+  { label: 'Media', to: '/artist/media', desktop: true },
+  { label: 'Messages', to: '/artist/dashboard?tab=messages', desktop: true },
+  { label: 'Announcements', to: '/artist/dashboard?tab=announcements' },
+  { label: 'Notifications', to: '/artist/dashboard?tab=notifications' },
+  { label: 'Profile', to: '/artist/profile', desktop: true },
+  { label: 'Settings', to: '/artist/settings', desktop: true },
+];
+
 export const ArtistNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,6 +32,13 @@ export const ArtistNavbar = () => {
   useEffect(() => {
     setMobileDrawerOpen(false);
   }, [location.pathname]);
+
+  const isActive = (n) => {
+    const [path, query] = n.to.split('?');
+    if (location.pathname !== path) return false;
+    const tab = new URLSearchParams(location.search).get('tab');
+    return query ? `tab=${tab}` === query : !tab || tab === 'overview';
+  };
 
   const handleNav = (path) => {
     playSFX('ticketClick');
@@ -50,40 +74,12 @@ export const ArtistNavbar = () => {
 
         {user ? (
           <>
-            <button 
-              onClick={() => handleNav('/artist/dashboard')}
-              className={`hover:text-[#d1a437] transition-colors uppercase ${location.pathname === '/artist/dashboard' ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}
-            >
-              DASHBOARD
-            </button>
-
-            <button 
-              onClick={() => handleNav('/artist/profile')}
-              className={`hover:text-[#d1a437] transition-colors uppercase ${location.pathname === '/artist/profile' ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}
-            >
-              PROFILE
-            </button>
-
-            <button 
-              onClick={() => handleNav('/artist/calendar')}
-              className={`hover:text-[#d1a437] transition-colors uppercase ${location.pathname === '/artist/calendar' ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}
-            >
-              CALENDAR
-            </button>
-
-            <button 
-              onClick={() => handleNav('/artist/media')}
-              className={`hover:text-[#d1a437] transition-colors uppercase ${location.pathname === '/artist/media' ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}
-            >
-              MEDIA
-            </button>
-
-            <button 
-              onClick={() => handleNav('/artist/settings')}
-              className={`hover:text-[#d1a437] transition-colors uppercase ${location.pathname === '/artist/settings' ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}
-            >
-              SETTINGS
-            </button>
+            {ARTIST_NAV.filter((n) => n.desktop).map((n) => (
+              <button key={n.label} onClick={() => handleNav(n.to)} aria-current={isActive(n) ? 'page' : undefined}
+                className={`hover:text-[#d1a437] transition-colors uppercase ${isActive(n) ? 'text-[#d1a437] font-bold' : 'opacity-80'}`}>
+                {n.label}
+              </button>
+            ))}
           </>
         ) : (
           <>
@@ -159,40 +155,12 @@ export const ArtistNavbar = () => {
 
             {user ? (
               <>
-                <button
-                  onClick={() => handleNav('/artist/dashboard')}
-                  className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${location.pathname === '/artist/dashboard' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}
-                >
-                  02 // DASHBOARD
-                </button>
-
-                <button
-                  onClick={() => handleNav('/artist/profile')}
-                  className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${location.pathname === '/artist/profile' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}
-                >
-                  03 // PROFILE & BIO
-                </button>
-
-                <button
-                  onClick={() => handleNav('/artist/calendar')}
-                  className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${location.pathname === '/artist/calendar' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}
-                >
-                  04 // CALENDAR & SCHEDULE
-                </button>
-
-                <button
-                  onClick={() => handleNav('/artist/media')}
-                  className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${location.pathname === '/artist/media' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}
-                >
-                  05 // MEDIA MANAGER
-                </button>
-
-                <button
-                  onClick={() => handleNav('/artist/settings')}
-                  className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${location.pathname === '/artist/settings' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}
-                >
-                  06 // SETTINGS
-                </button>
+                {ARTIST_NAV.map((n, idx) => (
+                  <button key={n.label} onClick={() => handleNav(n.to)} aria-current={isActive(n) ? 'page' : undefined}
+                    className={`p-3 text-left border border-[#ecdcaf]/20 uppercase transition-all ${isActive(n) ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : 'bg-[#0d0a07] text-[#ecdcaf]'}`}>
+                    {String(idx + 2).padStart(2, '0')} // {n.label}
+                  </button>
+                ))}
               </>
             ) : (
               <>

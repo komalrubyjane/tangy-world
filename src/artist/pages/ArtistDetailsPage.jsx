@@ -20,10 +20,9 @@ export const ArtistDetailsPage = () => {
     setStatus('loading');
 
     supabase
-      .from('artists')
+      .from('public_artists')
       .select('*')
       .eq('id', id)
-      .eq('status', 'approved')
       .maybeSingle()
       .then(({ data, error }) => {
         if (cancelled) return;
@@ -77,7 +76,7 @@ export const ArtistDetailsPage = () => {
         {/* AVATAR DISPLAY */}
         <div className="w-full md:w-1/2 h-80 md:h-auto bg-[#181614] border-b-4 md:border-b-0 md:border-r-4 border-[#191410] relative overflow-hidden">
           {artist.avatar_url ? (
-            <img src={artist.avatar_url} alt={artist.name} className="w-full h-full object-cover grayscale" />
+            <img src={artist.avatar_url} alt={artist.stage_name || artist.name} className="w-full h-full object-cover grayscale" />
           ) : (
             <div className="w-full h-full flex items-center justify-center font-poster text-8xl text-[#ecdcaf]">
               {artist.name[0]}
@@ -92,7 +91,7 @@ export const ArtistDetailsPage = () => {
               ARTIST SPOTLIGHT {artist.city ? `// ${artist.city}` : ''}
             </span>
             <h1 className="font-poster text-5xl sm:text-7xl text-[#191410] leading-none">
-              {artist.name}
+              {artist.stage_name || artist.name}
             </h1>
             <span className="font-mono text-xs font-bold text-[#c2272a] uppercase">{artist.genre}</span>
           </div>

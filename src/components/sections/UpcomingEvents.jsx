@@ -11,7 +11,7 @@ const TABLE_ANGLES = ['-0.9deg', '0.6deg', '-0.4deg'];
 // objects: large editorial heading, three posters on the grid, one link out.
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
-  const { events: allEvents } = useEvents();
+  const { events: allEvents, loading } = useEvents();
   const events = allEvents.filter((e) => e.dbStatus !== 'past').slice(0, 3);
   const sectionRef = useReveal();
 
@@ -42,6 +42,9 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
             </div>
           ))}
         </div>
+        {!loading && events.length === 0 && (
+          <p className="t-label text-[#EFE2C0]/70 mt-12 text-center">New sessions are being scheduled — join the waitlist on the sessions page.</p>
+        )}
       </div>
     </section>
   );

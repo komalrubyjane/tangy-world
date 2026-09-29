@@ -5,6 +5,7 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
 import { PortalShell, Badge, Empty, fmtDate, StatTile, ReadOnlyNote } from './portal/PortalUI';
 import { usePartnerPortal, partnerTabs, PartnerSection } from '../../portal/PartnerPortal';
+import { SponsorDeliverablesPanel } from '../../portal/PartnerExtras';
 
 const TABS = [
   { id: 'overview', label: '📊 OVERVIEW' },
@@ -111,7 +112,8 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
         </div>
       )}
 
-      {activeTab === 'deliverables' && (
+      {portalMode && activeTab === 'deliverables' && <SponsorDeliverablesPanel sponsorId={user.id} />}
+      {!portalMode && activeTab === 'deliverables' && (
         deliverables.length === 0 ? <Empty>NO DELIVERABLES ON FILE YET.</Empty> : (
           <div className="flex flex-col gap-3">
             {deliverables.map((d) => (

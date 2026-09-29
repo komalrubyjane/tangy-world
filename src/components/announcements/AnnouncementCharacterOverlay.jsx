@@ -52,6 +52,8 @@ const MIN_VISIBLE_MS = 1200;
  *   z-[500]           AnnouncementCharacterOverlay (THIS component)
  *   z-[9999]          Navbar header (fixed, top)
  *   z-[10000..10002]  Navbar mobile drawer / dropdown / toggle button
+ *   z-[10020..10040]  shared drawers / modals / toasts (admin/ui) — portals render
+ *                     the Navbar, so these must sit above it
  *   z-[10050]         UserLoginModal
  *   z-[99999]         top-most, reserved for critical system overlays
  *

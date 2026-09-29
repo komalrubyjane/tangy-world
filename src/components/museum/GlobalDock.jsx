@@ -8,7 +8,7 @@ import { TangyTVModal } from './TangyTVModal';
 import { UserLoginModal } from './UserLoginModal';
 
 // Staff tools keep their own chrome; the public dock stays out of them.
-const DOCK_HIDDEN_PREFIXES = ['/admin', '/check-in', '/demo-admin'];
+const DOCK_HIDDEN_PREFIXES = ['/admin-portal', '/check-in', '/demo-admin'];
 
 // The secondary navigation bar (PASSPORT · LOGIN · TV · KIRANA · POSTCARD)
 // and the modals it opens, rendered ONCE for the whole app so the bar is

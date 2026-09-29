@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Panel } from '../admin/ui';
+import { Panel, Button } from '../admin/ui';
 import { MessagesPanel } from './MessagesPanel';
 import { portalApi } from './portalApi';
+import { ArtistEventDrawer } from '../artist/components/ArtistEventDrawer';
+import { ProfileCompletionCard } from '../artist/components/ProfileCompletionCard';
+import { NotificationPreferences, PREF_KEYS_BY_ROLE } from './NotificationPreferences';
+import { InvoicesPanel, SponsorAssetsPanel, MyTasksPanel } from './PartnerExtras';
 import {
   usePortalTab, usePortalEvents, Greeting, NextEventCard, EventsPanel, EventDrawer, ScheduleTimeline, RequirementsPanel,
-  DocumentsPanel, AnnouncementsPanel, NotificationsPanel, CheckInAccessPanel, PortalStat,
+  DocumentsPanel, AnnouncementsPanel, NotificationsPanel, NOTIFICATION_FILTERS, CheckInAccessPanel, PortalStat,
 } from './PortalSections';
 
 // Shared tabs for artist / sponsor / vendor / venue host / volunteer portals.
@@ -27,11 +31,13 @@ export function partnerTabs(kind) {
     { id: 'events', label: c.events },
   ];
   if (kind === 'artist') tabs.push({ id: 'schedule', label: 'Schedule' });
-  if (kind === 'volunteer') tabs.push({ id: 'checkin', label: 'Check-in access' });
+  if (kind === 'volunteer') tabs.push({ id: 'tasks', label: 'My tasks' }, { id: 'checkin', label: 'Check-in access' });
   if (kind !== 'volunteer') tabs.push({ id: 'requirements', label: 'Requirements' });
   // Volunteers are reached through announcements/notifications, never private messaging.
   if (kind !== 'volunteer') tabs.push({ id: 'messages', label: 'Messages' });
   if (kind !== 'volunteer') tabs.push({ id: 'documents', label: 'Documents' });
+  if (kind === 'sponsor') tabs.push({ id: 'assets', label: 'Brand assets' });
+  if (kind !== 'volunteer') tabs.push({ id: 'payments', label: 'Payments' });
   tabs.push({ id: 'announcements', label: 'Announcements' }, { id: 'notifications', label: 'Notifications' });
   return tabs;
 }
@@ -44,7 +50,7 @@ export function usePartnerPortal(kind, extraTabIds = [], { enabled = true } = {}
   return { kind, ...nav, events, openEvent, setOpenEvent };
 }
 
-const PARTNER_SECTIONS = ['overview', 'events', 'schedule', 'checkin', 'requirements', 'messages', 'documents', 'announcements', 'notifications'];
+const PARTNER_SECTIONS = ['overview', 'events', 'schedule', 'tasks', 'checkin', 'requirements', 'messages', 'documents', 'assets', 'payments', 'announcements', 'notifications'];
 
 export const PartnerSection = ({ portal, user, overviewNote }) => {
   const { kind, tab, setTab, conversationId, setConversationId, events, openEvent, setOpenEvent } = portal;
@@ -60,15 +66,25 @@ export const PartnerSection = ({ portal, user, overviewNote }) => {
         <EventsPanel {...ev} includePast={events.includePast} setIncludePast={events.setIncludePast} onOpen={setOpenEvent} emptyHint={c.hint} />
       )}
       {tab === 'schedule' && <ScheduleTimeline {...ev} onOpen={setOpenEvent} />}
+      {tab === 'tasks' && kind === 'volunteer' && <MyTasksPanel userId={user?.id} />}
       {tab === 'checkin' && <CheckInAccessPanel events={events.events} />}
       {tab === 'requirements' && <RequirementsPanel onChanged={events.reload} />}
       {tab === 'messages' && (
         <MessagesPanel mode="partner" selectedId={conversationId} onSelect={setConversationId} events={events.events || []} />
       )}
       {tab === 'documents' && <DocumentsPanel />}
+      {tab === 'assets' && kind === 'sponsor' && <SponsorAssetsPanel sponsorId={user?.id} events={events.events || []} />}
+      {tab === 'payments' && <InvoicesPanel />}
       {tab === 'announcements' && <AnnouncementsPanel />}
-      {tab === 'notifications' && <NotificationsPanel />}
-      {openEvent && <EventDrawer event={openEvent} onClose={() => setOpenEvent(null)} onChanged={events.reload} />}
+      {tab === 'notifications' && (kind === 'artist'
+        ? <NotificationsPanel settingsTo="/artist/settings" />
+        : <>
+          <NotificationsPanel filters={NOTIFICATION_FILTERS.filter(([k]) => !['applications', ...(kind === 'volunteer' ? ['messages', 'requirements', 'payments'] : ['tasks'])].includes(k))} />
+          <NotificationPreferences keys={PREF_KEYS_BY_ROLE[kind === 'volunteer' ? 'volunteer' : 'partner']} />
+        </>)}
+      {openEvent && (kind === 'artist'
+        ? <ArtistEventDrawer event={openEvent} onClose={() => setOpenEvent(null)} />
+        : <EventDrawer event={openEvent} onClose={() => setOpenEvent(null)} onChanged={events.reload} />)}
     </div>
   );
 };
@@ -89,7 +105,11 @@ const Overview = ({ kind, user, ev, copy, setTab, onOpen, note }) => {
     <>
       <Greeting name={user?.full_name} subtitle={kind === 'artist' ? 'Your upcoming Tangy events' : kind === 'volunteer' ? 'Your Tangy volunteering' : 'Your Tangy events at a glance'} />
       {note}
-      <NextEventCard {...ev} onOpen={onOpen} emptyTitle={copy.next} emptyHint={copy.hint} />
+      {kind === 'artist' && <ProfileCompletionCard />}
+      <NextEventCard {...ev} onOpen={onOpen} emptyTitle={copy.next} emptyHint={copy.hint}
+        emptyAction={kind === 'artist' ? <Button size="sm" to="/artist/calendar" icon="CalendarDays">Set your availability</Button> : null}
+        messagesTo={kind === 'artist' ? '/artist/dashboard?tab=messages' : '?tab=messages'}
+        scheduleTo={kind === 'artist' ? '/artist/calendar' : '?tab=events'} />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <PortalStat label={copy.events} value={ev.events ? upcoming : null} onClick={() => setTab('events')} />
         {kind !== 'volunteer' && <PortalStat label="Needed from you" value={ev.events ? openReqs : null} tone={openReqs ? 'warn' : undefined} onClick={() => setTab('requirements')} />}

@@ -39,7 +39,7 @@ export const NotificationBell = ({ userId, allHref }) => {
         )}
       </button>
       {open && (
-        <div role="dialog" aria-label="Notifications" className="absolute right-0 mt-2 w-[min(92vw,360px)] z-[500] bg-[#15110D] border border-[#C99A2E]/35 rounded-md shadow-[0_18px_50px_rgba(0,0,0,0.6)] font-sans">
+        <div role="dialog" aria-label="Notifications" className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-[360px] z-[10010] bg-[#15110D] border border-[#C99A2E]/35 rounded-md shadow-[0_18px_50px_rgba(0,0,0,0.6)] font-sans">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#C99A2E]/15">
             <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#C99A2E]">Notifications</span>
             {count > 0 && <button onClick={() => markRead(null)} className="text-[11.5px] text-[#E7D5A4]/60 hover:text-[#EFE2C0] underline underline-offset-2">Mark all read</button>}

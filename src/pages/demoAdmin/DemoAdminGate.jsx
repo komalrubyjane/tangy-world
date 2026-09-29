@@ -30,7 +30,7 @@ export const DemoAdminGate = ({ children }) => {
             GO TO DEMO ENTRY →
           </Link>
         ) : (
-          <Link to="/admin" className="bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-bold uppercase tracking-widest py-3 border border-[#11100C]">
+          <Link to="/admin-portal" className="bg-[#C99A2E] text-[#11100C] hover:bg-[#E7D5A4] font-bold uppercase tracking-widest py-3 border border-[#11100C]">
             SIGN IN AS ADMIN →
           </Link>
         )}

@@ -76,7 +76,7 @@ export const AdminPreviewBanner = ({ label }) => (
         </span>
       </div>
       <Link
-        to="/admin"
+        to="/admin-portal"
         className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border border-[#E7D5A4]/60 px-2.5 py-1 hover:bg-[#E7D5A4] hover:text-[#B94717] transition-colors"
       >
         ← BACK TO CONTROL ROOM

@@ -111,7 +111,7 @@ export const AdminEntitySelectorInner = () => {
   if (!config) {
     return (
       <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
-        Unknown portal type. <Link to="/admin" className="underline ml-2">Back to Control Room</Link>
+        Unknown portal type. <Link to="/admin-portal" className="underline ml-2">Back to Control Room</Link>
       </div>
     );
   }
@@ -155,7 +155,7 @@ export const AdminEntitySelectorInner = () => {
             </div>
           )}
 
-          <Link to="/admin" className="inline-block mt-6 text-[10px] font-bold uppercase tracking-wider text-[#E7D5A4]/60 hover:text-[#E7D5A4] underline">
+          <Link to="/admin-portal" className="inline-block mt-6 text-[10px] font-bold uppercase tracking-wider text-[#E7D5A4]/60 hover:text-[#E7D5A4] underline">
             ← Back to Control Room
           </Link>
         </div>

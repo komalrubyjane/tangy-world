@@ -11,15 +11,16 @@ export const portalApi = {
 
   requirements: () =>
     list('event_requirements', {
-      select: 'id, event_id, title, details, due_at, status, response, responded_at, review_note, created_at, events(name, event_date)',
+      select: 'id, event_id, title, details, due_at, status, priority, response, attachment_path, responded_at, review_note, created_at, events(name, event_date)',
       build: (q) => q.order('status').order('due_at', { ascending: true, nullsFirst: false }),
       to: 99,
     }).then((r) => r.rows),
-  submitRequirement: (id, response) => rpc('submit_requirement', { p_id: id, p_response: response }),
+  submitRequirement: (id, response, attachmentPath = null) =>
+    rpc('submit_requirement', { p_id: id, p_response: response, p_attachment_path: attachmentPath }),
 
   documents: () =>
     list('event_documents', {
-      select: 'id, event_id, title, url, audience, created_at, events(name, event_date)',
+      select: 'id, event_id, title, description, category, url, storage_path, file_name, file_size_bytes, expires_at, audience, created_at, events(name, event_date)',
       build: (q) => q.order('created_at', { ascending: false }),
       to: 99,
     }).then((r) => r.rows),
@@ -44,14 +45,17 @@ export const portalApi = {
       p_unread_only: !!filters.unreadOnly,
       p_limit: filters.limit || 30,
       p_offset: filters.offset || 0,
+      p_assigned: filters.assigned || null,
     }).then((r) => r || []),
   adminStartConversation: ({ userId, subject, body, eventId }) =>
     rpc('admin_start_partner_conversation', { p_user_id: userId, p_subject: subject || null, p_body: body, p_event_id: eventId || null }),
   setConversationStatus: (conversationId, status) => rpc('set_conversation_status', { p_conversation_id: conversationId, p_status: status }),
+  setConversationMeta: (conversationId, { priority = null, assignToMe = null } = {}) =>
+    rpc('set_conversation_meta', { p_conversation_id: conversationId, p_priority: priority, p_assign_to_me: assignToMe }),
 
   // Notifications
-  notifications: ({ limit = 20, before = null, unreadOnly = false } = {}) =>
-    rpc('my_notifications', { p_limit: limit, p_before: before, p_unread_only: unreadOnly }).then((r) => r || []),
+  notifications: ({ limit = 20, before = null, unreadOnly = false, category = null } = {}) =>
+    rpc('my_notifications', { p_limit: limit, p_before: before, p_unread_only: unreadOnly, p_category: category }).then((r) => r || []),
   unreadCount: () => rpc('notification_unread_count').then((n) => n || 0),
   markNotificationsRead: (ids = null) => rpc('mark_notifications_read', { p_ids: ids }),
 

@@ -33,9 +33,8 @@ export const ArtistsDirectoryPage = () => {
       return;
     }
     supabase
-      .from('artists')
+      .from('public_artists')
       .select('*')
-      .eq('status', 'approved')
       .order('applied_at', { ascending: false })
       .then(({ data, error }) => {
         if (cancelled) return;
@@ -51,7 +50,7 @@ export const ArtistsDirectoryPage = () => {
 
   const filtered = artists.filter((a) =>
     (filter === 'All' || (a.genre || '').toLowerCase().includes(filter.toLowerCase())) &&
-    (search === '' || a.name.toLowerCase().includes(search.toLowerCase()))
+    (search === '' || [a.name, a.stage_name].some((n) => (n || '').toLowerCase().includes(search.toLowerCase())))
   );
 
   return (
@@ -168,7 +167,7 @@ export const ArtistsDirectoryPage = () => {
                 <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden border-b-2 sm:border-b-4 border-[#191410]">
                   <PhotoTreatment
                     src={artist.avatar_url || '/media/gallery/tangy1.jpg'}
-                    alt={artist.name}
+                    alt={artist.stage_name || artist.name}
                     className="w-full h-full"
                     onError={(e) => {
                       e.target.onerror = null;
@@ -204,7 +203,7 @@ export const ArtistsDirectoryPage = () => {
                     className="relative font-poster leading-[0.82] -rotate-1 origin-left -mt-[10%] drop-shadow-[2px_2px_0_rgba(0,0,0,0.35)]"
                     style={{ fontSize: 'clamp(26px,5.2vw,42px)' }}
                   >
-                    {artist.name}
+                    {artist.stage_name || artist.name}
                   </h3>
                   <p className="relative font-sans text-[11px] sm:text-xs opacity-80 line-clamp-1 leading-relaxed mt-1.5">{artist.bio}</p>
                   {artist.city && (
