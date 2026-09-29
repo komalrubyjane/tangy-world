@@ -73,13 +73,13 @@ export default function EventsPage() {
           </Toolbar>
         </div>
         <DataTable columns={columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload}
-          onRowClick={(e) => navigate(`/admin/events/${e.id}`)}
+          onRowClick={(e) => navigate(`/admin-portal/events/${e.id}`)}
           empty={{ title: 'No events yet', hint: status || when || venue || q ? 'No events match these filters.' : 'Create the first Tangy session.', icon: 'CalendarDays', action: can(P.EVENTS_MANAGE) && <Button size="sm" icon="Plus" onClick={() => setParam('new', '1')}>New event</Button> }} />
         <Pagination {...table} />
       </Panel>
       {creating && (
         <Modal title="Create event" wide onClose={() => setParam('new', '')}>
-          <EventForm onCancel={() => setParam('new', '')} onSaved={(evt) => navigate(`/admin/events/${evt.id}`)} />
+          <EventForm onCancel={() => setParam('new', '')} onSaved={(evt) => navigate(`/admin-portal/events/${evt.id}`)} />
         </Modal>
       )}
     </Page>

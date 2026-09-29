@@ -100,6 +100,12 @@ export function orIlike(q, columns, term) {
 // ---------------------------------------------------------------------------
 
 export const adminApi = {
+  search: (q) => rpc('admin_search', { p_query: q, p_limit: 6 }),
+  operationsOverview: () => rpc('admin_operations_overview'),
+  eventHealth: (id) => rpc('event_health', { p_event_id: id }),
+  createBookingRequest: ({ eventId, artistId, message, start, end, fee, expiresAt }) => rpc('create_booking_request', {
+    p_event_id: eventId, p_artist_id: artistId, p_message: message, p_proposed_start: start, p_proposed_end: end, p_fee_offer: fee, p_expires_at: expiresAt,
+  }),
   myPermissions: () => rpc('my_permissions'),
   runtimeSettings: () => rpc('get_runtime_settings'),
   logAuthEvent: (action) => rpc('log_auth_event', { p_action: action }).catch(() => null),

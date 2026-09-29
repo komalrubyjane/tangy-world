@@ -16,7 +16,7 @@ const ROLES = [
 
 // Module list per role, straight from the console's own nav config.
 const modulesFor = (role) =>
-  buildNav(MOCK_ROLE_PERMISSIONS[role]).flatMap((g) => g.items).filter((i) => !i.to.startsWith('/admin/ops/')).map((i) => i.label);
+  buildNav(MOCK_ROLE_PERMISSIONS[role]).flatMap((g) => g.items).filter((i) => !i.to.startsWith('/admin-portal/ops/')).map((i) => i.label);
 
 export const DevRoleSelector = ({ onUseRealLogin }) => {
   const [busy, setBusy] = useState(null);
@@ -52,7 +52,7 @@ export const DevRoleSelector = ({ onUseRealLogin }) => {
         <div className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.28em] text-[#C99A2E]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#B94717]" /> Tangy Sessions
         </div>
-        <h1 className="font-condensed text-[34px] sm:text-[40px] uppercase tracking-tight text-[#EFE2C0] mt-1 mb-0 leading-none">Admin System</h1>
+        <h1 className="font-condensed text-[34px] sm:text-[40px] uppercase tracking-tight text-[#EFE2C0] mt-1 mb-0 leading-none">Admin Portal</h1>
         <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.22em] text-[#ff4fd8]">Development / Demo mode</p>
         <p className="mt-4 text-[15px] text-[#E7D5A4]/75">Select a role to preview</p>
       </header>
@@ -132,7 +132,7 @@ export const DevModeBanner = ({ user }) => {
   const changeRole = async () => {
     setBusy(true);
     await switchDevRole(null);
-    if (pathname.startsWith('/admin/')) navigate('/admin', { replace: true });
+    if (pathname.startsWith('/admin-portal/')) navigate('/admin-portal', { replace: true });
   };
   return (
     <DevModeStrip localSession={!user.devMock}>
@@ -155,11 +155,11 @@ export const DevPortalStrip = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const id = user && Object.values(PORTAL_IDENTITIES).find((m) => m.email === user.email);
-  if (!id || pathname.startsWith('/admin') || pathname.startsWith('/check-in')) return null;
+  if (!id || pathname.startsWith('/admin-portal') || pathname.startsWith('/check-in')) return null;
   return (
     <div role="note" aria-label="Development mode" className="fixed left-3 bottom-3 z-[1000] flex items-center gap-2 rounded-full border-2 border-dashed border-[#ff4fd8] bg-[#1a0b17]/95 pl-3 pr-1 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#ffd6f5] shadow-lg">
       <span className="font-bold text-[#ff4fd8]">Dev</span> {id.label} · local test account
-      <button onClick={() => { navigate('/admin'); switchDevRole(null); }} className="h-6 px-2.5 rounded-full border border-[#ff4fd8]/70 hover:bg-[#ff4fd8]/20">Change role</button>
+      <button onClick={() => { navigate('/admin-portal'); switchDevRole(null); }} className="h-6 px-2.5 rounded-full border border-[#ff4fd8]/70 hover:bg-[#ff4fd8]/20">Change role</button>
     </div>
   );
 };

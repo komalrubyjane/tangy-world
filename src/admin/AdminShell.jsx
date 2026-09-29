@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAdminSession, useSetting } from './AdminSession';
+import { useDebounced } from './hooks';
 import { adminApi } from './api';
 import { buildNav, ROLE_LABELS, P } from './rbac';
 import { Icon, Button, cx } from './ui';
@@ -39,7 +40,7 @@ function usePendingApplications(enabled) {
       .then(({ count: c }) => { if (!cancelled && typeof c === 'number') setCount(c); });
     return () => { cancelled = true; };
     // Refresh when moving between sections (e.g. after reviewing one).
-  }, [enabled, pathname.startsWith('/admin/applications')]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enabled, pathname.startsWith('/admin-portal/applications')]); // eslint-disable-line react-hooks/exhaustive-deps
   return count;
 }
 
@@ -98,7 +99,7 @@ const NavItem = ({ item, badge, onNavigate }) => {
 
 const Sidebar = ({ nav, badges, onNavigate }) => {
   const { pathname } = useLocation();
-  const [openMore, setOpenMore] = useState(() => pathname.startsWith('/admin/ops'));
+  const [openMore, setOpenMore] = useState(() => pathname.startsWith('/admin-portal/ops'));
   const orgName = useSetting('general.organization_name', 'Tangy Sessions');
   return (
     <div className="flex flex-col h-full">
@@ -106,7 +107,7 @@ const Sidebar = ({ nav, badges, onNavigate }) => {
         <span className="w-2 h-2 rounded-full bg-[#B94717]" />
         <div className="leading-none">
           <div className="font-condensed text-[15px] uppercase tracking-wide text-[#EFE2C0]">{orgName}</div>
-          <div className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-[#C99A2E]/70 mt-1">Admin System</div>
+          <div className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-[#C99A2E]/70 mt-1">Admin Portal</div>
         </div>
       </div>
       <nav className="flex-1 overflow-y-auto px-2.5 py-3 flex flex-col gap-4" aria-label="Admin navigation">
@@ -134,28 +135,108 @@ const Sidebar = ({ nav, badges, onNavigate }) => {
   );
 };
 
+// Admin Portal / <group> / <section> — derived from the same permission-built nav.
+const Breadcrumbs = ({ nav }) => {
+  const { pathname } = useLocation();
+  const flat = nav.flatMap((g) => g.items.map((i) => ({ ...i, group: g.group })));
+  const match = flat.filter((i) => !i.external && (pathname === i.to || pathname.startsWith(`${i.to}/`)))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  useEffect(() => {
+    document.title = match && match.to !== '/admin-portal' ? `${match.label} · Tangy Admin Portal` : 'Tangy Admin Portal';
+  }, [match]);
+  if (!match || match.to === '/admin-portal') return null;
+  return (
+    <nav aria-label="Breadcrumb" className="mb-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/40">
+      <ol className="flex flex-wrap items-center gap-1.5">
+        <li><Link to="/admin-portal" className="hover:text-[#E7D5A4]">Admin Portal</Link></li>
+        <li aria-hidden="true">/</li>
+        <li>{match.group}</li>
+        <li aria-hidden="true">/</li>
+        <li>{pathname === match.to ? <span aria-current="page" className="text-[#E7D5A4]/70">{match.label}</span> : <Link to={match.to} className="hover:text-[#E7D5A4]">{match.label}</Link>}</li>
+      </ol>
+    </nav>
+  );
+};
+
+const UserMenu = ({ user, onSignOut }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  const initials = (user?.full_name || user?.email || '?').split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  return (
+    <div className="relative ml-1" ref={ref}>
+      <button onClick={() => setOpen((o) => !o)} aria-haspopup="menu" aria-expanded={open} aria-label="Account menu"
+        className="flex items-center gap-2 h-10 pl-1 pr-2 rounded hover:bg-[#C99A2E]/10">
+        <span className="w-8 h-8 rounded-full bg-[#C99A2E]/20 border border-[#C99A2E]/40 text-[#EFE2C0] font-mono text-[11px] inline-flex items-center justify-center">{initials}</span>
+        <span className="hidden md:flex flex-col items-start leading-tight">
+          <span className="text-[12.5px] text-[#EFE2C0] max-w-[180px] truncate">{user?.full_name || user?.email}</span>
+          <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-[#C99A2E]">{ROLE_LABELS[user?.role] || user?.role}</span>
+        </span>
+        <Icon name="ChevronDown" size={14} className="text-[#E7D5A4]/50" />
+      </button>
+      {open && (
+        <div role="menu" className="absolute right-0 mt-2 w-60 z-[500] bg-[#15110D] border border-[#C99A2E]/35 rounded-md shadow-[0_18px_50px_rgba(0,0,0,0.6)] py-1.5">
+          <div className="px-3.5 py-2 border-b border-[#C99A2E]/15 mb-1">
+            <div className="text-[13px] text-[#EFE2C0] truncate">{user?.full_name || '—'}</div>
+            <div className="text-[11.5px] text-[#E7D5A4]/50 truncate">{user?.email}</div>
+          </div>
+          <Link role="menuitem" to="/admin-portal/notifications" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#E7D5A4]/80 hover:bg-[#C99A2E]/10"><Icon name="Bell" size={15} />Notifications</Link>
+          <Link role="menuitem" to="/admin-portal/notifications?tab=settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#E7D5A4]/80 hover:bg-[#C99A2E]/10"><Icon name="Settings" size={15} />Notification settings</Link>
+          <button role="menuitem" onClick={() => { setOpen(false); onSignOut(); }} className="w-full flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#ef6b5e] hover:bg-[#a8322a]/10"><Icon name="LogOut" size={15} />Sign out</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const QUICK_ACTIONS = [
-  { label: 'Create event', to: '/admin/events?new=1', requires: P.EVENTS_MANAGE, icon: 'Plus' },
-  { label: 'Review pending applications', to: '/admin/applications?status=pending', requires: P.APPLICATIONS_REVIEW, icon: 'Inbox' },
-  { label: 'Add complimentary booking', to: '/admin/bookings?comp=1', requires: P.BOOKINGS_MANAGE, icon: 'Ticket' },
-  { label: 'New announcement', to: '/admin/content?new=1', requires: P.CONTENT, icon: 'Megaphone' },
+  { label: 'Create event', to: '/admin-portal/events?new=1', requires: P.EVENTS_MANAGE, icon: 'Plus' },
+  { label: 'Review pending applications', to: '/admin-portal/applications?status=pending', requires: P.APPLICATIONS_REVIEW, icon: 'Inbox' },
+  { label: 'Add complimentary booking', to: '/admin-portal/bookings?comp=1', requires: P.BOOKINGS_MANAGE, icon: 'Ticket' },
+  { label: 'New announcement', to: '/admin-portal/content?new=1', requires: P.CONTENT, icon: 'Megaphone' },
   { label: 'Open check-in terminal', to: '/check-in', requires: P.CHECKIN, icon: 'ScanLine' },
-  { label: 'Invite a user', to: '/admin/users?invite=1', requires: P.USERS_MANAGE, icon: 'UserPlus' },
+  { label: 'Invite a user', to: '/admin-portal/users?invite=1', requires: P.USERS_MANAGE, icon: 'UserPlus' },
 ];
 
+const RESULT_ICON = { event: 'CalendarDays', artist: 'Mic', sponsor: 'Handshake', vendor: 'Store', 'venue host': 'Building2', volunteer: 'HeartHandshake', booking: 'Ticket', attendee: 'Users', message: 'MessagesSquare' };
+
+// ⌘K: global, permission-scoped search (admin_search RPC — the database
+// decides what each role may find) plus section jumps and quick actions.
 const CommandPalette = ({ nav, onClose }) => {
-  const { can } = useAdminSession();
+  const { can, isMock } = useAdminSession();
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   const [idx, setIdx] = useState(0);
+  const dq = useDebounced(q, 220);
+  const [results, setResults] = useState({ q: '', rows: [], loading: false });
+  useEffect(() => {
+    const term = dq.trim();
+    if (term.length < 2 || isMock) { setResults({ q: term, rows: [], loading: false }); return undefined; }
+    let cancelled = false;
+    setResults((r) => ({ ...r, loading: true }));
+    adminApi.search(term).then(
+      (rows) => { if (!cancelled) setResults({ q: term, rows: rows || [], loading: false }); },
+      () => { if (!cancelled) setResults({ q: term, rows: [], loading: false }); });
+    return () => { cancelled = true; };
+  }, [dq, isMock]);
   const items = useMemo(() => {
     const all = [
       ...nav.flatMap((g) => g.items.map((i) => ({ label: i.label, to: i.to, icon: i.icon, hint: g.group }))),
       ...QUICK_ACTIONS.filter((a) => can(a.requires)).map((a) => ({ ...a, hint: 'Action' })),
     ];
     const t = q.trim().toLowerCase();
-    return t ? all.filter((i) => i.label.toLowerCase().includes(t) || i.hint.toLowerCase().includes(t)) : all;
-  }, [nav, q, can]);
+    const found = results.q && t.startsWith(results.q.toLowerCase().slice(0, 2))
+      ? results.rows.map((r) => ({ label: r.title, sub: r.subtitle, to: r.link, icon: RESULT_ICON[r.kind] || 'Search', hint: r.kind, key: `${r.kind}-${r.id}` }))
+      : [];
+    return t ? [...found, ...all.filter((i) => i.label.toLowerCase().includes(t) || i.hint.toLowerCase().includes(t))] : all;
+  }, [nav, q, can, results]);
 
   const go = (item) => { onClose(); navigate(item.to); };
 
@@ -175,22 +256,24 @@ const CommandPalette = ({ nav, onClose }) => {
               if (e.key === 'ArrowUp') { e.preventDefault(); setIdx((i) => Math.max(i - 1, 0)); }
               if (e.key === 'Enter' && items[idx]) go(items[idx]);
             }}
-            placeholder="Jump to a section or action…"
+            placeholder="Search events, people, bookings — or jump to a section…"
+            aria-label="Search the admin portal"
             className="flex-1 h-12 bg-transparent text-[14px] text-[#EFE2C0] placeholder:text-[#E7D5A4]/35 focus:outline-none"
           />
           <kbd className="font-mono text-[10px] text-[#E7D5A4]/40 border border-[#E7D5A4]/20 rounded px-1.5 py-0.5">ESC</kbd>
         </div>
-        <ul className="max-h-[50vh] overflow-y-auto py-1.5" role="listbox">
-          {items.length === 0 && <li className="px-4 py-6 text-center text-[13px] text-[#E7D5A4]/45">No matches</li>}
+        <ul className="max-h-[55vh] overflow-y-auto py-1.5" role="listbox">
+          {results.loading && <li className="px-4 py-2 text-[12px] text-[#E7D5A4]/45">Searching…</li>}
+          {items.length === 0 && !results.loading && <li className="px-4 py-6 text-center text-[13px] text-[#E7D5A4]/45">No matches</li>}
           {items.map((item, i) => (
-            <li key={`${item.hint}-${item.to}`} role="option" aria-selected={i === idx}>
+            <li key={item.key || `${item.hint}-${item.to}`} role="option" aria-selected={i === idx}>
               <button
                 onMouseEnter={() => setIdx(i)}
                 onClick={() => go(item)}
                 className={cx('w-full flex items-center gap-3 px-4 h-10 text-left text-[13px]', i === idx ? 'bg-[#C99A2E]/15 text-[#EFE2C0]' : 'text-[#E7D5A4]/75')}
               >
                 <Icon name={item.icon} size={15} className="opacity-70" />
-                <span className="flex-1 truncate">{item.label}</span>
+                <span className="flex-1 min-w-0 truncate">{item.label}{item.sub && <span className="ml-2 text-[#E7D5A4]/40">{item.sub}</span>}</span>
                 <span className="font-mono text-[9.5px] uppercase tracking-[0.15em] text-[#E7D5A4]/35">{item.hint}</span>
               </button>
             </li>
@@ -260,7 +343,7 @@ export const AdminShell = ({ children }) => {
             onClick={() => setPaletteOpen(true)}
             className="hidden sm:flex items-center gap-2 h-9 w-72 max-w-[40vw] px-3 rounded-[4px] border border-[#C99A2E]/25 text-[12.5px] text-[#E7D5A4]/45 hover:border-[#C99A2E]/50"
           >
-            <Icon name="Search" size={15} /> <span className="flex-1 text-left">Search sections & actions</span>
+            <Icon name="Search" size={15} /> <span className="flex-1 text-left">Search the portal</span>
             <kbd className="font-mono text-[10px] border border-[#E7D5A4]/20 rounded px-1">⌘K</kbd>
           </button>
           <Button variant="ghost" size="sm" icon="Search" className="sm:hidden" aria-label="Search" onClick={() => setPaletteOpen(true)} />
@@ -270,15 +353,12 @@ export const AdminShell = ({ children }) => {
               <span className="hidden sm:inline">Check-in</span>
             </Button>
           )}
-          {!isMock && <NotificationBell userId={user?.id} allHref="/admin/notifications" />}
-          <div className="hidden md:flex flex-col items-end leading-tight px-2 border-l border-[#C99A2E]/15 ml-1">
-            <span className="text-[12.5px] text-[#EFE2C0] max-w-[200px] truncate">{user?.full_name || user?.email}</span>
-            <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-[#C99A2E]">{ROLE_LABELS[user?.role] || user?.role}</span>
-          </div>
-          <Button variant="ghost" size="sm" icon="LogOut" aria-label="Sign out" title="Sign out" onClick={() => signOut()} />
+          {!isMock && <NotificationBell userId={user?.id} allHref="/admin-portal/notifications" />}
+          <UserMenu user={user} onSignOut={() => signOut()} />
         </header>
 
         <main id="admin-main" className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+          <Breadcrumbs nav={nav} />
           {children}
         </main>
       </div>

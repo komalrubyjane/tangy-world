@@ -26,7 +26,7 @@ const EventPages = () => {
         <ul className="divide-y divide-[#E7D5A4]/[0.06]">
           {(q.data || []).map((e) => (
             <li key={e.id}>
-              <Link to={`/admin/events/${e.id}?tab=content`} className="flex items-center gap-3 px-4 py-3 hover:bg-[#C99A2E]/[0.05] text-[13px]">
+              <Link to={`/admin-portal/events/${e.id}?tab=content`} className="flex items-center gap-3 px-4 py-3 hover:bg-[#C99A2E]/[0.05] text-[13px]">
                 <span className="font-mono text-[12px] text-[#C99A2E] w-24 shrink-0">{fmt.date(e.event_date)}</span>
                 <span className="flex-1 min-w-0 truncate">{e.name}</span>
                 {!e.description && <Badge tone="warn">No description</Badge>}

@@ -10,9 +10,9 @@ export default function TasksPage() {
   return (
     <Page
       title="Event tasks"
-      subtitle={can(P.TEAM) ? 'Tasks across every event team. Add tasks from an event’s team tabs.' : 'Your checklist for the events you’re working.'}
+      subtitle={can(P.TEAM) ? 'Tasks across every event — by person, team or event. Switch to the board to move work along.' : 'Your checklist for the events you’re working.'}
     >
-      <TasksTable initialStatus={params.get('status') ?? 'open'} />
+      <TasksTable initialStatus={params.get('status') ?? 'open'} initialMine={params.get('mine') === '1'} />
     </Page>
   );
 }

@@ -7,7 +7,15 @@ import { EVENT_STATUSES, EVENT_STATUS_LABELS } from '../rbac';
 import { Field, Input, Textarea, Select, Button } from '../ui';
 
 const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-const EDITABLE = ['name', 'slug', 'description', 'story', 'event_date', 'event_time', 'end_time', 'venue', 'venue_id', 'venue_partner_id', 'image_url', 'capacity', 'price', 'status', 'featured', 'tags'];
+const EDITABLE = ['name', 'slug', 'description', 'story', 'event_date', 'event_time', 'end_time', 'timezone', 'doors_at', 'venue', 'venue_id', 'venue_partner_id', 'image_url', 'capacity', 'price', 'status', 'featured', 'tags'];
+// IANA zones offered in the form (the database validates any IANA name).
+const TIMEZONES = ['Asia/Kolkata', 'Asia/Dubai', 'Asia/Singapore', 'Europe/London', 'America/New_York'];
+const toLocalInput = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
 
 export function useVenueOptions() {
   return useAsync(async () => {
@@ -43,8 +51,9 @@ export const EventForm = ({ initial, onSaved, onCancel, fields = EDITABLE, submi
   const [form, setForm] = useState(() => ({
     name: '', slug: '', description: '', story: '', event_date: '', event_time: '', end_time: '',
     venue: '', venue_id: '', venue_partner_id: '', image_url: '', capacity: defaultCapacity, price: defaultPrice,
-    status: 'draft', featured: false,
+    status: 'draft', featured: false, timezone: 'Asia/Kolkata',
     ...(initial || {}),
+    doors_at: toLocalInput(initial?.doors_at),
     tags: (initial?.tags || []).join(', '),
   }));
   const [errors, setErrors] = useState({});
@@ -76,6 +85,7 @@ export const EventForm = ({ initial, onSaved, onCancel, fields = EDITABLE, submi
     if (show('capacity')) payload.capacity = Number(form.capacity);
     if (show('price')) payload.price = Number(form.price);
     if (show('tags')) payload.tags = form.tags.split(',').map((t) => t.trim()).filter(Boolean);
+    if (show('doors_at')) payload.doors_at = form.doors_at ? new Date(form.doors_at).toISOString() : null;
     ['venue_id', 'venue_partner_id', 'end_time', 'event_time', 'image_url'].forEach((k) => { if (k in payload && !payload[k]) payload[k] = null; });
     try {
       const saved = isEdit ? await update('events', initial.id, payload) : await insert('events', payload);
@@ -99,6 +109,12 @@ export const EventForm = ({ initial, onSaved, onCancel, fields = EDITABLE, submi
           <Field label="Date *" error={errors.event_date}><Input type="date" value={form.event_date} onChange={set('event_date')} /></Field>
           <Field label="Start time"><Input value={form.event_time || ''} onChange={set('event_time')} placeholder="7:00 PM" /></Field>
           <Field label="End time"><Input value={form.end_time || ''} onChange={set('end_time')} placeholder="10:30 PM" /></Field>
+          <Field label="Timezone" hint="Event times are shown in this zone">
+            <Select value={form.timezone || 'Asia/Kolkata'} onChange={set('timezone')}>
+              {[...new Set([form.timezone || 'Asia/Kolkata', ...TIMEZONES])].map((z) => <option key={z} value={z}>{z}</option>)}
+            </Select>
+          </Field>
+          <Field label="Doors open"><Input type="datetime-local" value={form.doors_at || ''} onChange={set('doors_at')} /></Field>
         </div>
       )}
       {show('venue_id') && (

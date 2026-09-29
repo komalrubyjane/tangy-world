@@ -30,6 +30,8 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'));
 const VolunteersPage = lazy(() => import('./pages/VolunteersPage'));
 const RolesPage = lazy(() => import('./pages/RolesPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
+const InvoicesPage = lazy(() => import('./pages/InvoicesPage'));
 
 // Route-level guard. Hiding a nav item is not security — this renders the
 // Forbidden state for direct URL access, and the database refuses the data.
@@ -65,6 +67,8 @@ export const AdminApp = () => (
               <Route path="tasks" element={<Guard anyOf={[P.TASKS_OWN, P.TEAM]}><TasksPage /></Guard>} />
               <Route path="people" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
               <Route path="people/:kind" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
+              <Route path="reviews" element={<Guard requires={P.ENTITIES}><ReviewsPage /></Guard>} />
+              <Route path="invoices" element={<Guard requires={[P.PAYMENTS, P.BOOKINGS_MANAGE]}><InvoicesPage /></Guard>} />
               <Route path="team" element={<Guard requires={P.TEAM}><TeamPage /></Guard>} />
               <Route path="users" element={<Guard requires={P.USERS_MANAGE}><UsersPage /></Guard>} />
               <Route path="content" element={<Guard requires={P.CONTENT}><ContentPage /></Guard>} />

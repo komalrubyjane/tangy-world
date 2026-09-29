@@ -151,7 +151,7 @@ const EntityDrawer = ({ config, row, onClose, onSaved }) => {
             <ul className="divide-y divide-[#E7D5A4]/[0.06]">
               {related.data.map((e, i) => (
                 <li key={`${e.id}-${i}`}>
-                  <Link to={`/admin/events/${e.id}`} className="flex items-center gap-3 px-4 py-2.5 text-[12.5px] hover:bg-[#C99A2E]/[0.05]">
+                  <Link to={`/admin-portal/events/${e.id}`} className="flex items-center gap-3 px-4 py-2.5 text-[12.5px] hover:bg-[#C99A2E]/[0.05]">
                     <span className="font-mono text-[#C99A2E] w-24 shrink-0">{fmt.date(e.event_date)}</span>
                     <span className="flex-1 min-w-0 truncate">{e.name}{e.sub && <span className="text-[#E7D5A4]/40"> · {e.sub}</span>}</span>
                     {e.status && <Badge status={e.status} />}
@@ -202,7 +202,7 @@ const EntityManager = ({ kind }) => {
           title: `No ${config.label.toLowerCase()} found`,
           hint: config.canCreate ? undefined : `${config.label} are added when their application is approved.`,
           icon: 'Contact',
-          action: !config.canCreate && <Button size="sm" to={`/admin/applications?type=${{ sponsors: 'sponsor', vendors: 'vendor', crew: 'crew', volunteers: 'volunteer' }[kind]}`}>View applications</Button>,
+          action: !config.canCreate && <Button size="sm" to={`/admin-portal/applications?type=${{ sponsors: 'sponsor', vendors: 'vendor', crew: 'crew', volunteers: 'volunteer' }[kind]}`}>View applications</Button>,
         }} />
       <Pagination {...table} />
       {selected && <EntityDrawer key={selected.id || 'new'} config={config} row={selected} onClose={() => setSelected(null)} onSaved={() => { setSelected(null); table.reload(); }} />}
@@ -216,7 +216,7 @@ export default function PeoplePage() {
   const active = ENTITIES[kind] ? kind : 'artists';
   return (
     <Page title="Artists & partners" subtitle="The people and organizations behind every session. Partner records are created when their application is approved.">
-      <Tabs tabs={Object.entries(ENTITIES).map(([id, c]) => ({ id, label: c.label }))} value={active} onChange={(k) => navigate(`/admin/people/${k}`)} />
+      <Tabs tabs={Object.entries(ENTITIES).map(([id, c]) => ({ id, label: c.label }))} value={active} onChange={(k) => navigate(`/admin-portal/people/${k}`)} />
       <EntityManager key={active} kind={active} />
     </Page>
   );

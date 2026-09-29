@@ -8,6 +8,7 @@ import {
   CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
+  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck,
 } from 'lucide-react';
 
 // Tangy admin UI kit. Palette + type follow the site's design system
@@ -22,6 +23,7 @@ const ICONS = {
   CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
+  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck,
 };
 
 export const Icon = ({ name, size = 16, className = '', ...rest }) => {
@@ -253,7 +255,7 @@ export const Forbidden = ({ message = "You don't have permission to access this 
     <Icon name="Lock" size={28} className="text-[#C99A2E]/70" />
     <div className="font-condensed text-xl uppercase tracking-wide text-[#EFE2C0]">Access restricted</div>
     <p className="text-[13px] text-[#E7D5A4]/55 max-w-sm">{message}</p>
-    <Button to="/admin" size="sm">Back to dashboard</Button>
+    <Button to="/admin-portal" size="sm">Back to dashboard</Button>
   </div>
 );
 
@@ -261,7 +263,7 @@ export const NotFound = ({ what = 'page' }) => (
   <div className="flex flex-col items-center justify-center text-center gap-3 py-20 px-4">
     <div className="font-condensed text-xl uppercase tracking-wide text-[#EFE2C0]">Not found</div>
     <p className="text-[13px] text-[#E7D5A4]/55">This {what} doesn't exist or you can't access it.</p>
-    <Button to="/admin" size="sm">Back to dashboard</Button>
+    <Button to="/admin-portal" size="sm">Back to dashboard</Button>
   </div>
 );
 
@@ -374,7 +376,7 @@ function useEscape(onClose) {
 export const Drawer = ({ title, subtitle, onClose, children, footer, width = 'sm:max-w-xl' }) => {
   useEscape(onClose);
   return (
-    <div className="fixed inset-0 z-[400] flex justify-end" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
+    <div className="fixed inset-0 z-[10020] flex justify-end" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className={cx('relative w-full h-full bg-[#15110D] border-l border-[#C99A2E]/30 flex flex-col animate-[drawerIn_0.18s_ease]', width)}>
         <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-[#C99A2E]/15">
@@ -394,7 +396,7 @@ export const Drawer = ({ title, subtitle, onClose, children, footer, width = 'sm
 export const Modal = ({ title, onClose, children, footer, wide = false }) => {
   useEscape(onClose);
   return (
-    <div className="fixed inset-0 z-[450] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[10030] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div className={cx('relative w-full bg-[#15110D] border border-[#C99A2E]/35 rounded-t-lg sm:rounded-md max-h-[92dvh] flex flex-col', wide ? 'sm:max-w-2xl' : 'sm:max-w-md')}>
         <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-[#C99A2E]/15">
@@ -476,7 +478,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={push}>
       {children}
-      <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-[500] flex flex-col gap-2 items-end pointer-events-none" aria-live="polite">
+      <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-[10040] flex flex-col gap-2 items-end pointer-events-none" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={cx('pointer-events-auto max-w-sm w-full sm:w-auto px-4 py-2.5 rounded-md border text-[13px] shadow-lg bg-[#1b1611]', t.tone === 'bad' ? 'border-[#a8322a]/60 text-[#ef6b5e]' : 'border-[#1f8a5b]/50 text-[#9fe6c2]')}>
             {t.message}

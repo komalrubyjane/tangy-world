@@ -52,7 +52,7 @@ export default function TeamPage() {
                 {list.map((e) => <option key={e.id} value={e.id}>{fmt.date(e.event_date)} · {e.name}{e.status === 'draft' ? ' (draft)' : ''}</option>)}
               </Select>
             </Field>
-            {selected && <Link to={`/admin/events/${selected.id}?tab=team`} className="inline-block mt-2 text-[12px] underline text-[#E7D5A4]/55">Open event →</Link>}
+            {selected && <Link to={`/admin-portal/events/${selected.id}?tab=team`} className="inline-block mt-2 text-[12px] underline text-[#E7D5A4]/55">Open event →</Link>}
           </Panel>
           {eventId && <TeamManager key={eventId} eventId={eventId} />}
         </div>

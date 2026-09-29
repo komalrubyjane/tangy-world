@@ -40,12 +40,12 @@ export default function StaffEventPage() {
 
   return (
     <Page
-      back={{ to: '/admin/my-events', label: 'My events' }}
+      back={{ to: '/admin-portal/my-events', label: 'My events' }}
       title={evt.name}
       subtitle={`${fmt.date(evt.event_date)}${evt.event_time ? ` · ${evt.event_time}` : ''}${evt.end_time ? `–${evt.end_time}` : ''} · ${evt.venue || 'Venue TBC'}`}
       actions={
         <>
-          <Button icon="Users" to={`/admin/attendees?event=${evt.id}`}>Attendees</Button>
+          <Button icon="Users" to={`/admin-portal/attendees?event=${evt.id}`}>Attendees</Button>
           {evt.status !== 'cancelled' && <Button variant="primary" icon="ScanLine" to={`/check-in?event=${evt.id}`}>Check-in</Button>}
         </>
       }

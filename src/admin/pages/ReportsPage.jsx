@@ -7,6 +7,7 @@ import { P, localISODate } from '../rbac';
 import { Page, Panel, Grid, StatTile, Toolbar, FilterSelect, Input, Badge, AsyncBlock, Button, fmt } from '../ui';
 
 const PRESETS = [
+  { value: '7', label: 'Last 7 days' },
   { value: '30', label: 'Last 30 days' },
   { value: '90', label: 'Last 90 days' },
   { value: 'year', label: 'This year' },
@@ -84,7 +85,7 @@ export default function ReportsPage() {
               <tbody>
                 {ev.map((e) => (
                   <tr key={e.event_id} className="border-b border-[#E7D5A4]/[0.06]">
-                    <Td><Link to={`/admin/events/${e.event_id}?tab=reports`} className="hover:underline text-[#EFE2C0]">{e.name}</Link><div className="font-mono text-[11px] text-[#E7D5A4]/40">{fmt.date(e.event_date)}</div></Td>
+                    <Td><Link to={`/admin-portal/events/${e.event_id}?tab=reports`} className="hover:underline text-[#EFE2C0]">{e.name}</Link><div className="font-mono text-[11px] text-[#E7D5A4]/40">{fmt.date(e.event_date)}</div></Td>
                     <Td><Badge status={e.status} /></Td>
                     <Td><InlineBar value={Number(e.tickets_sold)} max={maxSold} label={`${fmt.num(e.tickets_sold)} / ${fmt.num(e.capacity)}`} /></Td>
                     <Td right>{fmt.pct(e.sell_through)}</Td>
@@ -121,7 +122,7 @@ export default function ReportsPage() {
           </Panel>
         )}
         {can(P.APPLICATIONS_VIEW) && (
-          <Panel title="Applications" subtitle="By submission date" flush actions={<Button size="sm" variant="ghost" to="/admin/applications">Open</Button>}>
+          <Panel title="Applications" subtitle="By submission date" flush actions={<Button size="sm" variant="ghost" to="/admin-portal/applications">Open</Button>}>
             <AsyncBlock loading={apps.loading} error={apps.error} onRetry={apps.reload} empty={(apps.data || []).length === 0} emptyProps={{ title: 'No applications in this period', icon: 'Inbox' }}>
               <table className="w-full text-[13px]">
                 <thead><tr className="border-b border-[#C99A2E]/20"><Th>Type</Th><Th right>Pending</Th><Th right>Approved</Th><Th right>Rejected</Th><Th right>Avg. review time</Th></tr></thead>

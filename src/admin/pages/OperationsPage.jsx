@@ -13,7 +13,7 @@ const SECTIONS = {
   enquiries: { title: 'Private session enquiries', component: PrivateEnquiriesSection },
   contact: { title: 'Contact messages', component: ContactEnquiriesSection },
   waitlist: { title: 'Waitlist', component: WaitlistSection },
-  notifications: { title: 'Email notifications', component: NotificationsSection },
+  notifications: { title: 'Email delivery', component: NotificationsSection },
   portals: { title: 'View portals', component: PortalsSection },
   tv: { title: 'Tangy TV', component: TVChannelsSection },
 };
@@ -25,7 +25,7 @@ export default function OperationsPage() {
   const Cmp = s.component;
   return (
     <Page title={s.title}>
-      <div className="font-mono"><Cmp basePath="/admin/preview" onNavigate={() => {}} /></div>
+      <div className={section === 'notifications' ? '' : 'font-mono'}><Cmp basePath="/admin/preview" onNavigate={() => {}} /></div>
     </Page>
   );
 }

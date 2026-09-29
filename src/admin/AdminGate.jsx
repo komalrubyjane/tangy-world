@@ -34,7 +34,7 @@ const Card = ({ title, subtitle, children }) => (
 // Email OTP is the primary sign-in (Supabase Auth — codes are never generated
 // or stored by Tangy). Password sign-in stays available as a fallback for
 // existing staff accounts until the project's OTP email template is verified.
-export const AdminLoginPanel = ({ title = 'Admin Console', subtitle = 'Sign in with your Tangy staff email.' }) => {
+export const AdminLoginPanel = ({ title = 'Tangy Admin Portal', subtitle = 'Sign in with your Tangy staff email.' }) => {
   const { signIn, authError } = useUserAuth();
   const [mode, setMode] = useState('otp');
   const [email, setEmail] = useState('');

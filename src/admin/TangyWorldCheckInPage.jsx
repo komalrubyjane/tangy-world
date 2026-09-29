@@ -167,7 +167,7 @@ function CheckInWorkspace() {
   useEffect(() => { const t = setInterval(() => setClock(Date.now()), 15000); return () => clearInterval(t); }, []);
   const accessEnds = selected?.access_expires_at ? new Date(selected.access_expires_at).getTime() : null;
   const accessOver = accessEnds != null && clock >= accessEnds;
-  const homePath = user?.role === 'volunteer' ? '/volunteer/dashboard' : '/admin';
+  const homePath = user?.role === 'volunteer' ? '/volunteer/dashboard' : '/admin-portal';
   const r = result && (RESULTS[result.result] || RESULTS.error);
   const pct = stats?.tickets_issued ? Math.round((100 * stats.checked_in) / stats.tickets_issued) : 0;
 

@@ -20,7 +20,12 @@ export const BOOKING_STATUSES = [
   { value: 'failed', label: 'Payment failed' },
   { value: 'cancelled', label: 'Cancelled' },
   { value: 'refunded', label: 'Refunded' },
+  { value: 'expired', label: 'Expired (unpaid)' },
 ];
+const PAYMENT_STATUS = {
+  created: 'Checkout started', authorized: 'Authorized', captured: 'Captured', failed: 'Failed',
+  refunded: 'Refunded in Razorpay', partially_refunded: 'Partially refunded in Razorpay', not_required: 'Not required',
+};
 const PAYMENT_FILTERS = [
   { value: '', label: 'Any payment' },
   { value: 'verified', label: 'Razorpay verified' },
@@ -125,7 +130,10 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
                 ['Razorpay order', b.razorpay_order_id],
                 ['Razorpay payment', b.razorpay_payment_id],
                 ['Signature', b.razorpay_signature_verified ? <Badge tone="good">Verified</Badge> : <Badge tone="muted">Not verified</Badge>],
-                b.refund_reference && ['Refund ref.', b.refund_reference],
+                b.payment_status && ['Payment status', `${PAYMENT_STATUS[b.payment_status] || b.payment_status}${b.payment_updated_at ? ` · ${fmt.dateTime(b.payment_updated_at)}` : ''}`],
+                b.refunded_amount > 0 && ['Refunded amount', fmt.money(b.refunded_amount)],
+                b.expired_at && ['Expired', `${fmt.dateTime(b.expired_at)} — checkout not completed in time`],
+                b.refund_reference && ['Refund', `Refund recorded manually in Razorpay · ${b.refund_reference}`],
                 b.cancel_reason && ['Cancel reason', b.cancel_reason],
                 b.cancelled_at && ['Cancelled', fmt.dateTime(b.cancelled_at)],
               ]} />
