@@ -31,7 +31,9 @@ function friendlySendError(message) {
 // Guest/User step, RequireAuthToApply for the five partner/team apply
 // pages, JoinPage, JoinLoginPage, and the Artist portal's own Login/Register
 // pages) renders this component rather than its own auth form.
-export const EmailOtpAuth = ({ onVerified, initialEmail = '', copy = {} }) => {
+// `allowSignup={false}` (the admin console) only sends codes to existing
+// accounts — an unknown email can't create an account from the admin login.
+export const EmailOtpAuth = ({ onVerified, initialEmail = '', copy = {}, allowSignup = true }) => {
   const [step, setStep] = useState('email');
   const [email, setEmail] = useState(initialEmail);
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
@@ -56,10 +58,15 @@ export const EmailOtpAuth = ({ onVerified, initialEmail = '', copy = {} }) => {
     setSending(true);
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { shouldCreateUser: true },
+      options: { shouldCreateUser: allowSignup },
     });
     setSending(false);
     if (err) {
+      // With signups disabled, Supabase rejects unknown emails.
+      if (!allowSignup && /signups? not allowed|not found|user not/i.test(err.message || '')) {
+        setError("We couldn't send a code to that address. Check it's the email on your Tangy staff account.");
+        return false;
+      }
       setError(friendlySendError(err.message));
       return false;
     }

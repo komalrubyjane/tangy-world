@@ -62,7 +62,7 @@ export const bookingService = {
   // (bookings.ticket_email_status), so a retry here never double-sends. If
   // this never runs at all (browser closed before it fires), the booking is
   // still fully confirmed with real tickets — an admin can trigger this
-  // same call later as a resend (src/admin/sections/PaymentsSection.jsx).
+  // same call later as a resend (Bookings & Payments → booking drawer, src/admin/components/Bookings.jsx).
   sendTicketEmail: async (bookingId, { force = false } = {}) => {
     if (!isSupabaseConfigured) return { success: false, error: 'Not configured.' };
     const { data, error } = await supabase.functions.invoke('send-ticket-email', {
