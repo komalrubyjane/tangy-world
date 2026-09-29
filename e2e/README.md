@@ -45,10 +45,13 @@ it isn't in `/Applications`) and `ffmpeg` for the fake-camera videos.
 | `staff.mjs` | Staff dashboard and nav, forbidden routes, event-scoped attendees, tasks, direct REST attacks with the staff JWT, mobile QR scan (valid / duplicate / wrong event / invalid), manual check-in |
 | `session.mjs` | Idle timeout sign-out, unauthenticated deep links, wrong OTP, patron refused |
 | `platform.mjs` | Artist ↔ admin messaging with notifications and read receipts, requirements, artist/vendor logistics, event-scoped vendor notice, sponsor isolation (UI + API), volunteer request → grant → mobile check-in → revoke → refused, command center counts, live permission change |
+| `portals.mjs` | Artist workspace (dashboard, booking request → accept, calendar month/week/agenda, availability, event drawer, public vs private profile + avatar, media upload/archive/submit/signed-URL preview/curator approval, settings + notification preferences, no marketing pop-up on workspace pages), sponsor (events, deliverables, brand assets + review, invoices, notifications, messages), vendor (logistics, requirements, invoices, notifications, messages), venue host (doors/logistics, event-change notice, messages), and isolation: private storage buckets, signed URLs, cross-role documents, cross-partner messages. Deliberate refusals are listed separately under EXPECTED REFUSALS |
+| `mobile.mjs` | 390 × 844 touch: admin (drawer nav, global search → event, tabs, tables as cards, tasks list/board/new, volunteers, reports, partners, invoices, reviews, notification panel, message thread), artist (menu, agenda calendar + drawer, workspace tabs, compose/reply, requests, media upload, profile save, settings), sponsor / vendor / venue host / volunteer portals, and the staff check-in terminal — no horizontal overflow, dialogs and drawers fit, buttons reachable |
+| `devmode.mjs` | Development role selector (run by `run.sh` last; needs the two dev-tools servers below) |
 
 ### Development role selector
 
-`e2e/devmode.mjs` checks the dev-only role selector against two `vite` dev servers on the local stack
+`e2e/devmode.mjs` (also run by `run.sh`) checks the dev-only role selector against two `vite` dev servers on the local stack
 (without `TANGY_DEV_TOOLS=off`): `DEV_MOCK_BASE` (no service key → mock-only) and `DEV_LOCAL_BASE`
 (with `SUPABASE_SERVICE_ROLE_KEY` from `supabase status` → real local sessions). Run `node e2e/devmode.mjs`.
 

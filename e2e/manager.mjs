@@ -11,14 +11,14 @@ for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings & Payments'
   check(nav.includes(item), `manager nav has ${item}`);
 for (const item of ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'])
   check(!nav.includes(item), `manager nav hides ${item}`);
-for (const path of ['/admin/users', '/admin/settings', '/admin/audit', '/admin/ai', '/admin/roles']) {
+for (const path of ['/admin-portal/users', '/admin-portal/settings', '/admin-portal/audit', '/admin-portal/ai', '/admin-portal/roles']) {
   await page.goto(BASE + path);
   await page.waitForTimeout(1200);
   check((await text(page)).includes("you don't have permission to access this section"), `direct URL ${path} is forbidden for manager`);
 }
 
 // Event lifecycle: create (draft) → publish → cancel
-await page.goto(BASE + '/admin/events?new=1');
+await page.goto(BASE + '/admin-portal/events?new=1');
 await page.getByLabel('Event name *').fill('E2E Manager Night');
 await page.getByLabel('Date *').fill('2026-12-20');
 await page.getByRole('button', { name: 'Create event' }).click();
@@ -34,7 +34,7 @@ for (const [status, label] of [['on-sale', 'published (on sale)'], ['cancelled',
 }
 
 // Team assignment: put staff2 on Vol. 6
-await page.goto(BASE + '/admin/events');
+await page.goto(BASE + '/admin-portal/events');
 await page.getByText('Tangy Sessions Vol. 6').first().click();
 await page.getByRole('tab', { name: 'Staff team', exact: true }).click();
 const form = page.locator('form').filter({ has: page.getByRole('button', { name: 'Assign' }) });
@@ -49,7 +49,7 @@ const asg = await api(page, 'GET', '/rest/v1/event_assignments?select=title,assi
 check(asg.data?.some((a) => a.events?.name === 'Tangy Sessions Vol. 6' && a.assignee_role === 'staff'), 'staff assigned to Vol. 6 via UI');
 
 // Staff announcement for Vol. 6
-await page.goto(BASE + '/admin/content');
+await page.goto(BASE + '/admin-portal/content');
 await page.getByRole('button', { name: 'New announcement' }).click();
 const dlg = page.getByRole('dialog').last();
 await dlg.getByLabel('Title *').fill('E2E Vol 6 load-in 4pm');
@@ -84,10 +84,10 @@ await browser.close();
   const { browser, page } = await launch();
   await otpLogin(page, 'staff2@tangy.test');
   await page.getByRole('heading', { name: /hello/i }).waitFor({ timeout: 15000 });
-  await page.goto(BASE + '/admin/my-events');
+  await page.goto(BASE + '/admin-portal/my-events');
   await page.waitForTimeout(1500);
   check((await text(page)).includes('vol. 6'), 'assigned staff2 sees Vol. 6 in My Events');
-  await page.goto(BASE + '/admin/announcements');
+  await page.goto(BASE + '/admin-portal/announcements');
   await page.waitForTimeout(1500);
   const t = await text(page);
   check(t.includes('e2e vol 6 load-in') && !t.includes('gates open 6:15'), 'staff2 sees Vol. 6 announcement, not Vol. 5\'s');

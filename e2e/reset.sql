@@ -21,3 +21,24 @@ delete from event_artist_details;
 update event_assignments set call_time = null, starts_at = null, ends_at = null, instructions = null, fee_amount = null, fee_status = 'not_applicable'
   where assignee_id in (select id from profiles where email like '%@tangy.test');
 delete from role_permissions where role = 'staff' and permission = 'reports.view';
+
+-- Platform finalization state (0020) for portals.mjs / mobile.mjs
+delete from assignment_requests where artist_id in (select id from artists where email = 'artist@tangy.test');
+delete from event_artists where artist_id in (select id from artists where email = 'artist@tangy.test')
+  and event_id <> (select id from events where slug = 'vol-5-local');
+delete from artist_availability where artist_id in (select id from artists where email = 'artist@tangy.test');
+delete from artist_media where artist_id in (select id from artists where email = 'artist@tangy.test');
+delete from artist_private_profiles where artist_id in (select id from artists where email = 'artist@tangy.test');
+update artists set stage_name = null, avatar_url = null where email = 'artist@tangy.test';
+delete from sponsor_assets;
+delete from sponsor_deliverables;
+delete from partner_invoices;
+delete from notification_preferences;
+update events set doors_at = null where slug = 'vol-5-local';
+-- Last, so fixture updates above (they fire event-change triggers) leave no notifications behind.
+delete from notifications;
+delete from email_outbox;
+-- Storage metadata for files the suites uploaded (local stack only).
+set storage.allow_delete_query = 'true';
+delete from storage.objects where bucket_id in ('artist-media', 'artist-avatars', 'sponsor-assets', 'event-documents') and name like '%e2e-%';
+reset storage.allow_delete_query;

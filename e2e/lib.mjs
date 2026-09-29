@@ -34,7 +34,7 @@ async function latestCode(email, after) {
   throw new Error(`no OTP email for ${email}`);
 }
 
-export async function otpLogin(page, email, path = '/admin') {
+export async function otpLogin(page, email, path = '/admin-portal') {
   await page.goto(BASE + path);
   await page.getByPlaceholder('you@example.com').fill(email);
   const t0 = Date.now() - 2000;

@@ -21,31 +21,31 @@ const text = async (page) => (await page.locator('main').innerText()).toLowerCas
   for (const item of ['Applications', 'Bookings & Payments', 'Users & Roles', 'Audit Logs', 'System Settings', 'Reports', 'Tangy AI', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions', 'Vendors'])
     check(!nav.includes(item), `staff nav hides ${item}`);
 
-  for (const path of ['/admin/users', '/admin/settings', '/admin/audit', '/admin/bookings', '/admin/applications', '/admin/reports', '/admin/events', '/admin/messages', '/admin/volunteers', '/admin/roles'])  {
+  for (const path of ['/admin-portal/users', '/admin-portal/settings', '/admin-portal/audit', '/admin-portal/bookings', '/admin-portal/applications', '/admin-portal/reports', '/admin-portal/events', '/admin-portal/messages', '/admin-portal/volunteers', '/admin-portal/roles'])  {
     await page.goto(BASE + path);
     await page.waitForTimeout(1200);
     check((await text(page)).includes("you don't have permission to access this section"), `direct URL ${path} is forbidden for staff`);
   }
   await shot(page, 's02-staff-forbidden');
 
-  await page.goto(BASE + '/admin/my-events');
+  await page.goto(BASE + '/admin-portal/my-events');
   await page.getByText('Tangy Sessions Vol. 5').first().waitFor();
   check(!(await text(page)).includes('vol. 6'), 'my events: only assigned event');
 
-  await page.goto(BASE + '/admin/attendees');
+  await page.goto(BASE + '/admin-portal/attendees');
   await page.waitForTimeout(2000);
   const at = await text(page);
   check(at.includes('ts-local003') && !at.includes('ts-local005'), 'attendees: only assigned event tickets');
   await shot(page, 's03-staff-attendees');
 
-  await page.goto(BASE + '/admin/tasks');
+  await page.goto(BASE + '/admin-portal/tasks');
   await page.getByText('Collect radio').first().waitFor();
-  await page.getByLabel('Task status').first().selectOption('done');
+  await page.getByLabel(/^Status of /).first().selectOption('done');
   await page.getByText('Task marked done').or(page.getByText(/updated/i)).first().waitFor({ timeout: 5000 }).catch(() => {});
   await page.waitForTimeout(800);
   await shot(page, 's04-staff-tasks');
 
-  await page.goto(BASE + '/admin/event-info');
+  await page.goto(BASE + '/admin-portal/event-info');
   await page.waitForTimeout(1500);
   check((await text(page)).includes('your role'), 'event info renders for staff');
 

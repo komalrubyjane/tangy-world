@@ -19,7 +19,7 @@ async function signIn(email, path, opts) {
 }
 
 // ---------------------------------------------------------------- sessions
-const admin = await signIn('manager@tangy.test', '/admin');
+const admin = await signIn('manager@tangy.test', '/admin-portal');
 await admin.page.getByRole('heading', { name: /operations/i }).waitFor({ timeout: 15000 });
 const artist = await signIn('artist@tangy.test', '/artist/login');
 await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
@@ -46,7 +46,7 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
   check((await unread(p)) >= 1, 'admin bell shows the new-message notification');
   const nav = await text(p, 'nav[aria-label="Admin navigation"]');
   check(/Messages\s*1/.test(nav), 'admin nav: Messages badge = 1 awaiting reply');
-  await p.goto(BASE + '/admin/messages');
+  await p.goto(BASE + '/admin-portal/messages');
   await p.getByRole('button', { name: /Aria Artist/ }).first().click();
   check(await until(p.getByText('Can we move soundcheck to 4:30 PM?')), 'admin opens the artist thread');
   await p.getByLabel('Message', { exact: true }).fill('Yes — soundcheck moved to 4:30 PM.');
@@ -57,18 +57,21 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
 {
   const p = artist.page;
   await p.reload();
-  await p.getByRole('tab', { name: 'Messages' }).click();
+  // The artist had the thread open while the reply arrived, so polling marks
+  // it read (mark_conversation_read) — the notification must still exist.
+  await p.getByRole('tab', { name: 'Notifications', exact: true }).first().click();
+  check(await until(p.locator('[data-notifications]').getByText('New message from Tangy').first()), 'artist notification center lists the reply');
+  await p.getByRole('tab', { name: 'Messages', exact: true }).first().click();
   await p.getByRole('button', { name: /Soundcheck timing/ }).first().click();
   check(await until(p.getByRole('region', { name: 'Conversation' }).getByText('Yes — soundcheck moved to 4:30 PM.')), 'artist sees the reply');
   check(await until(p.locator('[data-messages-panel]').getByText('Read', { exact: false }).last()), 'artist sees their message was read');
-  check((await unread(p)) >= 1, 'artist bell shows the reply notification');
 }
 
 // ---------------------------------------------------------------- B. requirements + schedule
 const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local&select=id')).data?.[0]?.id;
 {
   const p = admin.page;
-  await p.goto(`${BASE}/admin/events/${evtId}?tab=requirements`);
+  await p.goto(`${BASE}/admin-portal/events/${evtId}?tab=requirements`);
   const from = p.getByLabel('Requirement recipient');
   await from.locator('option', { hasText: 'Aria Artist' }).waitFor({ state: 'attached' });
   await from.selectOption({ label: (await from.locator('option').allInnerTexts()).find((o) => o.startsWith('Aria Artist')) });
@@ -76,7 +79,7 @@ const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local
   await p.getByRole('button', { name: 'Request' }).click();
   check(await until(p.getByText('Requirement sent')), 'admin requests a tech rider from the artist');
 
-  await p.goto(`${BASE}/admin/events/${evtId}?tab=schedule`);
+  await p.goto(`${BASE}/admin-portal/events/${evtId}?tab=schedule`);
   await p.getByRole('button', { name: 'Edit' }).first().click();
   const d = p.getByRole('dialog').last();
   const today = new Date().toLocaleDateString('en-CA');
@@ -112,16 +115,16 @@ const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local
 }
 {
   const p = admin.page;
-  await p.goto(`${BASE}/admin/events/${evtId}?tab=requirements`);
+  await p.goto(`${BASE}/admin-portal/events/${evtId}?tab=requirements`);
   await p.getByRole('button', { name: 'Accept' }).click();
-  check(await until(p.getByText('accepted', { exact: true })), 'admin accepts the requirement');
+  check(await until(p.getByText('Accepted', { exact: true }).first()), 'admin accepts the requirement');
 }
 
 // ---------------------------------------------------------------- C. vendor + announcements
 const vendor = await signIn('vendorco@tangy.test', '/join/login');
 {
   const p = admin.page;
-  await p.goto(BASE + '/admin/content');
+  await p.goto(BASE + '/admin-portal/content');
   await p.getByRole('button', { name: 'New announcement' }).click();
   const dlg = p.getByRole('dialog').last();
   await dlg.getByLabel('Title *').fill('E2E Loading bay moved');
@@ -143,7 +146,7 @@ const vendor = await signIn('vendorco@tangy.test', '/join/login');
   check(await until(p.getByText('E2E Loading bay moved')), 'vendor sees the vendor notice');
   check((await unread(p)) >= 1, 'vendor notified');
   await shot(p, 'p05-vendor-announcements');
-  await p.goto(BASE + '/admin');
+  await p.goto(BASE + '/admin-portal');
   check(await until(p.getByText('No access')) && await until(p.getByRole('link', { name: 'My portal' })), 'vendor cannot enter the admin console');
 }
 
@@ -179,7 +182,7 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
 }
 {
   const p = admin.page;
-  await p.goto(BASE + '/admin/volunteers');
+  await p.goto(BASE + '/admin-portal/volunteers');
   await p.getByRole('button', { name: 'Grant request' }).click();
   const dlg = p.getByRole('dialog').last();
   check((await text(p, '[role="dialog"]')).includes('volunteer@tangy.test'), 'grant dialog shows the volunteer');
@@ -209,7 +212,7 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
 }
 {
   const p = admin.page;
-  await p.goto(BASE + '/admin/volunteers');
+  await p.goto(BASE + '/admin-portal/volunteers');
   await p.getByRole('button', { name: 'Revoke' }).click();
   await p.getByRole('dialog').last().getByRole('button', { name: 'Revoke access' }).click();
   check(await until(p.getByText('Access revoked')), 'admin revokes access');
@@ -226,7 +229,7 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
 // ---------------------------------------------------------------- F. command center
 {
   const p = admin.page;
-  await p.goto(`${BASE}/admin/events/${evtId}`);
+  await p.goto(`${BASE}/admin-portal/events/${evtId}`);
   const cc = p.locator('[data-command-center]');
   check(await until(cc), 'command center renders');
   const t = await text(p, '[data-command-center]');
@@ -235,11 +238,11 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
 }
 
 // ---------------------------------------------------------------- G. live permission change
-const root = await signIn('root@tangy.test', '/admin');
+const root = await signIn('root@tangy.test', '/admin-portal');
 {
   const p = root.page;
-  await p.getByRole('heading', { name: /system overview/i }).waitFor({ timeout: 15000 });
-  await p.goto(BASE + '/admin/roles');
+  await p.getByRole('heading', { name: /good (morning|afternoon|evening)/i }).waitFor({ timeout: 15000 });
+  await p.goto(BASE + '/admin-portal/roles');
   const sw = p.getByRole('switch', { name: 'Reports & analytics for staff' });
   await sw.waitFor();
   check((await sw.getAttribute('aria-checked')) === 'false', 'staff starts without reports');
@@ -248,7 +251,7 @@ const root = await signIn('root@tangy.test', '/admin');
   check((await p.getByRole('switch', { name: 'Role management for admin' }).isDisabled()), 'role management is not delegable');
 }
 {
-  const staff = await signIn('staff@tangy.test', '/admin');
+  const staff = await signIn('staff@tangy.test', '/admin-portal');
   const p = staff.page;
   await p.getByRole('heading', { name: /hello/i }).waitFor({ timeout: 15000 });
   check((await text(p, 'nav[aria-label="Admin navigation"]')).includes('Reports'), 'granted permission appears in staff nav');

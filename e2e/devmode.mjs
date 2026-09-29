@@ -14,23 +14,23 @@ const FORBID = "you don't have permission to access this section";
 
 const EXPECT = {
   super_admin: {
-    label: 'Super Admin', heading: /system overview/i,
+    label: 'Super Admin', heading: /good (morning|afternoon|evening)/i,
     nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Users & Roles', 'Announcements', 'Reports', 'Audit Logs', 'System Settings', 'Tangy AI', 'Messages', 'Volunteers', 'Roles & Permissions'],
-    hidden: [], allowed: ['/admin/users', '/admin/audit', '/admin/settings', '/admin/ai', '/admin/events', '/admin/applications', '/admin/bookings', '/admin/reports'], blocked: [],
+    hidden: [], allowed: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai', '/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/reports'], blocked: [],
   },
   admin: {
-    label: 'Admin / Manager', heading: /operations/i,
+    label: 'Admin / Manager', heading: /good (morning|afternoon|evening)/i,
     nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Announcements', 'Team', 'Reports', 'Messages', 'Volunteers'],
     hidden: ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'],
-    allowed: ['/admin/events', '/admin/applications', '/admin/bookings', '/admin/attendees', '/admin/reports', '/admin/team'],
-    blocked: ['/admin/users', '/admin/audit', '/admin/settings', '/admin/ai'],
+    allowed: ['/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/attendees', '/admin-portal/reports', '/admin-portal/team'],
+    blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai'],
   },
   staff: {
     label: 'Staff', heading: /hello/i,
     nav: ['Dashboard', 'My Events', 'Attendees', 'QR Check-in', 'Check-in History', 'Event Tasks', 'Announcements', 'Event Info'],
     hidden: ['Applications', 'Bookings & Payments', 'Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Reports', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions'],
-    allowed: ['/admin/my-events', '/admin/attendees', '/admin/check-ins', '/admin/tasks', '/admin/announcements', '/admin/event-info'],
-    blocked: ['/admin/users', '/admin/audit', '/admin/settings', '/admin/ai', '/admin/applications', '/admin/bookings', '/admin/events', '/admin/reports'],
+    allowed: ['/admin-portal/my-events', '/admin-portal/attendees', '/admin-portal/check-ins', '/admin-portal/tasks', '/admin-portal/announcements', '/admin-portal/event-info'],
+    blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/events', '/admin-portal/reports'],
   },
 };
 
@@ -44,7 +44,7 @@ async function run(base, modeName) {
 
   const selector = page.locator('[data-dev-role-selector]');
   await page.goto(base + '/demo-admin');
-  await page.waitForURL('**/admin');
+  await page.waitForURL('**/admin-portal');
   check(await selector.waitFor({ timeout: 10000 }).then(() => true, () => false), `${modeName}: /demo-admin redirects to the role selector`);
   const body0 = await page.locator('body').innerText();
   check(/DEMO \/ DEVELOPMENT MODE/i.test(body0) && /Select a role to preview/.test(body0), `${modeName}: selector shows dev indicator + prompt`);
@@ -59,7 +59,7 @@ async function run(base, modeName) {
     check(await page.getByRole('tab', { name: 'Messages' }).waitFor({ timeout: 10000 }).then(() => true, () => false), 'local: artist portal opens with a real session');
     check(await page.getByText(/local test account/i).first().isVisible(), 'local: dev strip on the portal');
     await page.getByRole('button', { name: 'Change role' }).click();
-    await page.waitForURL('**/admin');
+    await page.waitForURL('**/admin-portal');
   }
   await page.locator('[data-dev-role-selector]').waitFor();
   await page.getByRole('button', { name: 'Sign in with a real account instead' }).click();
@@ -95,14 +95,14 @@ async function run(base, modeName) {
       check((await main()).includes(FORBID), `${role}: direct URL ${p} blocked`);
     }
     // persistence
-    await page.goto(base + '/admin'); await page.reload();
+    await page.goto(base + '/admin-portal'); await page.reload();
     check(await page.getByRole('heading', { name: e.heading }).first().waitFor({ timeout: 15000 }).then(() => true, () => false), `${role}: survives page refresh`);
     const who = await page.locator('body').innerText().catch(() => '');
     check(who.includes(`Tangy ${role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : 'Staff'}`), `${role}: header shows the dev identity`);
     if (role !== 'staff') {
-      await page.goto(base + '/admin/reports');
+      await page.goto(base + '/admin-portal/reports');
       await page.getByRole('button', { name: 'Change role' }).click();
-      check(await selector.waitFor({ timeout: 10000 }).then(() => true, () => false) && page.url().endsWith('/admin'), `${role}: Change role returns to the selector at /admin`);
+      check(await selector.waitFor({ timeout: 10000 }).then(() => true, () => false) && page.url().endsWith('/admin-portal'), `${role}: Change role returns to the selector at /admin-portal`);
     }
   }
 
@@ -120,8 +120,9 @@ async function run(base, modeName) {
   }
 
   // sign out leaves dev mode for good (back to the selector, not the console)
-  await page.goto(base + '/admin');
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.goto(base + '/admin-portal');
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
   await selector.waitFor();
   await page.reload();
   check(await selector.waitFor({ timeout: 8000 }).then(() => true, () => false), 'sign out + refresh shows the role selector');

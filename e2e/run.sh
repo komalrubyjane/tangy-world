@@ -6,7 +6,8 @@ export DB_CONTAINER="${DB_CONTAINER:-$(docker ps --format '{{.Names}}' | grep -m
 psql() { docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -q -v ON_ERROR_STOP=1; }
 mkdir -p shots
 fail=0
-for suite in superadmin manager staff session platform; do
+# devmode.mjs drives the two dev-tools servers (DEV_MOCK_BASE / DEV_LOCAL_BASE, see README.md).
+for suite in superadmin manager staff session platform portals mobile devmode; do
   psql < reset.sql && psql < staff_setup.sql || exit 1
   [[ $suite == staff ]] && node make-cam.mjs
   echo "== $suite"

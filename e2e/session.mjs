@@ -14,7 +14,7 @@ import { launch, otpLogin, check, BASE } from './lib.mjs';
   const token = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.endsWith('-auth-token')).length);
   check(token === 0, 'stored auth token cleared');
   check(/inactivity/i.test(await page.locator('body').innerText()), 'sign-in explains the inactivity sign-out');
-  await page.goto(BASE + '/admin/events');
+  await page.goto(BASE + '/admin-portal/events');
   check(await page.getByPlaceholder('you@example.com').waitFor({ timeout: 10000 }).then(() => true, () => false), 'session is really gone (reload shows sign-in)');
   await browser.close();
 }
@@ -22,7 +22,7 @@ import { launch, otpLogin, check, BASE } from './lib.mjs';
 // Tampered / absent session: admin routes require auth
 {
   const { browser, page } = await launch();
-  await page.goto(BASE + '/admin/users');
+  await page.goto(BASE + '/admin-portal/users');
   await page.getByPlaceholder('you@example.com').waitFor();
   check(!(await page.locator('body').innerText()).includes('manager@tangy.test'), 'unauthenticated deep link shows sign-in, no data');
   // Wrong OTP is rejected
