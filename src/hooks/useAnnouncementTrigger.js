@@ -32,12 +32,10 @@ function isActive(announcement, now) {
   return true;
 }
 
-function pickEligible(excludeSeen) {
+function pickEligible(published, excludeSeen) {
   const now = Date.now();
   const seen = excludeSeen ? getSeenIds() : [];
-  const candidates = announcementService
-    .getPublished()
-    .filter((a) => isActive(a, now) && (!excludeSeen || !seen.includes(a.id)));
+  const candidates = published.filter((a) => isActive(a, now) && (!excludeSeen || !seen.includes(a.id)));
   if (candidates.length === 0) return null;
   candidates.sort((a, b) => {
     const rankDiff = (PRIORITY_RANK[b.priority] || 0) - (PRIORITY_RANK[a.priority] || 0);
@@ -57,17 +55,27 @@ function pickEligible(excludeSeen) {
  * specific one (including unsaved drafts), or omit to re-run the normal
  * eligibility pick ignoring the seen-list.
  */
-export function useAnnouncementTrigger() {
+// `suppressed` (operational routes like /admin) defers the automatic pick
+// until the visitor is on a public page.
+export function useAnnouncementTrigger({ suppressed = false } = {}) {
   const [announcement, setAnnouncement] = useState(null);
   const [show, setShow] = useState(false);
+  const [published, setPublished] = useState([]);
 
   useEffect(() => {
-    const eligible = pickEligible(true);
-    if (eligible) {
-      setAnnouncement(eligible);
-      setShow(true);
-    }
-  }, []);
+    if (suppressed) return undefined;
+    let cancelled = false;
+    announcementService.getPublished().then((rows) => {
+      if (cancelled) return;
+      setPublished(rows);
+      const eligible = pickEligible(rows, true);
+      if (eligible) {
+        setAnnouncement(eligible);
+        setShow(true);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [suppressed]);
 
   const dismiss = useCallback(() => {
     setShow(false);
@@ -75,12 +83,12 @@ export function useAnnouncementTrigger() {
   }, [announcement]);
 
   const triggerManually = useCallback((override) => {
-    const target = override || pickEligible(false) || announcementService.getPublished()[0] || null;
+    const target = override || pickEligible(published, false) || published[0] || null;
     if (target) {
       setAnnouncement(target);
       setShow(true);
     }
-  }, []);
+  }, [published]);
 
   return { announcement, show, dismiss, triggerManually };
 }

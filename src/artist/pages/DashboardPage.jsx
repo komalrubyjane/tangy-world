@@ -7,6 +7,8 @@ import { supabase } from '../../lib/supabaseClient';
 import { useConversationRealtime } from '../../components/chat/useConversationRealtime';
 import { MessageBubble } from '../../components/chat/MessageBubble';
 import { MessageComposer } from '../../components/chat/MessageComposer';
+import { usePartnerPortal, partnerTabs, PartnerSection } from '../../portal/PartnerPortal';
+import { Tabs } from '../../admin/ui';
 
 // Inline expandable thread — reuses the same conversation architecture as
 // the Admin Inbox and Tangy Assistant rather than a separate mini chat.
@@ -43,6 +45,8 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { playSFX } = useAudio();
+  // Artist workspace: performances, schedule, requirements, messages with Tangy, documents, notifications.
+  const portal = usePartnerPortal('artist');
 
   const quickActions = [
     { label: 'UPDATE BIO', icon: '✍', path: '/artist/profile' },
@@ -128,12 +132,14 @@ export const DashboardPage = () => {
           </p>
         </div>
 
+        <div className="flex items-center gap-2 w-full sm:w-auto">
         <button
           onClick={() => { playSFX('ticketClick'); navigate('/artist/profile'); }}
           className="w-full sm:w-auto px-5 py-2.5 bg-[#191410] text-[#ecdcaf] font-mono text-xs font-bold uppercase border-2 border-[#191410] shadow-[3px_3px_0px_#c2272a] hover:bg-[#c2272a] transition-all min-h-[44px] text-center"
         >
           EDIT PROFILE →
         </button>
+        </div>
       </div>
 
       {/* STAT CARDS ROW */}
@@ -163,46 +169,17 @@ export const DashboardPage = () => {
         </div>
       </div>
 
+      {/* ARTIST WORKSPACE */}
+      <section id="workspace" aria-label="Artist workspace" className="bg-[#11100C] text-[#E7D5A4] border-2 sm:border-4 border-[#191410] p-3 sm:p-5 shadow-[6px_6px_0px_#4c1210] flex flex-col gap-4">
+        <Tabs tabs={partnerTabs('artist')} value={portal.tab} onChange={portal.setTab} />
+        <PartnerSection portal={portal} user={{ full_name: user?.name }} />
+      </section>
+
       {/* MAIN TWO COLUMN CONTENT GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8">
 
         {/* LEFT TWO COLUMNS: SHOWS & ASSIGNMENT REQUESTS */}
         <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-6">
-
-          {/* UPCOMING PERFORMANCES */}
-          <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-4 sm:p-6 shadow-[6px_6px_0px_#191410]">
-            <div className="flex justify-between items-center border-b-2 border-[#191410] pb-2 sm:pb-3 mb-3 sm:mb-4">
-              <span className="font-mono text-xs font-bold text-[#c2272a] uppercase">UPCOMING PERFORMANCES</span>
-              <button
-                onClick={() => navigate('/artist/calendar')}
-                className="font-mono text-[9.5px] sm:text-[10px] font-bold text-[#191410] underline uppercase"
-              >
-                VIEW CALENDAR →
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2.5 sm:gap-3">
-              {loadingPerformances ? (
-                <div className="text-center font-mono text-[10px] opacity-50 py-4">LOADING...</div>
-              ) : upcomingShows.length === 0 ? (
-                <div className="text-center font-mono text-[10px] opacity-50 py-4">NO UPCOMING PERFORMANCES CONFIRMED YET.</div>
-              ) : upcomingShows.map((s) => (
-                <div key={s.name + s.event_date} className="p-3 sm:p-4 bg-[#ecdcaf] border-2 border-[#191410] flex justify-between items-center gap-3">
-                  <div>
-                    <h3 className="font-poster text-lg sm:text-xl text-[#191410] leading-tight">{s.name}</h3>
-                    <p className="font-mono text-[9.5px] sm:text-[10px] text-[#241a12]/80 uppercase">{s.venue} · {s.event_time}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="font-mono text-xs font-bold text-[#c2272a]">{s.event_date}</span>
-                    <span className={`px-2 py-0.5 font-mono text-[8.5px] sm:text-[9px] font-bold uppercase border border-[#191410] ${s.status === 'on-sale' ? 'bg-[#2e6834] text-[#ecdcaf]' : 'bg-[#d1a437] text-[#191410]'}`}>
-                      {s.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* SESSION ASSIGNMENT REQUESTS */}
           <div className="bg-[#e9decb] text-[#241a12] border-2 sm:border-4 border-[#191410] p-4 sm:p-6 shadow-[6px_6px_0px_#191410]">

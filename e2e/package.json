@@ -1,0 +1,8 @@
+{
+  "name": "tangy-admin-e2e",
+  "private": true,
+  "type": "module",
+  "description": "End-to-end tests for the Tangy admin system (local Supabase stack only).",
+  "scripts": { "test": "bash run.sh" },
+  "dependencies": { "playwright-core": "^1.63.0" }
+}

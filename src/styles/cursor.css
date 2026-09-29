@@ -94,3 +94,11 @@ input, textarea, select {
 button, a, [role="button"], .btn-ticket {
   cursor: pointer !important;
 }
+
+/* Admin console: operational UI uses the native cursor. */
+body.admin-console {
+  cursor: auto !important;
+}
+body.admin-console .cursor {
+  display: none !important;
+}

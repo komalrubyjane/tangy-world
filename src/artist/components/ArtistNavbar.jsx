@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../../audio/AudioContext';
+import { NotificationBell } from '../../portal/NotificationBell';
 
 export const ArtistNavbar = () => {
   const navigate = useNavigate();
@@ -9,18 +10,11 @@ export const ArtistNavbar = () => {
   const { user, logout } = useAuth();
   const { playSFX } = useAudio();
   
-  const [showNotifs, setShowNotifs] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   useEffect(() => {
     setMobileDrawerOpen(false);
-    setShowNotifs(false);
   }, [location.pathname]);
-
-  const notifications = [
-    { id: 1, title: 'Event Invitation', msg: 'You are invited to perform at Stepwell Vol. 4', time: '2h ago', unread: true },
-    { id: 2, title: 'Slot Confirmed', msg: 'Your performance at Bansilal Stepwell is confirmed', time: '1d ago', unread: true }
-  ];
 
   const handleNav = (path) => {
     playSFX('ticketClick');
@@ -122,33 +116,9 @@ export const ArtistNavbar = () => {
 
         {user && (
           <>
-            {/* NOTIFICATION BELL */}
-            <div className="relative">
-              <button 
-                onClick={() => setShowNotifs(!showNotifs)}
-                className="w-7 h-7 sm:w-8 sm:h-8 bg-[#0d0a07] border border-[#d1a437] flex items-center justify-center relative hover:bg-[#c2272a] transition-all"
-                aria-label="Notifications"
-              >
-                <span className="text-xs sm:text-sm">🔔</span>
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#B5532A] text-[#ecdcaf] text-[7.5px] sm:text-[8px] font-bold flex items-center justify-center border border-[#191410]">
-                  2
-                </span>
-              </button>
-
-              {showNotifs && (
-                <div className="absolute right-0 top-10 w-64 sm:w-72 bg-[#181614] border-2 border-[#d1a437] p-3 shadow-2xl z-50 text-left flex flex-col gap-2">
-                  <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase border-b border-[#d1a437]/30 pb-1">
-                    NOTIFICATIONS
-                  </span>
-                  {notifications.map(n => (
-                    <div key={n.id} className="p-2 bg-[#181614] border border-[#ecdcaf]/20 flex flex-col">
-                      <span className="font-mono text-xs font-bold text-[#ecdcaf]">{n.title}</span>
-                      <span className="font-sans text-[10px] text-[#ecdcaf]/80">{n.msg}</span>
-                      <span className="font-mono text-[8px] text-[#d1a437] mt-1">{n.time}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {/* NOTIFICATION BELL — real notifications (0018), not sample data */}
+            <div className="bg-[#0d0a07] border border-[#d1a437]">
+              <NotificationBell userId={user.userId} allHref="/artist/dashboard?tab=notifications" />
             </div>
 
             {/* LOGOUT (DESKTOP) */}

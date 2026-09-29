@@ -151,11 +151,16 @@ constraints) that the old `unique(booking_id)` constraint this migration tries t
 (`checkins_booking_id_key`) is actually gone and `unique(ticket_id)` is in its place — the
 `drop constraint if exists` in 0016 assumes Postgres's default auto-generated name for that
 original unnamed constraint, which wasn't verified against a live database.
+17. `migrations/0017_admin_system.sql` — role-based admin system: `role_permissions` (Super Admin / Admin / Staff permission matrix, `has_permission()` / `my_permissions()`), append-only `audit_logs`, event-scoped staff access (fixes staff previously having global access), `venues`, `announcements`, `system_settings`, admin booking/refund/ticket RPCs, `check_in_ticket()` event authorization, and dashboard/report RPCs. Reverse: `rollbacks/0017_admin_system.down.sql`.
+18. `migrations/0018_operations_platform.sql` — operations platform: partner portal data (`event_member_kind()`, `my_portal_events()`, private `event_artist_details`, `event_requirements`, link-based `event_documents`, partner/volunteer announcement audiences — and closes the old `audience <> 'staff'` public-read policy), central `notifications` with triggers, partner ↔ admin messaging (`start_partner_conversation` / `send_message` / inboxes; no user-to-user messaging), time-boxed volunteer check-in (`temporary_access`, `access_requests`, grant/revoke/request RPCs; `check_in_ticket()` honours an active grant for that event only), artist approval now activates the `artist` role, event command center, platform analytics, and `set_role_permission()`. Reverse: `rollbacks/0018_operations_platform.down.sql`. **Optional:** with the `pg_cron` extension enabled, 0018 schedules `log_expired_access()` every 5 minutes to write `access.expired` audit rows; access itself ends at `expires_at` regardless.
+
+Database tests for 0017/0018 live in `tests/` and run against a local stack with `scripts/test-db.sh` (never production).
 
 ## What's NOT covered by these migrations
 
 - Diary and Archive content are still static/editorial (`src/data/mockData.js` and the section components) — no CMS tables were added for them in this pass, since the existing authored content was already complete and doesn't need frequent editing.
-- User↔admin messaging (conversations/messages, real E2E encryption) — designed but not yet built; a separate pass.
+- Messaging is partner ↔ Tangy admin (0018), protected by TLS in transit and RLS at rest. It is deliberately **not** end-to-end encrypted — admins must read and reply. File attachments and document uploads are not connected (documents are https links).
 - **Pending-booking expiry**: `create_pending_booking()` counts `pending` bookings against capacity (correctly, to reserve inventory during checkout) but nothing ever expires an abandoned pending booking — someone who starts checkout and never pays holds that inventory indefinitely. No cron/scheduled Edge Function was added for this pass; a real fix needs one (e.g. expire pending bookings older than ~30 minutes, matching the "pending booking expiration if already supported" note in the spec this was built against — it wasn't already supported, and wasn't added here).
-- **Refunds**: deliberately not implemented — Admin Payments is read-only this pass, as scoped.
-- **Ticket cancellation**: no admin action cancels an individual ticket (`tickets.status = 'cancelled'` is modeled in the schema/check-in logic but nothing currently sets it) — a real refund/cancellation workflow would need to.
+- **Refunds**: 0017 records refunds made in the Razorpay dashboard (`admin_record_refund`); it does not move money through the Razorpay API.
+- **Ticket cancellation**: available to admins since 0017 (`admin_cancel_ticket`).
+- **Email for 0018 events** (messages, access grants, requirements): in-app notifications only; no new emails are sent.

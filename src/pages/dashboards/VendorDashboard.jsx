@@ -4,6 +4,7 @@ import { useUserAuth } from '../../context/UserAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
 import { PortalShell, Badge, Empty, fmtDate, StatTile, ReadOnlyNote } from './portal/PortalUI';
+import { usePartnerPortal, partnerTabs, PartnerSection } from '../../portal/PartnerPortal';
 
 const TABS = [
   { id: 'overview', label: '📊 OVERVIEW' },
@@ -25,7 +26,10 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
   const navigate = useNavigate();
   const { user: authUser, logout } = useUserAuth();
   const user = overrideProfile || authUser;
-  const [activeTab, setActiveTab] = useState('overview');
+  // Approved accounts get the shared partner portal (events, messages, requirements…).
+  const portal = usePartnerPortal('vendor', ['overview', 'assignments', 'applications', 'profile', 'help'], { enabled: !readOnly && !demoData });
+  const activeTab = portal.tab;
+  const setActiveTab = portal.setTab;
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState([]);
   const [profile, setProfile] = useState(null);
@@ -85,6 +89,10 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
 
   const upcoming = assignments.filter((a) => a.events?.event_date >= TODAY && a.status !== 'declined');
   const isApproved = applications.some((a) => a.status === 'approved');
+  const portalMode = isApproved && !readOnly && !demoData;
+  const tabs = portalMode
+    ? [...partnerTabs('vendor'), ...TABS.filter((t) => ['applications', 'profile'].includes(t.id)).map((t) => ({ ...t, label: t.label.replace(/^[^A-Za-z]+/, '') }))]
+    : TABS;
 
   if (loading || !user) {
     return <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">LOADING VENDOR DASHBOARD...</div>;
@@ -97,13 +105,15 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       title={profile?.business_name || user.full_name || user.email}
       subtitle={user.email}
       statusBadge={isApproved ? <Badge status="approved" /> : applications[0] ? <Badge status={applications[0].status} /> : null}
-      tabs={TABS}
+      tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
       onLogout={handleLogout}
+      notificationsFor={portalMode ? user.id : null}
       preview={readOnly ? { label: `Viewing Vendor Portal — ${profile?.business_name || user.full_name || user.email}` } : undefined}
     >
-      {activeTab === 'overview' && (
+      {portalMode && <PartnerSection portal={portal} user={user} />}
+      {!portalMode && activeTab === 'overview' && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {!isApproved && (
             <div className="sm:col-span-3"><Empty>YOUR VENDOR APPLICATION ISN'T APPROVED YET — CHECK THE APPLICATIONS TAB.</Empty></div>
@@ -114,7 +124,7 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
         </div>
       )}
 
-      {activeTab === 'assignments' && (
+      {!portalMode && activeTab === 'assignments' && (
         <div className="flex flex-col gap-3">
           {assignments.length === 0 ? (
             <Empty>NO EVENT ASSIGNMENTS YET — YOU'LL SEE THEM HERE ONCE ADMIN SETS YOU UP AT A SESSION.</Empty>
@@ -189,7 +199,7 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
         )
       )}
 
-      {activeTab === 'help' && (
+      {!portalMode && activeTab === 'help' && (
         <div className="max-w-lg flex flex-col gap-4">
           {readOnly ? (
             <ReadOnlyNote>Messaging is disabled in admin preview.</ReadOnlyNote>

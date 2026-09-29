@@ -1,11 +1,13 @@
+/* global __TANGY_DEV_TOOLS__ */
 import { useState, useCallback, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
 import { UserAuthProvider } from './context/UserAuthContext';
 import { DemoAdminProvider } from './context/DemoAdminContext';
+import { DevPortalStrip } from './admin/dev/DevRoleSelector';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Navbar } from './components/layout/Navbar';
 import { Menu } from './components/sections/Menu';
@@ -242,11 +244,23 @@ function RouteFallback() {
   );
 }
 
+// Operational tools (admin console, check-in terminal, demo admin) never get
+// the public assistant or announcement overlay.
+const OPERATIONAL_PREFIXES = ['/admin', '/check-in', '/demo-admin'];
+const PORTAL_PREFIXES = ['/artist/dashboard', '/sponsor/dashboard', '/vendor/dashboard', '/venue/dashboard', '/volunteer/dashboard', '/crew/dashboard', '/dashboard'];
+
 function GlobalOverlays() {
-  const { announcement, show, dismiss } = useAnnouncementTrigger();
+  const { pathname } = useLocation();
+  const operational = OPERATIONAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  // Portals are working screens too: no marketing pop-up over their content.
+  const portal = PORTAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const { announcement, show, dismiss } = useAnnouncementTrigger({ suppressed: operational || portal });
+  const devStrip = (import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <DevPortalStrip /> : null;
+  if (operational) return <GlobalDock />;
   return (
     <>
       <GlobalDock />
+      {devStrip}
       <TangyAssistantLauncher />
       <AnnouncementCharacterOverlay
         announcement={announcement}
@@ -301,14 +315,15 @@ export default function App() {
                 <Route path="/book/:sessionId" element={<BookingPage />} />
 
                 {/* ADMIN DASHBOARD DEDICATED ROUTE */}
-                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/*" element={<AdminPage />} />
                 <Route path="/admin/preview/artist/:id" element={<AdminArtistPreview />} />
                 <Route path="/admin/preview/:role/:id" element={<AdminPortalPreview />} />
                 <Route path="/admin/preview/:role" element={<AdminEntitySelector />} />
 
                 {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
-                <Route path="/demo-admin" element={<DemoAdminLogin />} />
-                <Route path="/demo-admin/control-room" element={<DemoControlRoom />} />
+                {/* In dev mode the role selector at /admin replaces the legacy demo admin. */}
+                <Route path="/demo-admin" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin" replace /> : <DemoAdminLogin />} />
+                <Route path="/demo-admin/control-room" element={(import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <Navigate to="/admin" replace /> : <DemoControlRoom />} />
                 {/* One click from any login page's "TEAM DEMO" link — straight into that
                     role's own demo dashboard, no admin detour. Also what the Control
                     Room's "VIEW PORTALS" grid links to in demo mode (see DemoControlRoom.jsx). */}
