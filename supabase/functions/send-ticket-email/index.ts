@@ -30,16 +30,17 @@ function fmtDate(d: string | null): string {
 function emailHtml({ attendeeName, event, booking, tickets }: { attendeeName: string; event: any; booking: any; tickets: any[] }) {
   const safeName = String(attendeeName).replace(/</g, '&lt;');
   const tierLabel = TIER_LABELS[booking.tier] || booking.tier || 'General Admission';
-  // QR codes are attached as separate PNG files (one per ticket), not
-  // embedded inline — CID inline-image embedding support varies by email
+  // The booking's ONE QR (0023) is attached as booking-pass.png, not embedded
+  // inline — CID inline-image embedding support varies by email
   // provider/client and wasn't something that could be verified live, so
   // this degrades safely to "open the attachment" everywhere rather than
-  // risking a broken inline image in some clients.
+  // risking a broken inline image in some clients. Attendee names are
+  // user-entered, so they are escaped.
+  const esc = (v: string) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const ticketRows = tickets.map((t: any, i: number) => `
     <tr>
-      <td style="padding:10px 0;border-top:1px dashed rgba(17,16,12,0.3);font-family:Courier,monospace;font-size:12px;color:#11100C;">
-        Ticket ${i + 1} of ${tickets.length} — <strong>${t.ticket_number}</strong><br/>
-        <span style="opacity:0.7;">QR code attached: ${t.ticket_number}.png — also viewable anytime in your Tangy Dashboard.</span>
+      <td style="padding:8px 0;border-top:1px dashed rgba(17,16,12,0.3);font-family:Courier,monospace;font-size:12px;color:#11100C;">
+        ${i + 1}. <strong>${esc(t.attendee_name || `Guest ${i + 1}`)}</strong> <span style="opacity:0.6;">· ${t.ticket_number}</span>
       </td>
     </tr>`).join('');
 
@@ -76,7 +77,7 @@ function emailHtml({ attendeeName, event, booking, tickets }: { attendeeName: st
                 <table role="presentation" width="100%">${ticketRows}</table>
 
                 <p style="margin:20px 0 0 0;font-size:12px;line-height:1.6;color:#4A2E1A;">
-                  Show each QR code at check-in — one scan per ticket. Your tickets are always available in your Tangy Dashboard too.
+                  Show the attached QR (booking-pass.png) at the entrance — one QR for everyone on this booking; staff check each person in by name, even if you arrive separately. It's always available in your Tangy Dashboard too.
                 </p>
                 <p style="margin:20px 0 0 0;font-size:13px;line-height:1.6;color:#4A2E1A;">See you inside,<br />Tangy Sessions</p>
               </td>
@@ -156,12 +157,9 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Email service not configured.' });
     }
 
-    const attachments = [];
-    for (const t of tickets) {
-      const dataUrl: string = await QRCode.toDataURL(`TANGY:TICKET:${t.token}`, { width: 320, margin: 2, color: { dark: '#11100C', light: '#E7D5A4' } });
-      const base64 = dataUrl.split(',')[1];
-      attachments.push({ filename: `${t.ticket_number}.png`, content: base64 });
-    }
+    // One opaque booking QR (0023) — no ids, names or contact details inside.
+    const dataUrl: string = await QRCode.toDataURL(`TANGY:BOOKING:${booking.group_token}`, { width: 320, margin: 2, color: { dark: '#11100C', light: '#E7D5A4' } });
+    const attachments = [{ filename: 'booking-pass.png', content: dataUrl.split(',')[1] }];
 
     const html = emailHtml({ attendeeName: recipientName, event, booking, tickets });
 

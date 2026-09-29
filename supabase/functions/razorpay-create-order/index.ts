@@ -39,14 +39,36 @@ Deno.serve(async (req) => {
     const user = userData.user;
 
     const body = await req.json();
-    const { eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone } = body ?? {};
+    const { eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone, attendeeNames, details } = body ?? {};
 
+    // The event's own range (0024) is checked below once the event is loaded.
     const qty = Number(quantity);
-    if (!Number.isInteger(qty) || qty < 1 || qty > 10) {
-      return json({ error: 'Ticket quantity must be between 1 and 10.' }, 400);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 50) {
+      return json({ error: 'Choose a valid number of tickets.' }, 400);
     }
     if (!eventId || !attendeeName || !attendeeEmail) {
       return json({ error: 'Missing required booking details.' }, 400);
+    }
+    if (typeof attendeeName !== 'string' || attendeeName.trim().length === 0 || attendeeName.trim().length > 120) {
+      return json({ error: 'Enter your full name.' }, 400);
+    }
+    if (typeof attendeeEmail !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(attendeeEmail.trim())) {
+      return json({ error: 'Enter a valid email address.' }, 400);
+    }
+    // Indian mobile / WhatsApp number: 10 digits starting 6–9, optional +91 / 0.
+    const phoneDigits = typeof attendeePhone === 'string' ? attendeePhone.replace(/[\s-]/g, '').replace(/^(\+?91|0)(?=\d{10}$)/, '') : '';
+    if (!/^[6-9]\d{9}$/.test(phoneDigits)) {
+      return json({ error: 'Enter a valid 10-digit mobile / WhatsApp number.' }, 400);
+    }
+    if (details != null && (typeof details !== 'object' || Array.isArray(details))) {
+      return json({ error: 'Booking details are malformed.' }, 400);
+    }
+    // One name per ticket, collected before payment (0023). Re-validated by
+    // create_pending_booking(); names become the tickets' attendees only once
+    // payment is confirmed.
+    const names = Array.isArray(attendeeNames) ? attendeeNames.map((n) => (typeof n === 'string' ? n.trim() : '')) : [];
+    if (names.length !== qty || names.some((n) => n.length === 0 || n.length > 120)) {
+      return json({ error: 'Enter a name (up to 120 characters) for every attendee.' }, 400);
     }
     // Must match BookingPage.jsx's ticketTiers exactly — that's the only
     // other place ticket pricing is defined. If the tiers there ever change,
@@ -64,7 +86,7 @@ Deno.serve(async (req) => {
 
     const { data: event, error: eventError } = await admin
       .from('events')
-      .select('id, price, status')
+      .select('id, price, status, booking_min_quantity, booking_max_quantity')
       .eq('id', eventId)
       .single();
 
@@ -73,6 +95,9 @@ Deno.serve(async (req) => {
     }
     if (event.status !== 'on-sale') {
       return json({ error: 'This session is not currently on sale.' }, 409);
+    }
+    if (qty < event.booking_min_quantity || qty > event.booking_max_quantity) {
+      return json({ error: `This session takes ${event.booking_min_quantity}–${event.booking_max_quantity} tickets per booking.` }, 400);
     }
 
     const unitAmountRupees = event.price + TIER_MARKUP_RUPEES[tierId];
@@ -97,14 +122,31 @@ Deno.serve(async (req) => {
       p_registration_code: registrationCode,
       p_attendee_name: attendeeName,
       p_attendee_email: attendeeEmail,
-      p_attendee_phone: attendeePhone ?? null,
+      p_attendee_phone: phoneDigits,
       p_quantity: qty,
       p_amount: totalAmountRupees,
       p_tier: tierId,
       p_razorpay_order_id: null,
+      p_attendee_names: names,
+      // Optional details + event questions; create_pending_booking validates
+      // every field against the event's configuration (0024).
+      p_details: {
+        answers: details?.answers ?? {},
+        instagram: details?.instagram ?? null,
+        note: details?.note ?? null,
+        collab_interests: Array.isArray(details?.collabInterests) ? details.collabInterests : [],
+        collab_note: details?.collabNote ?? null,
+      },
     });
 
     if (bookingError) {
+      const invalid = bookingError.message?.match(/INVALID_(?:DETAILS|QUANTITY): (.+)$/);
+      if (invalid) {
+        return json({ error: invalid[1] }, 400);
+      }
+      if (bookingError.message?.includes('INVALID_ATTENDEE_NAMES')) {
+        return json({ error: 'Enter a name (up to 120 characters) for every attendee.' }, 400);
+      }
       if (bookingError.message?.includes('SOLD_OUT')) {
         return json({ error: 'Not enough tickets remain for this session.' }, 409);
       }

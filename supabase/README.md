@@ -158,18 +158,22 @@ original unnamed constraint, which wasn't verified against a live database.
 20. `migrations/0020_platform_finalization.sql` — platform finalization (additive; no historical migration edited, no existing row deleted). Reverse: `rollbacks/0020_platform_finalization.down.sql`. Details in [0019–0022 in detail](#0019-0022-in-detail) below.
 21. `migrations/0021_canonical_admin_links.sql` — new notifications and queued emails link to `/admin-portal/...` instead of the legacy `/admin/...`. Reverse: `rollbacks/0021_canonical_admin_links.down.sql`.
 22. `migrations/0022_artist_storage_policies.sql` — fixes the artist-media / artist-avatars ownership policies from 0013 (artists could not use their own files). Reverse: `rollbacks/0022_artist_storage_policies.down.sql`.
+23. `migrations/0023_named_group_checkin.sql` — named attendees, one booking QR and partial check-in by name. Reverse: `rollbacks/0023_named_group_checkin.down.sql`.
+24. `migrations/0024_event_booking_form.sql` — per-event booking form (tickets per booking, optional questions) and validated booking details. Reverse: `rollbacks/0024_event_booking_form.down.sql`.
 
-Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
-### Production application order (0017 → 0022)
+### Production application order (0017 → 0024)
 
 None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
 
-1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql`
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql`
 
-Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields).
 
-### 0019–0022 in detail
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+
+### 0019–0024 in detail
 
 **0020 — platform finalization**
 
@@ -185,6 +189,26 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 **0021 — canonical console links.** Every in-app notification and queued email goes through `notify()`; 0021 rewrites `/admin`, `/admin/...`, `/admin?...` and `/admin#...` links to `/admin-portal/...` there (helper `canonical_console_link()`), which covers the 0018 generators that still built legacy links (assignment, task, application, message, volunteer access request). Existing rows are **not** rewritten; the app's `/admin/*` → `/admin-portal/*` redirect keeps them working. Rollback restores 0020's `notify()` and drops the helper.
 
 **0022 — artist storage ownership.** 0013's "self" policies on `artist-media` and `artist-avatars` compared the first path segment with `artists.name` (the unqualified `name` inside the subquery resolved to the artist's display name, not the object path), so artists could never upload, preview (sign) or delete their own media or avatar. It failed closed — no one else gained access. 0022 recreates the six policies with `objects.name` qualified (`<artist_id>/<file>`, artist row owned by `auth.uid()`), scoped to `authenticated`, and adds an owner SELECT policy on the **public** avatars bucket so upsert/remove work (no new visibility — avatars are public by design). Admin and curator policies are unchanged. Rollback restores 0013's definitions exactly — i.e. the broken behaviour.
+
+**0023 — named attendees, one booking QR, partial check-in.** The model is extended, not replaced: a booking for N people already had N `tickets` rows (one per admission) and attendance is one `checkins` row per ticket (`unique(ticket_id)`, with who/when). So a ticket *is* an attendee:
+
+- `bookings.attendee_names text[]` — the names typed before payment, one per ticket (`valid_attendee_names`: count = quantity, trimmed, 1–120 chars; duplicates allowed). `confirm_booking_and_issue_tickets()` copies name *i* onto ticket *i*; `tickets.attendee_name` is the source of truth afterwards. Tickets issued before 0023 (and complimentary guest-list tickets) have **no** name — the UI shows "Guest N"; no names are invented or backfilled.
+- `bookings.group_token` — opaque 40-hex credential (backfilled for every existing booking). QR payload `TANGY:BOOKING:<token>`: no ids, names, email, phone or payment data. Per-ticket QRs (`TANGY:TICKET:<token>`) keep working unchanged.
+- `checkins.batch_id` — rows written by one check-in action share it (existing rows: `batch_id = id`, deterministic).
+- `check_in_ticket(p_token, p_event_id, p_method, p_notes, p_attendee_ids uuid[], p_preview)` — the single server function for QR and manual. A booking token locks the booking row, checks event / booking status, then locks exactly the selected tickets of **that** booking and admits them all or none: every id must be distinct, belong to the booking (so to the event), not be cancelled and not be checked in. The quantity is derived from the selection; the client never sends a count. `p_preview` returns the named attendee list and state without writing. Results: `ready`, `valid`, `already_checked_in`, `attendee_already_checked_in`, `invalid_selection`, `invalid_attendee`, `wrong_event`, `cancelled`, `payment_not_confirmed`, `not_found`, plus the existing permission results. Execute: `authenticated` only (and the function re-checks `checkin.perform` / a live volunteer grant and event assignment).
+- Read models: `attendee_tickets` adds `guest_name`, `group_token` (only for callers who may check in this event, only while someone is pending), and party counts; `get_checkin_history` adds `guest_name`, `batch_id`; `booking_checkin_history(booking)` returns one row per checked-in attendee (who, when, how) for staff on that event and admins.
+- `create_pending_booking` gains `p_attendee_names` (validated; raises `INVALID_ATTENDEE_NAMES`).
+- Reports need no change — they already count tickets (attendees), not bookings.
+- **Rollback** restores 0020's `create_pending_booking`, 0016/0017's issuance, and 0018's check-in function, view and history. It **drops attendee names** (export first); check-ins written by group check-in stay (they are ordinary per-ticket rows). Group QR codes stop working after a rollback; per-ticket QRs keep working.
+
+**0024 — event booking form.**
+
+- `events.booking_min_quantity` / `booking_max_quantity` (default 1–10, max 50) and `events.booking_questions` — optional per-event questions `{ id, type, label, required, help?, options?, min?, max? }` with types `text`, `long_text`, `number` (counts people in the booking, capped at its size — e.g. chair seating), `date`, `single_select`, `multi_select`, `boolean`. Validated by `valid_booking_questions()` (check constraint). The definition is public (it holds no answers); only `events.manage` holders can change it (existing events RLS).
+- Bookings: `booking_answers` (validated against the event's questions by `booking_answers_error()` — required, type, options, bounds, no unknown keys), `contact_instagram` (optional, stored without "@"), `customer_note`, `collab_interests` (structured: artist, sponsor, volunteer, event_team, sound_technical, video_photo, editing, graphic_design, other) and `collab_note`. Collaboration interest is a **lead** for the team — it never grants a role.
+- `create_pending_booking(…, p_details jsonb)` validates all of it plus the event's quantity range (`INVALID_QUANTITY` / `INVALID_DETAILS: <reason>`); `razorpay-create-order` also validates name, email and Indian mobile numbers and returns the reason to the customer.
+- Privacy: answers (including any date of birth or gender an event asks for) live on the booking row — readable by the booker and by admins with booking access (`bookings` RLS), **not** by event staff or the public; `attendee_tickets` never carries them. Previous Tangy attendance is not asked; admins see it derived from booking history.
+- `attendee_tickets` adds `payment_status` and `checked_in_by_name` (exports).
+- **Rollback** restores 0023's `create_pending_booking` and `attendee_tickets` and **drops** booking answers, Instagram handles, notes, collaboration interests and the per-event form configuration (export first). Bookings, attendees and check-ins are untouched.
 
 ## What's NOT covered by these migrations
 
