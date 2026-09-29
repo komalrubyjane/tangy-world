@@ -108,10 +108,17 @@ await scan('invalid.y4m', 'bogus QR', 'Invalid ticket', 'm04-invalid');
   await manualBtn.waitFor({ timeout: 15000 });
   await shot(page, 'm05a-before-manual');
   await manualBtn.click();
+  // TS-LOCAL001 is a 2-ticket booking made before attendee names existed:
+  // manual lookup opens the same attendee list as the booking QR (0023),
+  // with the two unnamed attendees shown as Guest 1 / Guest 2.
   await page.getByPlaceholder('Name, booking code or ticket number').fill('TS-LOCAL001');
-  await page.getByRole('button', { name: 'Check in' }).first().click();
-  const ok = await page.getByRole('status').getByText('Checked in', { exact: true }).waitFor({ timeout: 10000 }).then(() => true, () => false);
+  await page.locator('[data-manual-booking="TS-LOCAL001"]').getByRole('button', { name: /Select attendees for TS-LOCAL001/ }).click();
+  const panel = page.locator('[data-group-panel]');
+  await panel.waitFor({ timeout: 10000 });
+  await panel.locator('label[data-attendee="Guest 1"]').click();
+  await panel.getByRole('button', { name: 'Check in selected (1)' }).click();
+  const ok = await page.getByRole('status').getByText('Check-in successful', { exact: true }).waitFor({ timeout: 10000 }).then(() => true, () => false);
   await shot(page, 'm05-manual');
-  check(ok, 'manual check-in succeeds');
+  check(ok && /1 \/ 2/.test(await page.locator('[data-result-party]').innerText()), 'manual check-in succeeds (Guest 1 of 2)');
   await browser.close();
 }

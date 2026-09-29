@@ -42,3 +42,11 @@ delete from email_outbox;
 set storage.allow_delete_query = 'true';
 delete from storage.objects where bucket_id in ('artist-media', 'artist-avatars', 'sponsor-assets', 'event-documents') and name like '%e2e-%';
 reset storage.allow_delete_query;
+
+-- Group check-in fixtures (seed_group.sql, 0023) and the suite's customer
+-- checkout never leak into other suites.
+delete from bookings where registration_code like 'TS-GRP%';
+delete from bookings where user_id = (select id from profiles where email = 'patron@tangy.test') and registration_code not like 'TS-LOCAL%';
+-- Booking-form configuration (0024) back to defaults for the checkout suite.
+update events set booking_min_quantity = 1, booking_max_quantity = 10, booking_questions = '[]'::jsonb where slug in ('vol-5-local', 'vol-6-local');
+delete from payment_webhook_events where event_id like '%pay_e2e_%';

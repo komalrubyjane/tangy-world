@@ -207,8 +207,9 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
   await shot(p, 'p08-volunteer-checkin');
   // Load the next guest while access is still live — after the revoke below,
   // the click must be refused by the server, not by a missing button.
+  // (TS-LOCAL001 has two attendees, so it opens the attendee list — same server call.)
   await p.getByPlaceholder('Name, booking code or ticket number').fill('TS-LOCAL001');
-  await p.getByRole('button', { name: 'Check in' }).first().waitFor();
+  await p.getByRole('button', { name: /Select attendees for TS-LOCAL001/ }).waitFor();
 }
 {
   const p = admin.page;
@@ -219,7 +220,7 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
 }
 {
   const p = vol.page;
-  await p.getByRole('button', { name: 'Check in' }).first().click();
+  await p.getByRole('button', { name: /Select attendees for TS-LOCAL001/ }).click();
   check(await until(p.getByRole('status').getByText('Access expired', { exact: true })), 'after revoke the terminal refuses (server-side)');
   await p.goto(BASE + '/volunteer/dashboard?tab=checkin');
   check(await until(p.getByText('Ended', { exact: true }).first()), 'volunteer sees access ended');
