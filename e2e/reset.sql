@@ -6,6 +6,9 @@ update crew_applications set status='pending', reviewed_by=null, reviewed_at=nul
 update profiles set role='user' where email in ('vendor@tangy.test','crew@tangy.test');
 delete from vendor_profiles where id in (select id from profiles where email = 'vendor@tangy.test');
 delete from application_notifications;
+-- Events the suites created (waitlist/content suites add bookings, waitlist rows and ticket types to theirs).
+delete from waitlist where event_id in (select id from events where slug like 'e2e-%') or user_id in (select id from profiles where email like '%@tangy.test');
+delete from bookings where event_id in (select id from events where slug like 'e2e-%');
 delete from events where slug like 'e2e-%';
 delete from event_assignments where title = 'Gate check-in';
 delete from announcements where title like 'E2E %';
@@ -50,3 +53,10 @@ delete from bookings where user_id = (select id from profiles where email = 'pat
 -- Booking-form configuration (0024) back to defaults for the checkout suite.
 update events set booking_min_quantity = 1, booking_max_quantity = 10, booking_questions = '[]'::jsonb where slug in ('vol-5-local', 'vol-6-local');
 delete from payment_webhook_events where event_id like '%pay_e2e_%';
+-- Waitlist / enquiry / content suites (0025–0028): their fixtures and anything they created.
+delete from contact_enquiries where email like '%@tangy.test';
+delete from private_enquiries where email like '%@tangy.test';
+delete from diary_posts where slug like 'e2e-%';
+delete from gallery_albums where slug like 'e2e-%';
+delete from tv_videos where slug like 'e2e-%';
+update tv_videos set title = 'Field Recording — Vol. 22402' where slug = 'field-recording-22402';

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
-import { gallery } from '../../data/mockData';
+import { useGalleryPhotos } from '../../hooks/useContent';
 
 export const SessionArchivePage = () => {
+  const gallery = useGalleryPhotos();
   const [search, setSearch] = useState('');
   const [lightboxSrc, setLightboxSrc] = useState(null);
 

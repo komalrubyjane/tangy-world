@@ -33,6 +33,14 @@ const VendorApplyPage = lazy(() => import('./pages/VendorApplyPage').then((m) =>
 const SponsorApplyPage = lazy(() => import('./pages/SponsorApplyPage').then((m) => ({ default: m.SponsorApplyPage })));
 const VenueHostApplyPage = lazy(() => import('./pages/VenueHostApplyPage').then((m) => ({ default: m.VenueHostApplyPage })));
 const BlogsPage = lazy(() => import('./pages/BlogsPage').then((m) => ({ default: m.BlogsPage })));
+const DiaryPostPage = lazy(() => import('./pages/content/DiaryPostPage').then((m) => ({ default: m.DiaryPostPage })));
+const TvPage = lazy(() => import('./pages/content/TvPage').then((m) => ({ default: m.TvPage })));
+const TvVideoPage = lazy(() => import('./pages/content/TvPage').then((m) => ({ default: m.TvVideoPage })));
+const GalleryPage = lazy(() => import('./pages/content/GalleryPage').then((m) => ({ default: m.GalleryPage })));
+const GalleryAlbumPage = lazy(() => import('./pages/content/GalleryPage').then((m) => ({ default: m.GalleryAlbumPage })));
+const ArtistPage = lazy(() => import('./pages/content/ArtistPage').then((m) => ({ default: m.ArtistPage })));
+const FaqPage = lazy(() => import('./pages/content/FaqPage').then((m) => ({ default: m.FaqPage })));
+const NotFoundPage = lazy(() => import('./pages/content/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 const InnerCirclePage = lazy(() => import('./pages/InnerCirclePage').then((m) => ({ default: m.InnerCirclePage })));
 const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
 const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
@@ -109,7 +117,6 @@ const WeddingsPage = lazy(() => import('./pages/subsections/WeddingsPage').then(
 const HeritageExperiencesPage = lazy(() => import('./pages/subsections/HeritageExperiencesPage').then((m) => ({ default: m.HeritageExperiencesPage })));
 const MuseumJournalPage = lazy(() => import('./pages/subsections/MuseumJournalPage').then((m) => ({ default: m.MuseumJournalPage })));
 const RecentStoriesPage = lazy(() => import('./pages/subsections/RecentStoriesPage').then((m) => ({ default: m.RecentStoriesPage })));
-const BehindTheScenesPage = lazy(() => import('./pages/subsections/BehindTheScenesPage').then((m) => ({ default: m.BehindTheScenesPage })));
 const LocationPage = lazy(() => import('./pages/subsections/LocationPage').then((m) => ({ default: m.LocationPage })));
 const EmailDispatchPage = lazy(() => import('./pages/subsections/EmailDispatchPage').then((m) => ({ default: m.EmailDispatchPage })));
 const InstagramPage = lazy(() => import('./pages/subsections/InstagramPage').then((m) => ({ default: m.InstagramPage })));
@@ -325,8 +332,15 @@ export default function App() {
                 <Route path="/apply/host" element={<VenueHostApplyPage />} />
                 <Route path="/private-sessions" element={<PrivateSessionsPage />} />
                 <Route path="/blogs" element={<BlogsPage />} />
-                <Route path="/blogs/*" element={<BlogsPage />} />
+                <Route path="/blogs/:slug" element={<DiaryPostPage />} />
                 <Route path="/diary" element={<BlogsPage />} />
+                <Route path="/diary/:slug" element={<DiaryPostPage />} />
+                <Route path="/tv" element={<TvPage />} />
+                <Route path="/tv/:slug" element={<TvVideoPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/gallery/:album" element={<GalleryAlbumPage />} />
+                <Route path="/artists/:slug" element={<ArtistPage />} />
+                <Route path="/faq" element={<FaqPage />} />
                 <Route path="/inner-circle" element={<InnerCirclePage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/book/:sessionId" element={<BookingPage />} />
@@ -494,15 +508,15 @@ export default function App() {
                 {/* Diary */}
                 <Route path="/diary/journal" element={<MuseumJournalPage />} />
                 <Route path="/diary/stories" element={<RecentStoriesPage />} />
-                <Route path="/diary/behind-the-scenes" element={<BehindTheScenesPage />} />
+                <Route path="/diary/behind-the-scenes" element={<Navigate to="/diary" replace />} />
 
                 {/* Contact */}
                 <Route path="/contact/location" element={<LocationPage />} />
                 <Route path="/contact/email" element={<EmailDispatchPage />} />
                 <Route path="/contact/instagram" element={<InstagramPage />} />
 
-                {/* FALLBACK REDIRECT */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Unknown URLs get a real 404 (not a silent redirect home). */}
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
               </Suspense>
             </BrowserRouter>

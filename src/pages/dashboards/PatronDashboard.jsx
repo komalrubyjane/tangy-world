@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
@@ -115,7 +115,9 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
   const navigate = useNavigate();
   const { user: authUser, logout } = useUserAuth();
   const user = overrideProfile || authUser;
-  const [activeTab, setActiveTab] = useState('overview');
+  // Deep links (notifications, "Book your held seats") open a tab: /dashboard?tab=waitlist.
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => (!readOnly && TABS.some((t) => t.id === searchParams.get('tab')) ? searchParams.get('tab') : 'overview'));
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [waitlist, setWaitlist] = useState([]);

@@ -1,23 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
-import { diaryEntries } from '../data/mockData';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
+import { content } from '../lib/contentService';
+import { useContent, formatDate } from '../hooks/useContent';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { ContentLoading, ContentError, ContentEmpty } from '../components/ui/ContentStates';
 
-const CATEGORY_TAGS = {
-  'ALL': null,
-  'DIARY ENTRIES': [1, 2, 3],
-  'SHOW STORIES': [4, 5],
-  'BEHIND THE SCENES': [6, 7]
-};
-
+// The Tangy Diary (/diary, /blogs): published diary_posts (Admin → Content →
+// Diary). Filters are the posts' own tags.
 export const BlogsPage = () => {
   const [category, setCategory] = useState('ALL');
-  const [expanded, setExpanded] = useState(null);
+  const { data, loading, error, retry } = useContent(() => content.listDiary());
+  usePageMeta({ title: 'Diary', description: 'Stories, field notes and behind-the-scenes from Tangy Sessions.' });
 
-  const filteredEntries = category === 'ALL'
-    ? diaryEntries
-    : diaryEntries.filter(e => CATEGORY_TAGS[category]?.includes(e.id));
+  const posts = useMemo(() => data || [], [data]);
+  const tags = useMemo(() => ['ALL', ...new Set(posts.flatMap((p) => p.tags || []).map((t) => t.toUpperCase()))], [posts]);
+  const filteredEntries = category === 'ALL' ? posts : posts.filter((p) => (p.tags || []).some((t) => t.toUpperCase() === category));
 
   return (
     <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] printNoise">
@@ -35,11 +35,12 @@ export const BlogsPage = () => {
           HANDWRITTEN DIARY ENTRIES, UNRELEASED RECORDING LOGS, SHOW STORIES, AND BEHIND THE SCENES EDITORIALS.
         </p>
 
-        {/* CATEGORY FILTERS */}
-        <div id="stories" className="flex gap-2 sm:gap-3 mt-6 sm:mt-8 overflow-x-auto pb-1 sm:justify-center sm:flex-wrap scrollbar-none">
-          {Object.keys(CATEGORY_TAGS).map((cat) => (
+        {/* CATEGORY FILTERS (the posts' tags) */}
+        {tags.length > 1 && <div id="stories" className="flex gap-2 sm:gap-3 mt-6 sm:mt-8 overflow-x-auto pb-1 sm:justify-center sm:flex-wrap scrollbar-none">
+          {tags.map((cat) => (
             <button
               key={cat}
+              aria-pressed={category === cat}
               onClick={() => setCategory(cat)}
               className={`whitespace-nowrap px-3 sm:px-4 py-1.5 sm:py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider border border-[#D19A24] flex-shrink-0 transition-colors ${
                 category === cat ? 'bg-[#D19A24] text-[#11100C]' : 'bg-transparent text-[#E7D5A4] hover:bg-[#D19A24]/20'
@@ -48,18 +49,17 @@ export const BlogsPage = () => {
               {cat}
             </button>
           ))}
-        </div>
+        </div>}
       </section>
 
       {/* BLOG ENTRIES */}
       <section id="behind-the-scenes" className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 flex flex-col gap-8 sm:gap-12">
-        {filteredEntries.length === 0 && (
-          <div className="text-center py-20">
-            <p className="font-mono text-xs text-[#E7D5A4]/50 uppercase tracking-widest">NO ENTRIES IN THIS CATEGORY YET.</p>
-          </div>
+        {loading && <ContentLoading label="Loading the diary…" />}
+        {!loading && error && <ContentError onRetry={retry}>We couldn’t load the diary right now.</ContentError>}
+        {!loading && !error && filteredEntries.length === 0 && (
+          <ContentEmpty>{posts.length ? 'No entries in this category yet.' : 'The first diary entries are on their way.'}</ContentEmpty>
         )}
-        {filteredEntries.map((entry, idx) => {
-          const isExpanded = expanded === entry.id;
+        {!loading && filteredEntries.map((entry, idx) => {
           return (
             <article
               key={entry.id}
@@ -68,17 +68,20 @@ export const BlogsPage = () => {
               <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
               <LotusStamp index={idx} bg="transparent" border="#7C2D18" className="hidden sm:block absolute -top-3 -right-3 w-9 h-9 z-20 opacity-95 rotate-[-8deg]" />
               <div className="relative flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
-                <span>ENTRY #00{idx+1} · {entry.date}</span>
+                <span>{formatDate(entry.published_at)}</span>
                 <span className="hidden sm:block">{entry.location || 'HYDERABAD ARCHIVE'}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-0">
-                <div className="sm:col-span-1 w-full h-48 sm:h-auto overflow-hidden border-b-4 sm:border-b-0 sm:border-r-4 border-[#11100C]">
-                  <img
-                    src={entry.image}
-                    alt={entry.title}
-                    className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125"
-                  />
+                <div className="sm:col-span-1 w-full h-48 sm:h-auto overflow-hidden border-b-4 sm:border-b-0 sm:border-r-4 border-[#11100C] bg-[#11100C]/10">
+                  {entry.cover_url && (
+                    <img
+                      src={entry.cover_url}
+                      alt=""
+                      loading="lazy"
+                      className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125"
+                    />
+                  )}
                 </div>
 
                 <div className="sm:col-span-2 p-4 sm:p-8 flex flex-col justify-between">
@@ -88,30 +91,25 @@ export const BlogsPage = () => {
                     </span>
 
                     <h2 className="font-serif italic text-2xl sm:text-4xl md:text-5xl text-[#11100C] font-bold mb-3 leading-tight">
-                      {entry.title}
+                      <Link to={`/diary/${entry.slug}`} className="hover:underline focus-visible:outline focus-visible:outline-2">{entry.title}</Link>
                     </h2>
 
                     <p className="font-body text-sm sm:text-base text-[#11100C]/80 leading-relaxed mb-4 border-l-4 border-[#D19A24] pl-3 sm:pl-4">
-                      {entry.excerpt || entry.content?.substring(0, 160) + '...'}
+                      {entry.excerpt || (entry.body.length > 160 ? `${entry.body.substring(0, 160)}…` : entry.body)}
                     </p>
-
-                    {isExpanded && (
-                      <p className="font-body text-sm text-[#11100C]/90 leading-relaxed mb-4 pt-3 border-t border-[#11100C]/20">
-                        {entry.content}
-                      </p>
-                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-t border-[#11100C]/20 pt-3 sm:pt-4">
                     <div className="font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] uppercase">
-                      TAGS: HERITAGE · ACOUSTIC · FIELD RECORDING
+                      {(entry.tags || []).length ? `TAGS: ${entry.tags.join(' · ')}` : entry.author_name ? `BY ${entry.author_name}` : ''}
                     </div>
-                    <button
-                      onClick={() => setExpanded(isExpanded ? null : entry.id)}
-                      className="self-start sm:self-auto bg-[#11100C] text-[#E7D5A4] font-mono text-[10px] font-bold px-4 py-2 uppercase tracking-widest hover:bg-[#7C2D18] transition-colors border border-[#11100C]"
+                    <Link
+                      to={`/diary/${entry.slug}`}
+                      aria-label={`Read ${entry.title}`}
+                      className="self-start sm:self-auto bg-[#11100C] text-[#E7D5A4] font-mono text-[10px] font-bold px-4 py-3 uppercase tracking-widest hover:bg-[#7C2D18] transition-colors border border-[#11100C]"
                     >
-                      {isExpanded ? 'CLOSE ↑' : 'READ MORE →'}
-                    </button>
+                      READ →
+                    </Link>
                   </div>
                 </div>
               </div>

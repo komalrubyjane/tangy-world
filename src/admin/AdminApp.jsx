@@ -71,7 +71,7 @@ export const AdminApp = () => (
               <Route path="invoices" element={<Guard requires={[P.PAYMENTS, P.BOOKINGS_MANAGE]}><InvoicesPage /></Guard>} />
               <Route path="team" element={<Guard requires={P.TEAM}><TeamPage /></Guard>} />
               <Route path="users" element={<Guard requires={P.USERS_MANAGE}><UsersPage /></Guard>} />
-              <Route path="content" element={<Guard requires={P.CONTENT}><ContentPage /></Guard>} />
+              <Route path="content" element={<Guard anyOf={[P.CONTENT, P.CONTENT_VIEW]}><ContentPage /></Guard>} />
               <Route path="announcements" element={<Guard requires={P.ANNOUNCEMENTS_VIEW}><StaffAnnouncementsPage /></Guard>} />
               <Route path="reports" element={<Guard requires={P.REPORTS}><ReportsPage /></Guard>} />
               <Route path="audit" element={<Guard requires={P.AUDIT}><AuditLogsPage /></Guard>} />

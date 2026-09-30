@@ -5,7 +5,8 @@ import { assignmentService } from '../../services/assignmentService';
 import { useAdminSession } from '../AdminSession';
 import { adminApi, friendlyError, update, remove, insert } from '../api';
 import { useAsync } from '../hooks';
-import { P, EVENT_STATUS_LABELS, TICKET_TIERS, TAX_RATE, eventPhase } from '../rbac';
+import { P, EVENT_STATUS_LABELS, eventPhase } from '../rbac';
+import { TicketTypesEditor } from '../components/TicketTypesEditor';
 import {
   Page, Panel, Grid, StatTile, Tabs, Badge, Button, KeyValue, AsyncBlock, ConfirmDialog, NotFound, Skeleton, Select, Input,
   Textarea, Field, Icon, fmt, useToast,
@@ -292,6 +293,7 @@ const SponsorsTab = ({ evt }) => {
 };
 
 const TicketsTab = ({ evt, perf }) => {
+  const { can } = useAdminSession();
   const counts = useAsync(async () => {
     const { data, error } = await supabase.from('tickets').select('tier, status').eq('event_id', evt.id);
     if (error) throw friendlyError(error);
@@ -306,31 +308,7 @@ const TicketsTab = ({ evt, perf }) => {
   }, [evt.id]);
   return (
     <div className="flex flex-col gap-4">
-      <Panel title="Ticket types" subtitle="Prices are computed server-side at checkout (base price + tier markup + 18% tax). Tiers are defined in the payment function." flush>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
-            <thead><tr className="border-b border-[#C99A2E]/20 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45 text-left">
-              <th className="px-4 py-2">Type</th><th className="px-4 py-2 text-right">Price</th><th className="px-4 py-2 text-right">With tax</th><th className="px-4 py-2 text-right">Issued</th><th className="px-4 py-2 text-right">Checked in</th><th className="px-4 py-2 text-right">Cancelled</th>
-            </tr></thead>
-            <tbody>
-              {TICKET_TIERS.map((t) => {
-                const c = counts.data?.[t.id] || { issued: 0, checked_in: 0, cancelled: 0 };
-                const price = evt.price + t.markup;
-                return (
-                  <tr key={t.id} className="border-b border-[#E7D5A4]/[0.06]">
-                    <td className="px-4 py-2.5 text-[#EFE2C0]">{t.name}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{fmt.money(price)}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-[#E7D5A4]/60">{fmt.money(Math.round(price * (1 + TAX_RATE)))}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{fmt.num(c.issued)}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{fmt.num(c.checked_in)}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-[#E7D5A4]/50">{fmt.num(c.cancelled)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </Panel>
+      <TicketTypesEditor evt={evt} counts={counts.data} canManage={can(P.EVENTS_MANAGE)} />
       <Grid cols={3}>
         <StatTile label="Capacity" value={fmt.num(evt.capacity)} />
         <StatTile label="Sold (confirmed)" value={fmt.num(perf?.tickets_sold ?? 0)} />

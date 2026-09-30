@@ -1,14 +1,22 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { FIRST_VIDEO, MIDDLE_VIDEO, shufflePlaylist } from './playlist.js';
-import { tvChannelService } from '../../services/tvChannelService';
+import { content } from '../../lib/contentService';
 
 // The boot (first.mp4) and channel-switch (middle.mp4) videos stay fixed,
-// discovered via playlist.js's glob — but the actual channel lineup is
-// admin-managed (Admin → Tangy TV). TVControls reads
-// `currentVideo.filename` for its "NOW PLAYING" label, so channels are
-// mapped into that shape here.
+// discovered via playlist.js's glob — but the channel lineup is the
+// published Tangy TV videos marked "plays on the TV set" (tv_videos, managed
+// in Admin → Content → Tangy TV), so every visitor sees the same lineup.
+// TVControls reads `currentVideo.filename` for its "NOW PLAYING" label, so
+// videos are mapped into that shape here.
+let channelCache = [];
 function getChannelPlaylist() {
-  return tvChannelService.getPlaylist().map((c) => ({ filename: c.title, url: c.url }));
+  return channelCache;
+}
+async function loadChannelPlaylist() {
+  const { data, error } = await content.listTv();
+  if (error) return channelCache;
+  channelCache = (data || []).filter((v) => v.in_player).map((v) => ({ filename: v.title, url: v.video_url, slug: v.slug }));
+  return channelCache;
 }
 
 // Admin-entered channel URLs are raw local paths (may contain spaces etc.),
@@ -259,8 +267,18 @@ export function useTVPlayer() {
     setCurrentIndex(0);
     setIsPowered(true);
     boot();
+    // The boot clip loops until the first channel change, so the live lineup
+    // can arrive while it plays.
+    let live = true;
+    loadChannelPlaylist().then((list) => {
+      if (!live || !list.length) return;
+      const next = shufflePlaylist(list);
+      shuffledRef.current = next;
+      setShuffled(next);
+    });
 
     return () => {
+      live = false;
       v.removeEventListener('canplay', onCanPlay);
       v.removeEventListener('playing', onPlaying);
       v.removeEventListener('ended', onEnded);

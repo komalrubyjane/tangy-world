@@ -8,7 +8,7 @@ import {
   CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
-  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck,
+  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck, ArrowUp, ArrowDown,
 } from 'lucide-react';
 
 // Tangy admin UI kit. Palette + type follow the site's design system
@@ -23,7 +23,7 @@ const ICONS = {
   CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
-  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck,
+  Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck, ArrowUp, ArrowDown,
 };
 
 export const Icon = ({ name, size = 16, className = '', ...rest }) => {

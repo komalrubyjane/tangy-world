@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
-import { gallery, archiveItems } from '../data/mockData';
+import { archiveItems } from '../data/mockData';
+import { useGalleryPhotos } from '../hooks/useContent';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
 const TABS = ['ALL', 'GALLERY', 'ARCHIVE OBJECTS', 'PRESS'];
@@ -41,6 +42,7 @@ const MUSEUM_MILESTONES = [
 ];
 
 export const ArchivePage = () => {
+  const gallery = useGalleryPhotos();
   const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
   const [lightboxSrc, setLightboxSrc] = useState(null);

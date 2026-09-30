@@ -41,6 +41,8 @@ const ADMIN = [
   'bookings.view_all', 'bookings.manage', 'payments.view', 'attendees.view_all', 'checkin.perform', 'checkin.history',
   'content.manage', 'announcements.view', 'team.manage', 'entities.manage', 'users.view', 'reports.view', 'operations.manage',
   'messages.manage', 'volunteers.manage', 'access.grant',
+  'content.view', 'content.create', 'content.edit', 'content.publish', 'content.delete',
+  'content.manage_tv', 'content.manage_diary', 'content.manage_media', 'content.manage_sessions',
 ];
 export const MOCK_ROLE_PERMISSIONS = {
   staff: STAFF,

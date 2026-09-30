@@ -1,19 +1,7 @@
-import { useState } from 'react';
 import { merchandiseStore } from '../../data/mockData';
-import { useAudio } from '../../audio/AudioContext';
 
+// Merch previews only: there is no shop backend, so nothing is purchasable.
 export const MerchShopModal = ({ isOpen, onClose }) => {
-  const { playSFX } = useAudio();
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [addedItem, setAddedItem] = useState(null);
-
-  const handleBuy = (item) => {
-    playSFX('ticketClick');
-    setAddedItem(item);
-    setTimeout(() => {
-      setAddedItem(null);
-    }, 2500);
-  };
 
   if (!isOpen) return null;
 
@@ -39,11 +27,9 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {addedItem && (
-          <div className="p-3 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold text-center border border-[#ecdcaf] animate-bounce">
-            ✓ ADDED "{addedItem.name}" TO YOUR BAG!
-          </div>
-        )}
+        <p className="p-3 bg-[#191410] text-[#ecdcaf]/80 font-mono text-[11px] text-center border border-[#ecdcaf]/20 m-0">
+          The Tangy shop isn’t open yet — these are previews, not items for sale.
+        </p>
 
         {/* PRODUCTS CATALOG GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[62vh] overflow-y-auto pr-1">
@@ -70,12 +56,10 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
 
               <div className="flex items-center justify-between mt-4 pt-2 border-t border-[#ecdcaf]/10">
                 <span className="font-poster text-lg text-[#d1a437]">{item.price}</span>
-                <button
-                  onClick={() => handleBuy(item)}
-                  className="px-3 py-1.5 bg-[#d1a437] text-[#191410] font-mono text-[10px] font-bold tracking-widest uppercase hover:bg-[#ecdcaf] active:scale-95 transition-all"
-                >
-                  ADD TO BAG →
-                </button>
+                {/* There is no shop backend yet — nothing can be bought here. */}
+                <span className="px-3 py-1.5 border border-[#ecdcaf]/30 text-[#ecdcaf]/70 font-mono text-[10px] font-bold tracking-widest uppercase">
+                  COMING SOON
+                </span>
               </div>
             </div>
           ))}

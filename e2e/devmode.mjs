@@ -15,12 +15,12 @@ const FORBID = "you don't have permission to access this section";
 const EXPECT = {
   super_admin: {
     label: 'Super Admin', heading: /good (morning|afternoon|evening)/i,
-    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Users & Roles', 'Announcements', 'Reports', 'Audit Logs', 'System Settings', 'Tangy AI', 'Messages', 'Volunteers', 'Roles & Permissions'],
+    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Users & Roles', 'Content', 'Reports', 'Audit Logs', 'System Settings', 'Tangy AI', 'Messages', 'Volunteers', 'Roles & Permissions'],
     hidden: [], allowed: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai', '/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/reports'], blocked: [],
   },
   admin: {
     label: 'Admin / Manager', heading: /good (morning|afternoon|evening)/i,
-    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Announcements', 'Team', 'Reports', 'Messages', 'Volunteers'],
+    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers'],
     hidden: ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'],
     allowed: ['/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/attendees', '/admin-portal/reports', '/admin-portal/team'],
     blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai'],

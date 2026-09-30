@@ -7,8 +7,9 @@ const REVEAL_SELECTOR = '.reveal, .reveal-type, .reveal-paper, .reveal-stamp, .r
 // unobserved. The root itself toggles `.in-view` while on screen, which is
 // what lets section-level effects (e.g. the Private Sessions film grain)
 // run only while they can be seen. CSS transitions only; reduced motion is
-// handled in CSS.
-export function useReveal() {
+// handled in CSS. Pass `rescanKey` when content arrives after mount (e.g. CMS
+// photos) so the new elements are observed too.
+export function useReveal(rescanKey) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export function useReveal() {
       },
       { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
     );
-    targets.forEach((el) => io.observe(el));
+    targets.forEach((el) => { if (!el.classList.contains('is-visible')) io.observe(el); });
 
     const rootIo = new IntersectionObserver(([entry]) => {
       root.classList.toggle('in-view', entry.isIntersecting);
@@ -42,7 +43,7 @@ export function useReveal() {
       io.disconnect();
       rootIo.disconnect();
     };
-  }, []);
+  }, [rescanKey]);
 
   return ref;
 }

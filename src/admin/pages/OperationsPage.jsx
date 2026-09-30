@@ -1,11 +1,10 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { Page, NotFound } from '../ui';
 import { InboxSection } from '../sections/InboxSection';
 import { PrivateEnquiriesSection, ContactEnquiriesSection } from '../sections/EnquiriesSection';
 import { WaitlistSection } from '../sections/WaitlistSection';
 import { NotificationsSection } from '../sections/NotificationsSection';
 import { PortalsSection } from '../sections/PortalsSection';
-import { TVChannelsSection } from '../sections/TVChannelsSection';
 
 // The pre-existing control-room sections, kept working inside the new shell.
 const SECTIONS = {
@@ -15,11 +14,12 @@ const SECTIONS = {
   waitlist: { title: 'Waitlist', component: WaitlistSection },
   notifications: { title: 'Email delivery', component: NotificationsSection },
   portals: { title: 'View portals', component: PortalsSection },
-  tv: { title: 'Tangy TV', component: TVChannelsSection },
 };
 
 export default function OperationsPage() {
   const { section } = useParams();
+  // Tangy TV moved into the content CMS (database-backed, 0028).
+  if (section === 'tv') return <Navigate to="/admin-portal/content?tab=tv" replace />;
   const s = SECTIONS[section];
   if (!s) return <NotFound />;
   const Cmp = s.component;

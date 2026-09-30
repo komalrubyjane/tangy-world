@@ -7,7 +7,7 @@ await page.getByRole('heading', { name: /operations/i }).waitFor({ timeout: 1500
 await shot(page, 'a01-manager-dashboard');
 
 const nav = await page.locator('nav[aria-label="Admin navigation"]').innerText();
-for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Announcements', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts'])
+for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts'])
   check(nav.includes(item), `manager nav has ${item}`);
 for (const item of ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'])
   check(!nav.includes(item), `manager nav hides ${item}`);

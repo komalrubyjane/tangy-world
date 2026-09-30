@@ -1,5 +1,6 @@
-import { gallery } from '../../data/mockData';
 import { useReveal } from '../../hooks/useReveal';
+import { useContent } from '../../hooks/useContent';
+import { content } from '../../lib/contentService';
 
 // Photos in /media/gallery have pre-generated WebP variants in /media/opt.
 const gallerySrcSet = (src) => {
@@ -10,8 +11,11 @@ const gallerySrcSet = (src) => {
 // 04 — ARCHIVE. A contact sheet laid on aged paper: photography is the hero,
 // every frame shares one markup and one monochrome treatment, and the only
 // print details are frame numbers and the film edge.
+// Frames are the latest published gallery photos (Admin → Content → Gallery).
 export const Archive = () => {
-  const sectionRef = useReveal();
+  const { data } = useContent(() => content.recentPhotos(10));
+  const gallery = (data || []).map((p) => ({ id: p.id, src: p.image_url, label: p.caption || p.alt_text, alt: p.alt_text }));
+  const sectionRef = useReveal(gallery.length);
 
   return (
     <section ref={sectionRef} id="archive" className="t-section theme-archive overflow-hidden">
@@ -38,6 +42,7 @@ export const Archive = () => {
             <span>Eastman 5247</span>
             <span>Tangy Sessions · Hyderabad</span>
           </div>
+          {gallery.length === 0 && <p className="archiveMetadata text-[#EFE2C0]/60 px-4 py-10 text-center m-0">Photographs are being developed.</p>}
           <ol className="list-none m-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 p-4">
             {gallery.map((photo, i) => (
               <li key={photo.id} className="m-0">
@@ -47,7 +52,7 @@ export const Archive = () => {
                       src={photo.src}
                       srcSet={gallerySrcSet(photo.src)}
                       sizes="(min-width: 1024px) 18vw, (min-width: 768px) 30vw, 46vw"
-                      alt={photo.label}
+                      alt={photo.alt}
                       loading="lazy"
                       decoding="async"
                       className="photo-bw w-full h-full object-cover"

@@ -282,6 +282,14 @@ export const CompBookingModal = ({ eventId: fixedEventId, onClose, onCreated }) 
   const [error, setError] = useState('');
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
   const valid = f.eventId && f.name.trim() && /\S+@\S+\.\S+/.test(f.email) && f.note.trim() && f.quantity >= 1 && f.quantity <= 10;
+  // The event's own ticket types (0026) — any type, including ones not on sale.
+  const types = useAsync(async () => {
+    if (!f.eventId) return [];
+    const { data, error: err } = await supabase.from('event_ticket_types').select('code, name, active').eq('event_id', f.eventId).order('sort_order');
+    if (err) throw friendlyError(err);
+    return data || [];
+  }, [f.eventId]);
+  const typeOptions = types.data?.length ? types.data.map((t) => ({ id: t.code, name: t.active ? t.name : `${t.name} (not on sale)` })) : TICKET_TIERS.slice(0, 1);
 
   const submit = async (e) => {
     e?.preventDefault();
@@ -317,7 +325,7 @@ export const CompBookingModal = ({ eventId: fixedEventId, onClose, onCreated }) 
         <Field label="Phone"><Input value={f.phone} onChange={set('phone')} /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Quantity *"><Input type="number" min="1" max="10" value={f.quantity} onChange={set('quantity')} /></Field>
-          <Field label="Tier"><Select value={f.tier} onChange={set('tier')}>{TICKET_TIERS.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</Select></Field>
+          <Field label="Ticket type"><Select value={f.tier} onChange={set('tier')}>{typeOptions.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</Select></Field>
         </div>
         <Field label="Note *" hint="Why this is complimentary (logged)" className="sm:col-span-2"><Textarea rows={2} value={f.note} onChange={set('note')} /></Field>
       </form>

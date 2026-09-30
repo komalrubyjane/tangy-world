@@ -34,7 +34,16 @@ export const P = {
   ATTENDEES_ASSIGNED: 'attendees.view_assigned',
   CHECKIN: 'checkin.perform',
   CHECKIN_HISTORY: 'checkin.history',
-  CONTENT: 'content.manage',
+  CONTENT: 'content.manage',              // announcements
+  CONTENT_VIEW: 'content.view',
+  CONTENT_CREATE: 'content.create',
+  CONTENT_EDIT: 'content.edit',
+  CONTENT_PUBLISH: 'content.publish',
+  CONTENT_DELETE: 'content.delete',
+  CONTENT_TV: 'content.manage_tv',
+  CONTENT_DIARY: 'content.manage_diary',
+  CONTENT_MEDIA: 'content.manage_media',
+  CONTENT_SESSIONS: 'content.manage_sessions',
   ANNOUNCEMENTS_VIEW: 'announcements.view',
   TEAM: 'team.manage',
   TASKS_OWN: 'tasks.view_own',
@@ -102,7 +111,7 @@ export const NAV = [
     group: 'Communicate',
     items: [
       { to: '/admin-portal/messages', label: 'Messages', icon: 'MessagesSquare', requires: P.MESSAGES, badge: 'messages' },
-      { to: '/admin-portal/content', label: 'Announcements', icon: 'Megaphone', requires: P.CONTENT },
+      { to: '/admin-portal/content', label: 'Content', icon: 'Megaphone', anyOf: [P.CONTENT, P.CONTENT_VIEW] },
       { to: '/admin-portal/announcements', label: 'Announcements', icon: 'Megaphone', requires: P.ANNOUNCEMENTS_VIEW, hideIf: P.CONTENT },
       { to: '/admin-portal/event-info', label: 'Event Info', icon: 'Info', requires: P.EVENTS_ASSIGNED, hideIf: P.EVENTS_ALL },
     ],
@@ -131,7 +140,6 @@ export const NAV = [
       { to: '/admin-portal/ops/waitlist', label: 'Waitlist', icon: 'Hourglass', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/notifications', label: 'Email delivery', icon: 'BellRing', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/portals', label: 'View portals', icon: 'DoorOpen', requires: P.OPERATIONS },
-      { to: '/admin-portal/ops/tv', label: 'Tangy TV', icon: 'Tv', requires: P.OPERATIONS },
     ],
   },
 ];
@@ -173,19 +181,19 @@ export const LEGACY_TAB_ROUTES = {
   notifications: '/admin-portal/ops/notifications',
   payments: '/admin-portal/bookings?tab=payments',
   announcements: '/admin-portal/content',
-  tv: '/admin-portal/ops/tv',
+  tv: '/admin-portal/content?tab=tv',
   settings: '/admin-portal/settings',
   portals: '/admin-portal/ops/portals',
 };
 
-// Ticket tiers are defined (and priced) server-side in
-// supabase/functions/razorpay-create-order — mirrored here for display only.
+// Ticket types and prices are per event in event_ticket_types (0026) and are
+// priced by booking_quote() on the server. These are only display-name
+// fallbacks for the codes older bookings/tickets carry.
 export const TICKET_TIERS = [
-  { id: 'gen', name: 'General Admission', markup: 0 },
-  { id: 'vip', name: 'VIP Heritage Pass', markup: 500 },
-  { id: 'premium', name: 'Backstage Collective Pass', markup: 1200 },
+  { id: 'gen', name: 'General Admission' },
+  { id: 'vip', name: 'VIP Heritage Pass' },
+  { id: 'premium', name: 'Backstage Collective Pass' },
 ];
-export const TAX_RATE = 0.18;
 
 export const EVENT_STATUSES = ['draft', 'on-sale', 'sold-out', 'past', 'cancelled'];
 export const EVENT_STATUS_LABELS = {

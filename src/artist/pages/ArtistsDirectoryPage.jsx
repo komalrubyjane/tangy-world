@@ -155,7 +155,7 @@ export const ArtistsDirectoryPage = () => {
             return (
               <div
                 key={artist.id}
-                onClick={() => { playSFX('ticketClick'); navigate(`/artist/profile/${artist.id}`); }}
+                onClick={() => { playSFX('ticketClick'); navigate(artist.slug ? `/artists/${artist.slug}` : `/artist/profile/${artist.id}`); }}
                 className="group relative aspect-[3/4] border-2 sm:border-4 border-[#191410] shadow-[6px_6px_0px_#191410] sm:shadow-[10px_10px_0px_#191410] hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all cursor-pointer overflow-hidden isolate"
                 style={{ backgroundColor: palette.bg }}
               >
