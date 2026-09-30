@@ -24,6 +24,15 @@ if [[ "${1:-}" == "--apply" ]]; then
   done
 fi
 
+# The suites wipe tables inside their own transactions; the local demo
+# dataset (scripts/demo-data.sh) is set aside first and restored afterwards
+# (its accounts stay, so the SQL seed alone brings it back).
+demo=$("${PSQL[@]}" -At -c "select count(*) from events where id::text like 'de300000-%'")
+if [[ "$demo" != "0" ]]; then
+  "${PSQL[@]}" < supabase/demo/demo_remove.sql
+  trap '"${PSQL[@]}" < supabase/demo/demo_seed.sql && echo "(demo dataset restored)"' EXIT
+fi
+
 total=0
 for f in supabase/tests/*.test.sql; do
   output="$("${PSQL[@]}" < "$f" 2>&1)" || { echo "$f:"; echo "$output" | grep -E "ERROR|FAIL|CONTEXT" >&2; exit 1; }
