@@ -98,9 +98,9 @@ insert into events (id, slug, name, event_date, venue, capacity, price, status) 
 
 \echo '--- 1. Permission sets'
 select tt.login('00000000-0000-0000-0000-00000000a001');
-select tt.check(array_length(my_permissions(), 1) = 29, 'super admin has all 29 permissions');
+select tt.check(array_length(my_permissions(), 1) = 38, 'super admin has all 38 permissions (29 + 9 content permissions from 0028)');
 select tt.login('00000000-0000-0000-0000-00000000a002');
-select tt.check(array_length(my_permissions(), 1) = 21, 'admin has 21 permissions');
+select tt.check(array_length(my_permissions(), 1) = 30, 'admin has 30 permissions (21 + 9 content permissions from 0028)');
 select tt.check(not has_permission('settings.manage') and not has_permission('audit.view') and not has_permission('roles.manage'), 'admin lacks settings/audit/roles');
 select tt.login('00000000-0000-0000-0000-00000000a003');
 select tt.check(my_permissions() = array['announcements.view','attendees.view_assigned','checkin.history','checkin.perform','dashboard.view','events.view_assigned','tasks.view_own'], 'staff has exactly the 7 staff permissions');
