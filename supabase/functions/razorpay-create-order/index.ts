@@ -1,7 +1,8 @@
 // Creates a Razorpay order server-side and a matching `bookings` row in
-// status 'pending'. The amount is ALWAYS computed here from the event's own
-// price in the database — never accepted from the client — so a tampered
-// frontend request can change the quantity but never the unit price.
+// status 'pending'. The amount is ALWAYS computed by the database from the
+// event's ticket types (create_pending_booking → booking_quote, 0026) —
+// never accepted from the client — so a tampered request can pick a ticket
+// type and quantity but never a price.
 //
 // Required Edge Function secrets (set via `supabase secrets set`):
 //   RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
@@ -70,13 +71,10 @@ Deno.serve(async (req) => {
     if (names.length !== qty || names.some((n) => n.length === 0 || n.length > 120)) {
       return json({ error: 'Enter a name (up to 120 characters) for every attendee.' }, 400);
     }
-    // Must match BookingPage.jsx's ticketTiers exactly — that's the only
-    // other place ticket pricing is defined. If the tiers there ever change,
-    // update this map too; a mismatch would mean either overcharging or
-    // undercharging relative to what the UI advertised.
-    const TIER_MARKUP_RUPEES = { gen: 0, vip: 500, premium: 1200 };
-    if (!Object.prototype.hasOwnProperty.call(TIER_MARKUP_RUPEES, tierId)) {
-      return json({ error: 'Invalid ticket tier.' }, 400);
+    // Ticket type: an identifier only. Whether it exists, is on sale and
+    // what it costs is decided by the database.
+    if (typeof tierId !== 'string' || !/^[a-z][a-z0-9_]{0,31}$/.test(tierId)) {
+      return json({ error: 'Choose a ticket type.' }, 400);
     }
 
     // Service-role client: bypasses RLS deliberately, only after we've
@@ -94,17 +92,19 @@ Deno.serve(async (req) => {
       return json({ error: 'Event not found.' }, 404);
     }
     if (event.status !== 'on-sale') {
-      return json({ error: 'This session is not currently on sale.' }, 409);
+      // A sold-out session still sells to someone holding a live waitlist offer.
+      const { data: offer } = event.status === 'sold-out'
+        ? await admin.from('waitlist').select('id')
+            .eq('event_id', eventId).eq('user_id', user.id).eq('status', 'offered')
+            .gt('offer_expires_at', new Date().toISOString()).maybeSingle()
+        : { data: null };
+      if (!offer) {
+        return json({ error: 'This session is not currently on sale.' }, 409);
+      }
     }
     if (qty < event.booking_min_quantity || qty > event.booking_max_quantity) {
       return json({ error: `This session takes ${event.booking_min_quantity}–${event.booking_max_quantity} tickets per booking.` }, 400);
     }
-
-    const unitAmountRupees = event.price + TIER_MARKUP_RUPEES[tierId];
-    const subtotalRupees = unitAmountRupees * qty;
-    const taxesRupees = Math.round(subtotalRupees * 0.18);
-    const totalAmountRupees = subtotalRupees + taxesRupees;
-    const totalAmountPaise = totalAmountRupees * 100;
 
     const registrationCode = generateRegistrationCode();
 
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       p_attendee_email: attendeeEmail,
       p_attendee_phone: phoneDigits,
       p_quantity: qty,
-      p_amount: totalAmountRupees,
+      p_amount: null, // priced by the database for checkouts
       p_tier: tierId,
       p_razorpay_order_id: null,
       p_attendee_names: names,
@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
     });
 
     if (bookingError) {
-      const invalid = bookingError.message?.match(/INVALID_(?:DETAILS|QUANTITY): (.+)$/);
+      const invalid = bookingError.message?.match(/INVALID_(?:DETAILS|QUANTITY|TICKET_TYPE): (.+)$/);
       if (invalid) {
         return json({ error: invalid[1] }, 400);
       }
@@ -148,14 +148,22 @@ Deno.serve(async (req) => {
         return json({ error: 'Enter a name (up to 120 characters) for every attendee.' }, 400);
       }
       if (bookingError.message?.includes('SOLD_OUT')) {
-        return json({ error: 'Not enough tickets remain for this session.' }, 409);
+        const detail = bookingError.message.match(/SOLD_OUT: (.+)$/);
+        return json({ error: detail ? detail[1] : 'Not enough tickets remain for this session.' }, 409);
       }
       console.error('Booking insert failed', bookingError);
       return json({ error: 'Could not record booking.' }, 500);
     }
 
-    const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')!;
-    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')!;
+    const totalAmountPaise = Number(booking.amount) * 100;
+    const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
+    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
+    if (!razorpayKeyId || !razorpayKeySecret) {
+      // Payments not configured on this deployment: release the hold at once
+      // rather than keeping seats for a checkout that cannot be paid.
+      await admin.from('bookings').update({ status: 'failed' }).eq('id', booking.id);
+      return json({ error: 'Online payment is not available yet — please try again later.' }, 503);
+    }
     const basicAuth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
 
     const orderRes = await fetch('https://api.razorpay.com/v1/orders', {

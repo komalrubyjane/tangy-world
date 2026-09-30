@@ -85,35 +85,17 @@ Deno.serve(async (req) => {
     const failures: string[] = [];
 
     if ((eventType === 'payment.captured' || eventType === 'order.paid') && orderId) {
-      // Includes bookings that expired before the payment landed: moving
-      // expired -> confirmed fires flag_late_payment (0020), which audits and
-      // alerts payments staff to review capacity.
-      const { data: confirmedBookings, error: updateError } = await admin
-        .from('bookings')
-        .update({
-          status: 'confirmed',
-          razorpay_payment_id: paymentEntity?.id ?? null,
-          razorpay_signature_verified: true,
-          payment_status: 'captured',
-          payment_updated_at: now,
-        })
-        .eq('razorpay_order_id', orderId)
-        .neq('status', 'confirmed')
-        .select('id');
-
-      if (updateError) {
-        failures.push(`booking update failed: ${updateError.message}`);
-      } else {
-        // This is the authoritative confirmation path — independent of
-        // whether the client's own razorpay-verify-payment call ever ran
-        // (browser closed, network drop). confirm_booking_and_issue_tickets
-        // is idempotent, so it's safe even if verify-payment already issued
-        // these same tickets, and safe against this same webhook retrying.
-        for (const b of confirmedBookings ?? []) {
-          const { error: ticketError } = await admin.rpc('confirm_booking_and_issue_tickets', { p_booking_id: b.id });
-          if (ticketError) failures.push(`ticket issuance failed for ${b.id}: ${ticketError.message}`);
-        }
-      }
+      // settle_payment (0026) is the only place a paid booking is confirmed:
+      // it locks the event + booking, confirms pending holds, accepts late
+      // payments only if the seats are still free, never re-confirms a
+      // cancelled booking, checks the amount, and holds anything else for
+      // finance review. Idempotent, so Razorpay retries are safe.
+      const amountPaise = typeof paymentEntity?.amount === 'number' ? paymentEntity.amount : null;
+      const { data: settled, error: settleError } = await admin.rpc('settle_payment', {
+        p_order_id: orderId, p_payment_id: paymentEntity?.id ?? `${eventType}:${orderId}`, p_amount_paise: amountPaise, p_source: 'webhook',
+      });
+      if (settleError) failures.push(`settlement failed: ${settleError.message}`);
+      else if (settled?.result === 'not_found') failures.push(`no booking for order ${orderId}`);
     } else if (eventType === 'payment.authorized' && orderId) {
       const { error } = await admin.from('bookings')
         .update({ payment_status: 'authorized', payment_updated_at: now })

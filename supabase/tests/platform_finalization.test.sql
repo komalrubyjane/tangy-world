@@ -307,8 +307,12 @@ select tt.check(exists (select 1 from tt.audits('booking.expired') where metadat
 select tt.login('00000000-0000-0000-0000-0000000c0012');
 select tt.expect_error($$select expire_stale_bookings()$$, '%permission denied%', 'customers cannot trigger expiry');
 select tt.logout();
-update bookings set status = 'confirmed', razorpay_payment_id = 'pay_late' where registration_code = 'FIN-P1';
-select tt.check(exists (select 1 from tt.audits('payment.late')) and tt.notes('00000000-0000-0000-0000-0000000c0002', 'payment.late') = 1, 'a payment after expiry still confirms, and finance is alerted');
+-- 0026: a late payment is settled explicitly — here the released seats were
+-- rebooked, so it must not confirm (no over-capacity); finance reviews it.
+select tt.check((settle_payment('ord_p1', 'pay_late', null, 'webhook') ->> 'result') = 'needs_review', 'a payment after expiry with the seats gone is held for review');
+select tt.check((select status = 'expired' and payment_status = 'needs_review' from bookings where registration_code = 'FIN-P1'), 'the late booking is not confirmed (no over-capacity)');
+select tt.check(exists (select 1 from tt.audits('payment.needs_review')), 'the decision is audited');
+select tt.check(tt.notes('00000000-0000-0000-0000-0000000c0002', 'payment.review') = 1, 'finance is alerted');
 
 \echo '--- 13. Event health (explicit rules)'
 select tt.login('00000000-0000-0000-0000-0000000c0002');

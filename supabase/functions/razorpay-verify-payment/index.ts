@@ -67,36 +67,22 @@ Deno.serve(async (req) => {
       return json({ error: 'Payment signature verification failed.' }, 400);
     }
 
-    const { data: updated, error: updateError } = await admin
-      .from('bookings')
-      .update({
-        status: 'confirmed',
-        razorpay_payment_id,
-        razorpay_signature_verified: true,
-      })
-      .eq('id', booking_id)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error('Booking confirm update failed', updateError);
-      return json({ error: 'Could not confirm booking.' }, 500);
+    // settle_payment (0026) decides: pending -> confirmed (+ tickets); a
+    // late payment is accepted only if the seats are still free; anything
+    // else is held for finance review instead of creating an invalid booking.
+    const { data: settled, error: settleError } = await admin.rpc('settle_payment', {
+      p_order_id: razorpay_order_id, p_payment_id: razorpay_payment_id, p_amount_paise: null, p_source: 'verify',
+    });
+    if (settleError) {
+      console.error('settle_payment failed', settleError.message);
+      return json({ error: 'Could not confirm booking — contact support with your payment ID.' }, 500);
     }
-
-    // Issues one ticket row per quantity unit, each with its own random
-    // token (what the QR actually encodes) — idempotent, safe even if the
-    // webhook already did this for the same booking (see
-    // 0016_payments_tickets_checkin.sql).
-    const { data: tickets, error: ticketError } = await admin.rpc('confirm_booking_and_issue_tickets', { p_booking_id: booking_id });
-    if (ticketError) {
-      // The payment IS confirmed at this point — never undo that because
-      // ticket issuance had a problem. Surface it, but the booking stays
-      // confirmed; an admin can investigate/retry ticket issuance.
-      console.error('Ticket issuance failed', ticketError);
-      return json({ success: true, booking: updated, tickets: [], ticketError: 'Could not issue tickets — contact support.' });
+    if (settled?.result === 'needs_review') {
+      return json({ error: 'We received your payment, but these seats are no longer available. Our team will contact you about a refund or a new seat.', review: true }, 409);
     }
-
-    return json({ success: true, booking: updated, tickets: tickets || [] });
+    const { data: confirmed } = await admin.from('bookings').select('*').eq('id', booking_id).single();
+    const { data: tickets } = await admin.from('tickets').select('*').eq('booking_id', booking_id).order('ticket_number');
+    return json({ success: true, booking: confirmed, tickets: tickets || [] });
   } catch (err) {
     console.error('razorpay-verify-payment error', err);
     return json({ error: 'Unexpected server error.' }, 500);
