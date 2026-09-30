@@ -305,7 +305,7 @@ const PartnerCompose = ({ events, onClose, onCreated }) => {
       <Field label="Subject"><Input value={f.subject} maxLength={140} onChange={(e) => setF({ ...f, subject: e.target.value })} placeholder="e.g. Soundcheck timing" /></Field>
       <Field label="Message *"><Textarea rows={5} maxLength={4000} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} /></Field>
       {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
-      <p className="text-[11.5px] text-[#E7D5A4]/45">Only the Tangy team can read this conversation.</p>
+      <p className="text-[11.5px] text-[#E7D5A4]/45">Only you and the Tangy team can read this conversation. Please don’t share passwords or card details in messages.</p>
     </Modal>
   );
 };
