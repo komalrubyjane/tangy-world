@@ -4,13 +4,14 @@
 // Server-only: callable with the service-role key (Supabase Cron / pg_net)
 // or with the CRON_SECRET header. It never accepts an end-user session, so a
 // signed-in user cannot trigger or read anyone's email. Delivery goes through
-// the shared provider module (Resend in production).
+// the shared provider module (Resend in production). Without a configured
+// provider the queue is left as is.
 //
 // Rows are claimed with FOR UPDATE SKIP LOCKED (claim_email_batch), so two
 // concurrent runs never send the same email; failures are retried up to 5
 // times and then marked 'failed' for the admin to see.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { sendEmail, notificationHtml } from '../_shared/email.ts';
+import { sendEmail, notificationHtml, emailConfig } from '../_shared/email.ts';
 
 const ACTION_LABEL: Record<string, string> = {
   'message.new': 'Read message',
@@ -25,7 +26,14 @@ const ACTION_LABEL: Record<string, string> = {
   'application.new': 'Review application',
   'access.requested': 'Review request',
   'payment.late': 'Review booking',
+  'payment.review': 'Review payment',
   'payment.webhook_failed': 'Open bookings',
+  'application.received': 'View your profile',
+  'enquiry.new': 'Open inbox',
+  'waitlist.joined': 'View session',
+  'waitlist.offer': 'Book your seats',
+  'waitlist.offer_expired': 'View session',
+  'waitlist.converted': 'View booking',
 };
 
 Deno.serve(async (req) => {
@@ -37,6 +45,12 @@ Deno.serve(async (req) => {
   const auth = req.headers.get('Authorization') ?? '';
   const allowed = auth === `Bearer ${serviceRoleKey}` || (cronSecret && req.headers.get('x-cron-secret') === cronSecret);
   if (!allowed) return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+
+  // No provider yet (e.g. RESEND_API_KEY not set): leave the queue untouched
+  // so nothing is marked failed; it drains once email is configured.
+  if (!emailConfig().configured) {
+    return new Response(JSON.stringify({ configured: false, claimed: 0, sent: 0, failed: 0 }), { headers: { 'Content-Type': 'application/json' } });
+  }
 
   const siteUrl = (Deno.env.get('SITE_URL') ?? 'https://tangysessions.com').replace(/\/$/, '');
   const admin = createClient(supabaseUrl, serviceRoleKey);

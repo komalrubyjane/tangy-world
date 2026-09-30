@@ -1,17 +1,41 @@
-// Shared email delivery for Tangy Edge Functions.
+// Shared email delivery for every Tangy Edge Function. Secrets are read only
+// here, server-side.
 //
-// Production uses Resend (RESEND_API_KEY, RESEND_FROM_EMAIL) — the same
-// provider send-approval-email and send-ticket-email already use. For local
-// verification only, EMAIL_PROVIDER=mailpit delivers to the local stack's
-// Mailpit inbox (MAILPIT_URL) so every workflow can be checked end to end
-// without a real provider. Secrets are only ever read here, server-side.
+//   EMAIL_PROVIDER   resend (default) | mailpit (local stack) | log | disabled
+//   RESEND_API_KEY   required for resend; without it email is "not configured"
+//                    and nothing is sent (queued notification emails wait)
+//   EMAIL_FROM       sender, e.g. "Tangy Sessions <hello@tangysessions.com>"
+//                    (RESEND_FROM_EMAIL is still accepted as the old name)
+//   EMAIL_REPLY_TO   optional reply-to address
+//   MAILPIT_URL      local only, with EMAIL_PROVIDER=mailpit
+//
+// `log` prints the recipient and subject (never the body) and reports the
+// message as sent — for development only. `disabled` sends nothing.
 
-export type EmailMessage = { to: string; subject: string; html: string; text?: string };
+export type EmailAttachment = { filename: string; content: string }; // base64
+export type EmailMessage = { to: string; subject: string; html: string; text?: string; attachments?: EmailAttachment[] };
+export type SendResult = { ok: boolean; error?: string; notConfigured?: boolean };
 
-export async function sendEmail(msg: EmailMessage): Promise<{ ok: boolean; error?: string }> {
+const DEFAULT_FROM = 'Tangy Sessions <hello@tangysessions.com>';
+
+export function emailConfig() {
   const provider = (Deno.env.get('EMAIL_PROVIDER') ?? 'resend').toLowerCase();
-  const from = Deno.env.get('RESEND_FROM_EMAIL') ?? 'Tangy Sessions <hello@tangysessions.com>';
+  const from = Deno.env.get('EMAIL_FROM') ?? Deno.env.get('RESEND_FROM_EMAIL') ?? DEFAULT_FROM;
+  const replyTo = Deno.env.get('EMAIL_REPLY_TO') || undefined;
+  const configured = provider === 'mailpit' || provider === 'log' || (provider === 'resend' && !!Deno.env.get('RESEND_API_KEY'));
+  return { provider, from, replyTo, configured };
+}
+
+export const NOT_CONFIGURED = 'Email is not configured yet.';
+
+export async function sendEmail(msg: EmailMessage): Promise<SendResult> {
+  const { provider, from, replyTo, configured } = emailConfig();
+  if (!configured) return { ok: false, notConfigured: true, error: NOT_CONFIGURED };
   try {
+    if (provider === 'log') {
+      console.log(`[email:log] to=${msg.to} subject=${JSON.stringify(msg.subject)} attachments=${msg.attachments?.length ?? 0}`);
+      return { ok: true };
+    }
     if (provider === 'mailpit') {
       const base = (Deno.env.get('MAILPIT_URL') ?? 'http://host.docker.internal:54324').replace(/\/$/, '');
       const match = from.match(/^(.*)<(.+)>$/);
@@ -21,23 +45,24 @@ export async function sendEmail(msg: EmailMessage): Promise<{ ok: boolean; error
         body: JSON.stringify({
           From: { Email: match ? match[2].trim() : from, Name: match ? match[1].trim() : '' },
           To: [{ Email: msg.to }],
+          ReplyTo: replyTo ? [{ Email: replyTo }] : undefined,
           Subject: msg.subject,
           HTML: msg.html,
           Text: msg.text ?? '',
+          Attachments: msg.attachments?.map((a) => ({ Filename: a.filename, Content: a.content })),
         }),
       });
       return res.ok ? { ok: true } : { ok: false, error: `mailpit ${res.status}` };
     }
-    const key = Deno.env.get('RESEND_API_KEY');
-    if (!key) return { ok: false, error: 'Email service not configured.' };
+    if (provider !== 'resend') return { ok: false, notConfigured: true, error: `Unknown EMAIL_PROVIDER "${provider}".` };
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [msg.to], subject: msg.subject, html: msg.html, text: msg.text }),
+      headers: { Authorization: `Bearer ${Deno.env.get('RESEND_API_KEY')}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [msg.to], reply_to: replyTo, subject: msg.subject, html: msg.html, text: msg.text, attachments: msg.attachments }),
     });
     if (res.ok) return { ok: true };
     console.error('Resend API error', res.status, await res.text());
-    return { ok: false, error: `provider ${res.status}` };
+    return { ok: false, error: 'Email provider rejected the message.' };
   } catch (err) {
     console.error('email network error', err);
     return { ok: false, error: 'Could not reach email provider.' };

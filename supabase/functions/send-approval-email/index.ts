@@ -1,5 +1,6 @@
-// Sends the Tangy-branded "your application is approved" email — the only
-// place RESEND_API_KEY is ever read, and it never leaves this function.
+// Sends the Tangy-branded "your application is approved" email through the
+// shared provider module (_shared/email.ts — the only place email secrets
+// are read; they never leave the server).
 //
 // Called by the client (src/services/notificationService.js) right after an
 // admin's approve_collaboration / approve_crew_application /
@@ -18,6 +19,7 @@
 // Pass `force: true` to explicitly resend (the admin "RESEND EMAIL" action).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { sendEmail } from '../_shared/email.ts';
 
 const ROLE_META: Record<string, { label: string; loginPath: string }> = {
   vendor: { label: 'Vendor', loginPath: '/join/login' },
@@ -179,45 +181,15 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'No linked account email on file.' });
     }
 
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendKey) {
-      await admin.from('application_notifications').update({
-        status: 'failed',
-        error: 'Email service not configured.',
-      }).eq('id', notif.id);
-      return json({ success: false, error: 'Email service not configured.' });
-    }
-
     const portalUrl = `${siteUrl}${meta.loginPath}`;
     const html = emailHtml({ name: recipientName, roleLabel: meta.label, portalUrl });
-
-    let sendOk = false;
-    let sendError = '';
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: Deno.env.get('RESEND_FROM_EMAIL') ?? 'Tangy Sessions <hello@tangysessions.com>',
-          to: [recipientEmail],
-          subject: `You're officially part of Tangy — ${meta.label} Application Approved`,
-          html,
-        }),
-      });
-      if (res.ok) {
-        sendOk = true;
-      } else {
-        const body = await res.text();
-        console.error('Resend API error', res.status, body);
-        sendError = 'Email provider rejected the message.';
-      }
-    } catch (err) {
-      console.error('send-approval-email network error', err);
-      sendError = 'Could not reach email provider.';
-    }
+    const result = await sendEmail({
+      to: recipientEmail,
+      subject: `You're officially part of Tangy — ${meta.label} Application Approved`,
+      html,
+    });
+    const sendOk = result.ok;
+    const sendError = result.error ?? '';
 
     if (sendOk) {
       await admin.from('application_notifications').update({

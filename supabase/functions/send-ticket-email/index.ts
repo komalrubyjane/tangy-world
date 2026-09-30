@@ -1,7 +1,7 @@
 // Sends the ticket confirmation email after a booking is confirmed and its
 // tickets have been issued (confirm_booking_and_issue_tickets in
-// 0016_payments_tickets_checkin.sql). RESEND_API_KEY never leaves this
-// function. Mirrors send-approval-email's auth-client/admin-client split —
+// 0016_payments_tickets_checkin.sql), via _shared/email.ts (email secrets
+// never leave the server). Mirrors send-approval-email's auth-client/admin-client split —
 // see that function for the established pattern this follows.
 //
 // Called by the client (src/lib/bookingService.js) right after
@@ -15,6 +15,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import QRCode from 'https://esm.sh/qrcode@1.5.4';
 import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { sendEmail } from '../_shared/email.ts';
 
 const TIER_LABELS: Record<string, string> = { gen: 'General Admission', vip: 'VIP Heritage Pass', premium: 'Backstage Collective Pass' };
 
@@ -151,43 +152,20 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'No linked account email on file.' });
     }
 
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendKey) {
-      await admin.from('bookings').update({ ticket_email_status: 'failed', ticket_email_error: 'Email service not configured.' }).eq('id', booking_id);
-      return json({ success: false, error: 'Email service not configured.' });
-    }
-
     // One opaque booking QR (0023) — no ids, names or contact details inside.
     const dataUrl: string = await QRCode.toDataURL(`TANGY:BOOKING:${booking.group_token}`, { width: 320, margin: 2, color: { dark: '#11100C', light: '#E7D5A4' } });
     const attachments = [{ filename: 'booking-pass.png', content: dataUrl.split(',')[1] }];
 
     const html = emailHtml({ attendeeName: recipientName, event, booking, tickets });
 
-    let sendOk = false;
-    let sendError = '';
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: Deno.env.get('RESEND_FROM_EMAIL') ?? 'Tangy Sessions <hello@tangysessions.com>',
-          to: [recipientEmail],
-          subject: `Your Tangy Sessions tickets — ${event?.name || booking.registration_code}`,
-          html,
-          attachments,
-        }),
-      });
-      if (res.ok) {
-        sendOk = true;
-      } else {
-        const body = await res.text();
-        console.error('Resend API error', res.status, body);
-        sendError = 'Email provider rejected the message.';
-      }
-    } catch (err) {
-      console.error('send-ticket-email network error', err);
-      sendError = 'Could not reach email provider.';
-    }
+    const result = await sendEmail({
+      to: recipientEmail,
+      subject: `Your Tangy Sessions tickets — ${event?.name || booking.registration_code}`,
+      html,
+      attachments,
+    });
+    const sendOk = result.ok;
+    const sendError = result.error ?? '';
 
     if (sendOk) {
       await admin.from('bookings').update({ ticket_email_status: 'sent', ticket_email_sent_at: new Date().toISOString(), ticket_email_error: null }).eq('id', booking_id);
