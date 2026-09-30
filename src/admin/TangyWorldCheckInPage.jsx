@@ -111,11 +111,11 @@ function AttendeePanel({ party, method, busy, onConfirm, onCancel, notice }) {
       {!single && (
         <dl className="grid grid-cols-2 gap-2 m-0">
           <div className="rounded border border-[#C99A2E]/20 px-3 py-2">
-            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/50">Checked in</dt>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/60">Checked in</dt>
             <dd className="m-0 font-condensed text-3xl tabular-nums text-[#5fd3a0]" data-party-progress>{party.checked_in} / {party.party_size}</dd>
           </div>
           <div className="rounded border border-[#C99A2E]/20 px-3 py-2">
-            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/50">Remaining</dt>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#E7D5A4]/60">Remaining</dt>
             <dd className="m-0 font-condensed text-3xl tabular-nums text-[#f5b544]" data-party-remaining>{party.remaining}</dd>
           </div>
         </dl>
@@ -363,7 +363,7 @@ function CheckInWorkspace() {
               {[['Checked in', stats?.checked_in, 'text-[#5fd3a0]'], ['To arrive', stats?.remaining, 'text-[#f5b544]'], ['Tickets', stats?.tickets_issued, 'text-[#EFE2C0]']].map(([label, n, cls]) => (
                 <div key={label} className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md py-2.5 text-center">
                   <div className={cx('font-condensed text-2xl tabular-nums leading-none', cls)}>{n ?? '—'}</div>
-                  <div className="font-mono text-[9.5px] uppercase tracking-[0.15em] text-[#E7D5A4]/45 mt-1">{label}</div>
+                  <div className="font-mono text-[9.5px] uppercase tracking-[0.15em] text-[#E7D5A4]/60 mt-1">{label}</div>
                 </div>
               ))}
             </div>
@@ -415,17 +415,17 @@ function CheckInWorkspace() {
             {mode === 'scan' && eventId ? (
               <div className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3">
                 <QrScanner active onDecoded={onDecoded} />
-                <p className="text-center text-[12px] text-[#E7D5A4]/45 mt-3">{busy ? 'Verifying…' : pending ? 'Select who is here above.' : 'Point the camera at the booking QR code.'}</p>
+                <p className="text-center text-[12px] text-[#E7D5A4]/60 mt-3">{busy ? 'Verifying…' : pending ? 'Select who is here above.' : 'Point the camera at the booking QR code.'}</p>
               </div>
             ) : mode === 'manual' && (
               <div className="flex flex-col gap-2">
                 <div className="relative">
-                  <Icon name="Search" size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E7D5A4]/40" />
+                  <Icon name="Search" size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E7D5A4]/60" />
                   <input type="search" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Name, booking code or ticket number"
                     className="w-full h-12 pl-10 pr-3 bg-[#17130F] border border-[#C99A2E]/30 rounded-md text-[15px] text-[#EFE2C0] placeholder:text-[#E7D5A4]/30 focus:outline-none focus:border-[#C99A2E]" />
                 </div>
-                {searching && <div className="text-[12px] text-[#E7D5A4]/45 px-1">Searching…</div>}
-                {!searching && q && matches.length === 0 && <div className="text-[13px] text-[#E7D5A4]/50 px-1 py-3">No attendees found for "{q}".</div>}
+                {searching && <div className="text-[12px] text-[#E7D5A4]/60 px-1">Searching…</div>}
+                {!searching && q && matches.length === 0 && <div className="text-[13px] text-[#E7D5A4]/60 px-1 py-3">No attendees found for "{q}".</div>}
                 <ul className="flex flex-col gap-2">
                   {bookings.map((t) => {
                     const state = partyState(t.party_checked_in, t.party_size);
@@ -434,7 +434,7 @@ function CheckInWorkspace() {
                       <li key={t.booking_id} data-manual-booking={t.registration_code} className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3 flex items-center gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="text-[15px] text-[#EFE2C0] truncate">{t.party_size === 1 ? (t.guest_name || t.attendee_name) : t.attendee_name}</div>
-                          <div className="font-mono text-[11.5px] text-[#E7D5A4]/50">{t.registration_code} · {t.party_size} attendee{t.party_size === 1 ? '' : 's'} · {TIER_NAME[t.tier] || 'General'}</div>
+                          <div className="font-mono text-[11.5px] text-[#E7D5A4]/60">{t.registration_code} · {t.party_size} attendee{t.party_size === 1 ? '' : 's'} · {TIER_NAME[t.tier] || 'General'}</div>
                           {t.party_size > 0 && (
                             <div className="text-[12.5px] text-[#E7D5A4]/75 mt-0.5 flex flex-wrap items-center gap-x-2">
                               <span><span className="tabular-nums">{t.party_checked_in} / {t.party_size}</span> checked in{t.party_remaining > 0 && t.party_checked_in > 0 ? ` · ${t.party_remaining} remaining` : ''}</span>
@@ -463,15 +463,15 @@ function CheckInWorkspace() {
                 <ul className="divide-y divide-[#E7D5A4]/[0.06]">
                   {arrivals.map((c) => (
                     <li key={c.batch_id || c.id} className="px-4 py-2 flex items-center gap-2 text-[13px]">
-                      <span className="flex-1 min-w-0 truncate">{c.names.join(', ')} <span className="text-[#E7D5A4]/40 font-mono text-[11px]">{c.registration_code}</span></span>
+                      <span className="flex-1 min-w-0 truncate">{c.names.join(', ')} <span className="text-[#E7D5A4]/60 font-mono text-[11px]">{c.registration_code}</span></span>
                       {c.method === 'manual' && <Badge status="manual" />}
-                      <span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.time(c.checked_in_at)}</span>
+                      <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.time(c.checked_in_at)}</span>
                     </li>
                   ))}
                 </ul>
               </section>
             )}
-            {selected && <p className="text-center font-mono text-[10.5px] text-[#E7D5A4]/35">{selected.name} · {selected.venue || 'Venue TBC'}</p>}
+            {selected && <p className="text-center font-mono text-[10.5px] text-[#E7D5A4]/60">{selected.name} · {selected.venue || 'Venue TBC'}</p>}
           </>
         )}
       </main>

@@ -57,7 +57,7 @@ export const Closing = () => {
           </div>
         </div>
 
-        <div className="flex justify-between gap-4 mt-16 pt-4 border-t border-[#EFE2C0]/15 archiveMetadata text-[#EFE2C0]/45">
+        <div className="flex justify-between gap-4 mt-16 pt-4 border-t border-[#EFE2C0]/15 archiveMetadata text-[#EFE2C0]/60">
           <span>Tangy Sessions · Hyderabad · Est. 2016</span>
           <span className="folio !opacity-100">— 10 —</span>
         </div>

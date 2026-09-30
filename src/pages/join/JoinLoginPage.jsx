@@ -76,7 +76,7 @@ export const JoinLoginPage = () => {
               >
                 <div>
                   <div className="font-mono text-[10px] font-bold uppercase text-[#E7D5A4]/70">Team Demo</div>
-                  <div className="font-mono text-[10px] text-[#E7D5A4]/50">Internal preview — not a real account.</div>
+                  <div className="font-mono text-[10px] text-[#E7D5A4]/60">Internal preview — not a real account.</div>
                 </div>
                 <span className="shrink-0 px-2 py-1 border border-[#E7D5A4]/40 text-[9px] font-bold uppercase tracking-wider text-[#E7D5A4]/70">→</span>
               </button>

@@ -45,7 +45,7 @@ export const InvoicesPanel = () => {
               <li key={i.id} className="py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="text-[14px] text-[#EFE2C0]">Invoice {i.invoice_number} · {money(i)}</div>
-                  <div className="text-[12px] text-[#E7D5A4]/50">
+                  <div className="text-[12px] text-[#E7D5A4]/60">
                     {[i.direction === 'receivable' ? 'Payable by you' : 'Payable to you', i.events?.name,
                       i.issued_date && `issued ${fmt.date(i.issued_date)}`, i.due_date && `due ${fmt.date(i.due_date)}`, i.paid_date && `paid ${fmt.date(i.paid_date)}`].filter(Boolean).join(' · ')}
                   </div>
@@ -87,7 +87,7 @@ export const SponsorDeliverablesPanel = ({ sponsorId }) => {
               <li key={d.id} className="py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="text-[14px] text-[#EFE2C0]">{d.title}</div>
-                  <div className={cx('text-[12px]', late ? 'text-[#f5b544]' : 'text-[#E7D5A4]/50')}>
+                  <div className={cx('text-[12px]', late ? 'text-[#f5b544]' : 'text-[#E7D5A4]/60')}>
                     {[DELIVERABLE_KIND[d.kind], d.events?.name, d.due_date && `${late ? 'was due' : 'due'} ${fmt.date(d.due_date)}`, d.completed_at && `delivered ${fmt.date(d.completed_at)}`].filter(Boolean).join(' · ')}
                   </div>
                   {d.description && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{d.description}</p>}
@@ -159,7 +159,7 @@ export const SponsorAssetsPanel = ({ sponsorId, events = [] }) => {
               <li key={a.id} className="py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <div className="min-w-0 flex-1">
                   <button type="button" className="text-[14px] text-[#EFE2C0] hover:underline text-left" onClick={() => openPrivateFile('sponsor-assets', a.storage_path).catch((err) => setMsg(err.message))}>{a.title}</button>
-                  <div className="text-[12px] text-[#E7D5A4]/50">{[Object.fromEntries(ASSET_KIND)[a.kind], a.events?.name, formatBytes(a.file_size_bytes), fmt.date(a.created_at)].filter(Boolean).join(' · ')}</div>
+                  <div className="text-[12px] text-[#E7D5A4]/60">{[Object.fromEntries(ASSET_KIND)[a.kind], a.events?.name, formatBytes(a.file_size_bytes), fmt.date(a.created_at)].filter(Boolean).join(' · ')}</div>
                   {a.review_note && <p className="text-[12.5px] text-[#f5b544] mt-0.5">Tangy: {a.review_note}</p>}
                 </div>
                 <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export const MyTasksPanel = ({ userId }) => {
               <li key={t.id} className="py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <div className="min-w-0 flex-1">
                   <div className={cx('text-[14px] text-[#EFE2C0]', t.status === 'done' && 'line-through opacity-50')}>{t.title}</div>
-                  <div className={cx('text-[12px]', overdue ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/50')}>
+                  <div className={cx('text-[12px]', overdue ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/60')}>
                     {[t.events?.name, t.team && `${t.team} team`, t.due_at && `${overdue ? 'overdue since' : 'due'} ${fmt.dateTime(t.due_at)}`].filter(Boolean).join(' · ')}
                   </div>
                   {t.description && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{t.description}</p>}

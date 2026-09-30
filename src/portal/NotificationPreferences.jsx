@@ -66,7 +66,7 @@ export const NotificationPreferences = ({ keys }) => {
           </label>
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#E7D5A4]/50">
+              <tr className="text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#E7D5A4]/60">
                 <th className="font-normal py-2">Category</th><th className="font-normal py-2 text-center w-20">In-app</th><th className="font-normal py-2 text-center w-20">Email</th>
               </tr>
             </thead>
@@ -75,7 +75,7 @@ export const NotificationPreferences = ({ keys }) => {
                 const p = prefs.prefs?.[k] || { in_app: true, email: true };
                 return (
                   <tr key={k} className="border-t border-[#E7D5A4]/[0.06]">
-                    <td className="py-2.5 pr-2"><span className="block text-[#EFE2C0]">{LABELS[k][0]}</span><span className="block text-[11.5px] text-[#E7D5A4]/50">{LABELS[k][1]}</span></td>
+                    <td className="py-2.5 pr-2"><span className="block text-[#EFE2C0]">{LABELS[k][0]}</span><span className="block text-[11.5px] text-[#E7D5A4]/60">{LABELS[k][1]}</span></td>
                     <td className="text-center"><Toggle on={p.in_app} label={`${LABELS[k][0]} in-app`} disabled={saving === `${k}:in_app`} onChange={(v) => set(k, 'in_app', v)} /></td>
                     <td className="text-center"><Toggle on={p.email && prefs.email_enabled} label={`${LABELS[k][0]} email`} disabled={!prefs.email_enabled || saving === `${k}:email`} onChange={(v) => set(k, 'email', v)} /></td>
                   </tr>
@@ -83,7 +83,7 @@ export const NotificationPreferences = ({ keys }) => {
               })}
             </tbody>
           </table>
-          <p className="text-[11.5px] text-[#E7D5A4]/45">Cancellations, revoked access and payment problems are always shown in-app.</p>
+          <p className="text-[11.5px] text-[#E7D5A4]/60">Cancellations, revoked access and payment problems are always shown in-app.</p>
         </div>
       )}
     </Panel>

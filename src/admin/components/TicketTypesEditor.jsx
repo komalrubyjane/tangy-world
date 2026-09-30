@@ -57,19 +57,19 @@ export function TicketTypesEditor({ evt, counts, canManage }) {
     >
       <div className="overflow-x-auto">
         <table className="w-full text-[13px]" data-ticket-types>
-          <thead><tr className="border-b border-[#C99A2E]/20 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45 text-left">
+          <thead><tr className="border-b border-[#C99A2E]/20 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60 text-left">
             <th className="px-4 py-2">Type</th><th className="px-4 py-2 text-right">Price</th><th className="px-4 py-2 text-right">With tax</th>
             <th className="px-4 py-2 text-right">Limit</th><th className="px-4 py-2 text-right">Issued</th><th className="px-4 py-2 text-right">Checked in</th><th className="px-4 py-2" />
           </tr></thead>
           <tbody>
-            {types.loading && rows.length === 0 && <tr><td colSpan={7} className="px-4 py-3 text-[#E7D5A4]/50">Loading…</td></tr>}
+            {types.loading && rows.length === 0 && <tr><td colSpan={7} className="px-4 py-3 text-[#E7D5A4]/60">Loading…</td></tr>}
             {types.error && <tr><td colSpan={7} className="px-4 py-3 text-[#ef6b5e]">{types.error.message}</td></tr>}
             {rows.map((t) => {
               const c = counts?.[t.code] || { issued: 0, checked_in: 0 };
               return (
                 <tr key={t.id} className="border-b border-[#E7D5A4]/[0.06]">
                   <td className="px-4 py-2.5 text-[#EFE2C0]">
-                    {t.name} <span className="font-mono text-[10px] text-[#E7D5A4]/40">{t.code}</span>
+                    {t.name} <span className="font-mono text-[10px] text-[#E7D5A4]/60">{t.code}</span>
                     {!t.active && <span className="ml-2"><Badge status="archived">Not on sale</Badge></span>}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums">{fmt.money(t.price)}</td>

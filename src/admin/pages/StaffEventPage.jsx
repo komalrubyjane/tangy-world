@@ -88,7 +88,7 @@ export default function StaffEventPage() {
               <li key={a.id} className="px-4 py-3">
                 <div className="flex items-center gap-2"><span className="text-[13.5px] text-[#EFE2C0]">{a.title}</span>{a.priority === 'high' && <Badge tone="bad">Important</Badge>}</div>
                 <p className="text-[12.5px] text-[#E7D5A4]/60 mt-1 whitespace-pre-line">{a.body}</p>
-                <div className="font-mono text-[10.5px] text-[#E7D5A4]/35 mt-1">{fmt.dateTime(a.publish_at)}</div>
+                <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 mt-1">{fmt.dateTime(a.publish_at)}</div>
               </li>
             ))}
           </ul>

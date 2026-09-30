@@ -46,8 +46,8 @@ export const NotificationBell = ({ userId, allHref }) => {
           </div>
           <ul className="max-h-[60vh] overflow-y-auto divide-y divide-[#E7D5A4]/[0.06]">
             {error && <li className="px-4 py-6 text-center text-[12.5px] text-[#ef6b5e]">{error.message}</li>}
-            {!error && items === null && <li className="px-4 py-6 text-center text-[12.5px] text-[#E7D5A4]/45">Loading…</li>}
-            {!error && items?.length === 0 && <li className="px-4 py-8 text-center text-[12.5px] text-[#E7D5A4]/45">No notifications</li>}
+            {!error && items === null && <li className="px-4 py-6 text-center text-[12.5px] text-[#E7D5A4]/60">Loading…</li>}
+            {!error && items?.length === 0 && <li className="px-4 py-8 text-center text-[12.5px] text-[#E7D5A4]/60">No notifications</li>}
             {items?.map((n) => (
               <li key={n.id}>
                 <button onClick={() => follow(n)} className={cx('w-full text-left px-4 py-3 hover:bg-[#C99A2E]/[0.07] flex gap-2.5', !n.read_at && 'bg-[#C99A2E]/[0.04]')}>
@@ -55,7 +55,7 @@ export const NotificationBell = ({ userId, allHref }) => {
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13px] text-[#EFE2C0] leading-snug">{n.title}</span>
                     {n.body && <span className="block text-[12px] text-[#E7D5A4]/55 mt-0.5 line-clamp-2">{n.body}</span>}
-                    <span className="block font-mono text-[10px] text-[#E7D5A4]/35 mt-1">{fmt.relative(n.created_at)}</span>
+                    <span className="block font-mono text-[10px] text-[#E7D5A4]/60 mt-1">{fmt.relative(n.created_at)}</span>
                   </span>
                 </button>
               </li>

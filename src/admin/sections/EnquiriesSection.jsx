@@ -18,7 +18,7 @@ export const ContactEnquiriesSection = () => {
     <div className="bg-[#191410] border border-[#C99A2E]/60 p-6 rounded-sm">
       <h3 className="text-lg font-bold text-[#C99A2E] mb-4 border-b border-[#C99A2E]/30 pb-2">CONTACT ENQUIRIES</h3>
       <SearchBar value={search} onChange={setSearch} placeholder="Search name, email, type..." count={total} />
-      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING...</div> : rows.length === 0 ? (
+      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING...</div> : rows.length === 0 ? (
         <EmptyState>NO MESSAGES YET.</EmptyState>
       ) : (
         <div className="flex flex-col gap-3">
@@ -61,7 +61,7 @@ export const PrivateEnquiriesSection = () => {
     <div className="bg-[#191410] border border-[#C99A2E]/60 p-6 rounded-sm">
       <h3 className="text-lg font-bold text-[#C99A2E] mb-4 border-b border-[#C99A2E]/30 pb-2">PRIVATE SESSION ENQUIRIES</h3>
       <SearchBar value={search} onChange={setSearch} placeholder="Search name, email, type..." count={total} />
-      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING...</div> : rows.length === 0 ? (
+      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING...</div> : rows.length === 0 ? (
         <EmptyState>NO PRIVATE ENQUIRIES YET.</EmptyState>
       ) : (
         <div className="flex flex-col gap-3">

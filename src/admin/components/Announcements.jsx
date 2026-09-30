@@ -151,12 +151,12 @@ export const AnnouncementsManager = ({ eventId, startNew = false }) => {
   });
 
   const columns = [
-    { key: 'title', header: 'Announcement', render: (a) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{a.title}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[340px]">{a.body}</div></div>) },
+    { key: 'title', header: 'Announcement', render: (a) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{a.title}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[340px]">{a.body}</div></div>) },
     { key: 'audience', header: 'Audience', render: (a) => <Badge tone={a.audience === 'staff' ? 'info' : PUBLIC_AUDIENCES.includes(a.audience) ? 'gold' : 'muted'}>{AUDIENCE_LABEL[a.audience]}</Badge> },
     { key: 'event', header: 'Event', hidden: !!eventId, mobileHidden: true, render: (a) => <span className="text-[12.5px] text-[#E7D5A4]/60">{a.events?.name || '—'}</span> },
     { key: 'state', header: 'State', render: (a) => { const s = announcementState(a); return <Badge status={s === 'live' ? 'published' : s}>{s}</Badge>; } },
     { key: 'publish', header: 'Publish', mobileHidden: true, render: (a) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/55">{fmt.dateTime(a.publish_at)}{a.expire_at ? ` → ${fmt.dateTime(a.expire_at)}` : ''}</span> },
-    { key: 'updated', header: 'Updated', mobileHidden: true, render: (a) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/40">{fmt.relative(a.updated_at)}</span> },
+    { key: 'updated', header: 'Updated', mobileHidden: true, render: (a) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/60">{fmt.relative(a.updated_at)}</span> },
     { key: 'actions', header: '', align: 'right', hidden: !can(P.CONTENT), render: (a) => (
       <span className="inline-flex gap-1" onClick={(e) => e.stopPropagation()}>
         {a.audience !== 'staff' && <Button size="sm" variant="ghost" icon="Eye" aria-label="Preview" onClick={() => setPreview(toOverlayShape(a))} />}

@@ -134,7 +134,7 @@ export const AdminEntitySelectorInner = () => {
           {loading ? (
             <div className="p-8 text-center font-mono text-xs opacity-50">LOADING...</div>
           ) : rows.length === 0 ? (
-            <div className="p-8 text-center font-mono text-xs font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">
+            <div className="p-8 text-center font-mono text-xs font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
               NO APPROVED {config.label.toUpperCase()}S FOUND{search ? ' MATCHING YOUR SEARCH' : ' YET'}.
             </div>
           ) : (

@@ -27,7 +27,7 @@ export default function StaffAnnouncementsPage() {
                   <Badge tone={a.events ? 'gold' : 'muted'}>{a.events?.name || 'All staff'}</Badge>
                 </div>
                 <p className="text-[13px] text-[#E7D5A4]/65 mt-1.5 whitespace-pre-line">{a.body}</p>
-                <div className="font-mono text-[10.5px] text-[#E7D5A4]/35 mt-1.5">{fmt.dateTime(a.publish_at)}</div>
+                <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 mt-1.5">{fmt.dateTime(a.publish_at)}</div>
               </li>
             ))}
           </ul>

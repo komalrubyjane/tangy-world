@@ -27,7 +27,7 @@ export const ContactSheetsPage = () => {
           <div key={sheet.id} className="bg-[#181614] border-2 border-[#C99A2E]/40 p-3 sm:p-5">
             <div className="font-mono text-[10px] text-[#C99A2E] font-bold uppercase tracking-[0.3em] mb-3 flex justify-between items-center flex-wrap gap-1">
               <span>{sheet.roll}</span>
-              <span className="text-[#E7D5A4]/50">35MM // KODAK 5247</span>
+              <span className="text-[#E7D5A4]/60">35MM // KODAK 5247</span>
             </div>
             <div className="grid grid-cols-3 gap-1 sm:gap-2 bg-black p-1.5 sm:p-2 border border-[#E7D5A4]/10">
               {sheet.frames.map((frame, i) => (

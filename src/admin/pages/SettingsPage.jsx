@@ -20,8 +20,8 @@ const SettingRow = ({ s, onSaved }) => {
     <li className="px-4 py-3.5 flex flex-col sm:flex-row sm:items-center gap-3">
       <div className="flex-1 min-w-0">
         <div className="text-[13.5px] text-[#EFE2C0]">{s.label}</div>
-        {s.description && <div className="text-[12px] text-[#E7D5A4]/50 mt-0.5">{s.description}</div>}
-        <div className="font-mono text-[10.5px] text-[#E7D5A4]/30 mt-1">{s.key} · updated {fmt.relative(s.updated_at)}</div>
+        {s.description && <div className="text-[12px] text-[#E7D5A4]/60 mt-0.5">{s.description}</div>}
+        <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 mt-1">{s.key} · updated {fmt.relative(s.updated_at)}</div>
       </div>
       {s.value_type === 'boolean' ? (
         <button role="switch" aria-checked={!!value} aria-label={s.label} disabled={busy} onClick={() => { setValue(!value); save(!value); }}
@@ -75,8 +75,8 @@ export default function SettingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[12.5px]">
               <thead><tr className="border-b border-[#C99A2E]/20">
-                <th className="px-4 py-2 text-left font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Permission</th>
-                {CONSOLE_ROLES.map((r) => <th key={r} className="px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">{ROLE_LABELS[r]}</th>)}
+                <th className="px-4 py-2 text-left font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Permission</th>
+                {CONSOLE_ROLES.map((r) => <th key={r} className="px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">{ROLE_LABELS[r]}</th>)}
               </tr></thead>
               <tbody>
                 {perms.map((p) => (

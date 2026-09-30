@@ -306,7 +306,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
         {conversationId && (
           <div className="mt-2 pt-2 border-t border-[#C99A2E]/20">
             {teamMessagesLoading && teamMessages.length === 0 ? (
-              <div className="text-center font-mono text-[9px] text-[#E7D5A4]/40 py-2">LOADING TEAM CHAT...</div>
+              <div className="text-center font-mono text-[9px] text-[#E7D5A4]/60 py-2">LOADING TEAM CHAT...</div>
             ) : (
               teamMessages.map((m) => (
                 <MessageBubble

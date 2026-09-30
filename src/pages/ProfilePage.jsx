@@ -56,7 +56,7 @@ const Section = ({ title, children, delay = 0 }) => (
 );
 
 const Empty = ({ children }) => (
-  <div className="p-6 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">
+  <div className="p-6 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
     {children}
   </div>
 );
@@ -228,7 +228,7 @@ export const ProfilePage = () => {
             </div>
 
             {bookingsLoading ? (
-              <div className="p-6 text-center font-mono text-[11px] text-[#E7D5A4]/50">LOADING BOOKINGS...</div>
+              <div className="p-6 text-center font-mono text-[11px] text-[#E7D5A4]/60">LOADING BOOKINGS...</div>
             ) : (
               <>
                 <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Upcoming bookings</h3>

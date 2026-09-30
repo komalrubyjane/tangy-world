@@ -82,7 +82,7 @@ export default function RolesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#E7D5A4]/50 border-b border-[#C99A2E]/15">
+                <tr className="text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#E7D5A4]/60 border-b border-[#C99A2E]/15">
                   <th className="px-4 py-2.5 font-normal">Permission</th>
                   <th className="px-3 py-2.5 font-normal text-center">Super Admin</th>
                   <th className="px-3 py-2.5 font-normal text-center">Admin / Manager</th>
@@ -94,7 +94,7 @@ export default function RolesPage() {
                   <tr key={perm} className="border-b border-[#E7D5A4]/[0.05]">
                     <td className="px-4 py-2.5">
                       <div className="text-[#EFE2C0]">{DESCRIBE[perm]?.[0] || perm}</div>
-                      <div className="text-[11.5px] text-[#E7D5A4]/45">{DESCRIBE[perm]?.[1]} <span className="font-mono">· {perm}</span></div>
+                      <div className="text-[11.5px] text-[#E7D5A4]/60">{DESCRIBE[perm]?.[1]} <span className="font-mono">· {perm}</span></div>
                     </td>
                     <td className="px-3 py-2.5 text-center"><Icon name="Check" size={16} className="inline text-[#5fd3a0]" aria-label="Always on" /></td>
                     {EDITABLE.map((role) => {

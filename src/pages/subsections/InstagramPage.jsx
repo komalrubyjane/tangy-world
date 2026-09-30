@@ -43,7 +43,7 @@ export const InstagramPage = () => {
             { label: 'YOUTUBE ARCHIVE', icon: '🎬' },
             { label: 'SPOTIFY PLAYLIST', icon: '🎵' },
           ].map((s) => (
-            <span key={s.label} title="Channel launching soon" className="flex items-center gap-2 bg-[#EFE2C0]/20 text-[#E7D5A4]/50 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#E7D5A4]/20 cursor-default select-none">
+            <span key={s.label} title="Channel launching soon" className="flex items-center gap-2 bg-[#EFE2C0]/20 text-[#E7D5A4]/60 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#E7D5A4]/20 cursor-default select-none">
               <span className="opacity-60">{s.icon}</span>
               <span>{s.label}</span>
               <span className="text-[8px] font-normal normal-case opacity-70">(soon)</span>

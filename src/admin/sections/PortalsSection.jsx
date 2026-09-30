@@ -23,7 +23,7 @@ const PORTALS = [
 export const PortalsSection = ({ onNavigate, basePath = '/admin/preview' }) => (
   <div className="bg-[#191410] border border-[#C99A2E]/60 p-6 rounded-sm">
     <h3 className="text-lg font-bold text-[#C99A2E] mb-1 border-b border-[#C99A2E]/30 pb-2">VIEW PORTALS</h3>
-    <p className="text-[10px] text-[#E7D5A4]/50 uppercase font-bold mt-3 mb-4">
+    <p className="text-[10px] text-[#E7D5A4]/60 uppercase font-bold mt-3 mb-4">
       Inspect any real portal as it appears to that account — read-only, using your own admin session.
     </p>
 
@@ -48,7 +48,7 @@ export const PortalsSection = ({ onNavigate, basePath = '/admin/preview' }) => (
       </button>
     </div>
 
-    <p className="text-[9px] text-[#E7D5A4]/40 mt-5 leading-relaxed">
+    <p className="text-[9px] text-[#E7D5A4]/60 mt-5 leading-relaxed">
       Every preview is read-only. Sending messages, saving profile edits, and responding to assignments are disabled while
       inspecting another account — your own admin identity (and role) never changes.
     </p>

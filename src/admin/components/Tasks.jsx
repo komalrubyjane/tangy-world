@@ -76,10 +76,10 @@ export const TasksTable = ({ eventId: fixedEventId, initialStatus = 'open', init
   };
 
   const columns = [
-    { key: 'title', header: 'Task', render: (t) => (<div className="min-w-0"><div className={cx('text-[#EFE2C0]', t.status === 'done' && 'line-through opacity-50')}>{t.title}</div>{t.description && <div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[320px]">{t.description}</div>}</div>) },
+    { key: 'title', header: 'Task', render: (t) => (<div className="min-w-0"><div className={cx('text-[#EFE2C0]', t.status === 'done' && 'line-through opacity-50')}>{t.title}</div>{t.description && <div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[320px]">{t.description}</div>}</div>) },
     { key: 'event', header: 'Event', hidden: !!fixedEventId, render: (t) => <span className="text-[12.5px]">{t.events?.name}</span> },
     { key: 'who', header: 'Owner', hidden: !manager, render: (t) => <Owner t={t} /> },
-    { key: 'due', header: 'Due', render: (t) => (t.due_at ? <span className={cx('font-mono text-[12px]', isOverdue(t) && 'text-[#ef6b5e]')}>{fmt.dateTime(t.due_at)}{isOverdue(t) ? ' · overdue' : ''}</span> : <span className="text-[#E7D5A4]/30">—</span>) },
+    { key: 'due', header: 'Due', render: (t) => (t.due_at ? <span className={cx('font-mono text-[12px]', isOverdue(t) && 'text-[#ef6b5e]')}>{fmt.dateTime(t.due_at)}{isOverdue(t) ? ' · overdue' : ''}</span> : <span className="text-[#E7D5A4]/60">—</span>) },
     { key: 'priority', header: 'Priority', mobileHidden: true, render: (t) => <Badge tone={PRIORITY_TONE[t.priority]}>{PRIORITY_LABEL[t.priority] || t.priority}</Badge> },
     { key: 'status', header: 'Status', render: (t) => <StatusSelect t={t} onChange={setTaskStatus} /> },
   ];
@@ -127,7 +127,7 @@ export const TasksTable = ({ eventId: fixedEventId, initialStatus = 'open', init
 
 const Owner = ({ t }) => {
   const a = t.event_assignments;
-  if (a) return <span className="text-[12.5px]">{a.profiles?.full_name || a.profiles?.email} <span className="text-[#E7D5A4]/40">· {a.title}</span></span>;
+  if (a) return <span className="text-[12.5px]">{a.profiles?.full_name || a.profiles?.email} <span className="text-[#E7D5A4]/60">· {a.title}</span></span>;
   return <span className="text-[12.5px] text-[#E7D5A4]/60">{t.team ? `${t.team} team` : 'Event task'}</span>;
 };
 
@@ -163,17 +163,17 @@ const Board = ({ filters, select, onStatus, manager, reloadKey }) => {
         return (
           <section key={s.value} aria-label={s.label} className="bg-[#11100C] border border-[#C99A2E]/15 rounded-md flex flex-col min-h-[160px]">
             <header className="px-3 py-2 border-b border-[#C99A2E]/10 flex items-center justify-between font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#C99A2E]">
-              {s.label}<span className="text-[#E7D5A4]/50">{col.length}</span>
+              {s.label}<span className="text-[#E7D5A4]/60">{col.length}</span>
             </header>
             {col.length === 0 ? <EmptyState icon="ListChecks" title="Empty" /> : (
               <ul className="flex flex-col gap-2 p-2">
                 {col.map((t) => (
                   <li key={t.id} className={cx('bg-[#17130F] border rounded p-2.5 flex flex-col gap-1.5', isOverdue(t) ? 'border-[#a8322a]/60' : 'border-[#E7D5A4]/10')}>
                     <div className="text-[13px] text-[#EFE2C0]">{t.title}</div>
-                    <div className="text-[11.5px] text-[#E7D5A4]/50">{t.events?.name}{manager ? ' · ' : ''}{manager && <Owner t={t} />}</div>
+                    <div className="text-[11.5px] text-[#E7D5A4]/60">{t.events?.name}{manager ? ' · ' : ''}{manager && <Owner t={t} />}</div>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <Badge tone={PRIORITY_TONE[t.priority]}>{PRIORITY_LABEL[t.priority]}</Badge>
-                      {t.due_at && <span className={cx('font-mono text-[10.5px]', isOverdue(t) ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/45')}>{fmt.dateTime(t.due_at)}</span>}
+                      {t.due_at && <span className={cx('font-mono text-[10.5px]', isOverdue(t) ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/60')}>{fmt.dateTime(t.due_at)}</span>}
                     </div>
                     <StatusSelect t={t} onChange={move} />
                   </li>

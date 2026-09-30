@@ -49,8 +49,8 @@ export default function EventsPage() {
   });
 
   const columns = [
-    { key: 'date', header: 'Date', render: (e) => <span className="font-mono text-[12px] text-[#C99A2E] whitespace-nowrap">{fmt.date(e.event_date)}{e.event_time ? <span className="text-[#E7D5A4]/40"> · {e.event_time}</span> : null}</span> },
-    { key: 'name', header: 'Event', render: (e) => (<div className="min-w-0"><div className="text-[#EFE2C0] flex items-center gap-2">{e.name}{e.featured && <Badge tone="gold">Featured</Badge>}</div><div className="font-mono text-[11px] text-[#E7D5A4]/35">/{e.slug}</div></div>) },
+    { key: 'date', header: 'Date', render: (e) => <span className="font-mono text-[12px] text-[#C99A2E] whitespace-nowrap">{fmt.date(e.event_date)}{e.event_time ? <span className="text-[#E7D5A4]/60"> · {e.event_time}</span> : null}</span> },
+    { key: 'name', header: 'Event', render: (e) => (<div className="min-w-0"><div className="text-[#EFE2C0] flex items-center gap-2">{e.name}{e.featured && <Badge tone="gold">Featured</Badge>}</div><div className="font-mono text-[11px] text-[#E7D5A4]/60">/{e.slug}</div></div>) },
     { key: 'venue', header: 'Venue', render: (e) => <span className="text-[12.5px]">{e.venue || '—'}</span> },
     { key: 'status', header: 'Status', render: (e) => { const phase = eventPhase(e); return <span className="flex gap-1.5"><Badge status={e.status}>{EVENT_STATUS_LABELS[e.status]}</Badge>{phase === 'live' && <Badge status="live">Today</Badge>}</span>; } },
     { key: 'capacity', header: 'Capacity', align: 'right', mobileHidden: true, render: (e) => fmt.num(e.capacity) },
@@ -65,7 +65,7 @@ export default function EventsPage() {
     >
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
-          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} event{table.count === 1 ? '' : 's'}</span>}>
+          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} event{table.count === 1 ? '' : 's'}</span>}>
             <SearchInput value={search} onChange={setSearch} placeholder="Search name, venue, slug…" />
             <FilterSelect label="Status" value={status} onChange={(v) => setParam('status', v)} options={[{ value: '', label: 'Any status' }, ...EVENT_STATUSES.map((s) => ({ value: s, label: EVENT_STATUS_LABELS[s] }))]} />
             <FilterSelect label="When" value={when} onChange={(v) => setParam('when', v)} options={WHEN} />

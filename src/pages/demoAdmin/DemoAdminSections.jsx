@@ -100,7 +100,7 @@ export const DemoEventsSection = () => (
         </div>
       ))}
     </div>
-    <p className="text-[9px] text-[#E7D5A4]/40 mt-5">DEMO DATA — event creation/editing is disabled in demo mode.</p>
+    <p className="text-[9px] text-[#E7D5A4]/60 mt-5">DEMO DATA — event creation/editing is disabled in demo mode.</p>
   </div>
 );
 
@@ -129,7 +129,7 @@ export const DemoAttendeesSection = () => (
         { key: 'attendee', header: 'ATTENDEE', render: (b) => <>{b.attendee_name}<br /><span className="opacity-60">{b.attendee_email}</span></> },
         { key: 'event', header: 'EVENT', render: (b) => b.events?.name || '—' },
         { key: 'code', header: 'CODE', render: (b) => <span className="font-bold text-[#C99A2E]">{b.registration_code}</span> },
-        { key: 'checkin', header: 'CHECK-IN', render: (b) => (b.id === 'demo-bkg-2' ? <StatusBadge status="confirmed" /> : <span className="text-[10px] text-[#E7D5A4]/40 uppercase font-bold">Not checked in</span>) },
+        { key: 'checkin', header: 'CHECK-IN', render: (b) => (b.id === 'demo-bkg-2' ? <StatusBadge status="confirmed" /> : <span className="text-[10px] text-[#E7D5A4]/60 uppercase font-bold">Not checked in</span>) },
       ]}
       rows={DEMO_BOOKINGS}
     />
@@ -208,7 +208,7 @@ export const DemoPaymentsSection = () => (
       ]}
       rows={DEMO_BOOKINGS}
     />
-    <p className="text-[9px] text-[#E7D5A4]/40 mt-4">DEMO DATA — no real Razorpay integration is touched in demo mode.</p>
+    <p className="text-[9px] text-[#E7D5A4]/60 mt-4">DEMO DATA — no real Razorpay integration is touched in demo mode.</p>
   </div>
 );
 

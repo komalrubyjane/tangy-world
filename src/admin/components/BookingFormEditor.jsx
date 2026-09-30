@@ -61,7 +61,7 @@ export const BookingFormEditor = ({ evt, onSaved }) => {
               <li key={q.id} className="rounded border border-[#C99A2E]/20 p-3 flex flex-col gap-2" data-question-row={q.id}>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="info">{TYPE_LABEL[q.type] || q.type}</Badge>
-                  <span className="font-mono text-[11px] text-[#E7D5A4]/45">{q.id}</span>
+                  <span className="font-mono text-[11px] text-[#E7D5A4]/60">{q.id}</span>
                   <label className="ml-auto flex items-center gap-1.5 text-[12.5px]">
                     <input type="checkbox" checked={!!q.required} onChange={(e) => patch(i, { required: e.target.checked })} className="accent-[#C99A2E]" aria-label={`Required: ${q.label}`} />Required
                   </label>
@@ -92,7 +92,7 @@ export const BookingFormEditor = ({ evt, onSaved }) => {
           {['single_select', 'multi_select'].includes(custom.type) && (
             <Field label="Options (comma separated)"><Input value={custom.options} onChange={(e) => setCustom({ ...custom, options: e.target.value })} /></Field>
           )}
-          <p className="text-[11.5px] text-[#E7D5A4]/45 flex items-center gap-1.5"><Icon name="ShieldCheck" size={13} />Ask for date of birth or gender only when this event really needs it — answers are visible to the Tangy team only.</p>
+          <p className="text-[11.5px] text-[#E7D5A4]/60 flex items-center gap-1.5"><Icon name="ShieldCheck" size={13} />Ask for date of birth or gender only when this event really needs it — answers are visible to the Tangy team only.</p>
         </div>
 
         <div><Button variant="primary" disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save booking form'}</Button></div>

@@ -181,7 +181,7 @@ export const MediaPage = () => {
             : kindOf(preview.item) === 'video' ? <video src={preview.url} controls className="w-full max-h-[60vh] rounded" />
             : kindOf(preview.item) === 'audio' ? <audio src={preview.url} controls className="w-full" />
             : <p className="text-[13px] text-[#E7D5A4]/70">No inline preview for this file type — open it in a new tab.</p>}
-          <p className="text-[11.5px] text-[#E7D5A4]/45 mt-3">This private link expires in 10 minutes.</p>
+          <p className="text-[11.5px] text-[#E7D5A4]/60 mt-3">This private link expires in 10 minutes.</p>
         </Modal>
       )}
     </div>

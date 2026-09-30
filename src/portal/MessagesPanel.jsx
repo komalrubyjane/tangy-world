@@ -95,7 +95,7 @@ export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events =
                           <span className={cx('truncate text-[13.5px]', c.unread > 0 ? 'text-[#EFE2C0] font-medium' : 'text-[#E7D5A4]/85')}>
                             {admin ? (c.partner_name || c.partner_email) : (c.subject || 'Message to Tangy')}
                           </span>
-                          <span className="font-mono text-[10px] text-[#E7D5A4]/40 shrink-0">{fmt.relative(c.last_message_at || c.created_at)}</span>
+                          <span className="font-mono text-[10px] text-[#E7D5A4]/60 shrink-0">{fmt.relative(c.last_message_at || c.created_at)}</span>
                         </span>
                         <span className="block font-mono text-[10.5px] text-[#C99A2E]/80 truncate mt-0.5">
                           {admin && `${TYPE_LABEL[c.conversation_type] || ''}${c.subject ? ` · ${c.subject}` : ''}`}
@@ -105,11 +105,11 @@ export const MessagesPanel = ({ mode = 'partner', selectedId, onSelect, events =
                         {admin && (c.priority !== 'normal' || c.assigned_admin_name) && (
                           <span className="flex items-center gap-1.5 mt-1">
                             {c.priority !== 'normal' && <Badge tone={c.priority === 'urgent' ? 'bad' : 'warn'}>{PRIORITY_LABEL[c.priority]}</Badge>}
-                            {c.assigned_admin_name && <span className="font-mono text-[10px] text-[#E7D5A4]/45 truncate">→ {c.assigned_admin_name}</span>}
+                            {c.assigned_admin_name && <span className="font-mono text-[10px] text-[#E7D5A4]/60 truncate">→ {c.assigned_admin_name}</span>}
                           </span>
                         )}
                         <span className="flex items-center justify-between gap-2 mt-1">
-                          <span className="truncate text-[12px] text-[#E7D5A4]/50">{c.last_message_preview}</span>
+                          <span className="truncate text-[12px] text-[#E7D5A4]/60">{c.last_message_preview}</span>
                           {c.unread > 0 && <span className="shrink-0 min-w-5 h-5 px-1.5 rounded-full bg-[#B94717] text-white text-[10.5px] font-mono inline-flex items-center justify-center">{c.unread}</span>}
                         </span>
                       </span>
@@ -209,7 +209,7 @@ const Thread = ({ id, conv, admin, onBack, onChanged }) => {
           <div className="text-[14.5px] text-[#EFE2C0] truncate">
             {admin ? (conv?.partner_name || conv?.partner_email || 'Conversation') : (conv?.subject || 'Tangy team')}
           </div>
-          <div className="font-mono text-[10.5px] text-[#E7D5A4]/50 truncate">
+          <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 truncate">
             {admin && conv && `${TYPE_LABEL[conv.conversation_type] || ''} · ${conv.partner_email || ''}`}
             {!admin && 'Tangy team'}
             {conv?.event_name && ` · ${conv.event_name}`}
@@ -244,12 +244,12 @@ const Thread = ({ id, conv, admin, onBack, onChanged }) => {
           : msgs.length === 0 ? <EmptyState icon="MessagesSquare" title="No messages yet" />
           : msgs.map((m) => (
             <div key={m.id} className={cx('flex flex-col max-w-[85%] sm:max-w-[70%]', m.is_mine ? 'self-end items-end' : 'self-start items-start')}>
-              {!m.is_mine && <span className="font-mono text-[10px] text-[#E7D5A4]/45 mb-1">{m.from_tangy ? `${m.sender_name} · Tangy` : m.sender_name}</span>}
+              {!m.is_mine && <span className="font-mono text-[10px] text-[#E7D5A4]/60 mb-1">{m.from_tangy ? `${m.sender_name} · Tangy` : m.sender_name}</span>}
               <div className={cx('px-3.5 py-2.5 rounded-lg text-[13.5px] leading-relaxed whitespace-pre-wrap break-words',
                 m.is_mine ? 'bg-[#C99A2E] text-[#11100C] rounded-br-sm' : 'bg-[#221c15] text-[#EFE2C0] border border-[#C99A2E]/15 rounded-bl-sm')}>
                 {m.content}
               </div>
-              <span className="font-mono text-[10px] text-[#E7D5A4]/35 mt-1 flex items-center gap-1">
+              <span className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1 flex items-center gap-1">
                 {fmt.dateTime(m.created_at)}
                 {m.id === lastMine?.id && (m.read_by_other
                   ? <><Icon name="CheckCheck" size={12} className="text-[#5fd3a0]" /> Read</>
@@ -305,7 +305,7 @@ const PartnerCompose = ({ events, onClose, onCreated }) => {
       <Field label="Subject"><Input value={f.subject} maxLength={140} onChange={(e) => setF({ ...f, subject: e.target.value })} placeholder="e.g. Soundcheck timing" /></Field>
       <Field label="Message *"><Textarea rows={5} maxLength={4000} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} /></Field>
       {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
-      <p className="text-[11.5px] text-[#E7D5A4]/45">Only you and the Tangy team can read this conversation. Please don’t share passwords or card details in messages.</p>
+      <p className="text-[11.5px] text-[#E7D5A4]/60">Only you and the Tangy team can read this conversation. Please don’t share passwords or card details in messages.</p>
     </Modal>
   );
 };
@@ -351,17 +351,17 @@ const AdminCompose = ({ onClose, onCreated }) => {
       footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" icon="Send" onClick={submit} disabled={busy || !who || !f.body.trim()}>{busy ? 'Sending…' : 'Send'}</Button></>}>
       {who ? (
         <div className="flex items-center justify-between gap-2 bg-[#11100C] border border-[#C99A2E]/25 rounded px-3 py-2">
-          <span className="text-[13px]">{who.full_name || who.email} <span className="text-[#E7D5A4]/45 font-mono text-[11px]">{who.role}</span></span>
+          <span className="text-[13px]">{who.full_name || who.email} <span className="text-[#E7D5A4]/60 font-mono text-[11px]">{who.role}</span></span>
           <Button size="sm" variant="ghost" onClick={() => setWho(null)}>Change</Button>
         </div>
       ) : (
         <Field label="To (artist, sponsor, vendor or venue host)">
           <SearchInput value={q} onChange={setQ} placeholder="Search by name or email…" />
           <ul className="mt-2 max-h-48 overflow-y-auto border border-[#C99A2E]/15 rounded divide-y divide-[#E7D5A4]/[0.05]">
-            {people.length === 0 && <li className="px-3 py-3 text-[12px] text-[#E7D5A4]/45">No matching partners.</li>}
+            {people.length === 0 && <li className="px-3 py-3 text-[12px] text-[#E7D5A4]/60">No matching partners.</li>}
             {people.map((p) => (
               <li key={p.id}><button type="button" onClick={() => setWho(p)} className="w-full text-left px-3 py-2 text-[13px] hover:bg-[#C99A2E]/[0.08]">
-                {p.full_name || p.email} <span className="text-[#E7D5A4]/45 font-mono text-[11px]">{p.role} · {p.email}</span>
+                {p.full_name || p.email} <span className="text-[#E7D5A4]/60 font-mono text-[11px]">{p.role} · {p.email}</span>
               </button></li>
             ))}
           </ul>
@@ -370,7 +370,7 @@ const AdminCompose = ({ onClose, onCreated }) => {
       <Field label="Subject"><Input value={f.subject} maxLength={140} onChange={(e) => setF({ ...f, subject: e.target.value })} /></Field>
       <Field label="Message *"><Textarea rows={5} maxLength={4000} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} /></Field>
       {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
-      <p className="text-[11.5px] text-[#E7D5A4]/45">Volunteers and customers are reached through announcements, not private messages.</p>
+      <p className="text-[11.5px] text-[#E7D5A4]/60">Volunteers and customers are reached through announcements, not private messages.</p>
     </Modal>
   );
 };

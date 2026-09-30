@@ -240,11 +240,11 @@ export const SessionCalendarPage = () => {
         {/* SELECTED DAY EVENT DETAILS */}
         <div className="mt-8 sm:mt-10">
           {selectedDay == null ? (
-            <div className="text-center py-10 sm:py-12 border-2 border-dashed border-[#C99A2E]/30 font-mono text-xs text-[#E7D5A4]/50 uppercase tracking-widest">
+            <div className="text-center py-10 sm:py-12 border-2 border-dashed border-[#C99A2E]/30 font-mono text-xs text-[#E7D5A4]/60 uppercase tracking-widest">
               TAP A MARKED DAY ON THE CALENDAR TO SEE SESSION DETAILS.
             </div>
           ) : selectedEvents.length === 0 ? (
-            <div className="text-center py-10 sm:py-12 border-2 border-dashed border-[#C99A2E]/30 font-mono text-xs text-[#E7D5A4]/50 uppercase tracking-widest">
+            <div className="text-center py-10 sm:py-12 border-2 border-dashed border-[#C99A2E]/30 font-mono text-xs text-[#E7D5A4]/60 uppercase tracking-widest">
               NO SESSIONS SCHEDULED ON {MONTH_NAMES[viewMonth]} {selectedDay}, {viewYear}.
             </div>
           ) : (

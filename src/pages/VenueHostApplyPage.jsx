@@ -64,7 +64,7 @@ export const VenueHostApplyPage = () => {
         <button
           type="button"
           onClick={() => navigate('/join')}
-          className="mb-3 font-mono text-[10px] font-bold text-[#E7D5A4]/50 hover:text-[#C69A32] uppercase tracking-wider"
+          className="mb-3 font-mono text-[10px] font-bold text-[#E7D5A4]/60 hover:text-[#C69A32] uppercase tracking-wider"
         >
           ← CHANGE HOW YOU'RE JOINING
         </button>

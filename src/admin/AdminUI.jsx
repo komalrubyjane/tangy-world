@@ -41,7 +41,7 @@ export const SearchBar = ({ value, onChange, placeholder, count }) => (
       className="w-full sm:w-80 bg-[#11100C] border border-[#C99A2E]/60 px-3 py-2.5 sm:py-2 text-xs text-[#E7D5A4] focus:outline-none focus:border-[#C99A2E] transition-colors"
     />
     {typeof count === 'number' && (
-      <span className="text-[10px] text-[#E7D5A4]/50 uppercase font-bold">{count} result{count !== 1 ? 's' : ''}</span>
+      <span className="text-[10px] text-[#E7D5A4]/60 uppercase font-bold">{count} result{count !== 1 ? 's' : ''}</span>
     )}
   </div>
 );
@@ -59,13 +59,13 @@ export const LoadMoreButton = ({ hasMore, onClick }) => {
 };
 
 export const EmptyState = ({ children }) => (
-  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30 animate-[fadeIn_0.3s_ease]">
+  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30 animate-[fadeIn_0.3s_ease]">
     {children}
   </div>
 );
 
 export const LoadingState = () => (
-  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING...</div>
+  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING...</div>
 );
 
 export const NotConfiguredState = () => (
@@ -116,7 +116,7 @@ export const StatCard = ({ label, value, sub, accent }) => (
   <div className="bg-[#191410] border border-[#C99A2E]/60 p-4 sm:p-5 rounded-sm hover:border-[#C99A2E] transition-colors duration-200">
     <div className="text-[9px] sm:text-[10px] text-[#C99A2E] uppercase tracking-widest mb-1">{label}</div>
     <div className={`text-2xl sm:text-3xl font-bold ${accent ? 'text-[#C99A2E]' : 'text-[#E7D5A4]'}`}>{value}</div>
-    {sub && <div className="text-[9px] text-[#E7D5A4]/50 mt-1">{sub}</div>}
+    {sub && <div className="text-[9px] text-[#E7D5A4]/60 mt-1">{sub}</div>}
   </div>
 );
 

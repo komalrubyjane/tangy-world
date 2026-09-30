@@ -78,7 +78,7 @@ export const CrewApplyPage = () => {
           <button
             type="button"
             onClick={() => navigate('/join')}
-            className="font-mono text-[10px] text-[#ecdcaf]/50 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors"
+            className="font-mono text-[10px] text-[#ecdcaf]/60 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors"
           >
             ← CHANGE HOW YOU'RE JOINING
           </button>

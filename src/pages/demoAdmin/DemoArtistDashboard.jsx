@@ -121,7 +121,7 @@ export const DemoArtistDashboard = () => {
               <span key={a.date} className="px-2.5 py-1 text-[10px] font-bold uppercase border border-[#C99A2E]/40">{a.date} · {a.status}</span>
             ))}
           </div>
-          <p className="font-mono text-[9px] text-[#E7D5A4]/40 mt-3">Real artists set this themselves — nothing here is saved in this tour.</p>
+          <p className="font-mono text-[9px] text-[#E7D5A4]/60 mt-3">Real artists set this themselves — nothing here is saved in this tour.</p>
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
@@ -134,7 +134,7 @@ export const DemoArtistDashboard = () => {
               </div>
             ))}
           </div>
-          <p className="font-mono text-[9px] text-[#E7D5A4]/40 mt-3">Uploads are disabled in this tour — the real Media Manager uses Supabase Storage.</p>
+          <p className="font-mono text-[9px] text-[#E7D5A4]/60 mt-3">Uploads are disabled in this tour — the real Media Manager uses Supabase Storage.</p>
         </div>
 
         <div className="bg-[#191410] border-2 border-[#C99A2E]/40 p-5">

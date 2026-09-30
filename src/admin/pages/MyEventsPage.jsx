@@ -24,15 +24,15 @@ export function useMyAssignments() {
 const EventRow = ({ a, today }) => (
   <li>
     <Link to={`/admin-portal/my-events/${a.events.id}`} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-4 py-3.5 hover:bg-[#C99A2E]/[0.05]">
-      <div className="w-28 shrink-0 font-mono text-[12px] text-[#C99A2E]">{a.events.event_date === today ? 'TODAY' : fmt.date(a.events.event_date)}{a.events.event_time ? <div className="text-[#E7D5A4]/40">{a.events.event_time}</div> : null}</div>
+      <div className="w-28 shrink-0 font-mono text-[12px] text-[#C99A2E]">{a.events.event_date === today ? 'TODAY' : fmt.date(a.events.event_date)}{a.events.event_time ? <div className="text-[#E7D5A4]/60">{a.events.event_time}</div> : null}</div>
       <div className="flex-1 min-w-0">
         <div className="text-[14px] text-[#EFE2C0]">{a.events.name}</div>
-        <div className="text-[12.5px] text-[#E7D5A4]/50">{a.events.venue || 'Venue TBC'} · {a.title}</div>
+        <div className="text-[12.5px] text-[#E7D5A4]/60">{a.events.venue || 'Venue TBC'} · {a.title}</div>
       </div>
       <div className="flex items-center gap-2">
         {a.events.status === 'cancelled' && <Badge status="cancelled">Event cancelled</Badge>}
         <Badge status={a.status} />
-        <Icon name="ChevronRight" size={16} className="text-[#E7D5A4]/30 hidden sm:block" />
+        <Icon name="ChevronRight" size={16} className="text-[#E7D5A4]/60 hidden sm:block" />
       </div>
     </Link>
   </li>

@@ -125,7 +125,7 @@ export const WaitlistSection = () => {
       {notice.text && <p role={notice.kind === 'error' ? 'alert' : 'status'} className={`text-xs mb-3 ${notice.kind === 'error' ? 'text-[#ef4444]' : 'text-[#10b981]'}`}>{notice.text}</p>}
       {error && <p role="alert" className="text-xs mb-3 text-[#ef4444]">Could not load the waitlist: {error}</p>}
       <SearchBar value={search} onChange={(v) => { setSearch(v); setVisibleCount(50); }} placeholder="Search name or email..." count={filtered.length} />
-      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING...</div> : shown.length === 0 ? (
+      {loading ? <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING...</div> : shown.length === 0 ? (
         <EmptyState>NOBODY ON THE WAITLIST{statusFilter === 'active' ? ' RIGHT NOW' : ''}.</EmptyState>
       ) : (
         <DataTable

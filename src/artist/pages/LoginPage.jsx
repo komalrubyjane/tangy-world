@@ -64,7 +64,7 @@ export const LoginPage = () => {
             </div>
           </div>
 
-          <div className="font-mono text-[8.5px] text-[#ecdcaf]/50 uppercase border-t border-[#ecdcaf]/15 pt-3">
+          <div className="font-mono text-[8.5px] text-[#ecdcaf]/60 uppercase border-t border-[#ecdcaf]/15 pt-3">
             TANGY SESSIONS // EST. 2016 // BANSILAL STEPWELL
           </div>
         </div>
@@ -75,7 +75,7 @@ export const LoginPage = () => {
             <button
               type="button"
               onClick={() => navigate('/join')}
-              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/50 hover:text-[#c2272a] uppercase tracking-wider"
+              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/70 hover:text-[#c2272a] uppercase tracking-wider"
             >
               ← CHANGE HOW YOU'RE JOINING
             </button>
@@ -113,7 +113,7 @@ export const LoginPage = () => {
               className="w-full text-left font-mono text-[9px] bg-transparent hover:bg-[#191410]/5 p-2.5 border border-dashed border-[#191410]/30 transition-colors"
             >
               <span className="font-bold uppercase tracking-wider text-[#241a12]/70">TEAM DEMO</span>
-              <span className="text-[#241a12]/50"> — internal preview access, not a real account →</span>
+              <span className="text-[#241a12]/70"> — internal preview access, not a real account →</span>
             </button>
           )}
         </div>

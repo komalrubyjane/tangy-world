@@ -99,12 +99,12 @@ export const AdminLoginPanel = ({ title = 'Tangy Admin Portal', subtitle = 'Sign
         <button type="button" onClick={() => setMode(mode === 'otp' ? 'password' : 'otp')} className="text-[#E7D5A4]/55 hover:text-[#E7D5A4] underline underline-offset-2">
           {mode === 'otp' ? 'Use password instead' : 'Use email code instead'}
         </button>
-        <Link to="/" className="text-[#E7D5A4]/45 hover:text-[#E7D5A4]">← Website</Link>
+        <Link to="/" className="text-[#E7D5A4]/60 hover:text-[#E7D5A4]">← Website</Link>
       </div>
 
       {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
       {DEMO_ADMIN_ENABLED && !(import.meta.env.DEV && __TANGY_DEV_TOOLS__) && (
-        <Link to="/demo-admin" className="mt-4 block text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#E7D5A4]/45 hover:text-[#E7D5A4] border border-[#E7D5A4]/15 rounded py-2">
+        <Link to="/demo-admin" className="mt-4 block text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#E7D5A4]/60 hover:text-[#E7D5A4] border border-[#E7D5A4]/15 rounded py-2">
           Team demo — enter demo admin →
         </Link>
       )}
@@ -133,7 +133,7 @@ export const AdminGate = ({ children, requires = 'dashboard.view', title, subtit
   }, [authorized, user?.id, isMock]);
 
   if (authLoading || (isLoggedIn && loading)) {
-    return <Screen><div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#E7D5A4]/50">Verifying access…</div></Screen>;
+    return <Screen><div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#E7D5A4]/60">Verifying access…</div></Screen>;
   }
 
   if (!isLoggedIn) {

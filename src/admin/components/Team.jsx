@@ -67,10 +67,10 @@ const TaskList = ({ assignment, onChanged, canEdit }) => {
           <select aria-label="Task status" value={t.status} onChange={(e) => setStatus(t, e.target.value)} className="bg-[#11100C] border border-[#C99A2E]/25 rounded text-[11px] h-7 px-1.5">
             {TASK_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
-          <span className={cx('flex-1 min-w-0 truncate', t.status === 'done' && 'line-through text-[#E7D5A4]/40')}>{t.title}</span>
+          <span className={cx('flex-1 min-w-0 truncate', t.status === 'done' && 'line-through text-[#E7D5A4]/60')}>{t.title}</span>
           {t.priority === 'high' && <Badge tone="bad">High</Badge>}
-          {t.due_at && <span className="font-mono text-[11px] text-[#E7D5A4]/40">{fmt.dateTime(t.due_at)}</span>}
-          {canEdit && <button onClick={() => del(t)} aria-label="Delete task" className="text-[#E7D5A4]/30 hover:text-[#ef6b5e]"><Icon name="Trash2" size={14} /></button>}
+          {t.due_at && <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.dateTime(t.due_at)}</span>}
+          {canEdit && <button onClick={() => del(t)} aria-label="Delete task" className="text-[#E7D5A4]/60 hover:text-[#ef6b5e]"><Icon name="Trash2" size={14} /></button>}
         </div>
       ))}
       {canEdit && (

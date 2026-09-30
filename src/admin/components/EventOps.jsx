@@ -38,7 +38,7 @@ export const CommandCenter = ({ evt, onTab }) => {
     <button key={label} onClick={() => onTab(tab)} className="text-left bg-[#17130F] border border-[#C99A2E]/20 hover:border-[#C99A2E]/60 rounded-md p-3.5 min-w-0 transition-colors">
       <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#E7D5A4]/55">{label}</div>
       <div className={cx('mt-1.5 font-condensed text-[24px] leading-none tabular-nums', tone === 'warn' ? 'text-[#f5b544]' : 'text-[#EFE2C0]')}>{value}</div>
-      {sub && <div className="mt-1.5 text-[11.5px] text-[#E7D5A4]/50 leading-snug">{sub}</div>}
+      {sub && <div className="mt-1.5 text-[11.5px] text-[#E7D5A4]/60 leading-snug">{sub}</div>}
     </button>
   );
   return (
@@ -121,7 +121,7 @@ export const ScheduleTab = ({ evt }) => {
         <AsyncBlock loading={data.loading} error={data.error} onRetry={data.reload} empty={!team.length}
           emptyProps={{ title: 'No partners assigned', hint: 'Assign sponsors, vendors, crew or volunteers from their tabs.', icon: 'Users' }}>
           <DataTable rowKey="id" rows={team} columns={[
-            { key: 'who', header: 'Person', render: (a) => <div><div className="text-[#EFE2C0]">{a.profiles?.full_name || a.profiles?.email}</div><div className="text-[11.5px] text-[#E7D5A4]/50">{KIND_LABEL[a.assignee_role]} · {a.title}</div></div> },
+            { key: 'who', header: 'Person', render: (a) => <div><div className="text-[#EFE2C0]">{a.profiles?.full_name || a.profiles?.email}</div><div className="text-[11.5px] text-[#E7D5A4]/60">{KIND_LABEL[a.assignee_role]} · {a.title}</div></div> },
             { key: 'status', header: 'Status', render: (a) => <Badge status={a.status} /> },
             { key: 'call', header: 'Call', render: (a) => fmt.time(a.call_time) },
             { key: 'window', header: 'Window', render: (a) => (a.starts_at ? `${fmt.time(a.starts_at)} – ${fmt.time(a.ends_at)}` : '—') },
@@ -321,7 +321,7 @@ export const RequirementsTab = ({ evt }) => {
                   <Badge tone={REQ_TONE[r.status]}>{REQ_LABEL[r.status]}</Badge>
                   {r.priority !== 'normal' && <Badge tone={PRIORITY_TONE[r.priority]}>{r.priority}</Badge>}
                   {overdue && <Badge tone="bad">Overdue</Badge>}
-                  <span className="text-[12px] text-[#E7D5A4]/50">· {r.profiles?.full_name || r.profiles?.email}{r.due_at ? ` · due ${fmt.dateTime(r.due_at)}` : ''}</span>
+                  <span className="text-[12px] text-[#E7D5A4]/60">· {r.profiles?.full_name || r.profiles?.email}{r.due_at ? ` · due ${fmt.dateTime(r.due_at)}` : ''}</span>
                   {can(P.EVENTS_MANAGE) && (
                     <span className="ml-auto flex gap-1.5">
                       {r.status === 'submitted' && <Button size="sm" variant="success" onClick={() => act(() => rpc('review_requirement', { p_id: r.id, p_accept: true }), 'Accepted')}>Accept</Button>}
@@ -427,7 +427,7 @@ export const DocumentsTab = ({ evt }) => {
           <Textarea rows={2} aria-label="Description" value={form.description} maxLength={1000} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description (optional)" />
           <div className="flex items-center gap-3">
             <Button type="submit" variant="primary" icon="Link2" disabled={!ready || progress != null}>{progress != null ? `Uploading ${progress}%` : 'Share document'}</Button>
-            {form.file && <span className="text-[12px] text-[#E7D5A4]/50">{form.file.name} · {formatBytes(form.file.size)}</span>}
+            {form.file && <span className="text-[12px] text-[#E7D5A4]/60">{form.file.name} · {formatBytes(form.file.size)}</span>}
           </div>
         </form>
       )}
@@ -439,7 +439,7 @@ export const DocumentsTab = ({ evt }) => {
               <li key={d.id} className={cx('px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]', expired && 'opacity-60')}>
                 <Icon name="FileText" size={16} className="text-[#C99A2E]" />
                 <button onClick={() => open(d)} className="flex-1 min-w-[160px] text-left truncate text-[#EFE2C0] hover:underline">{d.title}
-                  <span className="block text-[11.5px] text-[#E7D5A4]/45">{[DOC_LABEL[d.category], d.storage_path ? formatBytes(d.file_size_bytes) : 'Link', d.expires_at && `${expired ? 'expired' : 'expires'} ${fmt.date(d.expires_at)}`].filter(Boolean).join(' · ')}</span>
+                  <span className="block text-[11.5px] text-[#E7D5A4]/60">{[DOC_LABEL[d.category], d.storage_path ? formatBytes(d.file_size_bytes) : 'Link', d.expires_at && `${expired ? 'expired' : 'expires'} ${fmt.date(d.expires_at)}`].filter(Boolean).join(' · ')}</span>
                 </button>
                 <Badge tone="muted">{d.audience === 'user' ? (d.profiles?.full_name || d.profiles?.email) : AUDIENCES.find(([v]) => v === d.audience)?.[1]}</Badge>
                 {can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" icon="Trash2" aria-label={`Remove ${d.title}`} onClick={() => setRemoving(d)} />}
@@ -481,7 +481,7 @@ export const ActivityTab = ({ evt }) => {
         <ul className="divide-y divide-[#E7D5A4]/[0.06]">
           {(logs.data || []).map((l) => (
             <li key={l.id} className="px-4 py-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[13px]">
-              <span className="font-mono text-[11px] text-[#E7D5A4]/40 w-28 shrink-0">{fmt.dateTime(l.created_at)}</span>
+              <span className="font-mono text-[11px] text-[#E7D5A4]/60 w-28 shrink-0">{fmt.dateTime(l.created_at)}</span>
               <span className="text-[#EFE2C0]">{l.actor_email || (l.actor_role === 'system' ? 'System' : '—')}</span>
               <span className="text-[#E7D5A4]/70">{auditLabel(l.action)}</span>
             </li>

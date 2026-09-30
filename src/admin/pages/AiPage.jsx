@@ -19,7 +19,7 @@ export default function AiPage() {
           {aiService.capabilities.map((c) => (
             <li key={c.id} className="px-4 py-3">
               <div className="text-[13.5px] text-[#EFE2C0]">{c.label}</div>
-              <div className="font-mono text-[11px] text-[#E7D5A4]/40 mt-0.5">{c.sources.join(' · ')}</div>
+              <div className="font-mono text-[11px] text-[#E7D5A4]/60 mt-0.5">{c.sources.join(' · ')}</div>
             </li>
           ))}
         </ul>

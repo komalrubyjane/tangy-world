@@ -176,7 +176,7 @@ export const InboxSection = () => {
           </div>
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING...</div>
+              <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING...</div>
             ) : error ? (
               <div className="p-6 text-center font-mono text-xs text-[#ef4444]">{error}</div>
             ) : conversations.length === 0 ? (
@@ -192,7 +192,7 @@ export const InboxSection = () => {
         {/* CHAT THREAD */}
         <div className={`${mobileView === 'list' ? 'hidden' : 'flex'} lg:flex flex-1 flex-col min-w-0`}>
           {!selected ? (
-            <div className="flex-1 flex items-center justify-center text-[#E7D5A4]/40 font-mono text-xs uppercase">
+            <div className="flex-1 flex items-center justify-center text-[#E7D5A4]/60 font-mono text-xs uppercase">
               Select a conversation to start chatting
             </div>
           ) : (
@@ -219,7 +219,7 @@ export const InboxSection = () => {
               />
               <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410]" style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}>
                 {messagesLoading ? (
-                  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/50">LOADING MESSAGES...</div>
+                  <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING MESSAGES...</div>
                 ) : messages.length === 0 ? (
                   <EmptyState>NO MESSAGES YET — SEND THE FIRST ONE.</EmptyState>
                 ) : (

@@ -31,7 +31,7 @@ export const ConversationListItem = ({ conversation, active, onClick }) => {
         <div className="flex items-center gap-1.5 mt-0.5">
           {other?.role && <span className="text-[9px] font-mono uppercase opacity-50">{ROLE_LABEL[roleBucket(other.role)]}</span>}
         </div>
-        <p className={`text-xs mt-1 truncate ${conversation.unread ? 'text-[#E7D5A4]/90 font-medium' : 'text-[#E7D5A4]/50'}`}>
+        <p className={`text-xs mt-1 truncate ${conversation.unread ? 'text-[#E7D5A4]/90 font-medium' : 'text-[#E7D5A4]/60'}`}>
           {conversation.lastMessagePreview || 'No messages yet'}
         </p>
         <div className="flex items-center gap-1.5 mt-1.5">

@@ -45,8 +45,8 @@ export default function InvoicesPage() {
   };
 
   const columns = [
-    { key: 'no', header: 'Invoice', render: (i) => <div><div className="text-[#EFE2C0]">{i.invoice_number}</div><div className="text-[11.5px] text-[#E7D5A4]/45">{i.direction === 'payable' ? 'Tangy pays partner' : 'Partner pays Tangy'}</div></div> },
-    { key: 'partner', header: 'Partner', render: (i) => <span className="text-[12.5px]">{i.profiles?.full_name || i.profiles?.email} <span className="text-[#E7D5A4]/40">· {i.profiles?.role}</span></span> },
+    { key: 'no', header: 'Invoice', render: (i) => <div><div className="text-[#EFE2C0]">{i.invoice_number}</div><div className="text-[11.5px] text-[#E7D5A4]/60">{i.direction === 'payable' ? 'Tangy pays partner' : 'Partner pays Tangy'}</div></div> },
+    { key: 'partner', header: 'Partner', render: (i) => <span className="text-[12.5px]">{i.profiles?.full_name || i.profiles?.email} <span className="text-[#E7D5A4]/60">· {i.profiles?.role}</span></span> },
     { key: 'event', header: 'Event', mobileHidden: true, render: (i) => <span className="text-[12.5px]">{i.events?.name || '—'}</span> },
     { key: 'amount', header: 'Amount', render: (i) => <span className="font-mono text-[12.5px]">{i.currency} {fmt.num(i.amount)}</span> },
     { key: 'due', header: 'Due', mobileHidden: true, render: (i) => <span className="font-mono text-[12px]">{i.due_date ? fmt.date(i.due_date) : '—'}</span> },
@@ -65,7 +65,7 @@ export default function InvoicesPage() {
       actions={<Button variant="primary" icon="Plus" onClick={() => setEditing({})}>New invoice</Button>}>
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
-          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} invoice{table.count === 1 ? '' : 's'}</span>}>
+          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} invoice{table.count === 1 ? '' : 's'}</span>}>
             <SearchInput value={search} onChange={setSearch} placeholder="Invoice number…" />
             <EventFilter value={event} onChange={setEvent} events={events} />
             <FilterSelect label="Status" value={status} onChange={setStatus}
@@ -138,7 +138,7 @@ const InvoiceForm = ({ invoice, events, onClose, onSaved }) => {
         <Field label="Notes (visible to the partner)" className="sm:col-span-2"><Textarea rows={2} maxLength={2000} value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></Field>
       </div>
       {error && <p role="alert" className="text-[12.5px] text-[#ef6b5e] mt-2">{error}</p>}
-      {isNew && <p className="text-[11.5px] text-[#E7D5A4]/45 mt-2">New invoices start as drafts — partners see them once issued.</p>}
+      {isNew && <p className="text-[11.5px] text-[#E7D5A4]/60 mt-2">New invoices start as drafts — partners see them once issued.</p>}
     </Modal>
   );
 };

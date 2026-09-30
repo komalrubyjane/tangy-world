@@ -158,7 +158,7 @@ export const CalendarPage = () => {
         <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11.5px] text-[#E7D5A4]/65" aria-label="Legend">
           {LEGEND.map(([cls, label]) => <li key={cls} className="flex items-center gap-1.5"><span className={cx('tc-swatch', cls)} aria-hidden="true" />{label}</li>)}
         </ul>
-        <p className="text-[11.5px] text-[#E7D5A4]/45">Grid times use your device's timezone; each event's detail shows its local time.</p>
+        <p className="text-[11.5px] text-[#E7D5A4]/60">Grid times use your device's timezone; each event's detail shows its local time.</p>
       </section>
 
       {data && data.requests.length > 0 && (

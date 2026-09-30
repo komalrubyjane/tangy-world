@@ -54,7 +54,7 @@ export const NotificationsSection = () => {
           <li key={r.id} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-[13.5px] text-[#EFE2C0] truncate">{r.subject}</div>
-              <div className="text-[12px] text-[#E7D5A4]/50 truncate">{r.to_email} · {r.notification_type} · {fmt.dateTime(r.created_at)}{r.attempts > 1 ? ` · ${r.attempts} attempts` : ''}</div>
+              <div className="text-[12px] text-[#E7D5A4]/60 truncate">{r.to_email} · {r.notification_type} · {fmt.dateTime(r.created_at)}{r.attempts > 1 ? ` · ${r.attempts} attempts` : ''}</div>
               {r.last_error && <div className="text-[12px] text-[#ef6b5e] truncate">{r.last_error}</div>}
             </div>
             <Badge tone={TONE[r.status]}>{r.status}</Badge>
@@ -65,7 +65,7 @@ export const NotificationsSection = () => {
           <li key={r.id} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-[13.5px] text-[#EFE2C0]">{r.notification_type === 'approval' ? 'Approval' : 'Rejection'} · {r.source_table.replace('_', ' ')}</div>
-              <div className="text-[12px] text-[#E7D5A4]/50">{fmt.dateTime(r.created_at)}{r.sent_at ? ` · sent ${fmt.dateTime(r.sent_at)}` : ''}</div>
+              <div className="text-[12px] text-[#E7D5A4]/60">{fmt.dateTime(r.created_at)}{r.sent_at ? ` · sent ${fmt.dateTime(r.sent_at)}` : ''}</div>
               {r.error && <div className="text-[12px] text-[#ef6b5e] truncate">{r.error}</div>}
             </div>
             <Badge tone={TONE[r.status]}>{r.status}</Badge>

@@ -79,13 +79,13 @@ export const JoinPage = () => {
               </button>
             ))}
           </div>
-          <p className="text-center mt-8 font-mono text-[10px] text-[#E7D5A4]/50 max-w-2xl mx-auto uppercase tracking-wider">
+          <p className="text-center mt-8 font-mono text-[10px] text-[#E7D5A4]/60 max-w-2xl mx-auto uppercase tracking-wider">
             Selecting a path here does not grant that role. Specialized paths go through a real application, reviewed by the
             Tangy team — your account stays a guest account until it's approved.
           </p>
 
           <div className="mt-14 pt-8 border-t border-[#C99A2E]/20">
-            <span className="block text-center font-mono text-[9px] sm:text-[10px] text-[#E7D5A4]/40 uppercase tracking-[0.3em] mb-4">
+            <span className="block text-center font-mono text-[9px] sm:text-[10px] text-[#E7D5A4]/60 uppercase tracking-[0.3em] mb-4">
               Other ways to join
             </span>
             <div role="group" aria-label="Other ways to join Tangy" className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto">

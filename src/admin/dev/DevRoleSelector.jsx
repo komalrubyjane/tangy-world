@@ -65,7 +65,7 @@ export const DevRoleSelector = ({ onUseRealLogin }) => {
             <section key={role} aria-label={title} className="flex flex-col bg-[#17130F] border border-[#C99A2E]/30 rounded-md p-5 hover:border-[#C99A2E]/70 transition-colors">
               <h2 className="font-condensed text-[24px] uppercase tracking-tight text-[#EFE2C0] m-0 leading-none">{title}</h2>
               <p className="text-[13px] text-[#C99A2E] mt-1.5">{tagline}</p>
-              <p className="font-mono text-[11px] text-[#E7D5A4]/45 mt-3">{id.full_name} · {id.email}</p>
+              <p className="font-mono text-[11px] text-[#E7D5A4]/60 mt-3">{id.full_name} · {id.email}</p>
               <ul className="mt-4 mb-5 flex flex-col gap-1 text-[12.5px] text-[#E7D5A4]/70 flex-1">
                 {modules.map((m) => <li key={m} className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-[#C99A2E]/70" />{m}</li>)}
               </ul>
@@ -79,13 +79,13 @@ export const DevRoleSelector = ({ onUseRealLogin }) => {
       </div>
 
       <h2 className="mt-10 mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#C99A2E] text-center">Partner & volunteer portals</h2>
-      <p className="text-center text-[12px] text-[#E7D5A4]/45 mb-4">{backend.local ? 'Signs in to a local test account with an approved application.' : 'Requires a local Supabase stack — portal data is scoped to a real session.'}</p>
+      <p className="text-center text-[12px] text-[#E7D5A4]/60 mb-4">{backend.local ? 'Signs in to a local test account with an approved application.' : 'Requires a local Supabase stack — portal data is scoped to a real session.'}</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {Object.entries(PORTAL_IDENTITIES).map(([role, id]) => (
           <section key={role} aria-label={id.label} className={`flex flex-col bg-[#17130F] border border-[#C99A2E]/25 rounded-md p-4 ${backend.local ? 'hover:border-[#C99A2E]/70' : 'opacity-50'}`}>
             <h3 className="font-condensed text-[18px] uppercase tracking-tight text-[#EFE2C0] m-0 leading-none">{id.label}</h3>
             <p className="text-[12px] text-[#E7D5A4]/55 mt-1.5 flex-1">{id.tagline}</p>
-            <p className="font-mono text-[10px] text-[#E7D5A4]/35 mt-2 truncate">{id.email}</p>
+            <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-2 truncate">{id.email}</p>
             <button onClick={() => enterPortal(role)} disabled={!backend.local || !!busy}
               className="mt-3 h-9 border border-[#C99A2E]/60 text-[#E7D5A4] rounded font-mono text-[11px] uppercase tracking-[0.1em] hover:bg-[#C99A2E]/15 disabled:opacity-50">
               {busy === role ? 'Opening…' : 'Open portal'}
@@ -95,14 +95,14 @@ export const DevRoleSelector = ({ onUseRealLogin }) => {
       </div>
 
       {note && <p role="status" className="mt-4 text-center text-[12.5px] text-[#f5b544]">{note}</p>}
-      <p className="mt-6 text-center text-[12px] text-[#E7D5A4]/45 leading-relaxed">
+      <p className="mt-6 text-center text-[12px] text-[#E7D5A4]/60 leading-relaxed">
         {backend.local
           ? `Data: local Supabase (${backend.host}). With SUPABASE_SERVICE_ROLE_KEY set for the dev server, each role signs in to a local test account and pages show real local data; otherwise pages show their empty/error states.`
           : `Data: no local Supabase connected. The preview identity has no database session, so pages show their empty or error states.`}
       </p>
       <div className="mt-4 flex items-center justify-center gap-5 text-[12px]">
         <button type="button" onClick={onUseRealLogin} className="text-[#E7D5A4]/55 hover:text-[#E7D5A4] underline underline-offset-2">Sign in with a real account instead</button>
-        <Link to="/" className="text-[#E7D5A4]/45 hover:text-[#E7D5A4]">← Website</Link>
+        <Link to="/" className="text-[#E7D5A4]/60 hover:text-[#E7D5A4]">← Website</Link>
       </div>
     </div>
   );

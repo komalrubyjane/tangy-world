@@ -107,7 +107,7 @@ export const ContactPage = () => {
               <div className="text-2xl mb-2">{card.icon}</div>
               <div className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{card.label}</div>
               <div className="font-mono text-xs sm:text-sm font-bold text-[#11100C] mb-1">{card.value}</div>
-              <div className="font-mono text-[8px] sm:text-[9px] text-[#11100C]/50 uppercase">{card.sub}</div>
+              <div className="font-mono text-[8px] sm:text-[9px] text-[#11100C]/70 uppercase">{card.sub}</div>
             </div>
           ))}
         </div>
@@ -222,7 +222,7 @@ export const ContactPage = () => {
               <span
                 key={s.label}
                 title="Channel launching soon"
-                className="flex items-center gap-2 bg-[#EFE2C0]/40 text-[#11100C]/50 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C]/30 cursor-default select-none"
+                className="flex items-center gap-2 bg-[#EFE2C0]/40 text-[#11100C]/70 font-mono text-[10px] sm:text-xs font-bold uppercase px-4 py-2.5 border-2 border-[#11100C]/30 cursor-default select-none"
               >
                 <span className="opacity-60">{s.icon}</span>
                 <span>{s.label}</span>

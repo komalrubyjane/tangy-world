@@ -55,13 +55,13 @@ export const DemoAdminLogin = () => {
               ENTER DEMO ADMIN →
             </button>
 
-            <button type="button" onClick={() => navigate('/')} className="text-center text-[10px] text-[#E7D5A4]/50 underline">
+            <button type="button" onClick={() => navigate('/')} className="text-center text-[10px] text-[#E7D5A4]/60 underline">
               ← Back to site
             </button>
           </div>
         )}
 
-        <div className="mt-6 text-center text-[9px] text-[#E7D5A4]/40 border-t border-[#C99A2E]/20 pt-4">
+        <div className="mt-6 text-center text-[9px] text-[#E7D5A4]/60 border-t border-[#C99A2E]/20 pt-4">
           PROPERTY OF TANGY SESSIONS · HYDERABAD · TEMPORARY DEMO BUILD
         </div>
       </div>

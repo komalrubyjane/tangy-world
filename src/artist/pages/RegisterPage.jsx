@@ -40,7 +40,7 @@ export const RegisterPage = () => {
             <button
               type="button"
               onClick={() => navigate('/join')}
-              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/50 hover:text-[#c2272a] uppercase tracking-wider"
+              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/70 hover:text-[#c2272a] uppercase tracking-wider"
             >
               ← CHANGE HOW YOU'RE JOINING
             </button>

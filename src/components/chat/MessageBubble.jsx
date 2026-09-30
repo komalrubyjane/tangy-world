@@ -39,7 +39,7 @@ export const MessageBubble = ({ text, isMine, label, sublabel, timestamp, isSyst
           </Link>
         )}
         {timestamp && (
-          <div className={`mt-1 font-mono text-[8.5px] uppercase tracking-wide ${isMine ? 'text-[#11100C]/50' : 'text-[#E7D5A4]/50'}`}>
+          <div className={`mt-1 font-mono text-[8.5px] uppercase tracking-wide ${isMine ? 'text-[#11100C]/70' : 'text-[#E7D5A4]/60'}`}>
             {timeAgo(timestamp)}
           </div>
         )}
