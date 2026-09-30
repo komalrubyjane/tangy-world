@@ -13,7 +13,10 @@ import { EmailOtpAuth } from '../auth/EmailOtpAuth';
 // listener picks up the resulting session automatically, so this component
 // just needs to stop rendering the gate once `isLoggedIn` flips true —
 // which re-renders `children` (the real application form) in place.
-export const RequireAuthToApply = ({ roleLabel, children }) => {
+// Enquiry forms (contact, private sessions) pass their own title/intro and
+// hide the "change how you're joining" link. The visitor stays on the page,
+// so what they were about to do is preserved through sign-in.
+export const RequireAuthToApply = ({ roleLabel, children, title, intro, showJoinLink = true }) => {
   const navigate = useNavigate();
   const { isLoggedIn, loading } = useUserAuth();
 
@@ -23,20 +26,20 @@ export const RequireAuthToApply = ({ roleLabel, children }) => {
   return (
     <div className="bg-black/10 border-2 border-current p-6 sm:p-8 flex flex-col gap-5">
       <div className="text-center">
-        <h3 className="display text-2xl sm:text-3xl uppercase">VERIFY YOUR EMAIL TO APPLY</h3>
+        <h3 className="display text-2xl sm:text-3xl uppercase">{title || 'VERIFY YOUR EMAIL TO APPLY'}</h3>
         <p className="font-mono text-xs opacity-80 mt-2 max-w-md mx-auto">
-          Verify your email with a one-time code to submit your {roleLabel} application. This links the application to your
-          account so you can track its status and we can email you the moment it's reviewed.
+          {intro || `Verify your email with a one-time code to submit your ${roleLabel} application. This links the application to your
+          account so you can track its status and we can email you the moment it's reviewed. Applying never changes your account type by itself.`}
         </p>
       </div>
 
       <div className="max-w-sm mx-auto w-full">
-        <EmailOtpAuth copy={{ emailIntro: `Enter your email — we'll send a one-time verification code to start your ${roleLabel} application.` }} />
+        <EmailOtpAuth copy={{ emailIntro: `Enter your email — we'll send a one-time verification code${roleLabel ? ` to start your ${roleLabel} application` : ''}.` }} />
       </div>
 
-      <button type="button" onClick={() => navigate('/join')} className="text-center font-mono text-[10px] font-bold uppercase tracking-wider opacity-60 hover:opacity-100">
+      {showJoinLink && <button type="button" onClick={() => navigate('/join')} className="text-center font-mono text-[10px] font-bold uppercase tracking-wider opacity-60 hover:opacity-100">
         ← CHANGE HOW YOU'RE JOINING
-      </button>
+      </button>}
     </div>
   );
 };

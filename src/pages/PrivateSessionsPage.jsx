@@ -8,6 +8,8 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { enquiryService } from '../services/enquiryService';
 import { useUserAuth } from '../context/UserAuthContext';
+import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
+import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
 
 const ENQUIRY_TYPES = [
   { id: 'private_gathering', label: 'Private Gathering' },
@@ -33,6 +35,7 @@ export const PrivateSessionsPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  useApplicantPrefill(user, { setName, setEmail, setPhone });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,11 +58,12 @@ export const PrivateSessionsPage = () => {
       return;
     }
     if (!isSupabaseConfigured) {
-      setSubmitted(true);
+      setFormError(FORMS_OFFLINE_MESSAGE);
       return;
     }
     setSubmitting(true);
     const { error } = await supabase.from('private_enquiries').insert({
+      user_id: user.id,
       type: enquiryType,
       name,
       email,
@@ -67,11 +71,10 @@ export const PrivateSessionsPage = () => {
       preferred_date: date,
       guest_count: guestCount,
       message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
-      user_id: user?.id ?? null,
     });
     setSubmitting(false);
     if (error) {
-      setFormError('Something went wrong submitting your request — please try again.');
+      setFormError(applicationErrorMessage(error, 'Something went wrong submitting your request — please try again.'));
       return;
     }
     setSubmitted(true);
@@ -205,6 +208,7 @@ export const PrivateSessionsPage = () => {
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our private session coordinator will review your request and get back to you within 48 hours.</p>
             </div>
           ) : (
+            <RequireAuthToApply title="SIGN IN TO SEND YOUR REQUEST" intro="Verify your email with a one-time code. Your request is linked to your Tangy profile so you can follow it and our coordinator can reply." showJoinLink={false}>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
               <div className="flex flex-wrap gap-1.5">
                 {ENQUIRY_TYPES.map((t) => (
@@ -246,6 +250,7 @@ export const PrivateSessionsPage = () => {
                 {submitting ? 'SUBMITTING...' : 'SUBMIT RESERVATION REQUEST →'}
               </button>
             </form>
+            </RequireAuthToApply>
           )}
         </div>
 

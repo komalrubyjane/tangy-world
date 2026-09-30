@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useEvents } from '../hooks/useEvents';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '../audio/AudioContext';
-import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { isMockAuth } from '../config/auth';
-import { waitlistService } from '../services/waitlistService';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { WaitlistDirectory } from '../components/booking/WaitlistDirectory';
 import { PosterEventCard } from '../components/ui/PosterEventCard';
 
 const VENUE_FILTERS = ['ALL', 'STEPWELL', 'BARADARI', 'COURTYARD'];
@@ -16,68 +15,8 @@ export const SessionsPage = () => {
   const { playSFX } = useAudio();
   const { events, loading: eventsLoading } = useEvents();
   const [filter, setFilter] = useState('ALL');
-  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
-  const [waitlistEmail, setWaitlistEmail] = useState('');
-  const [waitlistName, setWaitlistName] = useState('');
-  const [waitlistPhone, setWaitlistPhone] = useState('');
-  const [waitlistEventId, setWaitlistEventId] = useState('');
-  const [waitlistError, setWaitlistError] = useState('');
-  const [waitlistSubmitting, setWaitlistSubmitting] = useState(false);
-
   const upcomingEvents = events.filter((e) => e.dbStatus !== 'past');
-
-  useEffect(() => {
-    if (!waitlistEventId && upcomingEvents.length > 0) {
-      setWaitlistEventId(upcomingEvents[0].id);
-    }
-  }, [upcomingEvents, waitlistEventId]);
-
-  const handleWaitlistSubmit = async (e) => {
-    e.preventDefault();
-    setWaitlistError('');
-    if (!waitlistName || !waitlistEmail) return;
-    if (!/^\S+@\S+\.\S+$/.test(waitlistEmail)) {
-      setWaitlistError('Please enter a valid email address.');
-      return;
-    }
-    if (waitlistPhone && !/^[\d\s+()-]{7,15}$/.test(waitlistPhone)) {
-      setWaitlistError('Please enter a valid phone number, or leave it blank.');
-      return;
-    }
-    playSFX('ticketClick');
-
-    if (isMockAuth) {
-      if (waitlistEventId) {
-        waitlistService.join({ eventId: waitlistEventId, name: waitlistName, email: waitlistEmail, phone: waitlistPhone || null });
-      }
-      setWaitlistSubmitted(true);
-      return;
-    }
-
-    if (!isSupabaseConfigured || !waitlistEventId) {
-      setWaitlistSubmitted(true);
-      return;
-    }
-
-    setWaitlistSubmitting(true);
-    const { error } = await supabase.from('waitlist').insert({
-      event_id: waitlistEventId,
-      name: waitlistName,
-      email: waitlistEmail,
-      phone: waitlistPhone || null,
-    });
-    setWaitlistSubmitting(false);
-
-    if (error) {
-      if (error.code === '23505') {
-        setWaitlistError("You're already on the waitlist for this session.");
-      } else {
-        setWaitlistError('Something went wrong — please try again.');
-      }
-      return;
-    }
-    setWaitlistSubmitted(true);
-  };
+  usePageMeta({ title: 'Sessions', description: 'Upcoming Tangy sessions — live music in Hyderabad’s heritage spaces. Book tickets or join the waitlist.' });
 
   const filteredEvents = upcomingEvents.filter(evt => {
     if (filter === 'ALL') return true;
@@ -171,7 +110,7 @@ export const SessionsPage = () => {
               key={evt.id}
               event={evt}
               idx={idx}
-              onBook={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
+              onBook={() => { playSFX('ticketClick'); navigate(`/sessions/${evt.slug || evt.id}`); }}
             />
           ))}
         </div>
@@ -221,7 +160,7 @@ export const SessionsPage = () => {
                   .map((evt) => (
                     <button
                       key={evt.id}
-                      onClick={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
+                      onClick={() => { playSFX('ticketClick'); navigate(`/sessions/${evt.slug || evt.id}`); }}
                       className="text-left bg-[#E7D5A4] border-2 border-[#11100C] p-4 hover:-translate-y-0.5 transition-transform"
                     >
                       <span className="font-mono text-[9px] font-bold text-[#B94717] block mb-1 uppercase">{evt.date}</span>
@@ -247,69 +186,11 @@ export const SessionsPage = () => {
             </span>
             <h2 className="display text-3xl sm:text-5xl text-[#11100C]">JOIN THE WAITLIST</h2>
             <p className="font-mono text-xs text-[#11100C]/70 mt-2">
-              Get notified 48 hours before official public tickets launch for sold-out sessions.
+              Sold out? Join a session's waitlist — released seats are offered in order and held for you.
             </p>
           </div>
 
-          {waitlistSubmitted ? (
-            <div className="text-center py-8 border-2 border-[#11100C] bg-[#EFE2C0] paperTexture">
-              <h3 className="display text-3xl text-[#11100C] mb-2">YOU ARE ON THE WAITLIST!</h3>
-              <p className="font-mono text-xs text-[#11100C]/70 uppercase">We'll email you the moment tickets open.</p>
-            </div>
-          ) : upcomingEvents.length === 0 ? (
-            <div className="text-center py-8 border-2 border-dashed border-[#11100C]/40 font-mono text-xs text-[#11100C]/60">
-              NO UPCOMING SESSIONS TO WAITLIST FOR RIGHT NOW — CHECK BACK SOON.
-            </div>
-          ) : (
-            <form onSubmit={handleWaitlistSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              <input
-                required
-                type="text"
-                placeholder="YOUR FULL NAME *"
-                value={waitlistName}
-                onChange={(e) => setWaitlistName(e.target.value)}
-                className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
-              />
-              <input
-                required
-                type="email"
-                placeholder="YOUR EMAIL ADDRESS *"
-                value={waitlistEmail}
-                onChange={(e) => setWaitlistEmail(e.target.value)}
-                className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
-              />
-              <input
-                type="tel"
-                placeholder="PHONE NUMBER (OPTIONAL)"
-                value={waitlistPhone}
-                onChange={(e) => setWaitlistPhone(e.target.value)}
-                className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
-              />
-              <select
-                value={waitlistEventId}
-                onChange={(e) => setWaitlistEventId(e.target.value)}
-                className="p-3 bg-[#F5E9C9] border border-[#11100C] focus:outline-none"
-              >
-                {upcomingEvents.map((evt) => (
-                  <option key={evt.id} value={evt.id}>{evt.title} — {evt.date}</option>
-                ))}
-              </select>
-
-              {waitlistError && (
-                <div className="p-3 bg-[#B5532A] text-[#E7D5A4] font-bold border border-[#11100C]">
-                  ✕ {waitlistError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={waitlistSubmitting}
-                className="py-3 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] border-2 border-[#11100C] font-bold uppercase tracking-widest transition-colors shadow-[4px_4px_0px_#11100C] disabled:opacity-50"
-              >
-                {waitlistSubmitting ? 'JOINING...' : 'JOIN SESSION WAITLIST →'}
-              </button>
-            </form>
-          )}
+          {eventsLoading ? <p className="m-0 text-center font-mono text-xs">Loading sessions…</p> : <WaitlistDirectory events={events} />}
         </div>
       </section>
 

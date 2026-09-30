@@ -4,6 +4,9 @@ import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { enquiryService } from '../services/enquiryService';
+import { useUserAuth } from '../context/UserAuthContext';
+import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
+import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
 
 export const ContactPage = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -14,6 +17,8 @@ export const ContactPage = () => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const { user } = useUserAuth();
+  useApplicantPrefill(user, { setName, setEmail });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,16 +29,17 @@ export const ContactPage = () => {
       return;
     }
     if (!isSupabaseConfigured) {
-      setSubmitted(true);
+      setError(FORMS_OFFLINE_MESSAGE);
       return;
     }
     setSubmitting(true);
     const { error: err } = await supabase.from('contact_enquiries').insert({
+      user_id: user.id,
       name, email, subject, message, inquiry_type: inquiry,
     });
     setSubmitting(false);
     if (err) {
-      setError('Something went wrong sending your message — please try again.');
+      setError(applicationErrorMessage(err, 'Something went wrong sending your message — please try again.'));
       return;
     }
     setSubmitted(true);
@@ -129,6 +135,7 @@ export const ContactPage = () => {
               </p>
             </div>
           ) : (
+            <RequireAuthToApply title="SIGN IN TO SEND A MESSAGE" intro="Verify your email with a one-time code so we can reply to you and you can follow the conversation from your Tangy profile." showJoinLink={false}>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
               <div>
                 <label className="font-bold text-[#B94717] block mb-2 uppercase text-[10px]">INQUIRY TYPE</label>
@@ -181,6 +188,7 @@ export const ContactPage = () => {
                 {submitting ? 'SENDING...' : 'SEND DISPATCH →'}
               </button>
             </form>
+            </RequireAuthToApply>
           )}
         </div>
       </section>

@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { EmailOtpAuth } from '../../components/auth/EmailOtpAuth';
+import { safeNext } from '../../lib/enquiries';
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
 import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 
@@ -15,10 +16,13 @@ import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 export const JoinLoginPage = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useUserAuth();
+  // Where the visitor was headed before being asked to sign in (same-site paths only).
+  const [params] = useSearchParams();
+  const next = safeNext(params.get('next'));
 
   useEffect(() => {
-    if (isLoggedIn) navigate('/dashboard');
-  }, [isLoggedIn, navigate]);
+    if (isLoggedIn) navigate(next, { replace: true });
+  }, [isLoggedIn, navigate, next]);
 
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono overflow-x-hidden">
@@ -28,7 +32,7 @@ export const JoinLoginPage = () => {
           <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">TANGY PROFILE // SIGN IN</span>
           <h1 className="font-condensed text-2xl font-bold uppercase mb-6 mt-1">WELCOME BACK</h1>
 
-          <EmailOtpAuth onVerified={() => navigate('/dashboard')} />
+          <EmailOtpAuth onVerified={() => navigate(next, { replace: true })} />
         </div>
 
         <div className="bg-[#181614] border-2 border-[#C99A2E] p-5 sm:p-6 shadow-[8px_8px_0px_#11100C]">

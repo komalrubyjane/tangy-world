@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
+import { loginPath } from '../../lib/enquiries';
 
 // Real Supabase-Auth-backed route guard. Only checks isLoggedIn by default —
 // the role-scoped dashboards it wraps (patron/vendor/crew/etc.) key off the
@@ -12,17 +13,19 @@ import { useUserAuth } from '../../context/UserAuthContext';
 export const ProtectedRoute = ({ allowedRoles, children }) => {
   const { user, isLoggedIn, loading } = useUserAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (loading) return;
     if (!isLoggedIn) {
-      navigate('/join/login');
+      // Come back here after signing in.
+      navigate(loginPath(location.pathname + location.search), { replace: true });
       return;
     }
     if (allowedRoles && !allowedRoles.includes(user?.role)) {
       navigate('/dashboard');
     }
-  }, [isLoggedIn, loading, user, allowedRoles, navigate]);
+  }, [isLoggedIn, loading, user, allowedRoles, navigate, location.pathname, location.search]);
 
   if (loading) {
     return (

@@ -24,7 +24,7 @@ import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 // listener picks that session up automatically, so onVerified here only
 // needs to close the modal.
 export const UserLoginModal = () => {
-  const { isLoginModalOpen, closeLoginModal, isLoggedIn, user, logout } = useUserAuth();
+  const { isLoginModalOpen, closeLoginModal, isLoggedIn, user, logout, loginReason } = useUserAuth();
   const { playSFX } = useAudio();
   const navigate = useNavigate();
 
@@ -41,9 +41,9 @@ export const UserLoginModal = () => {
   // modal mid auth shouldn't reopen straight back into that form.
   useEffect(() => {
     if (isLoginModalOpen && !isLoggedIn) {
-      setStep('role');
+      setStep(loginReason ? 'auth' : 'role');
     }
-  }, [isLoginModalOpen, isLoggedIn]);
+  }, [isLoginModalOpen, isLoggedIn, loginReason]);
 
   useEffect(() => {
     if (!isLoginModalOpen || !isLoggedIn || !user || !isSupabaseConfigured) return;
@@ -102,7 +102,7 @@ export const UserLoginModal = () => {
             {showRoleStep ? '✦ TANGY MEMBERSHIP DESK' : '✦ TANGY PATRON PORTAL'}
           </div>
           <h2 className="display text-2xl sm:text-3xl font-bold leading-tight">
-            {isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : 'CREATE YOUR ACCOUNT'}
+            {isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : loginReason ? `SIGN IN ${loginReason}` : 'CREATE YOUR ACCOUNT'}
           </h2>
           <p className="font-serif italic text-xs text-[#2A1A0E] opacity-80 mt-1">
             {isLoggedIn
@@ -189,13 +189,13 @@ export const UserLoginModal = () => {
 
         {showAuthStep && (
           <div className="flex flex-col gap-4">
-            <button
+            {!loginReason && <button
               type="button"
               onClick={() => setStep('role')}
               className="self-start font-mono text-[10px] font-bold text-[#11100C]/60 hover:text-[#B94717] uppercase tracking-wider outline-none focus-visible:ring-2 focus-visible:ring-[#B94717]"
             >
               ← CHANGE HOW YOU'RE JOINING
-            </button>
+            </button>}
 
             <EmailOtpAuth
               copy={{ emailIntro: "Enter your email — we'll send a one-time verification code to unlock your Digital Passport." }}
@@ -203,7 +203,7 @@ export const UserLoginModal = () => {
             />
 
             <div className="font-mono text-[9px] opacity-70 bg-[#E3D4AC] p-2 border border-[#11100C]/30">
-              ℹ️ Guest / User account — for attending Tangy experiences.
+              ℹ️ {loginReason ? 'New here? The same code creates your free Tangy account.' : 'Guest / User account — for attending Tangy experiences.'}
             </div>
 
             {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}

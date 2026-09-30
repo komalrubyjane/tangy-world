@@ -137,11 +137,19 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
     const [myBookings] = await Promise.all([bookingService.getMyBookings(user.id)]);
     setBookings(myBookings || []);
     if (isSupabaseConfigured) {
-      const { data } = await supabase.from('waitlist').select('*, events(name, event_date, venue)').eq('email', user.email);
-      setWaitlist(data || []);
+      // Own dashboard: my_waitlist() (position + offer, 0027). Admin preview
+      // of someone else's dashboard reads their rows directly (staff RLS).
+      if (readOnly) {
+        const { data } = await supabase.from('waitlist').select('id, status, quantity, offer_expires_at, events(name, slug, event_date, venue)')
+          .eq('user_id', user.id).in('status', ['waiting', 'offered']);
+        setWaitlist((data || []).map((w) => ({ ...w, event_name: w.events?.name, event_slug: w.events?.slug, event_date: w.events?.event_date, venue: w.events?.venue })));
+      } else {
+        const { data } = await supabase.rpc('my_waitlist');
+        setWaitlist((data || []).filter((w) => ['waiting', 'offered'].includes(w.status)));
+      }
     }
     setLoading(false);
-  }, [user, demoData]);
+  }, [user, demoData, readOnly]);
 
   useEffect(() => {
     load();
@@ -355,9 +363,19 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {waitlist.map((w) => (
-                  <div key={w.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3">
-                    <h4 className="font-condensed font-bold uppercase">{w.events?.name || 'Session'}</h4>
-                    <p className="font-mono text-[10px] mt-1">{fmtDate(w.events?.event_date)} · {w.events?.venue}</p>
+                  <div key={w.id} className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-3" data-my-waitlist-entry>
+                    <h4 className="font-condensed font-bold uppercase">{w.event_name || w.events?.name || 'Session'}</h4>
+                    <p className="font-mono text-[10px] mt-1">{fmtDate(w.event_date || w.events?.event_date)}{w.venue ? ` · ${w.venue}` : ''}</p>
+                    <p className="font-mono text-[10px] mt-1 font-bold">
+                      {w.status === 'offered'
+                        ? `Seats held for you until ${new Date(w.offer_expires_at).toLocaleString('en-IN', { hour: 'numeric', minute: '2-digit', day: 'numeric', month: 'short' })}`
+                        : `Waiting${w.queue_position ? ` · position ${w.queue_position}` : ''} · ${w.quantity} ${w.quantity === 1 ? 'person' : 'people'}`}
+                    </p>
+                    {w.event_slug && !readOnly && (
+                      <a href={`/sessions/${w.event_slug}`} className="inline-block mt-2 font-mono text-[10px] font-bold underline">
+                        {w.status === 'offered' ? 'Book your held seats →' : 'View session →'}
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>

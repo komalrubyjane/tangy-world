@@ -265,8 +265,33 @@ begin
 end;
 $$;
 
-revoke execute on function join_waitlist(uuid, integer), leave_waitlist(uuid), my_waitlist(), admin_offer_waitlist(uuid) from public, anon;
-grant execute on function join_waitlist(uuid, integer), leave_waitlist(uuid), my_waitlist(), admin_offer_waitlist(uuid) to authenticated;
+-- Admin: take someone off the waitlist (duplicate, request, no-show...).
+-- A held offer's seats pass straight to the next person.
+create or replace function admin_remove_waitlist_entry(p_entry_id uuid, p_reason text default null)
+returns void
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v_row waitlist%rowtype;
+begin
+  if not has_permission('bookings.manage') then
+    raise exception 'You do not have permission to manage the waitlist.';
+  end if;
+  select * into v_row from waitlist where id = p_entry_id for update;
+  if v_row.id is null or v_row.status not in ('waiting', 'offered') then
+    raise exception 'This waitlist entry is no longer active.';
+  end if;
+  update waitlist set status = 'skipped', resolved_at = now(), updated_at = now() where id = v_row.id;
+  perform audit_write('waitlist.removed', 'waitlist', v_row.id::text,
+    jsonb_build_object('previous_status', v_row.status, 'reason', nullif(btrim(p_reason), '')), v_row.event_id);
+  if v_row.status = 'offered' then
+    perform offer_waitlist_seats(v_row.event_id);
+  end if;
+end;
+$$;
+
+revoke execute on function join_waitlist(uuid, integer), leave_waitlist(uuid), my_waitlist(), admin_offer_waitlist(uuid), admin_remove_waitlist_entry(uuid, text) from public, anon;
+grant execute on function join_waitlist(uuid, integer), leave_waitlist(uuid), my_waitlist(), admin_offer_waitlist(uuid), admin_remove_waitlist_entry(uuid, text) to authenticated;
 
 -- Checkout honours holds --------------------------------------------------------------------
 create or replace function create_pending_booking(p_user_id uuid, p_event_id uuid, p_registration_code text, p_attendee_name text,

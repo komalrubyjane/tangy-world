@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { artists, gallery } from '../data/mockData';
-import { useEvents } from '../hooks/useEvents';
+import { useSessionDetail, useBookingQuote } from '../hooks/useSessionDetail';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { useUserAuth } from '../context/UserAuthContext';
 import { bookingService } from '../lib/bookingService';
 import { generateQrDataUrl } from '../lib/qr';
@@ -10,29 +10,36 @@ import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { CheckoutSteps } from '../components/booking/CheckoutSteps';
+import { WaitlistPanel, WaitlistOfferBanner } from '../components/booking/WaitlistPanel';
 
+// The public session page (/sessions/:slug; /book/:id is kept as an alias).
+// Ticket types, prices and seats come from the server (event_ticket_types /
+// event_availability, migrations 0026–0027) — nothing here is hard-coded.
 export const BookingPage = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const { playSFX } = useAudio();
-  const { events, loading: eventsLoading } = useEvents();
   const { user, isLoggedIn, openLoginModal } = useUserAuth();
+  const { session, availability, lineup, waitlist, loading: eventsLoading, error: loadError, refresh } = useSessionDetail(sessionId, user?.id);
 
-  // Dynamically load event data based on sessionId parameter (slug or id)
-  const session = useMemo(() => {
-    return events.find(e => e.slug === sessionId || e.id === sessionId) || null;
-  }, [events, sessionId]);
+  const isPast = session?.dbStatus === 'past' || (session?.rawDate && session.rawDate < new Date().toISOString().slice(0, 10));
+  const isCancelled = session?.dbStatus === 'cancelled';
+  const offer = waitlist?.status === 'offered' && new Date(waitlist.offer_expires_at) > new Date() ? waitlist : null;
+  const remaining = availability?.remaining ?? null;
+  // A live waitlist offer means seats are held for this person even though
+  // the session shows as sold out to everyone else.
+  const isSoldOut = !offer && (session?.status === 'SOLD OUT' || !!availability?.sold_out);
 
-  const isSoldOut = session?.status === 'SOLD OUT';
-  const isPast = session?.dbStatus === 'past';
+  const ticketTiers = useMemo(() => (availability?.ticket_types || []).map((t) => ({
+    id: t.code, name: t.name, price: Number(t.price), desc: t.description || '', remaining: t.remaining,
+  })), [availability]);
 
-  // Ticket Tiers
-  const basePrice = session ? (parseInt(session.price.replace(/[^\d]/g, '')) || 799) : 799;
-  const ticketTiers = [
-    { id: 'gen', name: 'General Admission', price: basePrice, desc: 'Entry to stepwell acoustic sanctuary & main stage performance.' },
-    { id: 'vip', name: 'VIP Heritage Pass', price: basePrice + 500, desc: 'Reserved front-tier seating, complimentary filter coffee & vintage poster print.' },
-    { id: 'premium', name: 'Backstage Collective Pass', price: basePrice + 1200, desc: 'Access to post-midnight artist jam session, vinyl record & signed ticket stub.' }
-  ];
+  usePageMeta({
+    title: session ? session.title : eventsLoading ? 'Session' : 'Session not found',
+    description: session ? `${session.title} — ${[session.date, session.time, session.venue].filter(Boolean).join(' · ')}. ${session.description || ''}` : undefined,
+    image: session?.image,
+    noindex: !eventsLoading && !session,
+  });
 
   // Checkout form (see components/booking/CheckoutSteps). One object so nothing
   // typed is lost moving between steps.
@@ -51,7 +58,16 @@ export const BookingPage = () => {
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [groupQr, setGroupQr] = useState('');
   const [confirmedTickets, setConfirmedTickets] = useState([]);
-  const selectedTier = ticketTiers.find((t) => t.id === form.tierId) || ticketTiers[0];
+  const selectedTier = ticketTiers.find((t) => t.id === form.tierId) || ticketTiers[0] || null;
+  const quote = useBookingQuote(session?.id, selectedTier?.id, form.quantity);
+
+  // Default to the first ticket type that is actually on sale.
+  useEffect(() => {
+    if (ticketTiers.length && !ticketTiers.some((t) => t.id === form.tierId && t.remaining !== 0)) {
+      const first = ticketTiers.find((t) => t.remaining !== 0) || ticketTiers[0];
+      setForm((f) => ({ ...f, tierId: first.id }));
+    }
+  }, [ticketTiers, form.tierId]);
 
   useEffect(() => {
     if (user) setForm((f) => ({ ...f, fullName: f.fullName || user.full_name || '', email: f.email || user.email || '' }));
@@ -86,7 +102,7 @@ export const BookingPage = () => {
     bookingService.sendTicketEmail(booking.id);
   };
 
-  const fail = (message) => setPay({ status: 'failed', message: message || 'The payment did not go through.' });
+  const fail = (message, review = false) => setPay({ status: 'failed', review, message: message || 'The payment did not go through.' });
 
   const openCheckout = async (order) => {
     try {
@@ -115,7 +131,8 @@ export const BookingPage = () => {
           razorpaySignature: response.razorpay_signature,
         });
         if (!verifyRes.success) {
-          fail(verifyRes.error || 'We could not verify the payment — please contact support before retrying.');
+          fail(verifyRes.error || 'We could not verify the payment — please contact support before retrying.', verifyRes.review);
+          if (verifyRes.review) { orderRef.current = null; refresh(); }
           return;
         }
         orderRef.current = null;
@@ -135,7 +152,7 @@ export const BookingPage = () => {
   // pending bookings); changed details start a new one and the old unpaid
   // hold expires on its own (bookings.pending_timeout_minutes).
   const handlePay = async () => {
-    if (!session || pay.status === 'processing') return;
+    if (!session || !selectedTier || pay.status === 'processing') return;
     playSFX('ticketClick');
     const payload = {
       eventId: session.id,
@@ -164,6 +181,7 @@ export const BookingPage = () => {
     if (!orderRes.success) {
       orderRef.current = null;
       fail(orderRes.error || 'We could not start the payment.');
+      refresh();   // seats or prices may have changed
       return;
     }
     orderRef.current = { fingerprint, order: orderRes.order };
@@ -182,7 +200,9 @@ export const BookingPage = () => {
   if (!session) {
     return (
       <div className="w-full min-h-[100dvh] bg-[#4A171D] textileTexture text-[#ecdcaf] flex flex-col items-center justify-center gap-4 font-mono text-xs font-bold p-8 text-center">
-        <span>SESSION NOT FOUND.</span>
+        <h1 className="font-poster text-3xl">{loadError ? 'We couldn’t load this session' : 'Session not found'}</h1>
+        <p className="font-normal max-w-sm">{loadError ? 'Check your connection and try again.' : 'It may have been moved or is no longer listed.'}</p>
+        {loadError && <button onClick={refresh} className="px-4 py-2 bg-[#ecdcaf] text-[#191410] border-2 border-[#ecdcaf] uppercase">Try again</button>}
         <button
           onClick={() => navigate('/sessions')}
           className="px-4 py-2 bg-[#c2272a] text-[#ecdcaf] border-2 border-[#ecdcaf] uppercase"
@@ -212,7 +232,7 @@ export const BookingPage = () => {
         {/* BACK TO SESSIONS NAVIGATION LINK */}
         <div className="mb-6 flex items-center justify-between">
           <button
-            onClick={() => { playSFX('ticketClick'); navigate('/'); }}
+            onClick={() => { playSFX('ticketClick'); navigate('/sessions'); }}
             className="font-mono text-xs font-bold text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-2 border border-[#ecdcaf]/30 px-3 py-1.5 bg-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
           >
             ← BACK TO ALL SESSIONS
@@ -232,12 +252,12 @@ export const BookingPage = () => {
             <h1 className="font-poster text-3xl sm:text-4xl text-[#ecdcaf] leading-tight my-0.5">
               {session.title}
             </h1>
-            <p className="font-mono text-xs text-[#d1a437]">{session.artist} · {session.venue} · {session.date}</p>
+            <p className="font-mono text-xs text-[#d1a437]">{[session.venue, session.date, session.time].filter(Boolean).join(' · ')}</p>
           </div>
 
           <div className="flex items-center gap-2 bg-[#EFE2C0] text-[#191410] px-3.5 py-1.5 font-mono text-xs font-bold border border-[#191410] -rotate-1 shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#B5532A] animate-pulse" />
-            <span>STATUS: {session.status} ({session.capacity} SEATS LEFT)</span>
+            <span data-seats-left>{isCancelled ? 'CANCELLED' : isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT' : remaining != null ? `${remaining} ${remaining === 1 ? 'SEAT' : 'SEATS'} LEFT` : 'ON SALE'}</span>
           </div>
         </div>
 
@@ -275,8 +295,8 @@ export const BookingPage = () => {
                   <span className="font-bold text-[#ecdcaf]">{session.time}</span>
                 </div>
                 <div>
-                  <span className="text-[#ecdcaf]/60 block text-[9px]">DURATION</span>
-                  <span className="font-bold text-[#ecdcaf]">3.5 HOURS</span>
+                  <span className="text-[#ecdcaf]/60 block text-[9px]">FROM</span>
+                  <span className="font-bold text-[#ecdcaf]">{ticketTiers.length ? `₹${Math.min(...ticketTiers.map((t) => t.price)).toLocaleString()}` : '—'}</span>
                 </div>
                 <div>
                   <span className="text-[#ecdcaf]/60 block text-[9px]">CAPACITY</span>
@@ -285,22 +305,21 @@ export const BookingPage = () => {
               </div>
 
               {/* GENRE TAGS */}
-              <div className="flex items-center gap-2">
+              {session.tags.length > 0 && <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-[9px] text-[#ecdcaf]/60">TAGS:</span>
                 {session.tags.map((tag, idx) => (
                   <span key={idx} className="font-mono text-[9px] font-bold bg-[#C89D35]/20 text-[#d1a437] border border-[#d1a437]/40 px-2.5 py-0.5 uppercase">
                     {tag}
                   </span>
                 ))}
-              </div>
+              </div>}
             </div>
 
             {/* 3. ABOUT THE EVENT / STORY */}
             <div className="w-full bg-[#EFE2C0] paperTexture text-[#191410] border-2 border-[#191410] p-6 shadow-[6px_6px_0px_#c2272a] text-left flex flex-col gap-3">
               <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">02 // ABOUT THE SESSION</span>
-              <h3 className="font-poster text-2xl text-[#191410]">AN UNFORGETTABLE ACOUSTIC RITUAL</h3>
-              <p className="font-sans text-sm text-[#191410]/90 leading-relaxed font-normal">
-                {session.description}
+              <p className="font-sans text-sm text-[#191410]/90 leading-relaxed font-normal whitespace-pre-line">
+                {session.description || 'Details for this session will be announced soon.'}
               </p>
               {session.story && (
                 <blockquote className="p-3 bg-[#191410] text-[#ecdcaf] border-l-4 border-[#c2272a] font-serif italic text-xs mt-1">
@@ -309,46 +328,39 @@ export const BookingPage = () => {
               )}
             </div>
 
-            {/* 4. PERFORMING ARTISTS */}
-            <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-4">
-              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">03 // FEATURED ARTISTS</span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {artists.slice(0, 2).map((art) => (
-                  <div key={art.id} className="bg-[#EFE2C0] paperTexture text-[#191410] p-3 border border-[#191410] flex items-center gap-3 shadow-md">
-                    <img src={art.image} alt={art.name} className="w-14 h-14 object-cover border border-[#191410]" />
-                    <div className="flex flex-col">
-                      <span className="font-mono text-[8px] font-bold text-[#c2272a] uppercase">{art.role}</span>
-                      <h4 className="font-poster text-lg text-[#191410] leading-none my-0.5">{art.name}</h4>
-                      <span className="font-mono text-[9px] text-[#191410]/70">{art.genre}</span>
-                    </div>
-                  </div>
-                ))}
+            {/* 4. LINEUP — approved artists linked to this session */}
+            {lineup.length > 0 && (
+              <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-4" data-lineup>
+                <h2 className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase m-0">03 // LINEUP</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 list-none m-0 p-0">
+                  {lineup.map((art) => (
+                    <li key={art.id}>
+                      <Link to={art.slug ? `/artists/${art.slug}` : '/artist'} className="bg-[#EFE2C0] paperTexture text-[#191410] p-3 border border-[#191410] flex items-center gap-3 shadow-md hover:-translate-y-0.5 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d1a437]">
+                        {art.avatar_url
+                          ? <img src={art.avatar_url} alt="" className="w-14 h-14 object-cover border border-[#191410]" loading="lazy" />
+                          : <span aria-hidden="true" className="w-14 h-14 flex items-center justify-center border border-[#191410] font-poster text-xl">{(art.stage_name || art.name).slice(0, 1)}</span>}
+                        <span className="flex flex-col">
+                          <span className="font-poster text-lg text-[#191410] leading-none my-0.5">{art.stage_name || art.name}</span>
+                          <span className="font-mono text-[9px] text-[#191410]/70">{[art.genre, art.city].filter(Boolean).join(' · ')}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-
-            {/* 5. SESSION GALLERY & ATMOSPHERE */}
-            <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-4">
-              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 // SESSION ATMOSPHERE GALLERY</span>
-              <div className="grid grid-cols-3 gap-2">
-                {gallery.slice(0, 3).map((item) => (
-                  <img 
-                    key={item.id} 
-                    src={item.src} 
-                    alt={item.label} 
-                    className="w-full aspect-[4/3] object-cover border border-[#ecdcaf]/20 filter contrast-110 hover:scale-105 transition-transform duration-300" 
-                  />
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* 6. LOCATION MAP & SANCTUARY */}
             <div className="w-full bg-[#4A171D] border-2 border-[#d1a437] p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-3">
-              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">05 // SANCTUARY LOCATION</span>
-              <h3 className="font-poster text-xl text-[#ecdcaf]">{session.venue}</h3>
-              <p className="font-mono text-xs text-[#ecdcaf]/80">{session.city}, TELANGANA · 17TH CENTURY HERITAGE MONUMENT</p>
-              <div className="p-3 bg-[#181614] border border-[#d1a437]/40 font-mono text-[10px] text-[#d1a437]">
-                📍 DIRECTIONS: Follow stepwell lantern markers from Secunderabad Metro Station. Parking available at heritage sanctuary entrance.
-              </div>
+              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 // VENUE</span>
+              <h3 className="font-poster text-xl text-[#ecdcaf]">{session.venue || 'Venue to be announced'}</h3>
+              <p className="font-mono text-xs text-[#ecdcaf]/80">{session.city}</p>
+              {session.venue && (
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${session.venue}, ${session.city}`)}`} target="_blank" rel="noopener noreferrer"
+                  className="self-start p-3 bg-[#181614] border border-[#d1a437]/40 font-mono text-[10px] text-[#d1a437] hover:text-[#ecdcaf]">
+                  📍 Open in Google Maps ↗
+                </a>
+              )}
             </div>
 
           </div>
@@ -405,29 +417,40 @@ export const BookingPage = () => {
                     VIEW MY BOOKINGS →
                   </button>
                 </div>
+              ) : isCancelled ? (
+                <div className="p-4 bg-[#4A171D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
+                  THIS SESSION HAS BEEN CANCELLED.
+                </div>
+              ) : isPast ? (
+                <div className="p-4 bg-[#4A171D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
+                  THIS SESSION HAS ALREADY TAKEN PLACE.
+                </div>
+              ) : isSoldOut ? (
+                <WaitlistPanel session={session} entry={waitlist} isLoggedIn={isLoggedIn} onChange={refresh}
+                  onSignIn={() => { playSFX('ticketClick'); openLoginModal('TO JOIN THE WAITLIST'); }} />
               ) : !isLoggedIn ? (
                 <div className="flex flex-col items-center gap-4 text-center py-6">
                   <p className="font-mono text-xs text-[#241a12]/80 leading-relaxed">
                     Sign in to your Tangy Passport to book tickets for this session.
                   </p>
                   <button
-                    onClick={() => { playSFX('ticketClick'); openLoginModal(); }}
+                    onClick={() => { playSFX('ticketClick'); openLoginModal('TO BOOK THIS SESSION'); }}
                     className="w-full py-3 bg-[#c2272a] text-[#ecdcaf] hover:bg-[#191410] font-mono text-xs font-bold tracking-widest uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410]"
                   >
                     SIGN IN TO BOOK →
                   </button>
                 </div>
-              ) : isSoldOut ? (
-                <div className="p-4 bg-[#4A171D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
-                  THIS SESSION IS SOLD OUT.
-                </div>
-              ) : isPast ? (
-                <div className="p-4 bg-[#4A171D] text-[#ecdcaf] font-mono text-xs font-bold text-center border-2 border-[#191410]">
-                  THIS SESSION HAS ALREADY TAKEN PLACE.
-                </div>
+              ) : !selectedTier ? (
+                <p className="p-4 font-mono text-xs text-[#191410] text-center border-2 border-dashed border-[#191410]/40 m-0">
+                  Tickets for this session aren't on sale yet.
+                </p>
               ) : (
-                <CheckoutSteps event={session} tiers={ticketTiers} form={form} setForm={setForm} step={step} setStep={setStep}
-                  pay={pay} onPay={handlePay} onRetry={handlePay} />
+                <>
+                  {offer && <WaitlistOfferBanner entry={offer} />}
+                  <CheckoutSteps event={session} tiers={ticketTiers} form={form} setForm={setForm} step={step} setStep={setStep}
+                    pay={pay} onPay={handlePay} onRetry={handlePay} quote={quote}
+                    maxAvailable={offer ? offer.quantity + (remaining ?? 0) : remaining ?? undefined} />
+                </>
               )}
 
             </div>

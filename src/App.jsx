@@ -142,7 +142,7 @@ function MainWorld() {
   const handleCurtainComplete = useCallback(() => setShowUiControls(true), []);
 
   const handleNavigateBooking = (evt) => {
-    navigate(`/book/${evt.slug || evt.id}`);
+    navigate(`/sessions/${evt.slug || evt.id}`);
   };
 
   const handleNavigateArtist = () => {
@@ -311,7 +311,8 @@ export default function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/about/*" element={<AboutPage />} />
                 <Route path="/sessions" element={<SessionsPage />} />
-                <Route path="/sessions/*" element={<SessionsPage />} />
+                {/* One page per session; /book/:id is the older alias. */}
+                <Route path="/sessions/:sessionId" element={<BookingPage />} />
                 <Route path="/archive" element={<ArchivePage />} />
                 <Route path="/archive/*" element={<ArchivePage />} />
                 <Route path="/crew" element={<CrewPage />} />

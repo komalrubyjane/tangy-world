@@ -5,6 +5,9 @@ import { useAudio } from '../../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { isMockAuth } from '../../config/auth';
 import { enquiryService } from '../../services/enquiryService';
+import { useUserAuth } from '../../context/UserAuthContext';
+import { RequireAuthToApply } from '../../components/apply/RequireAuthToApply';
+import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../../lib/enquiries';
 
 const ENQUIRY_TYPE = 'corporate_event';
 
@@ -21,6 +24,8 @@ export const CorporateEventsPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const { user } = useUserAuth();
+  useApplicantPrefill(user, { setName, setEmail, setPhone });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,17 +42,18 @@ export const CorporateEventsPage = () => {
       return;
     }
     if (!isSupabaseConfigured) {
-      setSubmitted(true);
+      setFormError(FORMS_OFFLINE_MESSAGE);
       return;
     }
     setSubmitting(true);
     const { error } = await supabase.from('private_enquiries').insert({
+      user_id: user.id,
       type: ENQUIRY_TYPE, name, email, phone, preferred_date: date, guest_count: guestCount,
       message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
     });
     setSubmitting(false);
     if (error) {
-      setFormError('Something went wrong submitting your request — please try again.');
+      setFormError(applicationErrorMessage(error, 'Something went wrong submitting your request — please try again.'));
       return;
     }
     setSubmitted(true);
@@ -76,6 +82,7 @@ export const CorporateEventsPage = () => {
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our private session coordinator will get back to you within 48 hours.</p>
             </div>
           ) : (
+            <RequireAuthToApply title="SIGN IN TO SEND YOUR REQUEST" intro="Verify your email with a one-time code. Your request is linked to your Tangy profile so you can follow it and our coordinator can reply." showJoinLink={false}>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input required type="text" placeholder="YOUR NAME *" value={name} onChange={(e) => setName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
@@ -104,6 +111,7 @@ export const CorporateEventsPage = () => {
                 {submitting ? 'SUBMITTING...' : 'REQUEST A CORPORATE SESSION →'}
               </button>
             </form>
+            </RequireAuthToApply>
           )}
         </div>
       </main>

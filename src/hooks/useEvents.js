@@ -3,7 +3,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { events as mockEvents } from '../data/mockData';
 import { isMockAuth } from '../config/auth';
 
-function mapDbEvent(row) {
+export function mapDbEvent(row) {
   const eventDate = new Date(`${row.event_date}T00:00:00`);
   return {
     id: row.id,

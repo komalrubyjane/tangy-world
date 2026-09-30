@@ -270,7 +270,7 @@ export const SessionCalendarPage = () => {
                         ARTISTS: {evt.artists?.length ? evt.artists.join(', ') : 'TO BE ANNOUNCED'} · ₹{evt.price}
                       </p>
                       <button
-                        onClick={() => { playSFX('ticketClick'); !isSoldOut && navigate(`/book/${evt.slug || evt.id}`); }}
+                        onClick={() => { playSFX('ticketClick'); !isSoldOut && navigate(`/sessions/${evt.slug || evt.id}`); }}
                         disabled={isSoldOut}
                         className={`w-full sm:w-auto px-6 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest border-2 transition-colors ${
                           isSoldOut

@@ -7,6 +7,9 @@ import { useAudio } from '../audio/AudioContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { userService } from '../services/userService';
+import { useUserAuth } from '../context/UserAuthContext';
+import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
+import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
 
 export const CrewPage = () => {
   const navigate = useNavigate();
@@ -21,6 +24,8 @@ export const CrewPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [crewSubmitting, setCrewSubmitting] = useState(false);
   const [crewError, setCrewError] = useState('');
+  const { user } = useUserAuth();
+  useApplicantPrefill(user, { setName: setVolName, setEmail: setVolEmail, setPhone: setVolPhone });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,11 +44,12 @@ export const CrewPage = () => {
       return;
     }
     if (!isSupabaseConfigured) {
-      setSubmitted(true);
+      setCrewError(FORMS_OFFLINE_MESSAGE);
       return;
     }
     setCrewSubmitting(true);
     const { error } = await supabase.from('crew_applications').insert({
+      user_id: user.id,
       name: volName,
       email: volEmail,
       phone: volPhone,
@@ -52,7 +58,7 @@ export const CrewPage = () => {
     });
     setCrewSubmitting(false);
     if (error) {
-      setCrewError('Something went wrong submitting your application — please try again.');
+      setCrewError(applicationErrorMessage(error, 'Something went wrong submitting your application — please try again.'));
       return;
     }
     setSubmitted(true);
@@ -194,6 +200,7 @@ export const CrewPage = () => {
               <p className="font-mono text-xs text-[#ecdcaf]/80">Our crew desk will review your submission and contact you via phone/email within 48 hours.</p>
             </div>
           ) : (
+            <RequireAuthToApply roleLabel="Crew">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input required type="text" placeholder="YOUR FULL NAME *" value={volName} onChange={(e) => setVolName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
@@ -215,6 +222,7 @@ export const CrewPage = () => {
                 {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
               </button>
             </form>
+            </RequireAuthToApply>
           )}
         </div>
 

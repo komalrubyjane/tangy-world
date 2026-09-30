@@ -10,6 +10,8 @@ export const STATUS_COLORS = {
   waiting: 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/40',
   scheduled: 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/40',
   notified: 'bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/40',
+  offered: 'bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/40',
+  skipped: 'bg-[#E7D5A4]/10 text-[#E7D5A4]/70 border-[#E7D5A4]/30',
   contacted: 'bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/40',
   rejected: 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/40',
   cancelled: 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/40',

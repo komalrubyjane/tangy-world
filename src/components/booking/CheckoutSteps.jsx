@@ -115,16 +115,21 @@ export function CheckoutProgress({ step }) {
 }
 
 // form = { fullName, phone, email, instagram, quantity, tierId, names[], answers{}, collabInterests[], collabNote, note }
-export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay, onPay, onRetry }) {
+// `quote` is the server's booking_quote() for the current ticket type and
+// quantity; totals shown come from it (the client figure is only a
+// placeholder while it loads). Checkout charges the server amount regardless.
+export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay, onPay, onRetry, quote, maxAvailable }) {
   const [errors, setErrors] = useState({});
   const topRef = useRef(null);
   const tier = tiers.find((t) => t.id === form.tierId) || tiers[0];
   const questions = event.bookingQuestions || [];
   const min = event.bookingMin ?? 1;
-  const max = event.bookingMax ?? 10;
-  const subtotal = tier.price * form.quantity;
-  const taxes = Math.round(subtotal * 0.18);
-  const total = subtotal + taxes;
+  const max = Math.max(min, Math.min(event.bookingMax ?? 10, maxAvailable ?? Infinity, tier.remaining ?? Infinity));
+  const quoted = quote && quote.ticket_type === tier.id && quote.quantity === form.quantity ? quote : null;
+  const taxPercent = quote?.tax_percent ?? 18;
+  const subtotal = quoted ? quoted.subtotal : tier.price * form.quantity;
+  const taxes = quoted ? quoted.tax : Math.round((subtotal * taxPercent) / 100);
+  const total = quoted ? quoted.total : subtotal + taxes;
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
 
   // One name field per person; typed names survive quantity changes.
@@ -199,10 +204,11 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
               <legend className={labelCls}>Ticket</legend>
               {tiers.map((t) => (
                 <label key={t.id} className={`p-3 border-2 cursor-pointer flex gap-3 items-start ${form.tierId === t.id ? 'bg-[#191410] text-[#ecdcaf] border-[#191410]' : 'bg-[#ecdcaf] text-[#191410] border-[#191410]/30'}`}>
-                  <input type="radio" name="tier" checked={form.tierId === t.id} onChange={() => set({ tierId: t.id })} className="mt-1 accent-[#c2272a] w-4 h-4" />
+                  <input type="radio" name="tier" checked={form.tierId === t.id} disabled={t.remaining === 0} onChange={() => set({ tierId: t.id })} className="mt-1 accent-[#c2272a] w-4 h-4" />
                   <span className="flex-1">
                     <span className="flex justify-between gap-2"><span className="font-poster text-base">{t.name}</span><span className="font-poster text-lg text-[#d1a437]">₹{t.price.toLocaleString()}</span></span>
-                    <span className="block font-mono text-[10px] mt-1 opacity-80">{t.desc}</span>
+                    {t.desc && <span className="block font-mono text-[10px] mt-1 opacity-80">{t.desc}</span>}
+                    {t.remaining != null && t.remaining <= 10 && <span className="block font-mono text-[10px] mt-1 font-bold">{t.remaining === 0 ? 'Sold out' : `${t.remaining} left`}</span>}
                   </span>
                 </label>
               ))}
@@ -299,7 +305,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
               <ol className="m-0 pl-5 flex flex-col gap-0.5" aria-label="Attendees">{form.names.map((n, i) => <li key={i}>{n.trim()}</li>)}</ol>
             </div>
             <div className="flex justify-between text-[#ecdcaf]/80 pt-2 border-t border-[#ecdcaf]/20"><span>Subtotal</span><span>₹{subtotal.toLocaleString()}</span></div>
-            <div className="flex justify-between text-[#ecdcaf]/80"><span>GST (18%)</span><span>₹{taxes.toLocaleString()}</span></div>
+            <div className="flex justify-between text-[#ecdcaf]/80"><span>GST ({taxPercent}%)</span><span>₹{taxes.toLocaleString()}</span></div>
             <div className="flex justify-between font-bold text-sm text-[#d1a437] pt-2 border-t border-[#ecdcaf]/20" data-order-total><span>TOTAL</span><span>₹{total.toLocaleString()}</span></div>
           </div>
           <dl className="font-mono text-[10.5px] text-[#191410] m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
@@ -312,7 +318,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
           {pay.status === 'failed' && (
             <div role="alert" className="p-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-[10.5px] border-2 border-[#191410] flex flex-col gap-2" data-payment-failed>
               <span className="font-bold text-xs">Payment unsuccessful</span>
-              <span>{pay.message} No booking has been confirmed and no money has been taken for a failed attempt.</span>
+              <span>{pay.message}{pay.review ? '' : ' No booking has been confirmed and no money has been taken for a failed attempt.'}</span>
               <button type="button" onClick={onRetry} className="h-11 bg-[#ecdcaf] text-[#191410] font-bold uppercase tracking-widest border-2 border-[#191410]">Try again</button>
             </div>
           )}

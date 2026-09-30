@@ -21,8 +21,8 @@ function toApiBooking(mockBooking) {
 
 export const bookingService = {
   // Real payment path — creates a Razorpay order + a 'pending' booking
-  // server-side (the Edge Function computes the authoritative amount from
-  // the event's own price + tier markup; nothing about the amount is
+  // server-side (the database prices it from the event's ticket types via
+  // booking_quote(), migration 0026; nothing about the amount is
   // trusted from this call). Requires a real Supabase session regardless of
   // the app's global AUTH_MODE — there is no mock equivalent, since a mock
   // session has no JWT for the Edge Function to verify.
@@ -58,7 +58,13 @@ export const bookingService = {
         razorpay_signature: razorpaySignature,
       },
     });
-    if (error) return { success: false, error: error.message || 'Could not verify payment.' };
+    if (error) {
+      // 409 + review: the payment arrived but can't be honoured automatically
+      // (e.g. the checkout hold lapsed and the seats went to someone else) —
+      // finance has been alerted; show the server's explanation.
+      const body = await error.context?.json?.().catch(() => null);
+      return { success: false, review: !!body?.review, error: body?.error || 'Could not verify payment.' };
+    }
     if (data?.error) return { success: false, error: data.error };
     return { success: true, booking: data.booking, tickets: data.tickets || [] };
   },

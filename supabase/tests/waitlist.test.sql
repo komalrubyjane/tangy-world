@@ -176,6 +176,16 @@ select tt.check(not exists (select 1 from u), 'members cannot edit their own ent
 select tt.login('00000000-0000-0000-0000-00000000b500');
 select tt.check((select count(*) = 6 from waitlist), 'the team sees the whole waitlist (including the legacy row)');
 select tt.check(admin_offer_waitlist('00000000-0000-0000-0000-00000000b601') = 0, 'an admin can run the offer engine (nothing more to offer)');
+select admin_remove_waitlist_entry((select id from waitlist where user_id = '00000000-0000-0000-0000-00000000b505'), 'duplicate');
+select tt.check(tt.wl('00000000-0000-0000-0000-00000000b505') = 'skipped', 'an admin can remove an entry (Eli''s held offer)');
+select tt.logout();
+select tt.check((select count(*) = 1 from audit_logs where action = 'waitlist.removed' and metadata ->> 'reason' = 'duplicate'
+  and actor_id = '00000000-0000-0000-0000-00000000b500'), 'removal is audited with the admin and the reason');
+select tt.login('00000000-0000-0000-0000-00000000b500');
+select tt.expect_error($$select admin_remove_waitlist_entry((select id from waitlist where user_id = '00000000-0000-0000-0000-00000000b505'))$$, '%no longer active%', 'removing twice is refused');
+select tt.login('00000000-0000-0000-0000-00000000b503');
+select tt.expect_error($$select admin_remove_waitlist_entry((select id from waitlist limit 1))$$, '%permission%', 'a customer cannot remove entries');
+select tt.login('00000000-0000-0000-0000-00000000b500');
 select tt.logout();
 select tt.check((select run_platform_jobs() ? 'waitlist_offers_expired'), 'the scheduled jobs include offer expiry');
 

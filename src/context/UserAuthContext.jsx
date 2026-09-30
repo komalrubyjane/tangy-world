@@ -123,8 +123,13 @@ export const UserAuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const openLoginModal = () => {
+  // `reason` (optional, e.g. 'TO BOOK THIS SESSION') opens straight at the
+  // sign-in step — the visitor already knows what they're doing, and the
+  // page they're on stays underneath, so nothing is lost after verifying.
+  const [loginReason, setLoginReason] = useState(null);
+  const openLoginModal = (reason = null) => {
     setAuthError('');
+    setLoginReason(typeof reason === 'string' ? reason : null);
     setIsLoginModalOpen(true);
   };
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -143,6 +148,7 @@ export const UserAuthProvider = ({ children }) => {
         isLoginModalOpen,
         openLoginModal,
         closeLoginModal,
+        loginReason,
         authMode: AUTH_MODE,
       }}
     >

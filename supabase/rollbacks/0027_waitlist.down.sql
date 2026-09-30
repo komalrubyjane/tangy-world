@@ -11,6 +11,7 @@ drop function if exists join_waitlist(uuid, integer);
 drop function if exists leave_waitlist(uuid);
 drop function if exists my_waitlist();
 drop function if exists admin_offer_waitlist(uuid);
+drop function if exists admin_remove_waitlist_entry(uuid, text);
 drop function if exists expire_waitlist_offers();
 drop function if exists offer_waitlist_seats(uuid);
 

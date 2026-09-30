@@ -79,7 +79,7 @@ export const UpcomingSessionsPage = () => {
               key={evt.id}
               event={evt}
               idx={idx}
-              onBook={() => { playSFX('ticketClick'); navigate(`/book/${evt.slug || evt.id}`); }}
+              onBook={() => { playSFX('ticketClick'); navigate(`/sessions/${evt.slug || evt.id}`); }}
             />
           ))}
         </div>
