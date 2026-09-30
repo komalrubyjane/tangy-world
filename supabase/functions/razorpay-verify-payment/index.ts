@@ -5,18 +5,8 @@
 // id using the secret key, which never leaves this function.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { hmacSha256Hex, timingSafeEqual, requireSecret } from '../_shared/crypto.ts';
 
-async function hmacSha256Hex(secret: string, message: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
-  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 Deno.serve(async (req) => {
   const preflight = handleOptions(req);
@@ -60,10 +50,14 @@ Deno.serve(async (req) => {
       return json({ success: true, booking, tickets: tickets || [] });
     }
 
-    const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET')!;
+    const keySecret = requireSecret('RAZORPAY_KEY_SECRET');
+    if (!keySecret) {
+      // Never verify against a missing key (it would become the string "undefined").
+      return json({ error: 'Online payment is not available yet.' }, 503);
+    }
     const expectedSignature = await hmacSha256Hex(keySecret, `${razorpay_order_id}|${razorpay_payment_id}`);
 
-    if (expectedSignature !== razorpay_signature) {
+    if (!timingSafeEqual(expectedSignature, String(razorpay_signature ?? ''))) {
       return json({ error: 'Payment signature verification failed.' }, 400);
     }
 
