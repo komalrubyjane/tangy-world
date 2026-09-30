@@ -1,12 +1,12 @@
 import { chromium } from 'playwright-core';
 import { check, BASE, SHOTS } from './lib.mjs';
 
-// Phone sweep of the public pages at the three target sizes: no sideways
+// Sweep of the public pages at 390/375/412 (phones), 768 (tablet) and 1440 (desktop): no sideways
 // scrolling, exactly one <h1>, every <img> has an alt attribute (empty is
 // fine for decoration), every button/link has an accessible name, and the
 // page sets its own <title>. Screenshots go to shots/responsive-*.png.
 
-const VIEWPORTS = [[390, 844], [375, 812], [412, 915]];
+const VIEWPORTS = [[390, 844], [375, 812], [412, 915], [768, 1024], [1440, 900]];
 const PAGES = [
   ['/sessions', 'sessions'],
   ['/sessions/vol-6-local', 'session'],
@@ -18,6 +18,10 @@ const PAGES = [
   ['/gallery/tangy-sessions', 'album'],
   ['/artists/aria-artist', 'artist'],
   ['/faq', 'faq'],
+  ['/artists', 'artists'],
+  ['/terms', 'terms'],
+  ['/privacy', 'privacy'],
+  ['/refund-policy', 'refunds'],
   ['/contact', 'contact'],
   ['/private-sessions', 'private'],
   ['/join/login', 'login'],
@@ -27,7 +31,8 @@ const PAGES = [
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
 const errors = [];
 for (const [w, h] of VIEWPORTS) {
-  const context = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const phone = w < 700;
+  const context = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, isMobile: phone, hasTouch: phone, reducedMotion: 'reduce' });
   const page = await context.newPage();
   page.on('pageerror', (e) => errors.push(`${w}px pageerror: ${e.message}`));
   for (const [path, name] of PAGES) {

@@ -1,3 +1,4 @@
+import { sectionTab } from './lib.mjs';
 // Development-only role selector (src/admin/dev/). Needs two `vite` dev
 // servers against the LOCAL stack — see e2e/README.md:
 //   DEV_MOCK_BASE   no SUPABASE_SERVICE_ROLE_KEY  → mock-only identities
@@ -15,12 +16,12 @@ const FORBID = "you don't have permission to access this section";
 const EXPECT = {
   super_admin: {
     label: 'Super Admin', heading: /good (morning|afternoon|evening)/i,
-    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Users & Roles', 'Content', 'Reports', 'Audit Logs', 'System Settings', 'Tangy AI', 'Messages', 'Volunteers', 'Roles & Permissions'],
+    nav: ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Users & Roles', 'Content', 'Reports', 'Audit Logs', 'System Settings', 'Tangy AI', 'Messages', 'Volunteers', 'Roles & Permissions'],
     hidden: [], allowed: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai', '/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/reports'], blocked: [],
   },
   admin: {
     label: 'Admin / Manager', heading: /good (morning|afternoon|evening)/i,
-    nav: ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers'],
+    nav: ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers'],
     hidden: ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'],
     allowed: ['/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/attendees', '/admin-portal/reports', '/admin-portal/team'],
     blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai'],
@@ -28,7 +29,7 @@ const EXPECT = {
   staff: {
     label: 'Staff', heading: /hello/i,
     nav: ['Dashboard', 'My Events', 'Attendees', 'QR Check-in', 'Check-in History', 'Event Tasks', 'Announcements', 'Event Info'],
-    hidden: ['Applications', 'Bookings & Payments', 'Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Reports', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions'],
+    hidden: ['Applications', 'Bookings', 'Payments', 'Waitlist', 'Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Reports', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions'],
     allowed: ['/admin-portal/my-events', '/admin-portal/attendees', '/admin-portal/check-ins', '/admin-portal/tasks', '/admin-portal/announcements', '/admin-portal/event-info'],
     blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/events', '/admin-portal/reports'],
   },
@@ -56,7 +57,7 @@ async function run(base, modeName) {
     check(await page.getByText(/Partner portals need a local Supabase session/).waitFor({ timeout: 10000 }).then(() => true, () => false), 'mock: partner portal refuses cleanly without a local session');
   } else {
     await page.waitForURL('**/artist/dashboard', { timeout: 15000 });
-    check(await page.getByRole('tab', { name: 'Messages' }).waitFor({ timeout: 10000 }).then(() => true, () => false), 'local: artist portal opens with a real session');
+    check(await sectionTab(page, 'Messages').waitFor({ timeout: 10000 }).then(() => true, () => false), 'local: artist portal opens with a real session');
     check(await page.getByText(/local test account/i).first().isVisible(), 'local: dev strip on the portal');
     await page.getByRole('button', { name: 'Change role' }).click();
     await page.waitForURL('**/admin-portal');

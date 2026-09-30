@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
 
 // Operations platform (0018): partner portals, partner↔admin messaging,
 // notifications, requirements, logistics, event announcements, temporary
@@ -28,7 +28,7 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
 // ---------------------------------------------------------------- A. messaging
 {
   const p = artist.page;
-  await p.getByRole('tab', { name: 'Messages' }).click();
+  await sectionTab(p, 'Messages').click();
   check(await until(p.getByText('No messages yet').first()), 'artist: empty messages state');
   await p.getByRole('button', { name: 'New message' }).click();
   const dlg = p.getByRole('dialog').last();
@@ -60,9 +60,9 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
   await p.reload();
   // The artist had the thread open while the reply arrived, so polling marks
   // it read (mark_conversation_read) — the notification must still exist.
-  await p.getByRole('tab', { name: 'Notifications', exact: true }).first().click();
+  await sectionTab(p, 'Notifications', { exact: true }).first().click();
   check(await until(p.locator('[data-notifications]').getByText('New message from Tangy').first()), 'artist notification center lists the reply');
-  await p.getByRole('tab', { name: 'Messages', exact: true }).first().click();
+  await sectionTab(p, 'Messages', { exact: true }).first().click();
   await p.getByRole('button', { name: /Soundcheck timing/ }).first().click();
   check(await until(p.getByRole('region', { name: 'Conversation' }).getByText('Yes — soundcheck moved to 4:30 PM.')), 'artist sees the reply');
   check(await until(p.locator('[data-messages-panel]').getByText('Read', { exact: false }).last()), 'artist sees their message was read');
@@ -108,7 +108,7 @@ const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local
   await next.getByRole('button', { name: 'View event' }).click();
   check(await until(p.getByText('Green room B, dinner at 6')), 'artist sees private hospitality in the event drawer');
   await p.keyboard.press('Escape');
-  await p.getByRole('tab', { name: 'Requirements' }).click();
+  await sectionTab(p, 'Requirements').click();
   await p.getByLabel('Response to Tech rider').fill('16 channels, 2 vocal mics, DI for harmonium');
   await p.getByRole('button', { name: 'Submit' }).click();
   check(await until(p.getByText('Submitted', { exact: true })), 'artist submits the requirement');
@@ -125,7 +125,7 @@ const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local
 const vendor = await signIn('vendorco@tangy.test', '/join/login');
 {
   const p = admin.page;
-  await p.goto(BASE + '/admin-portal/content');
+  await p.goto(BASE + '/admin-portal/content/announcements');
   await p.getByRole('button', { name: 'New announcement' }).click();
   const dlg = p.getByRole('dialog').last();
   await dlg.getByLabel('Title *').fill('E2E Loading bay moved');
@@ -175,7 +175,7 @@ const vol = await signIn('volunteer@tangy.test', '/join/login', { mobile: true }
   const p = vol.page;
   await p.goto(BASE + '/volunteer/dashboard?tab=checkin');
   check(await until(p.getByText('No active check-in access')), 'volunteer: no access by default');
-  check(!(await text(p, 'nav[role="tablist"]')).includes('Messages'), 'volunteer portal has no private messaging tab');
+  check(!(await text(p, 'nav[aria-label="Portal sections"]')).includes('Messages'), 'volunteer portal has no private messaging tab');
   await p.getByRole('button', { name: /Request access · Tangy Sessions Vol\. 5/ }).click();
   await p.getByLabel('Message to the event team').fill('I am on the second gate tonight');
   await p.getByRole('button', { name: 'Send request' }).click();

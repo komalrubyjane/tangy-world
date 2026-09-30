@@ -225,11 +225,11 @@ const statsBefore = statsCheckedIn();
   await p.goto(`${BASE}/admin-portal/bookings?q=TS-GRPMIX`);
   await p.locator('main').getByText('TS-GRPMIX').locator('visible=true').first().tap();
   const hist = p.locator('[data-arrivals]');
-  check(await until(hist), 'booking drawer shows the check-in history');
+  check(await until(hist), 'the booking page shows the check-in history');
   const h = await text(hist);
   check(/Meera Iyer checked in by Sam Staff · manual/.test(h) && /Asha Iyer checked in by Sam Staff · manual/.test(h)
     && /Ravi Iyer checked in by Mira Manager/.test(h) && /Tara Iyer checked in by Mira Manager/.test(h), 'history: every attendee, who checked them in, how');
-  check(/5 \/ 5 checked in/.test(await text(p.getByRole('dialog').last())), 'drawer: 5 / 5');
+  check(/5 \/ 5 checked in/.test(await text(p.locator('[data-detail-page]'))), 'booking page: 5 / 5');
   await shot(p, 'g09-history');
   track('manager', s.errors); await s.browser.close();
 }

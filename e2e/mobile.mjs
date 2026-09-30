@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, BASE, sectionTab, SECTION_NAVS } from './lib.mjs';
 
 // Phone workflows at 390 × 844 (touch, DPR 2): the admin portal, the artist
 // workspace and every partner portal, driven the way someone on a phone uses
@@ -43,7 +43,7 @@ async function dialogFits(p, label) {
   const offscreen = buttons.filter(([l, r, w]) => w > 0 && (l < -1 || r > W + 1)).length;
   check(b && b.x >= -1 && b.x + b.width <= W + 1 && offscreen === 0, `${label}: dialog fits and its ${buttons.length} buttons are reachable`);
 }
-const tapTab = async (p, name) => { const t = p.getByRole('tab', { name, exact: true }).first(); await t.scrollIntoViewIfNeeded(); await t.tap(); };
+const tapTab = async (p, name) => { const t = sectionTab(p, name, { exact: true }); await t.scrollIntoViewIfNeeded(); await t.tap(); };
 
 // ================================================================ ADMIN PORTAL
 const admin = await signIn('manager@tangy.test', '/admin-portal');
@@ -239,7 +239,7 @@ async function partner(email, dash, label, extra) {
   await p.goto(BASE + dash);
   check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), `${label}: dashboard on a phone`);
   await fits(p, `${label} dashboard`);
-  const strip = p.locator('[role="tablist"]').first();
+  const strip = p.locator(SECTION_NAVS).first();
   const sw = await strip.evaluate((el) => { for (let n = el; n; n = n.parentElement) { if (/(auto|scroll)/.test(getComputedStyle(n).overflowX)) return true; } return el.scrollWidth <= el.clientWidth + 1; });
   check(sw, `${label}: tab strip scrolls instead of overflowing`);
   await tapTab(p, label === 'venue host' ? 'Upcoming events' : 'My events');
@@ -260,7 +260,7 @@ const sponsor = await partner('sponsor@tangy.test', '/sponsor/dashboard', 'spons
   await dialogFits(p, 'sponsor asset upload');
   await p.getByRole('dialog').last().getByRole('button', { name: 'Cancel' }).tap();
   for (const t of ['Payments', 'DELIVERABLES']) {
-    await p.getByRole('tab', { name: new RegExp(t, 'i') }).first().tap();
+    await sectionTab(p, new RegExp(t, 'i')).first().tap();
     await fits(p, `sponsor ${t.toLowerCase()}`);
   }
 });

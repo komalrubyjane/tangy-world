@@ -18,7 +18,7 @@ const text = async (page) => (await page.locator('main').innerText()).toLowerCas
   const nav = await page.locator('nav[aria-label="Admin navigation"]').innerText();
   for (const item of ['Dashboard', 'My Events', 'Attendees', 'QR Check-in', 'Check-in History', 'Event Tasks', 'Announcements', 'Event Info'])
     check(nav.includes(item), `staff nav has ${item}`);
-  for (const item of ['Applications', 'Bookings & Payments', 'Users & Roles', 'Audit Logs', 'System Settings', 'Reports', 'Tangy AI', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions', 'Vendors'])
+  for (const item of ['Applications', 'Bookings', 'Payments', 'Waitlist', 'Users & Roles', 'Audit Logs', 'System Settings', 'Reports', 'Tangy AI', 'Team', 'Messages', 'Volunteers', 'Roles & Permissions', 'Vendors'])
     check(!nav.includes(item), `staff nav hides ${item}`);
 
   for (const path of ['/admin-portal/users', '/admin-portal/settings', '/admin-portal/audit', '/admin-portal/bookings', '/admin-portal/applications', '/admin-portal/reports', '/admin-portal/events', '/admin-portal/messages', '/admin-portal/volunteers', '/admin-portal/roles'])  {

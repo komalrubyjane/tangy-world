@@ -164,20 +164,21 @@ original unnamed constraint, which wasn't verified against a live database.
 26. `migrations/0026_ticket_types_and_settlement.sql` — per-event ticket types priced on the server (`booking_quote`), public availability, and safe payment settlement (`settle_payment`). Reverse: `rollbacks/0026_ticket_types_and_settlement.down.sql`.
 27. `migrations/0027_waitlist.sql` — server-authoritative waitlist with held seat offers. Reverse: `rollbacks/0027_waitlist.down.sql`.
 28. `migrations/0028_content_cms.sql` — Tangy TV, diary, gallery, artist slugs, session copy editing and granular content permissions. Reverse: `rollbacks/0028_content_cms.down.sql`.
+29. `migrations/0029_private_media_realtime_jobs.sql` — private content media with signed URLs, live seat-availability signal, waitlist allocation policy, upload limits on every bucket, single-flight scheduled jobs with a run log. Reverse: `rollbacks/0029_private_media_realtime_jobs.down.sql`.
 
-Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
-### Production application order (0017 → 0028)
+### Production application order (0017 → 0029)
 
 None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
 
-1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql`
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql` → 13. `0029_private_media_realtime_jobs.sql`
 
 Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields). After 0026 redeploy **all three** Razorpay functions (`razorpay-create-order`, `razorpay-verify-payment`, `razorpay-webhook` — they call `settle_payment()` and price from ticket types; the old functions would still confirm late payments). After 0026–0028 also redeploy `send-ticket-email`, `send-approval-email` and `send-notification-emails` (shared email module, section 7).
 
-Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0029` → `0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
 
-### 0019–0028 in detail
+### 0019–0029 in detail
 
 **0020 — platform finalization**
 
@@ -227,6 +228,22 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 **0027 — waitlist.** `waitlist` gains `user_id`, `quantity`, `status` (`waiting → offered → converted | expired | cancelled | skipped`), offer timestamps, `booking_id` and a strict arrival order (`queue_no`); one live entry per person per session. Only the RPCs write it (the anonymous insert policy is gone): `join_waitlist` (signed in; only when the party doesn't fit or others are already waiting, or the session is marked sold out), `leave_waitlist`, `my_waitlist` (position and offer), `admin_offer_waitlist` / `admin_remove_waitlist_entry` (`bookings.manage`, audited). `offer_waitlist_seats(event)` runs under the event row lock whenever seats free up — a booking leaves pending/confirmed (cancelled, expired checkout, failed, refunded), capacity rises, an offer is declined or lapses — and offers strictly first-come-first-served (a smaller party never jumps the queue), holding the seats for `waitlist.offer_hold_minutes` (default 120) and notifying the person (`waitlist.offer`, in-app + email outbox). Held seats count against capacity in checkout, `event_availability` and late settlement, so two people can never claim the same released seat; the holder's checkout converts the offer. `expire_waitlist_offers()` runs in `run_platform_jobs()`. Pre-0027 anonymous rows are listed for the team but never auto-offered. **Rollback** restores 0026's functions and 0020's jobs, the anonymous insert policy, and drops the offer/queue columns.
 
 **0028 — content CMS.** `tv_videos`, `diary_posts`, `gallery_albums` / `gallery_photos` with `draft / published / archived` and scheduled publishing (`published_at`); visitors read published items only. Validation: url-safe unique slugs, media links must be site paths or `https://` (no `http:`/`javascript:`), photo alt text required. Permissions: `content.view / create / edit / publish / delete` combined with an area (`content.manage_tv / manage_diary / manage_media`); publishing or unpublishing needs `content.publish` (trigger — also enforced for direct API writes); `content.manage_sessions` + `content.edit` may edit a session's public copy through `update_session_content()` (description, story, image, tags, featured — never price, capacity or dates). Admin and super admin get all of them; grant others on the Roles page. Changes are audited. `content-media` bucket: public read, 50 MB, images/MP4/WebM only, writes need a content area right. `artists.slug` (unique, from stage name) and `public_artists.slug` power `/artists/:slug`. Seeds: the bundled TV videos and gallery photos (published); the old static diary copy is imported as **drafts** to review. **Rollback** drops the content tables (export first), the slug and the permissions; the bucket remains (Storage blocks SQL deletes).
+
+**0029 — private media, live availability, allocation policy, upload limits, job runs.**
+
+- `content-media` becomes a **private** bucket. Uploads are stored as `/storage/content-media/<path>` and shown through one-hour signed URLs; `content_media_is_public(name)` lets Storage sign a file for anyone only while it belongs to published content (published TV video / diary post / album / photo with `published_at` in the past, or a non-draft session cover). Editors see drafts. Existing references to bundled `/media/...` files are unaffected.
+- `event_availability_signal` (in the `supabase_realtime` publication; public read for non-draft sessions; no booking data) is bumped by triggers on bookings, waitlist, ticket types and event capacity/status. The session page re-reads `event_availability()` when it changes.
+- `waitlist.allocation` setting: `strict_order` (default, unchanged) or `first_fit`; `offer_waitlist_seats` records the policy in each `waitlist.offered` audit.
+- Size limits and MIME allowlists on every bucket; the public `artist-avatars` bucket takes raster images only (no HTML, no SVG).
+- `run_platform_jobs(source)` takes a transaction advisory lock (an overlapping run is skipped and recorded) and logs each run in `platform_job_runs`.
+- Tests: `tests/media_realtime_jobs.test.sql`; two-session races in `scripts/test-concurrency.sh`. **Rollback** makes content-media public again, restores 0027's offer engine and jobs function, removes the signal, the run log and the upload limits.
+
+## Local review tools
+
+- `scripts/demo-data.sh seed|remove|status` — the local demo dataset (docs/OPERATIONS.md §8). `scripts/test-db.sh` sets it aside while the suites run and restores it.
+- `scripts/test-fresh-db.sh` — every migration on an empty database + every suite.
+- `scripts/test-concurrency.sh`, `scripts/run-jobs.sh`, `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs`.
+- `node scripts/route-inventory.mjs` → `docs/ROUTES.md`.
 
 ## Messaging security
 

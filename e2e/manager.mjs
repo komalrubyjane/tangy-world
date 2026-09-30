@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
 
 const text = async (page) => (await page.locator('main').innerText()).toLowerCase();
 const { browser, page, errors } = await launch();
@@ -7,7 +7,7 @@ await page.getByRole('heading', { name: /operations/i }).waitFor({ timeout: 1500
 await shot(page, 'a01-manager-dashboard');
 
 const nav = await page.locator('nav[aria-label="Admin navigation"]').innerText();
-for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings & Payments', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts'])
+for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts'])
   check(nav.includes(item), `manager nav has ${item}`);
 for (const item of ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'])
   check(!nav.includes(item), `manager nav hides ${item}`);
@@ -22,10 +22,10 @@ await page.goto(BASE + '/admin-portal/events?new=1');
 await page.getByLabel('Event name *').fill('E2E Manager Night');
 await page.getByLabel('Date *').fill('2026-12-20');
 await page.getByRole('button', { name: 'Create event' }).click();
-await page.getByRole('tab', { name: 'Overview' }).waitFor();
+await sectionTab(page, 'Overview').waitFor();
 check(/draft/.test(await text(page)), 'new event starts as draft');
 for (const [status, label] of [['on-sale', 'published (on sale)'], ['cancelled', 'cancelled']]) {
-  await page.getByRole('tab', { name: 'Details', exact: true }).click();
+  await sectionTab(page, 'Details', { exact: true }).click();
   await page.getByLabel('Status').selectOption(status);
   await page.getByRole('button', { name: 'Save changes' }).click();
   await page.waitForTimeout(1500);
@@ -36,7 +36,7 @@ for (const [status, label] of [['on-sale', 'published (on sale)'], ['cancelled',
 // Team assignment: put staff2 on Vol. 6
 await page.goto(BASE + '/admin-portal/events');
 await page.getByText('Tangy Sessions Vol. 6').first().click();
-await page.getByRole('tab', { name: 'Staff team', exact: true }).click();
+await sectionTab(page, 'Staff team', { exact: true }).click();
 const form = page.locator('form').filter({ has: page.getByRole('button', { name: 'Assign' }) });
 const person = form.getByLabel('Person');
 await person.locator('option', { hasText: 'Tara Staff' }).waitFor({ state: 'attached' });
@@ -49,7 +49,7 @@ const asg = await api(page, 'GET', '/rest/v1/event_assignments?select=title,assi
 check(asg.data?.some((a) => a.events?.name === 'Tangy Sessions Vol. 6' && a.assignee_role === 'staff'), 'staff assigned to Vol. 6 via UI');
 
 // Staff announcement for Vol. 6
-await page.goto(BASE + '/admin-portal/content');
+await page.goto(BASE + '/admin-portal/content/announcements');
 await page.getByRole('button', { name: 'New announcement' }).click();
 const dlg = page.getByRole('dialog').last();
 await dlg.getByLabel('Title *').fill('E2E Vol 6 load-in 4pm');

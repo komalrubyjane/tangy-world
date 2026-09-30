@@ -90,3 +90,12 @@ export async function api(page, method, path, body) {
     return { status: res.status, data };
   }, { method, path, body, anon: ANON });
 }
+
+// A section tab. Since the routing pass, section tabs are real links inside a
+// section nav (admin "Sections", portal "Portal sections" / "Dashboard
+// sections"); in-page filters and view toggles are still role="tab".
+export const SECTION_NAVS = 'nav[aria-label="Sections"], nav[aria-label="Portal sections"], nav[aria-label="Dashboard sections"]';
+export function sectionTab(scope, name, opts = {}) {
+  return scope.locator(SECTION_NAVS).getByRole('link', { name, ...opts })
+    .or(scope.getByRole('tab', { name, ...opts })).first();
+}

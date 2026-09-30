@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, BASE, sectionTab } from './lib.mjs';
 
 const { browser, page, errors } = await launch();
 await page.goto(BASE + '/admin-portal');
@@ -10,7 +10,7 @@ await otpLogin(page, 'root@tangy.test');
 await page.getByRole('heading', { name: /good (morning|afternoon|evening)/i }).waitFor({ timeout: 15000 });
 await shot(page, '02-superadmin-dashboard');
 const nav = await page.locator('nav[aria-label="Admin navigation"]').innerText();
-for (const item of ['Applications', 'Events', 'Bookings & Payments', 'Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Reports'])
+for (const item of ['Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Reports'])
   check(nav.includes(item), `super admin nav has ${item}`);
 check(await page.getByText('Needs attention').isVisible(), 'dashboard: needs attention panel');
 check((await page.locator('main').innerText()).includes('Tangy Sessions Vol. 6'), 'dashboard: upcoming event listed');
@@ -44,15 +44,15 @@ await page.goto(BASE + '/admin-portal/events');
 await page.getByText('Tangy Sessions Vol. 5').first().waitFor();
 await shot(page, '04-events');
 await page.getByText('Tangy Sessions Vol. 5').first().click();
-await page.getByRole('tab', { name: 'Overview' }).waitFor();
+await sectionTab(page, 'Overview').waitFor();
 await shot(page, '05-event-overview');
 for (const tab of ['Details', 'Artists', 'Venue', 'Sponsors', 'Crew & vendors', 'Volunteers', 'Staff team', 'Schedule', 'Tickets', 'Bookings', 'Attendees', 'Check-in', 'Tasks', 'Requirements', 'Announcements', 'Messages', 'Documents', 'Content', 'Reports', 'Activity']) {
-  await page.getByRole('tab', { name: tab, exact: true }).click();
+  await sectionTab(page, tab, { exact: true }).click();
   await page.waitForTimeout(600);
   const t = await page.locator('main').innerText();
   check(!/Something went wrong|permission to access/i.test(t), `event tab ${tab} renders`);
 }
-await page.getByRole('tab', { name: 'Staff team', exact: true }).click();
+await sectionTab(page, 'Staff team', { exact: true }).click();
 await shot(page, '06-event-team');
 
 // Create event
@@ -60,7 +60,7 @@ await page.goto(BASE + '/admin-portal/events?new=1');
 await page.getByLabel('Event name *').fill('E2E Test Night');
 await page.getByLabel('Date *').fill('2026-12-12');
 await page.getByRole('button', { name: 'Create event' }).click();
-await page.getByRole('tab', { name: 'Overview' }).waitFor();
+await sectionTab(page, 'Overview').waitFor();
 check((await page.locator('h1').innerText()).includes('E2E TEST NIGHT') || (await page.locator('h1').innerText()).toLowerCase().includes('e2e test night'), 'event created and opened');
 
 // Bookings + drawer
@@ -80,7 +80,7 @@ for (const [path, text, name] of [
   ['/admin-portal/settings', 'Allow manual check-in', '11-settings'],
   ['/admin-portal/users', 'manager@tangy.test', '12-users'],
   ['/admin-portal/ai', 'Not connected', '13-ai'],
-  ['/admin-portal/content', 'Gates open 6:15 PM', '14-content'],
+  ['/admin-portal/content/announcements', 'Gates open 6:15 PM', '14-content'],
   ['/admin-portal/team', 'Staff roster', '15-team'],
   ['/admin-portal/people/venues', 'Bansilalpet Stepwell', '16-venues'],
   ['/admin-portal/check-ins', 'Check-in history', '17-checkins'],

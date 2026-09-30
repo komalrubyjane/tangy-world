@@ -224,7 +224,7 @@ const failedCode = sql(`select registration_code from bookings where event_id = 
 {
   const p = customer.page;
   await p.goto(`${BASE}/dashboard`);
-  await p.getByRole('button', { name: /BOOKINGS/ }).tap();
+  await p.getByRole('link', { name: /BOOKINGS/ }).tap();
   const card = p.locator('div', { has: p.locator('[data-booking-pass]') }).filter({ hasText: 'Tangy Sessions Vol. 6' }).last();
   check(await until(card), 'the booking appears under upcoming bookings');
   const ct = await text(card);
@@ -252,8 +252,8 @@ const failedCode = sql(`select registration_code from bookings where event_id = 
   const p = s.page;
   await p.goto(`${BASE}/admin-portal/bookings?q=${code}`);
   await p.locator('main').getByText(code).locator('visible=true').first().tap();
-  const drawer = p.getByRole('dialog').last();
-  check(await until(drawer.getByText('Primary booker', { exact: true })), 'admin opens the booking');
+  const drawer = p.locator('[data-detail-page]');
+  check(await until(drawer.getByText('Primary booker', { exact: true })), 'admin opens the booking (its own page)');
   const dt = await text(drawer);
   check(/Pat Patron/.test(dt) && /9876543210/.test(dt) && /patron@tangy\.test/.test(dt) && /@pat\.patron/.test(dt), 'primary booker: name, mobile, email, Instagram');
   check(await until(drawer.getByText(/1 other confirmed booking/)), 'previous attendance derived from history (not asked)');

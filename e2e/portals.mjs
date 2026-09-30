@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
 
 // Partner workspaces from 0020: the artist workspace (dashboard, calendar,
 // availability, booking requests, media with signed-URL preview, settings and
@@ -59,7 +59,7 @@ const ev6 = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-6-local&s
   const stats = await text(p, 'main');
   check(/UPCOMING SHOWS\s*1\b/.test(stats), `artist dashboard: 1 upcoming show (Vol. 5 today) (${stats.match(/UPCOMING SHOWS\s*\S+/)?.[0]})`);
   check(await until(p.getByText(/PROFILE COMPLETE\s*\d+%/)), 'artist dashboard: server-computed profile completion');
-  const tabs = await text(p, 'section[aria-label="Artist workspace"] [role="tablist"]');
+  const tabs = await text(p, 'section[aria-label="Artist workspace"] nav[aria-label="Sections"]');
   check(['Overview', 'My performances', 'Schedule', 'Requirements', 'Messages', 'Documents', 'Payments', 'Notifications'].every((t) => tabs.toLowerCase().includes(t.toLowerCase())), `artist workspace tabs are complete (${tabs})`);
   check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), 'artist overview: next event is the confirmed performance');
   await shot(p, 'w01-artist-dashboard');
@@ -287,7 +287,7 @@ const sponsorId = (await api(sponsor.page, 'GET', '/rest/v1/profiles?email=eq.sp
   const p = sponsor.page;
   await p.goto(BASE + '/sponsor/dashboard');
   check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), 'sponsor dashboard: next event');
-  const tabs = await text(p, '[role="tablist"]');
+  const tabs = await text(p, 'nav[aria-label="Portal sections"], nav[aria-label="Dashboard sections"], nav[aria-label="Sections"]');
   check(['Overview', 'My events', 'Messages', 'Documents', 'Brand assets', 'Payments', 'Notifications', 'Deliverables'].every((t) => tabs.toLowerCase().includes(t.toLowerCase())), `sponsor tabs are complete (${tabs})`);
   await p.goto(BASE + '/sponsor/dashboard?tab=events');
   await p.getByRole('button', { name: /Tangy Sessions Vol\. 5/ }).first().click();
@@ -354,6 +354,9 @@ async function createInvoice(p, partner, number, direction, amount) {
   await p.goto(BASE + '/admin-portal/invoices');
   await p.getByRole('button', { name: 'New invoice' }).click();
   const dlg = p.getByRole('dialog').last();
+  // Partner and event options load after the dialog opens.
+  await dlg.getByLabel('Partner *').locator('option', { hasText: partner }).first().waitFor({ state: 'attached', timeout: 15000 });
+  await dlg.getByLabel('Event').locator('option', { hasText: 'Vol. 5' }).first().waitFor({ state: 'attached', timeout: 15000 });
   const opts = await dlg.getByLabel('Partner *').locator('option').allInnerTexts();
   await dlg.getByLabel('Partner *').selectOption({ label: opts.find((o) => o.startsWith(partner)) });
   const evs = await dlg.getByLabel('Event').locator('option').allInnerTexts();
@@ -393,7 +396,7 @@ await createInvoice(admin.page, 'Saffron Sponsor', 'INV-E2E-S1', 'receivable', 2
   const list = p.locator('[data-notifications]');
   check(await until(list.getByText('Brand asset approved: E2E Primary logo')), 'sponsor notified of the asset review');
   check(await until(list.getByText('Invoice issued: INV-E2E-S1')), 'sponsor notified of the invoice');
-  await p.getByRole('tab', { name: 'Payments' }).last().click();
+  await p.getByRole('tablist', { name: 'Filter notifications' }).getByRole('tab', { name: 'Payments' }).click();
   const filtered = await list.getByText('Brand asset approved: E2E Primary logo').waitFor({ state: 'detached', timeout: 8000 }).then(() => true, () => false);
   check(filtered && await until(list.getByText('Invoice issued: INV-E2E-S1')), 'notification category filter works');
   check(await until(p.locator('[data-notification-preferences]')), 'sponsor has notification preferences');
@@ -436,7 +439,7 @@ const vendor = await signIn('vendorco@tangy.test', '/join/login');
   const p = vendor.page;
   await p.goto(BASE + '/vendor/dashboard');
   check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), 'vendor dashboard: next event');
-  const tabs = await text(p, '[role="tablist"]');
+  const tabs = await text(p, 'nav[aria-label="Portal sections"], nav[aria-label="Dashboard sections"], nav[aria-label="Sections"]');
   check(['My events', 'Requirements', 'Messages', 'Documents', 'Payments', 'Notifications'].every((t) => tabs.toLowerCase().includes(t.toLowerCase())) && !/brand assets/i.test(tabs), `vendor tabs are complete, no sponsor-only tabs (${tabs})`);
 }
 {
@@ -499,7 +502,7 @@ const venue = await signIn('venue@tangy.test', '/join/login');
   const p = venue.page;
   await p.goto(BASE + '/venue/dashboard');
   check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), 'venue host dashboard: hosted event');
-  const tabs = await text(p, '[role="tablist"]');
+  const tabs = await text(p, 'nav[aria-label="Portal sections"], nav[aria-label="Dashboard sections"], nav[aria-label="Sections"]');
   check(['Upcoming events', 'Messages', 'Documents', 'Notifications'].every((t) => tabs.toLowerCase().includes(t.toLowerCase())), `venue host tabs are complete (${tabs})`);
 }
 {

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
+import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
 
 // Content CMS (0028) end to end: a manager drafts and publishes a diary post,
 // renames a Tangy TV video and builds a gallery album in Admin → Content; a
@@ -23,9 +23,9 @@ const PRICING = sql("select id from events where slug = 'e2e-pricing'");
 // --- Manager: diary draft ---------------------------------------------------------
 const m = await launch();
 await otpLogin(m.page, 'manager@tangy.test');
-await m.page.goto(`${BASE}/admin-portal/content?tab=diary`);
+await m.page.goto(`${BASE}/admin-portal/content/diary`);
 const seen = (loc) => loc.waitFor({ timeout: 10000 }).then(() => true, () => false);
-check(await seen(m.page.getByRole('tab', { name: 'Diary' })), 'manager: Content has a Diary tab');
+check(await seen(m.page.getByRole('navigation', { name: 'Admin navigation' }).getByRole('link', { name: 'Diary', exact: true })), 'manager: Content → Diary is in the sidebar');
 check(await seen(m.page.getByRole('link', { name: 'Content', exact: true }).first()), 'manager: nav says "Content"');
 await m.page.getByRole('button', { name: /new post/i }).click();
 await m.page.getByLabel('Title *').fill('E2E Diary Test');
@@ -60,7 +60,7 @@ check((await v.page.title()).startsWith('E2E Diary Test'), 'visitor: the page ti
 await shot(v.page, 'content-02-diary-post');
 
 // --- Tangy TV --------------------------------------------------------------------------
-await m.page.goto(`${BASE}/admin-portal/content?tab=tv`);
+await m.page.goto(`${BASE}/admin-portal/content/tv`);
 await m.page.getByText('Field Recording — Vol. 22402').first().click();
 await m.page.getByLabel('Title *').fill('E2E Field Recording');
 await m.page.getByRole('button', { name: 'Save' }).click();
@@ -72,10 +72,10 @@ await v.page.goto(`${BASE}/tv/field-recording-22402`);
 check(await v.page.locator('[data-tv-video] video').waitFor({ timeout: 10000 }).then(() => true, () => false), 'visitor: /tv/:slug plays the video');
 await shot(v.page, 'content-03-tv');
 await m.page.goto(`${BASE}/admin-portal/ops/tv`);
-check(await m.page.waitForURL(/\/admin-portal\/content\?tab=tv/, { timeout: 10000 }).then(() => true, () => false), 'the old ops/tv page redirects to Content → Tangy TV');
+check(await m.page.waitForURL(/\/admin-portal\/content\/tv$/, { timeout: 10000 }).then(() => true, () => false), 'the old ops/tv page redirects to Content → Tangy TV');
 
 // --- Gallery ------------------------------------------------------------------------------
-await m.page.goto(`${BASE}/admin-portal/content?tab=gallery`);
+await m.page.goto(`${BASE}/admin-portal/content/gallery`);
 await m.page.getByRole('button', { name: /new album/i }).click();
 await m.page.getByLabel('Title *').fill('E2E Album');
 await m.page.getByRole('button', { name: 'Save' }).click();

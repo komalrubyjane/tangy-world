@@ -34,7 +34,7 @@ VITE_SUPABASE_ANON_KEY="$ANON_KEY" \
 VITE_DEMO_ADMIN_ENABLED=false TANGY_DEV_TOOLS=off npx vite --host 127.0.0.1 --port 5173
 ```
 
-Then run `e2e/run.sh` (with `ANON_KEY` still exported; set `E2E_BASE` for another port). Each suite resets its data first, so the run is repeatable.
+Then run `e2e/run.sh` (with `ANON_KEY` and `SERVICE_ROLE_KEY` exported — the latter loads the local demo dataset; set `E2E_BASE` for another port). Each suite resets its data first, so the run is repeatable.
 The local auth server allows 30 sign-ins per 5 minutes per IP; the full run signs in more often, so `otpLogin` waits and retries when a code is refused (the log shows "otp send refused … waiting 60s").
 Screenshots and logs go to `e2e/shots/`. The run needs Google Chrome (set `CHROME_PATH` if
 it isn't in `/Applications`) and `ffmpeg` for the fake-camera videos.
@@ -54,6 +54,8 @@ it isn't in `/Applications`) and `ffmpeg` for the fake-camera videos.
 | `waitlist.mjs` | Waitlist (0027) at 390px: sold-out session shows the waitlist, sign-in returns to the session, join for 2 → position 1, direct inserts / self-offers / offer engine / double join refused, a cancellation offers the seats (notification, held-seat banner, checkout) while others still see sold out, dashboard and admin views, lapsed hold released back on sale |
 | `content.mjs` | Content CMS (0028): manager drafts → publishes a diary post (draft is a 404 for visitors), renames a Tangy TV video (every visitor sees it; old ops/tv redirects), builds a gallery album (alt text required); ticket types edited in the event's Tickets tab reach the public session page; staff get no content nav and the database refuses their writes; 404, FAQ and artist pages |
 | `responsive.mjs` | Public pages at 390×844, 375×812 and 412×915: no sideways scroll, one visible h1, image alt attributes, named controls, per-page titles |
+| `routing.mjs` | Real URLs everywhere (needs the demo dataset, loaded by run.sh): sidebar → `/admin-portal/content/sessions` → `/…/heritage-after-dark`, refresh / back / forward, 30 deep links, invalid ids → not found, legacy links redirect, breadcrumbs and titles, dashboard cards, event tabs as URLs, keyboard (skip link, dialog focus trap, Escape), admin pages at 390/375/412, staff/sponsor refused, portal sections as URLs, public routes incl. legal pages, live seat updates over Realtime, private media (signed URLs; drafts unreachable) |
+| `sweep.mjs` | Every remaining route at 390px as the right role (visitor, patron, sponsor, vendor, venue host, volunteer, crew, private client, artist, super admin, staff): renders, no JS error, no sideways scroll; redirects land where expected; demo routes disabled; admin-invite-user allowed/refused; HTML refused by the avatars bucket |
 | `devmode.mjs` | Development role selector (run by `run.sh` last; needs the two dev-tools servers below) |
 
 ### Development role selector
