@@ -1,6 +1,6 @@
 /* global __TANGY_DEV_TOOLS__ */
 import { useState, useCallback, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
@@ -40,6 +40,10 @@ const GalleryPage = lazy(() => import('./pages/content/GalleryPage').then((m) =>
 const GalleryAlbumPage = lazy(() => import('./pages/content/GalleryPage').then((m) => ({ default: m.GalleryAlbumPage })));
 const ArtistPage = lazy(() => import('./pages/content/ArtistPage').then((m) => ({ default: m.ArtistPage })));
 const FaqPage = lazy(() => import('./pages/content/FaqPage').then((m) => ({ default: m.FaqPage })));
+const ArtistsIndexPage = lazy(() => import('./pages/content/ArtistsIndexPage').then((m) => ({ default: m.ArtistsIndexPage })));
+const TermsPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ default: m.PrivacyPage })));
+const RefundPolicyPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ default: m.RefundPolicyPage })));
 const NotFoundPage = lazy(() => import('./pages/content/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 const InnerCirclePage = lazy(() => import('./pages/InnerCirclePage').then((m) => ({ default: m.InnerCirclePage })));
 const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
@@ -265,6 +269,12 @@ const PORTAL_PAGES = ['/artist/profile'];
 
 // /admin/<anything>?q#h → /admin-portal/<anything>?q#h (the /admin/preview/*
 // inspectors are declared as their own, more specific routes).
+// Old /book/:id links → the session's own page.
+function LegacyBookRedirect() {
+  const { sessionId } = useParams();
+  return <Navigate to={`/sessions/${sessionId}`} replace />;
+}
+
 function LegacyAdminRedirect() {
   const { pathname, search, hash } = useLocation();
   return <Navigate to={`/admin-portal${pathname.replace(/^\/admin/, '')}${search}${hash}`} replace />;
@@ -341,9 +351,14 @@ export default function App() {
                 <Route path="/gallery/:album" element={<GalleryAlbumPage />} />
                 <Route path="/artists/:slug" element={<ArtistPage />} />
                 <Route path="/faq" element={<FaqPage />} />
+                <Route path="/artists" element={<ArtistsIndexPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                <Route path="/404" element={<NotFoundPage />} />
                 <Route path="/inner-circle" element={<InnerCirclePage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/book/:sessionId" element={<BookingPage />} />
+                <Route path="/book/:sessionId" element={<LegacyBookRedirect />} />
 
                 {/* ADMIN DASHBOARD DEDICATED ROUTE */}
                 {/* Tangy Admin Portal — canonical home of the console. */}
@@ -378,6 +393,22 @@ export default function App() {
                   <Route path="profile/:id" element={<ArtistDetailsPage />} />
                   <Route 
                     path="dashboard" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <DashboardPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="dashboard/:tab" 
+                    element={
+                      <ArtistProtectedRoute>
+                        <DashboardPage />
+                      </ArtistProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="dashboard/:tab/:sub" 
                     element={
                       <ArtistProtectedRoute>
                         <DashboardPage />
@@ -438,6 +469,7 @@ export default function App() {
                     its own dashboard (or render Patron's directly for role='user'). */}
                 <Route path="/profile" element={<ProtectedRoute><PassportProfilePage /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
+                <Route path="/dashboard/:tab" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
                 {/* No `allowedRoles` here, deliberately — these must stay reachable by a
                     still-role='user' PENDING applicant so they can see their own
                     application status (each dashboard's own isApproved gate handles
@@ -446,11 +478,20 @@ export default function App() {
                     /dashboard before ever showing their status. RLS (self-row only)
                     is the real security boundary — see ProtectedRoute.jsx's own note. */}
                 <Route path="/vendor/dashboard" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
+                <Route path="/vendor/dashboard/:tab" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
+                <Route path="/vendor/dashboard/:tab/:sub" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
                 <Route path="/crew/dashboard" element={<ProtectedRoute><CrewDashboard /></ProtectedRoute>} />
+                <Route path="/crew/dashboard/:tab" element={<ProtectedRoute><CrewDashboard /></ProtectedRoute>} />
                 <Route path="/volunteer/dashboard" element={<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>} />
+                <Route path="/volunteer/dashboard/:tab" element={<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>} />
                 <Route path="/sponsor/dashboard" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
+                <Route path="/sponsor/dashboard/:tab" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
+                <Route path="/sponsor/dashboard/:tab/:sub" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
                 <Route path="/venue/dashboard" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
+                <Route path="/venue/dashboard/:tab" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
+                <Route path="/venue/dashboard/:tab/:sub" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
                 <Route path="/private/dashboard" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
+                <Route path="/private/dashboard/:tab" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
 
                 {/* Legacy/documented aliases from the removed mock account system. */}
                 <Route path="/admin-mock" element={<Navigate to="/admin-portal" replace />} />
@@ -481,7 +522,6 @@ export default function App() {
                 <Route path="/archive/contact-sheets" element={<ContactSheetsPage />} />
 
                 {/* Artists (plural) — real system lives at /artist/*, these are just aliases */}
-                <Route path="/artists" element={<Navigate to="/artist" replace />} />
                 <Route path="/artists/apply" element={<Navigate to="/artist/register" replace />} />
                 <Route path="/artists/login" element={<Navigate to="/artist/login" replace />} />
                 <Route path="/artists/portal" element={<Navigate to="/artist/dashboard" replace />} />

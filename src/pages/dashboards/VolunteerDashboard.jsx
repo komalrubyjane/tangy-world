@@ -110,6 +110,7 @@ export const VolunteerDashboard = ({ overrideProfile, readOnly, demoData } = {})
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tabHref={portal.hrefFor}
       onLogout={handleLogout}
       notificationsFor={portalMode ? user.id : null}
       preview={readOnly ? { label: `Viewing Volunteer Portal — ${user.full_name || user.email}` } : undefined}

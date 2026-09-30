@@ -22,7 +22,7 @@ export function performanceIcsItem(e) {
 
 const Row = ({ label, value }) => (value ? (
   <div className="flex justify-between gap-4 py-1.5 border-b border-[#E7D5A4]/[0.05] last:border-0">
-    <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/50 pt-0.5">{label}</dt>
+    <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/60 pt-0.5">{label}</dt>
     <dd className="m-0 text-[13.5px] text-[#EFE2C0] text-right whitespace-pre-line">{value}</dd>
   </div>) : null);
 
@@ -54,7 +54,7 @@ export const ArtistEventDrawer = ({ event: e, onClose }) => {
   return (
     <Drawer title={e.name} subtitle={e.event_status === 'cancelled' ? 'This event has been cancelled' : `${fmt.date(e.event_date)} · times in ${tzAbbr(tz)}`} onClose={onClose}
       footer={<>
-        <Button variant="ghost" icon="MessagesSquare" to="/artist/dashboard?tab=messages">Message Tangy</Button>
+        <Button variant="ghost" icon="MessagesSquare" to="/artist/dashboard/messages">Message Tangy</Button>
         <Button icon="CalendarDays" onClick={() => downloadIcs([ics], `${e.name.replace(/\W+/g, '-').toLowerCase()}.ics`)}>Add to calendar</Button>
       </>}>
       <Panel title="Event">
@@ -96,7 +96,7 @@ export const ArtistEventDrawer = ({ event: e, onClose }) => {
         {extra === null ? <Skeleton rows={2} /> : extra.reqs.length === 0 ? <p className="text-[13px] text-[#E7D5A4]/55">Nothing needed from you for this event.</p> : (
           <ul className="flex flex-col gap-1.5 text-[13px]">
             {extra.reqs.map((r) => <li key={r.id} className="flex items-center justify-between gap-2"><span>{r.title}</span><Badge tone={r.status === 'submitted' ? 'info' : 'warn'}>{r.status.replace('_', ' ')}</Badge></li>)}
-            <li><Link to="/artist/dashboard?tab=requirements" className="text-[#e4bd5c] underline underline-offset-2 text-[12.5px]">Respond to requirements</Link></li>
+            <li><Link to="/artist/dashboard/requirements" className="text-[#e4bd5c] underline underline-offset-2 text-[12.5px]">Respond to requirements</Link></li>
           </ul>
         )}
       </Panel>

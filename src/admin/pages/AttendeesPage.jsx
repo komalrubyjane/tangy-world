@@ -15,7 +15,7 @@ export default function AttendeesPage() {
         : 'Attendees for the events you are assigned to. Contact details are visible to admins only.'}
       actions={can(P.CHECKIN) && <Button variant="primary" icon="ScanLine" to="/check-in">QR check-in</Button>}
     >
-      <AttendeesTable initialEventId={params.get('event') || ''} />
+      <AttendeesTable initialEventId={params.get('event') || ''} initialSearch={params.get('q') || ''} />
     </Page>
   );
 }

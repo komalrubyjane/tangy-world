@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { assignmentService } from '../../services/assignmentService';
 import { useAdminSession } from '../AdminSession';
@@ -8,7 +8,7 @@ import { useAsync } from '../hooks';
 import { P, EVENT_STATUS_LABELS, eventPhase } from '../rbac';
 import { TicketTypesEditor } from '../components/TicketTypesEditor';
 import {
-  Page, Panel, Grid, StatTile, Tabs, Badge, Button, KeyValue, AsyncBlock, ConfirmDialog, NotFound, Skeleton, Select, Input,
+  Page, Panel, Grid, StatTile, Tabs, Badge, Button, KeyValue, AsyncBlock, ConfirmDialog, NotFound, Forbidden, Skeleton, Select, Input,
   Textarea, Field, Icon, fmt, useToast,
 } from '../ui';
 import { EventForm } from '../components/EventForm';
@@ -91,7 +91,7 @@ const OverviewTab = ({ evt, perf, stats, onTab, health }) => {
           ]} />
         </Panel>
         <Panel title="Description">
-          <p className="text-[13px] text-[#E7D5A4]/75 whitespace-pre-line">{evt.description || <span className="text-[#E7D5A4]/35">No description yet.</span>}</p>
+          <p className="text-[13px] text-[#E7D5A4]/75 whitespace-pre-line">{evt.description || <span className="text-[#E7D5A4]/60">No description yet.</span>}</p>
         </Panel>
       </div>
     </div>
@@ -155,7 +155,7 @@ const ArtistsTab = ({ evt }) => {
           <ul className="divide-y divide-[#E7D5A4]/[0.06]">
             {(data.data?.linked || []).map((a) => (
               <li key={a.id} className="px-4 py-3 flex items-center gap-3">
-                <div className="flex-1 min-w-0"><div className="text-[13.5px] text-[#EFE2C0]">{a.name}</div><div className="text-[12px] text-[#E7D5A4]/45">{[a.genre, a.city].filter(Boolean).join(' · ')}</div></div>
+                <div className="flex-1 min-w-0"><div className="text-[13.5px] text-[#EFE2C0]">{a.name}</div><div className="text-[12px] text-[#E7D5A4]/60">{[a.genre, a.city].filter(Boolean).join(' · ')}</div></div>
                 {can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" icon="Trash2" aria-label={`Remove ${a.name}`} onClick={() => removeArtist(a)} />}
               </li>
             ))}
@@ -183,22 +183,22 @@ const ArtistsTab = ({ evt }) => {
                 <Button variant="primary" disabled={!selected || !selected.user_id} onClick={request}>Send request</Button>
                 <Button disabled={!selected} onClick={addDirect}>Add directly</Button>
               </div>
-              {selected && !selected.user_id && <p className="text-[12px] text-[#E7D5A4]/45">This artist has no portal account — add them directly.</p>}
+              {selected && !selected.user_id && <p className="text-[12px] text-[#E7D5A4]/60">This artist has no portal account — add them directly.</p>}
             </div>
           </Panel>
         )}
         <Panel title="Requests" flush>
-          {(data.data?.requests || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/45">No requests sent for this event.</div> : (
+          {(data.data?.requests || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/60">No requests sent for this event.</div> : (
             <ul className="divide-y divide-[#E7D5A4]/[0.06]">
               {data.data.requests.map((r) => (
                 <li key={r.id} className="px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
                   <span className="flex-1 min-w-[140px]">{r.artistName}
-                    <span className="block text-[11.5px] text-[#E7D5A4]/45">
+                    <span className="block text-[11.5px] text-[#E7D5A4]/60">
                       {[r.start && `${fmt.dateTime(r.start)}${r.end ? `–${fmt.time(r.end)}` : ''}`, r.fee != null && fmt.money(r.fee),
                         r.status === 'pending' && r.expiresAt && `reply by ${fmt.date(r.expiresAt)}`, r.reason && `“${r.reason}”`].filter(Boolean).join(' · ')}
                     </span>
                   </span>
-                  <span className="font-mono text-[11px] text-[#E7D5A4]/40">{fmt.relative(r.createdAt)}</span>
+                  <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.relative(r.createdAt)}</span>
                   <Badge status={r.status === 'accepted' ? 'approved' : r.status} />
                   {r.status === 'pending' && can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" onClick={async () => { await assignmentService.cancel(r.id); data.reload(); }}>Withdraw</Button>}
                 </li>
@@ -281,7 +281,7 @@ const SponsorsTab = ({ evt }) => {
             <li key={d.id} className="px-4 py-2.5 flex items-center gap-3 text-[13px]">
               <span className="text-[#C99A2E] w-40 truncate">{d.sponsor_profiles?.organization_name || 'Sponsor'}</span>
               <span className="flex-1 min-w-0 truncate">{d.title}</span>
-              {d.due_date && <span className="font-mono text-[11px] text-[#E7D5A4]/40">due {fmt.date(d.due_date)}</span>}
+              {d.due_date && <span className="font-mono text-[11px] text-[#E7D5A4]/60">due {fmt.date(d.due_date)}</span>}
               <Badge status={d.status === 'delivered' ? 'done' : 'pending'}>{d.status}</Badge>
               {can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" onClick={() => toggle(d)}>{d.status === 'delivered' ? 'Reopen' : 'Delivered'}</Button>}
             </li>
@@ -357,7 +357,7 @@ const ReportsTab = ({ evt, perf }) => {
       <Panel title="Bookings by status" flush>
         <AsyncBlock loading={breakdown.loading} error={breakdown.error} empty={Object.keys(breakdown.data || {}).length === 0} emptyProps={{ title: 'No bookings yet', icon: 'Ticket' }}>
           <table className="w-full text-[13px]">
-            <thead><tr className="border-b border-[#C99A2E]/20 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45 text-left"><th className="px-4 py-2">Status</th><th className="px-4 py-2 text-right">Bookings</th><th className="px-4 py-2 text-right">Tickets</th>{can(P.PAYMENTS) && <th className="px-4 py-2 text-right">Amount</th>}</tr></thead>
+            <thead><tr className="border-b border-[#C99A2E]/20 font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60 text-left"><th className="px-4 py-2">Status</th><th className="px-4 py-2 text-right">Bookings</th><th className="px-4 py-2 text-right">Tickets</th>{can(P.PAYMENTS) && <th className="px-4 py-2 text-right">Amount</th>}</tr></thead>
             <tbody>
               {Object.entries(breakdown.data || {}).map(([k, v]) => (
                 <tr key={k} className="border-b border-[#E7D5A4]/[0.06]"><td className="px-4 py-2.5"><Badge status={k.split(' ')[0]}>{k}</Badge></td><td className="px-4 py-2.5 text-right tabular-nums">{v.bookings}</td><td className="px-4 py-2.5 text-right tabular-nums">{v.tickets}</td>{can(P.PAYMENTS) && <td className="px-4 py-2.5 text-right tabular-nums">{fmt.money(v.amount)}</td>}</tr>
@@ -373,14 +373,16 @@ const ReportsTab = ({ evt, perf }) => {
 // ---------------------------------------------------------------------------
 
 export default function EventDetailPage() {
-  const { id } = useParams();
+  // Each tab is its own URL: /admin-portal/events/:id/:tab (overview = /:id).
+  const { id, tab: tabParam } = useParams();
   const navigate = useNavigate();
   const { can } = useAdminSession();
   const toast = useToast();
-  const [params, setParams] = useSearchParams();
+  const [params] = useSearchParams();
   const tabs = TABS.filter((t) => !t.requires || can(t.requires));
-  const tab = tabs.some((t) => t.id === params.get('tab')) ? params.get('tab') : 'overview';
-  const setTab = (t) => setParams({ tab: t }, { replace: true });
+  const tab = tabParam || 'overview';
+  const base = `/admin-portal/events/${id}`;
+  const setTab = (t) => navigate(t === 'overview' ? base : `${base}/${t}`);
   const [confirm, setConfirm] = useState(null);
 
   const eventQ = useAsync(async () => {
@@ -394,6 +396,10 @@ export default function EventDetailPage() {
   const health = useAsync(() => (evt ? adminApi.eventHealth(evt.id) : null), [evt?.id, evt?.status, evt?.event_date]);
   const refresh = () => { eventQ.reload(); perf.reload(); stats.reload(); };
 
+  if (params.get('tab')) return <Navigate to={params.get('tab') === 'overview' ? base : `${base}/${params.get('tab')}`} replace />;
+  if (tabParam && !tabs.some((t) => t.id === tabParam)) {
+    return TABS.some((t) => t.id === tabParam) ? <Forbidden /> : <NotFound what="event section" />;
+  }
   if (eventQ.loading && !evt) return <Skeleton rows={10} />;
   if (eventQ.error) return <Panel><AsyncBlock error={eventQ.error} onRetry={eventQ.reload} /></Panel>;
   if (!evt) return <NotFound what="event" />;
@@ -418,10 +424,12 @@ export default function EventDetailPage() {
     <Page
       back={{ to: '/admin-portal/events', label: 'Events' }}
       title={evt.name}
-      subtitle={<span className="inline-flex flex-wrap items-center gap-2">{fmt.date(evt.event_date)}{evt.event_time ? ` · ${evt.event_time}` : ''} · {evt.venue || 'Venue TBC'} <Badge status={evt.status}>{EVENT_STATUS_LABELS[evt.status]}</Badge>{phase === 'live' && <Badge status="live">Today</Badge>}{health.data && <Badge tone={HEALTH[health.data.state]?.tone}>{HEALTH[health.data.state]?.label}</Badge>}<span className="font-mono text-[11px] text-[#E7D5A4]/40">{evt.timezone}</span></span>}
+      crumbs={[{ label: evt.name, to: tab === 'overview' ? undefined : base }, ...(tab === 'overview' ? [] : [{ label: tabs.find((t) => t.id === tab)?.label || tab }])]}
+      docTitle={tab === 'overview' ? evt.name : `${evt.name} · ${tabs.find((t) => t.id === tab)?.label || tab}`}
+      subtitle={<span className="inline-flex flex-wrap items-center gap-2">{fmt.date(evt.event_date)}{evt.event_time ? ` · ${evt.event_time}` : ''} · {evt.venue || 'Venue TBC'} <Badge status={evt.status}>{EVENT_STATUS_LABELS[evt.status]}</Badge>{phase === 'live' && <Badge status="live">Today</Badge>}{health.data && <Badge tone={HEALTH[health.data.state]?.tone}>{HEALTH[health.data.state]?.label}</Badge>}<span className="font-mono text-[11px] text-[#E7D5A4]/60">{evt.timezone}</span></span>}
       actions={actions}
     >
-      <Tabs tabs={tabs} value={tab} onChange={setTab} />
+      <Tabs tabs={tabs.map((t) => ({ ...t, to: t.id === 'overview' ? base : `${base}/${t.id}` }))} value={tab} />
       {tab === 'overview' && <OverviewTab evt={evt} perf={perf.data} stats={stats.data} onTab={setTab} health={health.data} />}
       {tab === 'details' && (
         <div className="flex flex-col gap-4">
@@ -461,7 +469,7 @@ export default function EventDetailPage() {
               : <p className="text-[13px] whitespace-pre-line">{evt.story}</p>}
           </Panel>
           <Panel title="Cover image">
-            {evt.image_url ? <img src={evt.image_url} alt="" className="w-full rounded" /> : <p className="text-[13px] text-[#E7D5A4]/45">No cover image set.</p>}
+            {evt.image_url ? <img src={evt.image_url} alt="" className="w-full rounded" /> : <p className="text-[13px] text-[#E7D5A4]/60">No cover image set.</p>}
           </Panel>
         </div>
       )}

@@ -96,6 +96,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tabHref={portal.hrefFor}
       onLogout={handleLogout}
       notificationsFor={portalMode ? user.id : null}
       preview={readOnly ? { label: `Viewing Sponsor Portal — ${profile?.organization_name || user.full_name || user.email}` } : undefined}
@@ -121,7 +122,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
                 <div>
                   <h4 className="font-condensed font-bold uppercase">{d.title}</h4>
                   {d.events?.name && <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1">{d.events.name} · {fmtDate(d.events.event_date)}</p>}
-                  {d.due_date && <p className="font-mono text-[10px] text-[#E7D5A4]/50 mt-1">Due {fmtDate(d.due_date)}</p>}
+                  {d.due_date && <p className="font-mono text-[10px] text-[#E7D5A4]/60 mt-1">Due {fmtDate(d.due_date)}</p>}
                   {d.description && <p className="font-mono text-[11px] text-[#E7D5A4]/80 mt-2">{d.description}</p>}
                 </div>
                 <Badge status={d.status === 'delivered' ? 'delivered' : 'pending'} />

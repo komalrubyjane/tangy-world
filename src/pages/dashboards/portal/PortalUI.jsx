@@ -29,13 +29,13 @@ export const Badge = ({ status }) => (
 );
 
 export const Empty = ({ children }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">
+  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
     {children}
   </div>
 );
 
 export const Loading = ({ label = 'LOADING...' }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50">{label}</div>
+  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60">{label}</div>
 );
 
 export const fmtDate = (d) => {
@@ -85,7 +85,8 @@ export const AdminPreviewBanner = ({ label }) => (
   </div>
 );
 
-export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tabs, activeTab, onTabChange, onLogout, preview, notificationsFor, children }) => (
+// `tabHref` (from usePortalTab) makes each section a real link with its own URL.
+export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tabs, activeTab, onTabChange, tabHref, onLogout, preview, notificationsFor, children }) => (
   <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
     <Navbar />
     {preview && <AdminPreviewBanner label={preview.label} />}
@@ -104,7 +105,7 @@ export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tab
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {statusBadge}
-          {notificationsFor && !preview && <NotificationBell userId={notificationsFor} allHref="?tab=notifications" />}
+          {notificationsFor && !preview && <NotificationBell userId={notificationsFor} allHref={tabHref ? tabHref('notifications') : '?tab=notifications'} />}
           {!preview && (
             <button onClick={onLogout} className="bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] border border-[#B94717] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">
               LOG OUT ✕
@@ -115,20 +116,17 @@ export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tab
     </section>
 
     <section className="px-4 sm:px-6 max-w-6xl mx-auto">
-      <nav role="tablist" className="flex gap-2 overflow-x-auto border-b-2 border-[#C99A2E]/40 pb-3 mb-6 -mx-1 px-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={`shrink-0 px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
-              activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <nav aria-label="Portal sections" className="flex gap-2 overflow-x-auto border-b-2 border-[#C99A2E]/40 pb-3 mb-6 -mx-1 px-1">
+        {tabs.map((tab) => {
+          const cls = `shrink-0 inline-flex items-center min-h-[36px] px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
+            activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
+          }`;
+          return tabHref ? (
+            <Link key={tab.id} to={tabHref(tab.id)} aria-current={activeTab === tab.id ? 'page' : undefined} className={cls}>{tab.label}</Link>
+          ) : (
+            <button key={tab.id} type="button" aria-pressed={activeTab === tab.id} onClick={() => onTabChange(tab.id)} className={cls}>{tab.label}</button>
+          );
+        })}
       </nav>
     </section>
 

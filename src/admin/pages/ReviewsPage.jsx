@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { friendlyError } from '../api';
 import { signedUrl, formatBytes } from '../../lib/storage';
@@ -26,13 +26,16 @@ const SOURCES = {
   },
 };
 
+// /admin-portal/reviews (artist media) and /admin-portal/reviews/assets.
 export default function ReviewsPage() {
-  const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') === 'assets' ? 'assets' : 'media';
+  const { tab: tabParam } = useParams();
+  const [params] = useSearchParams();
+  if (params.get('tab') === 'assets') return <Navigate to="/admin-portal/reviews/assets" replace />;
+  const tab = tabParam === 'assets' ? 'assets' : 'media';
   return (
-    <Page title="Media & asset reviews" subtitle="Approve artist media and sponsor brand assets before they're used.">
-      <Tabs value={tab} onChange={(t) => setParams(t === 'media' ? {} : { tab: t }, { replace: true })}
-        tabs={[{ id: 'media', label: 'Artist media' }, { id: 'assets', label: 'Sponsor assets' }]} />
+    <Page title="Media & asset reviews" subtitle="Approve artist media and sponsor brand assets before they're used."
+      crumbs={tab === 'assets' ? [{ label: 'Sponsor assets' }] : undefined}>
+      <Tabs value={tab} tabs={[{ id: 'media', label: 'Artist media', to: '/admin-portal/reviews' }, { id: 'assets', label: 'Sponsor assets', to: '/admin-portal/reviews/assets' }]} />
       <ReviewList key={tab} source={SOURCES[tab]} />
     </Page>
   );
@@ -75,7 +78,7 @@ const ReviewList = ({ source }) => {
       <div className="p-3 border-b border-[#C99A2E]/15 flex items-center justify-between gap-2">
         <FilterSelect label="Status" value={status} onChange={setStatus}
           options={[...Object.entries(source.statuses).map(([value, [label]]) => ({ value, label })), { value: '', label: 'All' }]} />
-        <span className="font-mono text-[11px] text-[#E7D5A4]/45">{rows ? `${rows.length} item${rows.length === 1 ? '' : 's'}` : ''}</span>
+        <span className="font-mono text-[11px] text-[#E7D5A4]/60">{rows ? `${rows.length} item${rows.length === 1 ? '' : 's'}` : ''}</span>
       </div>
       {error ? <ErrorState error={error} onRetry={load} /> : rows === null ? <Skeleton rows={4} /> : rows.length === 0 ? (
         <EmptyState icon="CircleCheck" title={status === source.queue ? 'Nothing waiting for review' : 'Nothing here'} />
@@ -87,7 +90,7 @@ const ReviewList = ({ source }) => {
               <li key={r.id} className="px-4 py-3 flex flex-col md:flex-row md:items-center gap-2 md:gap-3" data-review={r.title || r.file_name}>
                 <div className="min-w-0 flex-1">
                   <button type="button" onClick={() => open(r)} className="text-[14px] text-[#EFE2C0] hover:underline text-left">{r.title || r.file_name}</button>
-                  <div className="text-[12px] text-[#E7D5A4]/50">{[source.owner(r), source.kind(r), formatBytes(r.file_size_bytes), fmt.dateTime(r.created_at)].filter(Boolean).join(' · ')}</div>
+                  <div className="text-[12px] text-[#E7D5A4]/60">{[source.owner(r), source.kind(r), formatBytes(r.file_size_bytes), fmt.dateTime(r.created_at)].filter(Boolean).join(' · ')}</div>
                   {r.review_note && <p className="text-[12px] text-[#E7D5A4]/60 mt-0.5">Note: {r.review_note}</p>}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">

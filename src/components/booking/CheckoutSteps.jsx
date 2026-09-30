@@ -325,6 +325,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
           {pay.status === 'dismissed' && <p role="status" className="font-mono text-[10.5px] text-[#191410] m-0">Payment window closed — nothing was charged. You can try again when you're ready.</p>}
           <div className="p-2 bg-[#C89D35]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
             🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy's servers, and payment is verified before your booking is confirmed.
+            {' '}By paying you accept the <a href="/terms" target="_blank" rel="noopener" className="underline">terms</a> and <a href="/refund-policy" target="_blank" rel="noopener" className="underline">refund policy</a>; see how we use your details in the <a href="/privacy" target="_blank" rel="noopener" className="underline">privacy notice</a>.
           </div>
           <div className="grid grid-cols-[1fr_2fr] gap-2">
             <button type="button" className={btnGhost} onClick={() => go(3)} disabled={pay.status === 'processing'}>← Edit</button>

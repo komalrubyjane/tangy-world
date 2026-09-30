@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { useAdminSession } from '../AdminSession';
 import { adminApi, orIlike } from '../api';
@@ -7,14 +7,13 @@ import { useServerTable, useDebounced, useAsync } from '../hooks';
 import { ROLE_LABELS } from '../rbac';
 import { auditLabel, auditSummary } from '../auditLabels';
 import {
-  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Drawer, KeyValue, ConfirmDialog, Modal,
-  Field, Input, Select, fmt, useToast,
+  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Drawer, KeyValue, ConfirmDialog, Modal, Field, Input, Select, fmt, useToast, Skeleton, ErrorState, EmptyState,
 } from '../ui';
 
 const ROLES = ['super_admin', 'admin', 'staff', 'user', 'artist', 'vendor', 'sponsor', 'venue', 'crew', 'volunteer'];
 const INVITE_ROLES = ['staff', 'admin', 'super_admin'];
 
-const UserDrawer = ({ profile, onClose, onChanged }) => {
+const UserDrawer = ({ profile, onClose, onChanged, inline = false }) => {
   const { user } = useAdminSession();
   const toast = useToast();
   const [role, setRole] = useState(profile.role);
@@ -27,7 +26,7 @@ const UserDrawer = ({ profile, onClose, onChanged }) => {
   }, [profile.id]);
 
   return (
-    <Drawer title={profile.full_name || profile.email} subtitle={profile.email} onClose={onClose}>
+    <Drawer inline={inline} title={profile.full_name || profile.email} subtitle={profile.email} onClose={onClose}>
       <div className="flex gap-2"><Badge status={profile.role}>{ROLE_LABELS[profile.role]}</Badge><Badge status={profile.is_active ? 'active' : 'deactivated'} /></div>
       <Panel title="Account">
         <KeyValue items={[
@@ -50,18 +49,18 @@ const UserDrawer = ({ profile, onClose, onChanged }) => {
             {profile.is_active
               ? <Button variant="danger" icon="Ban" onClick={() => setDialog('deactivate')}>Deactivate account</Button>
               : <Button variant="success" icon="CircleCheck" onClick={() => setDialog('reactivate')}>Reactivate account</Button>}
-            <p className="text-[12px] text-[#E7D5A4]/45 mt-2">Deactivation revokes every permission immediately. History is kept.</p>
+            <p className="text-[12px] text-[#E7D5A4]/60 mt-2">Deactivation revokes every permission immediately. History is kept.</p>
           </div>
         )}
       </Panel>
       <Panel title="Activity" flush>
-        {(history.data || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/45">{history.loading ? 'Loading…' : 'No recorded activity.'}</div> : (
+        {(history.data || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/60">{history.loading ? 'Loading…' : 'No recorded activity.'}</div> : (
           <ul className="divide-y divide-[#E7D5A4]/[0.06]">
             {history.data.map((h) => (
               <li key={h.id} className="px-4 py-2 text-[12px]">
                 <span className="text-[#EFE2C0]">{auditLabel(h.action)}</span>
-                <span className="text-[#E7D5A4]/45"> · {h.actor_email || 'System'} · {fmt.dateTime(h.created_at)}</span>
-                {auditSummary(h) && <div className="text-[#E7D5A4]/40">{auditSummary(h)}</div>}
+                <span className="text-[#E7D5A4]/60"> · {h.actor_email || 'System'} · {fmt.dateTime(h.created_at)}</span>
+                {auditSummary(h) && <div className="text-[#E7D5A4]/60">{auditSummary(h)}</div>}
               </li>
             ))}
           </ul>
@@ -126,7 +125,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState('');
   const [search, setSearch] = useState('');
   const q = useDebounced(search);
-  const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
   const inviting = params.get('invite') === '1';
   const setParam = (k, v) => { const n = new URLSearchParams(params); if (v) n.set(k, v); else n.delete(k); setParams(n, { replace: true }); };
 
@@ -143,11 +142,11 @@ export default function UsersPage() {
   });
 
   const columns = [
-    { key: 'name', header: 'User', render: (u) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{u.full_name || '—'}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[240px]">{u.email}</div></div>) },
+    { key: 'name', header: 'User', render: (u) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{u.full_name || '—'}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[240px]">{u.email}</div></div>) },
     { key: 'role', header: 'Role', render: (u) => <Badge status={u.role}>{ROLE_LABELS[u.role] || u.role}</Badge> },
     { key: 'status', header: 'Status', render: (u) => <Badge status={u.is_active ? 'active' : 'deactivated'} /> },
-    { key: 'passport', header: 'Passport', mobileHidden: true, render: (u) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/50">{u.passport_id}</span> },
-    { key: 'since', header: 'Joined', mobileHidden: true, render: (u) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/50">{fmt.date(u.member_since)}</span> },
+    { key: 'passport', header: 'Passport', mobileHidden: true, render: (u) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/60">{u.passport_id}</span> },
+    { key: 'since', header: 'Joined', mobileHidden: true, render: (u) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/60">{fmt.date(u.member_since)}</span> },
   ];
 
   return (
@@ -155,19 +154,38 @@ export default function UsersPage() {
       actions={<Button variant="primary" icon="UserPlus" onClick={() => setParam('invite', '1')}>Invite team member</Button>}>
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
-          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} account{table.count === 1 ? '' : 's'}</span>}>
+          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} account{table.count === 1 ? '' : 's'}</span>}>
             <SearchInput value={search} onChange={setSearch} placeholder="Name, email, passport ID…" />
             <FilterSelect label="Role" value={role} onChange={(v) => setParam('role', v)} options={[{ value: '', label: 'Any role' }, ...ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }))]} />
             <FilterSelect label="Status" value={status} onChange={setStatus} options={[{ value: '', label: 'Any status' }, { value: 'active', label: 'Active' }, { value: 'deactivated', label: 'Deactivated' }]} />
           </Toolbar>
         </div>
-        <DataTable columns={columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload} onRowClick={setSelected}
+        <DataTable columns={columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload} onRowClick={(u) => navigate(`/admin-portal/users/${u.id}`)}
           empty={{ title: 'No users found', icon: 'Users' }} />
         <Pagination {...table} />
       </Panel>
-      {selected && <UserDrawer key={selected.id} profile={selected} onClose={() => setSelected(null)} onChanged={() => { setSelected(null); table.reload(); }} />}
       {inviting && <InviteModal onClose={() => setParam('invite', '')} onDone={() => { setParam('invite', ''); table.reload(); }} />}
     </Page>
   );
 }
 
+
+// /admin-portal/users/:id — one account as its own page.
+export function UserDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const q = useAsync(async () => {
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+    const { data, error } = await supabase.from('profiles').select('id, full_name, email, phone, role, is_active, deactivated_at, member_since, passport_id').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  }, [id]);
+  const name = q.data ? q.data.full_name || q.data.email : q.loading ? 'User' : 'User not found';
+  return (
+    <Page title={name} back={{ to: '/admin-portal/users', label: 'Users & roles' }} crumbs={[{ label: name }]}>
+      {q.loading ? <Skeleton rows={6} /> : q.error ? <ErrorState error={q.error} onRetry={q.reload} /> : !q.data ? (
+        <Panel><EmptyState icon="Users" title="User not found" action={<Button to="/admin-portal/users" icon="ChevronLeft">Back to users</Button>} /></Panel>
+      ) : <UserDrawer inline key={q.data.id} profile={q.data} onClose={() => navigate('/admin-portal/users')} onChanged={q.reload} />}
+    </Page>
+  );
+}

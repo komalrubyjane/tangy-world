@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { mapDbEvent } from './useEvents';
+import { withResolvedMedia } from '../lib/contentService';
 
 // One session's public page: the event (by slug, or id for old /book/:id
 // links), server-computed availability and ticket types (0026/0027), the
@@ -36,7 +37,9 @@ export function useSessionDetail(slugOrId, userId) {
         ? await supabase.from('public_artists').select('id, slug, name, stage_name, genre, city, avatar_url').in('id', ids)
         : { data: [] };
       if (cancelled) return;
-      setState({ loading: false, error: null, session: mapDbEvent(row), availability: availability || null, lineup: lineup || [] });
+      const [session] = await withResolvedMedia([mapDbEvent(row)], ['image']);
+      if (cancelled) return;
+      setState({ loading: false, error: null, session: { ...session, image: session.image || '/media/gallery/tangy1.jpg' }, availability: availability || null, lineup: lineup || [] });
     })();
     return () => { cancelled = true; };
   }, [slugOrId, tick]);
@@ -53,15 +56,35 @@ export function useSessionDetail(slugOrId, userId) {
     return () => { cancelled = true; };
   }, [eventId, userId, tick]);
 
-  // Seats change while people check out; keep the counts reasonably fresh.
+  // Live seats: re-read only the counts whenever the session's availability
+  // signal changes (0029, Supabase Realtime), and also on focus and every
+  // two minutes as a fallback. The server still decides at checkout.
+  const [live, setLive] = useState({ availability: null, at: null, connected: false });
+  const refreshAvailability = useCallback(async () => {
+    if (!eventId) return;
+    const { data, error } = await supabase.rpc('event_availability', { p_event_id: eventId });
+    if (!error && data) setLive((l) => ({ ...l, availability: data, at: new Date() }));
+  }, [eventId]);
   useEffect(() => {
-    const onFocus = () => refresh();
+    if (!eventId || !isSupabaseConfigured) return undefined;
+    const channel = supabase.channel(`availability-${eventId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_availability_signal', filter: `event_id=eq.${eventId}` }, () => refreshAvailability())
+      .subscribe((status) => setLive((l) => ({ ...l, connected: status === 'SUBSCRIBED' })));
+    const onFocus = () => refreshAvailability();
     window.addEventListener('focus', onFocus);
-    const id = window.setInterval(refresh, 60_000);
-    return () => { window.removeEventListener('focus', onFocus); window.clearInterval(id); };
-  }, [refresh]);
+    const id = window.setInterval(refreshAvailability, 120_000);
+    return () => { supabase.removeChannel(channel); window.removeEventListener('focus', onFocus); window.clearInterval(id); };
+  }, [eventId, refreshAvailability]);
+  useEffect(() => { setLive({ availability: null, at: null, connected: false }); }, [eventId]);
 
-  return { ...state, waitlist, refresh };
+  return {
+    ...state,
+    availability: live.availability || state.availability,
+    availabilityAt: live.at,
+    live: live.connected,
+    waitlist,
+    refresh: () => { refresh(); refreshAvailability(); },
+  };
 }
 
 // The server's price for a ticket type × quantity (includes tax). Debounced

@@ -1,4 +1,8 @@
+import { Link } from 'react-router-dom';
 import { HOME_CHAPTERS } from '../../data/homeChapters';
+
+const EXPLORE = [['Sessions', '/sessions'], ['Artists', '/artists'], ['Tangy TV', '/tv'], ['Diary', '/diary'], ['Gallery', '/gallery'], ['FAQ', '/faq'], ['Contact', '/contact']];
+const POLICIES = [['Terms', '/terms'], ['Privacy', '/privacy'], ['Refund policy', '/refund-policy']];
 
 // Back cover: umber, the masthead once more, an index of the chapters and a
 // colophon. Bottom padding clears the fixed dock (--dock-space).
@@ -19,14 +23,23 @@ export const Footer = () => {
               {HOME_CHAPTERS.map((c, i) => (
                 <li key={c.id}>
                   <a href={`/#${c.id}`} className="font-mono text-xs uppercase tracking-[0.14em] text-[#EFE2C0]/85 hover:text-[#C89D35]">
-                    <span className="text-[#EFE2C0]/45 mr-2">{String(i + 1).padStart(2, '0')}</span>{c.label}
+                    <span className="text-[#EFE2C0]/60 mr-2">{String(i + 1).padStart(2, '0')}</span>{c.label}
                   </a>
                 </li>
               ))}
             </ol>
           </nav>
 
-          <div className="col-span-4 md:col-span-4 lg:col-span-4 lg:col-start-9">
+          <nav aria-label="Explore" className="col-span-4 md:col-span-4 lg:col-span-2">
+            <p className="t-meta text-[#C89D35] m-0 mb-4">Explore</p>
+            <ul className="list-none m-0 p-0 flex flex-col gap-2">
+              {EXPLORE.map(([label, to]) => (
+                <li key={to}><Link to={to} className="font-mono text-xs uppercase tracking-[0.14em] text-[#EFE2C0]/85 hover:text-[#C89D35]">{label}</Link></li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="col-span-4 md:col-span-4 lg:col-span-4">
             <p className="t-meta text-[#C89D35] m-0 mb-4">Contact & credits</p>
             <ul className="list-none m-0 p-0 flex flex-col gap-2 font-mono text-xs uppercase tracking-[0.14em] text-[#EFE2C0]/85">
               <li>Archive 2016 — 2026</li>
@@ -38,6 +51,9 @@ export const Footer = () => {
 
         <div className="mt-14 pt-6 border-t border-[#EFE2C0]/15 flex flex-col md:flex-row justify-between gap-2 t-meta text-[#EFE2C0]/55">
           <span>© 2016–2026 Tangy Sessions. All rights reserved.</span>
+          <nav aria-label="Policies" className="flex flex-wrap gap-4">
+            {POLICIES.map(([label, to]) => <Link key={to} to={to} className="hover:text-[#C89D35] underline underline-offset-2">{label}</Link>)}
+          </nav>
           <span>An interactive physical music archive box</span>
         </div>
       </div>

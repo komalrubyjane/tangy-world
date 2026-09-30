@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import {
-  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Modal, Field, Select, Textarea,
-  ConfirmDialog, Drawer, EmptyState, ErrorState, Skeleton, Icon, useToast, fmt,
+  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Modal, Field, Select, Textarea, ConfirmDialog, Drawer, EmptyState, ErrorState, Skeleton, Icon, useToast, fmt,
 } from '../ui';
 import { useDebounced, useAsync } from '../hooks';
 import { rpc, friendlyError } from '../api';
@@ -44,7 +43,7 @@ export default function VolunteersPage() {
   const [revoking, setRevoking] = useState(null);
   const [declining, setDeclining] = useState(null);
   const [assignFor, setAssignFor] = useState(null);
-  const [activityFor, setActivityFor] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => { setPage(0); }, [q, eventId, access]);
   const table = useAsync(() => rpc('volunteers_overview', {
@@ -58,18 +57,18 @@ export default function VolunteersPage() {
     { key: 'name', header: 'Volunteer', render: (r) => (
       <div className="min-w-0">
         <div className="text-[#EFE2C0]">{r.full_name || '—'}</div>
-        <div className="text-[12px] text-[#E7D5A4]/50 truncate">{r.email}{r.is_active ? '' : ' · deactivated'}</div>
+        <div className="text-[12px] text-[#E7D5A4]/60 truncate">{r.email}{r.is_active ? '' : ' · deactivated'}</div>
       </div>) },
     { key: 'events', header: 'Events', render: (r) => (r.events?.length
       ? <div className="flex flex-wrap gap-1">{r.events.map((e) => <Badge key={e.event_id} tone="muted">{e.name} · {fmt.date(e.event_date)}</Badge>)}</div>
-      : <span className="text-[#E7D5A4]/35">Not assigned</span>) },
+      : <span className="text-[#E7D5A4]/60">Not assigned</span>) },
     { key: 'access', header: 'Check-in access', render: (r) => {
       if (r.active_grant) return <div><Badge status="active">Active</Badge> <span className="text-[12px] text-[#E7D5A4]/70">{r.active_grant.event_name}</span></div>;
       if (r.pending_requests?.length) return <div><Badge tone="warn">Requested</Badge> <span className="text-[12px] text-[#E7D5A4]/70">{r.pending_requests[0].event_name}</span></div>;
       if (r.last_grant) return <Badge status="expired">{r.last_grant.state === 'revoked' ? 'Revoked' : 'Expired'}</Badge>;
-      return <span className="text-[#E7D5A4]/35">None</span>;
+      return <span className="text-[#E7D5A4]/60">None</span>;
     } },
-    { key: 'expires', header: 'Expires', render: (r) => (r.active_grant ? <span className="font-mono text-[12px]">{fmt.dateTime(r.active_grant.expires_at)}</span> : <span className="text-[#E7D5A4]/30">—</span>) },
+    { key: 'expires', header: 'Expires', render: (r) => (r.active_grant ? <span className="font-mono text-[12px]">{fmt.dateTime(r.active_grant.expires_at)}</span> : <span className="text-[#E7D5A4]/60">—</span>) },
     { key: 'actions', header: '', render: (r) => (
       <div className="flex flex-wrap justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
         {canGrant && r.pending_requests?.map((req) => (
@@ -81,7 +80,7 @@ export default function VolunteersPage() {
         {canGrant && !r.active_grant && !r.pending_requests?.length && r.is_active && <Button size="sm" icon="KeyRound" onClick={() => setGrantFor({ volunteer: r })}>Grant check-in</Button>}
         {canGrant && r.active_grant && <Button size="sm" variant="danger" icon="Ban" onClick={() => setRevoking(r)}>Revoke</Button>}
         <Button size="sm" variant="ghost" icon="CalendarDays" onClick={() => setAssignFor(r)}>Assign event</Button>
-        <Button size="sm" variant="ghost" icon="Activity" aria-label={`Activity for ${r.full_name || r.email}`} onClick={() => setActivityFor(r)} />
+        <Button size="sm" variant="ghost" icon="Activity" aria-label={`Activity for ${r.full_name || r.email}`} onClick={() => navigate(`/admin-portal/volunteers/${r.user_id}`)} />
       </div>) },
   ];
 
@@ -96,7 +95,7 @@ export default function VolunteersPage() {
       )}
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
-          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(count)} volunteer{count === 1 ? '' : 's'}</span>}>
+          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(count)} volunteer{count === 1 ? '' : 's'}</span>}>
             <SearchInput value={search} onChange={setSearch} placeholder="Search name or email…" />
             <FilterSelect label="Event" value={eventId} onChange={setEventId} className="w-full sm:w-60"
               options={[{ value: '', label: 'All events' }, ...(events.data || []).map((e) => ({ value: e.id, label: `${e.name} · ${fmt.date(e.event_date)}` }))]} />
@@ -127,7 +126,6 @@ export default function VolunteersPage() {
           onClose={() => setDeclining(null)} />
       )}
       {assignFor && <AssignDialog volunteer={assignFor} events={events.data || []} onClose={() => setAssignFor(null)} onDone={() => { setAssignFor(null); toast('Volunteer assigned'); table.reload(); }} />}
-      {activityFor && <ActivityDrawer volunteer={activityFor} onClose={() => setActivityFor(null)} />}
     </Page>
   );
 }
@@ -153,8 +151,8 @@ const GrantDialog = ({ volunteer, request, events, onClose, onDone }) => {
     <Modal title="Grant check-in access" onClose={onClose}
       footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" icon="KeyRound" onClick={submit} disabled={busy || !eventId}>{busy ? 'Granting…' : 'Grant access'}</Button></>}>
       <dl className="grid grid-cols-[90px_1fr] gap-y-1.5 text-[13px]">
-        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/45 pt-0.5">Volunteer</dt><dd className="m-0 text-[#EFE2C0]">{volunteer.full_name || '—'}</dd>
-        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/45 pt-0.5">Email</dt><dd className="m-0">{volunteer.email}</dd>
+        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/60 pt-0.5">Volunteer</dt><dd className="m-0 text-[#EFE2C0]">{volunteer.full_name || '—'}</dd>
+        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/60 pt-0.5">Email</dt><dd className="m-0">{volunteer.email}</dd>
       </dl>
       {request?.message && <p className="text-[12.5px] text-[#E7D5A4]/65 border-l-2 border-[#C99A2E]/40 pl-3">“{request.message}”</p>}
       <Field label="Event">
@@ -203,7 +201,7 @@ const AssignDialog = ({ volunteer, events, onClose, onDone }) => {
         </Select>
       </Field>
       <Field label="Role at the event"><Textarea rows={1} value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} /></Field>
-      <p className="text-[12px] text-[#E7D5A4]/45">Assigning adds the event to their portal. It does not grant check-in access.</p>
+      <p className="text-[12px] text-[#E7D5A4]/60">Assigning adds the event to their portal. It does not grant check-in access.</p>
       {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
     </Modal>
   );
@@ -211,10 +209,10 @@ const AssignDialog = ({ volunteer, events, onClose, onDone }) => {
 
 const KIND = { grant: 'Access granted', request: 'Access requested', checkin: 'Checked in a ticket' };
 
-const ActivityDrawer = ({ volunteer, onClose }) => {
+const ActivityDrawer = ({ volunteer, onClose, inline = false }) => {
   const act = useAsync(() => rpc('volunteer_access_activity', { p_user_id: volunteer.user_id }), [volunteer.user_id]);
   return (
-    <Drawer title={volunteer.full_name || volunteer.email} subtitle="Check-in access activity" onClose={onClose}>
+    <Drawer inline={inline} title={volunteer.full_name || volunteer.email} subtitle="Check-in access activity" onClose={onClose}>
       {act.loading ? <Skeleton rows={5} /> : act.error ? <ErrorState error={act.error} onRetry={act.reload} /> : !act.data?.length ? (
         <EmptyState icon="Activity" title="No activity yet" />
       ) : (
@@ -222,7 +220,7 @@ const ActivityDrawer = ({ volunteer, onClose }) => {
           {act.data.map((a, i) => (
             <li key={i} className="border-l-2 border-[#C99A2E]/40 pl-3 text-[13px]">
               <div className="text-[#EFE2C0]">{KIND[a.kind]} · {a.event_name}</div>
-              <div className="font-mono text-[11px] text-[#E7D5A4]/50">{fmt.dateTime(a.at)}</div>
+              <div className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.dateTime(a.at)}</div>
               {a.kind === 'grant' && (
                 <div className="text-[12px] text-[#E7D5A4]/65 mt-0.5">
                   Until {fmt.dateTime(a.detail.expires_at)} · by {a.detail.granted_by} · <Badge status={a.detail.state === 'active' ? 'active' : 'expired'}>{a.detail.state}</Badge>
@@ -238,3 +236,23 @@ const ActivityDrawer = ({ volunteer, onClose }) => {
     </Drawer>
   );
 };
+
+// /admin-portal/volunteers/:userId — a volunteer's check-in access history.
+export function VolunteerDetailPage() {
+  const { userId } = useParams();
+  const navigate = useNavigate();
+  const q = useAsync(async () => {
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) return null;
+    const { data, error } = await supabase.from('profiles').select('id, full_name, email').eq('id', userId).maybeSingle();
+    if (error) throw error;
+    return data;
+  }, [userId]);
+  const name = q.data ? q.data.full_name || q.data.email : q.loading ? 'Volunteer' : 'Volunteer not found';
+  return (
+    <Page title={name} back={{ to: '/admin-portal/volunteers', label: 'Volunteers' }} crumbs={[{ label: name }]}>
+      {q.loading ? <Skeleton rows={4} /> : q.error ? <ErrorState error={q.error} onRetry={q.reload} /> : !q.data ? (
+        <Panel><EmptyState icon="HeartHandshake" title="Volunteer not found" action={<Button to="/admin-portal/volunteers" icon="ChevronLeft">Back to volunteers</Button>} /></Panel>
+      ) : <ActivityDrawer inline volunteer={{ user_id: q.data.id, full_name: q.data.full_name, email: q.data.email }} onClose={() => navigate('/admin-portal/volunteers')} />}
+    </Page>
+  );
+}

@@ -83,7 +83,9 @@ export const NAV = [
       { to: '/admin-portal/applications', label: 'Applications', icon: 'Inbox', requires: P.APPLICATIONS_VIEW, badge: 'applications' },
       { to: '/admin-portal/events', label: 'Events', icon: 'CalendarDays', requires: P.EVENTS_ALL },
       { to: '/admin-portal/my-events', label: 'My Events', icon: 'CalendarDays', requires: P.EVENTS_ASSIGNED, hideIf: P.EVENTS_ALL },
-      { to: '/admin-portal/bookings', label: 'Bookings & Payments', icon: 'Ticket', requires: P.BOOKINGS_ALL },
+      { to: '/admin-portal/bookings', label: 'Bookings', icon: 'Ticket', requires: P.BOOKINGS_ALL },
+      { to: '/admin-portal/payments', label: 'Payments', icon: 'Wallet', requires: [P.BOOKINGS_ALL, P.PAYMENTS] },
+      { to: '/admin-portal/waitlist', label: 'Waitlist', icon: 'Hourglass', requires: P.BOOKINGS_ALL },
       { to: '/admin-portal/invoices', label: 'Partner Invoices', icon: 'Receipt', requires: [P.PAYMENTS, P.BOOKINGS_MANAGE] },
       { to: '/admin-portal/attendees', label: 'Attendees', icon: 'Users', anyOf: [P.ATTENDEES_ALL, P.ATTENDEES_ASSIGNED] },
       { to: '/check-in', label: 'QR Check-in', icon: 'ScanLine', requires: P.CHECKIN, external: true },
@@ -111,9 +113,21 @@ export const NAV = [
     group: 'Communicate',
     items: [
       { to: '/admin-portal/messages', label: 'Messages', icon: 'MessagesSquare', requires: P.MESSAGES, badge: 'messages' },
-      { to: '/admin-portal/content', label: 'Content', icon: 'Megaphone', anyOf: [P.CONTENT, P.CONTENT_VIEW] },
+      {
+        to: '/admin-portal/content', label: 'Content', icon: 'FileText', anyOf: [P.CONTENT, P.CONTENT_VIEW],
+        children: [
+          { to: '/admin-portal/content/sessions', label: 'Sessions', icon: 'CalendarDays', anyOf: [P.EVENTS_MANAGE, P.CONTENT_SESSIONS] },
+          { to: '/admin-portal/content/artists', label: 'Artists', icon: 'Mic', anyOf: [P.ENTITIES, P.CONTENT_VIEW] },
+          { to: '/admin-portal/content/gallery', label: 'Gallery', icon: 'Image', requires: [P.CONTENT_VIEW, P.CONTENT_MEDIA] },
+          { to: '/admin-portal/content/tv', label: 'Tangy TV', icon: 'Tv', requires: [P.CONTENT_VIEW, P.CONTENT_TV] },
+          { to: '/admin-portal/content/diary', label: 'Diary', icon: 'ScrollText', requires: [P.CONTENT_VIEW, P.CONTENT_DIARY] },
+          { to: '/admin-portal/content/announcements', label: 'Announcements', icon: 'Megaphone', requires: P.CONTENT },
+          { to: '/admin-portal/content/media', label: 'Media library', icon: 'Paperclip', requires: [P.CONTENT_VIEW, P.CONTENT_MEDIA] },
+        ],
+      },
       { to: '/admin-portal/announcements', label: 'Announcements', icon: 'Megaphone', requires: P.ANNOUNCEMENTS_VIEW, hideIf: P.CONTENT },
       { to: '/admin-portal/event-info', label: 'Event Info', icon: 'Info', requires: P.EVENTS_ASSIGNED, hideIf: P.EVENTS_ALL },
+      { to: '/admin-portal/notifications', label: 'Notifications', icon: 'Bell', requires: P.DASHBOARD },
     ],
   },
   {
@@ -137,7 +151,6 @@ export const NAV = [
       { to: '/admin-portal/ops/inbox', label: 'Website support inbox', icon: 'Inbox', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/enquiries', label: 'Private enquiries', icon: 'Mail', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/contact', label: 'Contact messages', icon: 'Mail', requires: P.OPERATIONS },
-      { to: '/admin-portal/ops/waitlist', label: 'Waitlist', icon: 'Hourglass', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/notifications', label: 'Email delivery', icon: 'BellRing', requires: P.OPERATIONS },
       { to: '/admin-portal/ops/portals', label: 'View portals', icon: 'DoorOpen', requires: P.OPERATIONS },
     ],
@@ -146,9 +159,10 @@ export const NAV = [
 
 export function buildNav(perms) {
   const set = new Set(perms || []);
+  const visible = (item) => allowed(set, item) && !(item.hideIf && set.has(item.hideIf));
   return NAV.map((g) => ({
     ...g,
-    items: g.items.filter((item) => allowed(set, item) && !(item.hideIf && set.has(item.hideIf))),
+    items: g.items.filter(visible).map((item) => (item.children ? { ...item, children: item.children.filter(visible) } : item)),
   })).filter((g) => g.items.length > 0);
 }
 
@@ -176,12 +190,12 @@ export const LEGACY_TAB_ROUTES = {
   collab: '/admin-portal/applications',
   private: '/admin-portal/ops/enquiries',
   contact: '/admin-portal/ops/contact',
-  waitlist: '/admin-portal/ops/waitlist',
+  waitlist: '/admin-portal/waitlist',
   inbox: '/admin-portal/ops/inbox',
   notifications: '/admin-portal/ops/notifications',
-  payments: '/admin-portal/bookings?tab=payments',
-  announcements: '/admin-portal/content',
-  tv: '/admin-portal/content?tab=tv',
+  payments: '/admin-portal/payments',
+  announcements: '/admin-portal/content/announcements',
+  tv: '/admin-portal/content/tv',
   settings: '/admin-portal/settings',
   portals: '/admin-portal/ops/portals',
 };

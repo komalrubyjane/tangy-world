@@ -52,7 +52,7 @@ export default function TeamPage() {
                 {list.map((e) => <option key={e.id} value={e.id}>{fmt.date(e.event_date)} · {e.name}{e.status === 'draft' ? ' (draft)' : ''}</option>)}
               </Select>
             </Field>
-            {selected && <Link to={`/admin-portal/events/${selected.id}?tab=team`} className="inline-block mt-2 text-[12px] underline text-[#E7D5A4]/55">Open event →</Link>}
+            {selected && <Link to={`/admin-portal/events/${selected.id}/team`} className="inline-block mt-2 text-[12px] underline text-[#E7D5A4]/55">Open event →</Link>}
           </Panel>
           {eventId && <TeamManager key={eventId} eventId={eventId} />}
         </div>
@@ -64,7 +64,7 @@ export default function TeamPage() {
                 <li key={s.id} className="px-4 py-2.5 flex items-center gap-2 text-[12.5px]">
                   <div className="flex-1 min-w-0">
                     <div className="text-[#EFE2C0] truncate">{s.full_name || s.email}</div>
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/40">{ROLE_LABELS[s.role]}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">{ROLE_LABELS[s.role]}</div>
                   </div>
                   {!s.is_active && <Badge status="deactivated" />}
                   <span className="font-mono text-[11px] text-[#E7D5A4]/55 tabular-nums">{s.upcoming} upcoming</span>

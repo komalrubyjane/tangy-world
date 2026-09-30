@@ -5,7 +5,7 @@ import { useAdminSession, useSetting } from './AdminSession';
 import { useDebounced } from './hooks';
 import { adminApi } from './api';
 import { buildNav, ROLE_LABELS, P } from './rbac';
-import { Icon, Button, cx } from './ui';
+import { Icon, Button, cx, CrumbContext } from './ui';
 import { SIGNOUT_REASON_KEY } from './AdminGate';
 import { NotificationBell } from '../portal/NotificationBell';
 
@@ -97,6 +97,29 @@ const NavItem = ({ item, badge, onNavigate }) => {
   return <NavLink to={item.to} end={item.end} onClick={onNavigate} className={cls}>{inner}</NavLink>;
 };
 
+// A section with pages of its own (Content → Sessions, TV, …): the children
+// are listed under it while you're anywhere inside the section.
+const NavGroupItem = ({ item, badges, onNavigate }) => {
+  const { pathname } = useLocation();
+  const inside = pathname === item.to || pathname.startsWith(`${item.to}/`);
+  return (
+    <div>
+      <Link to={item.to} onClick={onNavigate} aria-current={pathname === item.to ? 'page' : undefined} data-active={inside ? 'true' : undefined}
+        className={cx('group flex items-center gap-2.5 h-8 px-2.5 rounded-[4px] text-[13px] transition-colors',
+          inside ? 'bg-[#C99A2E]/15 text-[#EFE2C0] shadow-[inset_2px_0_0_#C99A2E]' : 'text-[#E7D5A4]/65 hover:text-[#EFE2C0] hover:bg-[#E7D5A4]/[0.04]')}>
+        <Icon name={item.icon} size={16} className="shrink-0 opacity-80" />
+        <span className="truncate">{item.label}</span>
+        <Icon name="ChevronDown" size={13} className={cx('ml-auto opacity-50 transition-transform', !inside && '-rotate-90')} />
+      </Link>
+      {inside && item.children.length > 0 && (
+        <ul className="ml-4 pl-2 border-l border-[#C99A2E]/15 mt-0.5 flex flex-col gap-0.5 list-none" aria-label={`${item.label} sections`}>
+          {item.children.map((c) => <li key={c.to}><NavItem item={c} badge={badges[c.badge]} onNavigate={onNavigate} /></li>)}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 const Sidebar = ({ nav, badges, onNavigate }) => {
   const { pathname } = useLocation();
   const [openMore, setOpenMore] = useState(() => pathname.startsWith('/admin-portal/ops'));
@@ -116,15 +139,17 @@ const Sidebar = ({ nav, badges, onNavigate }) => {
           return (
             <div key={group.group}>
               {group.collapsible ? (
-                <button onClick={() => setOpenMore((o) => !o)} className="w-full flex items-center justify-between px-2.5 mb-1 font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#E7D5A4]/35 hover:text-[#E7D5A4]/70" aria-expanded={!collapsed}>
+                <button onClick={() => setOpenMore((o) => !o)} className="w-full flex items-center justify-between px-2.5 mb-1 font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#E7D5A4]/60 hover:text-[#E7D5A4]/70" aria-expanded={!collapsed}>
                   {group.group} <Icon name="ChevronDown" size={13} className={cx('transition-transform', collapsed && '-rotate-90')} />
                 </button>
               ) : (
-                <div className="px-2.5 mb-1 font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#E7D5A4]/35">{group.group}</div>
+                <div className="px-2.5 mb-1 font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#E7D5A4]/60">{group.group}</div>
               )}
               {!collapsed && (
                 <div className="flex flex-col gap-0.5">
-                  {group.items.map((item) => <NavItem key={item.to} item={item} badge={badges[item.badge]} onNavigate={onNavigate} />)}
+                  {group.items.map((item) => (item.children
+                    ? <NavGroupItem key={item.to} item={item} badges={badges} onNavigate={onNavigate} />
+                    : <NavItem key={item.to} item={item} badge={badges[item.badge]} onNavigate={onNavigate} />))}
                 </div>
               )}
             </div>
@@ -135,24 +160,36 @@ const Sidebar = ({ nav, badges, onNavigate }) => {
   );
 };
 
-// Admin Portal / <group> / <section> — derived from the same permission-built nav.
-const Breadcrumbs = ({ nav }) => {
+// Admin / <section> / <sub-section> / <page crumbs> — the first part comes from
+// the permission-built nav, the rest from the page (<Page crumbs>). The last
+// crumb is the current page and isn't a link. Also sets document.title.
+const Breadcrumbs = ({ nav, extra }) => {
   const { pathname } = useLocation();
-  const flat = nav.flatMap((g) => g.items.map((i) => ({ ...i, group: g.group })));
+  const flat = nav.flatMap((g) => g.items.flatMap((i) => [{ ...i, parent: null }, ...(i.children || []).map((c) => ({ ...c, parent: i }))]));
   const match = flat.filter((i) => !i.external && (pathname === i.to || pathname.startsWith(`${i.to}/`)))
     .sort((a, b) => b.to.length - a.to.length)[0];
-  useEffect(() => {
-    document.title = match && match.to !== '/admin-portal' ? `${match.label} · Tangy Admin Portal` : 'Tangy Admin Portal';
-  }, [match]);
-  if (!match || match.to === '/admin-portal') return null;
+  const trail = [
+    { label: 'Admin', to: '/admin-portal' },
+    ...(match && match.to !== '/admin-portal' ? [...(match.parent ? [{ label: match.parent.label, to: match.parent.to }] : []), { label: match.label, to: match.to }] : []),
+    ...(extra.crumbs || []),
+  ];
+  const title = extra.title || (match && match.to !== '/admin-portal' ? match.label : 'Dashboard');
+  useEffect(() => { document.title = `Tangy Admin — ${title}`; }, [title]);
+  if (trail.length < 2) return null;
   return (
-    <nav aria-label="Breadcrumb" className="mb-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/40">
-      <ol className="flex flex-wrap items-center gap-1.5">
-        <li><Link to="/admin-portal" className="hover:text-[#E7D5A4]">Admin Portal</Link></li>
-        <li aria-hidden="true">/</li>
-        <li>{match.group}</li>
-        <li aria-hidden="true">/</li>
-        <li>{pathname === match.to ? <span aria-current="page" className="text-[#E7D5A4]/70">{match.label}</span> : <Link to={match.to} className="hover:text-[#E7D5A4]">{match.label}</Link>}</li>
+    <nav aria-label="Breadcrumb" className="mb-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/60" data-breadcrumbs>
+      <ol className="flex flex-wrap items-center gap-1.5 list-none m-0 p-0">
+        {trail.map((c, i) => {
+          const last = i === trail.length - 1;
+          return (
+            <li key={`${c.to || c.label}-${i}`} className="flex items-center gap-1.5 min-w-0">
+              {i > 0 && <span aria-hidden="true">/</span>}
+              {last || !c.to
+                ? <span aria-current={last ? 'page' : undefined} className={cx('truncate max-w-[16rem]', last && 'text-[#E7D5A4]/70')}>{c.label}</span>
+                : <Link to={c.to} className="hover:text-[#E7D5A4]">{c.label}</Link>}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
@@ -179,16 +216,16 @@ const UserMenu = ({ user, onSignOut }) => {
           <span className="text-[12.5px] text-[#EFE2C0] max-w-[180px] truncate">{user?.full_name || user?.email}</span>
           <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-[#C99A2E]">{ROLE_LABELS[user?.role] || user?.role}</span>
         </span>
-        <Icon name="ChevronDown" size={14} className="text-[#E7D5A4]/50" />
+        <Icon name="ChevronDown" size={14} className="text-[#E7D5A4]/60" />
       </button>
       {open && (
         <div role="menu" className="absolute right-0 mt-2 w-60 z-[500] bg-[#15110D] border border-[#C99A2E]/35 rounded-md shadow-[0_18px_50px_rgba(0,0,0,0.6)] py-1.5">
           <div className="px-3.5 py-2 border-b border-[#C99A2E]/15 mb-1">
             <div className="text-[13px] text-[#EFE2C0] truncate">{user?.full_name || '—'}</div>
-            <div className="text-[11.5px] text-[#E7D5A4]/50 truncate">{user?.email}</div>
+            <div className="text-[11.5px] text-[#E7D5A4]/60 truncate">{user?.email}</div>
           </div>
           <Link role="menuitem" to="/admin-portal/notifications" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#E7D5A4]/80 hover:bg-[#C99A2E]/10"><Icon name="Bell" size={15} />Notifications</Link>
-          <Link role="menuitem" to="/admin-portal/notifications?tab=settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#E7D5A4]/80 hover:bg-[#C99A2E]/10"><Icon name="Settings" size={15} />Notification settings</Link>
+          <Link role="menuitem" to="/admin-portal/notifications/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#E7D5A4]/80 hover:bg-[#C99A2E]/10"><Icon name="Settings" size={15} />Notification settings</Link>
           <button role="menuitem" onClick={() => { setOpen(false); onSignOut(); }} className="w-full flex items-center gap-2.5 px-3.5 h-9 text-[13px] text-[#ef6b5e] hover:bg-[#a8322a]/10"><Icon name="LogOut" size={15} />Sign out</button>
         </div>
       )}
@@ -200,7 +237,7 @@ const QUICK_ACTIONS = [
   { label: 'Create event', to: '/admin-portal/events?new=1', requires: P.EVENTS_MANAGE, icon: 'Plus' },
   { label: 'Review pending applications', to: '/admin-portal/applications?status=pending', requires: P.APPLICATIONS_REVIEW, icon: 'Inbox' },
   { label: 'Add complimentary booking', to: '/admin-portal/bookings?comp=1', requires: P.BOOKINGS_MANAGE, icon: 'Ticket' },
-  { label: 'New announcement', to: '/admin-portal/content?new=1', requires: P.CONTENT, icon: 'Megaphone' },
+  { label: 'New announcement', to: '/admin-portal/content/announcements?new=1', requires: P.CONTENT, icon: 'Megaphone' },
   { label: 'Open check-in terminal', to: '/check-in', requires: P.CHECKIN, icon: 'ScanLine' },
   { label: 'Invite a user', to: '/admin-portal/users?invite=1', requires: P.USERS_MANAGE, icon: 'UserPlus' },
 ];
@@ -228,7 +265,8 @@ const CommandPalette = ({ nav, onClose }) => {
   }, [dq, isMock]);
   const items = useMemo(() => {
     const all = [
-      ...nav.flatMap((g) => g.items.map((i) => ({ label: i.label, to: i.to, icon: i.icon, hint: g.group }))),
+      ...nav.flatMap((g) => g.items.flatMap((i) => [{ label: i.label, to: i.to, icon: i.icon, hint: g.group },
+        ...(i.children || []).map((c) => ({ label: `${i.label} · ${c.label}`, to: c.to, icon: c.icon, hint: g.group }))])),
       ...QUICK_ACTIONS.filter((a) => can(a.requires)).map((a) => ({ ...a, hint: 'Action' })),
     ];
     const t = q.trim().toLowerCase();
@@ -245,7 +283,7 @@ const CommandPalette = ({ nav, onClose }) => {
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-[#17130F] border border-[#C99A2E]/40 rounded-md shadow-2xl overflow-hidden">
         <div className="flex items-center gap-2 px-3 border-b border-[#C99A2E]/20">
-          <Icon name="Search" size={16} className="text-[#E7D5A4]/45" />
+          <Icon name="Search" size={16} className="text-[#E7D5A4]/60" />
           <input
             autoFocus
             value={q}
@@ -260,11 +298,11 @@ const CommandPalette = ({ nav, onClose }) => {
             aria-label="Search the admin portal"
             className="flex-1 h-12 bg-transparent text-[14px] text-[#EFE2C0] placeholder:text-[#E7D5A4]/35 focus:outline-none"
           />
-          <kbd className="font-mono text-[10px] text-[#E7D5A4]/40 border border-[#E7D5A4]/20 rounded px-1.5 py-0.5">ESC</kbd>
+          <kbd className="font-mono text-[10px] text-[#E7D5A4]/60 border border-[#E7D5A4]/20 rounded px-1.5 py-0.5">ESC</kbd>
         </div>
         <ul className="max-h-[55vh] overflow-y-auto py-1.5" role="listbox">
-          {results.loading && <li className="px-4 py-2 text-[12px] text-[#E7D5A4]/45">Searching…</li>}
-          {items.length === 0 && !results.loading && <li className="px-4 py-6 text-center text-[13px] text-[#E7D5A4]/45">No matches</li>}
+          {results.loading && <li className="px-4 py-2 text-[12px] text-[#E7D5A4]/60">Searching…</li>}
+          {items.length === 0 && !results.loading && <li className="px-4 py-6 text-center text-[13px] text-[#E7D5A4]/60">No matches</li>}
           {items.map((item, i) => (
             <li key={item.key || `${item.hint}-${item.to}`} role="option" aria-selected={i === idx}>
               <button
@@ -273,8 +311,8 @@ const CommandPalette = ({ nav, onClose }) => {
                 className={cx('w-full flex items-center gap-3 px-4 h-10 text-left text-[13px]', i === idx ? 'bg-[#C99A2E]/15 text-[#EFE2C0]' : 'text-[#E7D5A4]/75')}
               >
                 <Icon name={item.icon} size={15} className="opacity-70" />
-                <span className="flex-1 min-w-0 truncate">{item.label}{item.sub && <span className="ml-2 text-[#E7D5A4]/40">{item.sub}</span>}</span>
-                <span className="font-mono text-[9.5px] uppercase tracking-[0.15em] text-[#E7D5A4]/35">{item.hint}</span>
+                <span className="flex-1 min-w-0 truncate">{item.label}{item.sub && <span className="ml-2 text-[#E7D5A4]/60">{item.sub}</span>}</span>
+                <span className="font-mono text-[9.5px] uppercase tracking-[0.15em] text-[#E7D5A4]/60">{item.hint}</span>
               </button>
             </li>
           ))}
@@ -290,6 +328,7 @@ export const AdminShell = ({ children }) => {
   const nav = useMemo(() => buildNav(perms ? [...perms] : []), [perms]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [crumbState, setCrumbState] = useState({ crumbs: [], title: null });
   const { pathname } = useLocation();
   const pendingApps = usePendingApplications(can(P.APPLICATIONS_VIEW));
   const awaitingMessages = useAwaitingMessages(can(P.MESSAGES) && !isMock);
@@ -341,7 +380,7 @@ export const AdminShell = ({ children }) => {
           <Button variant="ghost" size="sm" icon="Menu" className="lg:hidden" aria-label="Open navigation" onClick={() => setDrawerOpen(true)} />
           <button
             onClick={() => setPaletteOpen(true)}
-            className="hidden sm:flex items-center gap-2 h-9 w-72 max-w-[40vw] px-3 rounded-[4px] border border-[#C99A2E]/25 text-[12.5px] text-[#E7D5A4]/45 hover:border-[#C99A2E]/50"
+            className="hidden sm:flex items-center gap-2 h-9 w-72 max-w-[40vw] px-3 rounded-[4px] border border-[#C99A2E]/25 text-[12.5px] text-[#E7D5A4]/60 hover:border-[#C99A2E]/50"
           >
             <Icon name="Search" size={15} /> <span className="flex-1 text-left">Search the portal</span>
             <kbd className="font-mono text-[10px] border border-[#E7D5A4]/20 rounded px-1">⌘K</kbd>
@@ -358,8 +397,8 @@ export const AdminShell = ({ children }) => {
         </header>
 
         <main id="admin-main" className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
-          <Breadcrumbs nav={nav} />
-          {children}
+          <Breadcrumbs nav={nav} extra={crumbState} />
+          <CrumbContext.Provider value={setCrumbState}>{children}</CrumbContext.Provider>
         </main>
       </div>
 

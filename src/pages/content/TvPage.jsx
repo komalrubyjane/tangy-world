@@ -6,6 +6,7 @@ import { useContent } from '../../hooks/useContent';
 import { usePageMeta } from '../../hooks/usePageMeta';
 import { ContentLoading, ContentError, ContentEmpty } from '../../components/ui/ContentStates';
 import { NotFoundPage } from './NotFoundPage';
+import { MediaImg, MediaVideo } from '../../components/ui/Media';
 
 const duration = (s) => (s ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : '');
 
@@ -39,8 +40,8 @@ export const TvPage = () => {
                   <Link to={`/tv/${v.slug}`} className="block bg-[#11100C] border-2 border-[#C99A2E]/50 hover:border-[#C99A2E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]" data-tv-card>
                     <div className="aspect-video bg-black flex items-center justify-center overflow-hidden">
                       {v.thumbnail_url
-                        ? <img src={v.thumbnail_url} alt="" loading="lazy" className="w-full h-full object-cover" />
-                        : <video src={`${encodeURI(v.video_url)}#t=1`} preload="metadata" muted playsInline aria-hidden="true" className="w-full h-full object-cover" />}
+                        ? <MediaImg src={v.thumbnail_url} alt="" loading="lazy" className="w-full h-full object-cover" />
+                        : <MediaVideo src={v.video_url} preload="metadata" muted playsInline aria-hidden="true" className="w-full h-full object-cover" />}
                     </div>
                     <div className="p-3">
                       <div className="font-bold text-sm">{v.title}</div>
@@ -75,10 +76,10 @@ export const TvVideoPage = () => {
         {!loading && error && <ContentError onRetry={retry} />}
         {video && (
           <article className="mt-6 flex flex-col gap-4" data-tv-video>
-            <video src={encodeURI(video.video_url)} poster={video.thumbnail_url || undefined} controls playsInline preload="metadata"
+            <MediaVideo src={video.video_url} poster={video.thumbnail_url} controls playsInline preload="metadata"
               className="w-full aspect-video bg-black border-2 border-[#C99A2E]/60">
               Your browser can’t play this video.
-            </video>
+            </MediaVideo>
             <h1 className="font-condensed text-3xl sm:text-4xl uppercase m-0">{video.title}</h1>
             {video.category && <p className="text-[10px] text-[#C99A2E] uppercase tracking-widest m-0">{video.category}</p>}
             {video.description && <p className="text-sm leading-relaxed whitespace-pre-line m-0 text-[#E7D5A4]/85">{video.description}</p>}

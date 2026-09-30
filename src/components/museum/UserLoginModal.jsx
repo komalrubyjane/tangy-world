@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { useAudio } from '../../audio/AudioContext';
@@ -36,6 +37,14 @@ export const UserLoginModal = () => {
   };
   const [step, setStep] = useState('role'); // 'role' | 'auth'
   const [stampsCount, setStampsCount] = useState(0);
+  const dialogRef = useRef(null);
+  useFocusTrap(dialogRef, isLoginModalOpen);
+  useEffect(() => {
+    if (!isLoginModalOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') closeLoginModal(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isLoginModalOpen, closeLoginModal]);
 
   // Every fresh open starts at role selection — a visitor who closed the
   // modal mid auth shouldn't reopen straight back into that form.
@@ -82,7 +91,12 @@ export const UserLoginModal = () => {
   return (
     <div className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
       <div
-        className={`relative w-full ${showRoleStep ? 'max-w-2xl' : 'max-w-md'} max-h-[90dvh] overflow-y-auto bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]`}
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-modal-title"
+        tabIndex={-1}
+        className={`outline-none relative w-full ${showRoleStep ? 'max-w-2xl' : 'max-w-md'} max-h-[90dvh] overflow-y-auto bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]`}
         style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
       >
         {/* Masking tape at top */}
@@ -90,7 +104,9 @@ export const UserLoginModal = () => {
 
         {/* Close Button */}
         <button
+          type="button"
           onClick={closeLoginModal}
+          aria-label="Close"
           className="absolute top-3 right-3 font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] p-1"
         >
           ✕ CLOSE
@@ -101,7 +117,7 @@ export const UserLoginModal = () => {
           <div className="font-mono text-[9px] font-bold text-[#B94717] tracking-[0.2em] uppercase mb-1">
             {showRoleStep ? '✦ TANGY MEMBERSHIP DESK' : '✦ TANGY PATRON PORTAL'}
           </div>
-          <h2 className="display text-2xl sm:text-3xl font-bold leading-tight">
+          <h2 id="login-modal-title" className="display text-2xl sm:text-3xl font-bold leading-tight">
             {isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : loginReason ? `SIGN IN ${loginReason}` : 'CREATE YOUR ACCOUNT'}
           </h2>
           <p className="font-serif italic text-xs text-[#2A1A0E] opacity-80 mt-1">
@@ -132,7 +148,7 @@ export const UserLoginModal = () => {
             </div>
 
             <div className="pt-3 border-t border-[#11100C]/20">
-              <span className="block font-mono text-[8px] text-[#11100C]/50 uppercase tracking-[0.25em] mb-2">Other ways to join</span>
+              <span className="block font-mono text-[8px] text-[#11100C]/70 uppercase tracking-[0.25em] mb-2">Other ways to join</span>
               <div role="group" aria-label="Other ways to join Tangy" className="flex flex-col gap-1.5">
                 {MORE_WAYS_TO_JOIN.map((card) => (
                   <button
@@ -150,7 +166,7 @@ export const UserLoginModal = () => {
               </div>
             </div>
 
-            <p className="font-mono text-[9px] text-[#11100C]/50 leading-relaxed">
+            <p className="font-mono text-[9px] text-[#11100C]/70 leading-relaxed">
               Selecting a path doesn't grant that role — specialized paths go through a real application reviewed by the Tangy
               team.
             </p>

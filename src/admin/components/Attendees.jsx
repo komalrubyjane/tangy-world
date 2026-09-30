@@ -45,14 +45,14 @@ function applyFilters(query, { eventId, tier, checkin, bookingStatus, q }) {
 
 const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
-export const AttendeesTable = ({ eventId: fixedEventId, initialEventId = '' }) => {
+export const AttendeesTable = ({ eventId: fixedEventId, initialEventId = '', initialSearch = '' }) => {
   const { can } = useAdminSession();
   const toast = useToast();
   const events = useAttendeeEventOptions();
   const [event, setEvent] = useState(initialEventId);
   const [tier, setTier] = useState('');
   const [checkin, setCheckin] = useState('');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [manual, setManual] = useState(null);
   const [exporting, setExporting] = useState(false);
   const q = useDebounced(search);
@@ -92,11 +92,11 @@ export const AttendeesTable = ({ eventId: fixedEventId, initialEventId = '' }) =
     { key: 'name', header: 'Attendee', render: (r) => (
       <div className="min-w-0" data-attendee={r.guest_name || r.ticket_number}>
         <div className="text-[#EFE2C0]">{r.guest_name || <span className="text-[#E7D5A4]/60">Guest · {r.attendee_name}</span>}</div>
-        <div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[240px]">{r.guest_name && r.guest_name !== r.attendee_name ? `Booked by ${r.attendee_name}` : 'Booker'}{seesContacts && r.attendee_email ? ` · ${r.attendee_email}` : ''}</div>
+        <div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[240px]">{r.guest_name && r.guest_name !== r.attendee_name ? `Booked by ${r.attendee_name}` : 'Booker'}{seesContacts && r.attendee_email ? ` · ${r.attendee_email}` : ''}</div>
       </div>) },
     { key: 'ticket', header: 'Ticket', render: (r) => <span className="font-mono text-[12px] text-[#C99A2E]">{r.ticket_number}</span> },
     { key: 'tier', header: 'Type', render: (r) => <span className="text-[12.5px]">{TIER_NAME[r.tier] || r.tier || 'General'}</span> },
-    { key: 'event', header: 'Event', hidden: !!fixedEventId, mobileHidden: true, render: (r) => <span className="text-[12.5px]">{r.event_name} <span className="text-[#E7D5A4]/40">· {fmt.date(r.event_date)}</span></span> },
+    { key: 'event', header: 'Event', hidden: !!fixedEventId, mobileHidden: true, render: (r) => <span className="text-[12.5px]">{r.event_name} <span className="text-[#E7D5A4]/60">· {fmt.date(r.event_date)}</span></span> },
     { key: 'booking', header: 'Booking', mobileHidden: true, render: (r) => (<span className="flex items-center gap-2"><span className="font-mono text-[11.5px] text-[#E7D5A4]/60">{r.registration_code}</span>{r.booking_status !== 'confirmed' && <Badge status={r.booking_status} />}{r.booking_source === 'complimentary' && <Badge status="complimentary">Comp</Badge>}</span>) },
     { key: 'checkin', header: 'Check-in', render: (r) => (r.checked_in_at
       ? <span className="flex items-center gap-2"><Badge status="checked_in">Checked in {fmt.time(r.checked_in_at)}</Badge>{r.checkin_method === 'manual' && <Badge status="manual" />}</span>
@@ -121,7 +121,7 @@ export const AttendeesTable = ({ eventId: fixedEventId, initialEventId = '' }) =
       <div className="p-3 border-b border-[#C99A2E]/15">
         <Toolbar right={
           <>
-            <span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} ticket{table.count === 1 ? '' : 's'}</span>
+            <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} ticket{table.count === 1 ? '' : 's'}</span>
             {seesContacts && <Button size="sm" icon="Download" onClick={exportCsv} disabled={exporting || table.count === 0}>{exporting ? 'Exporting…' : 'CSV'}</Button>}
           </>
         }>

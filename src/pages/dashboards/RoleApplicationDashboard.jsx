@@ -5,6 +5,7 @@ import { Footer } from '../../components/layout/Footer';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
+import { usePortalTab } from '../../portal/PortalSections';
 
 // Shared real dashboard shell for every "apply, then get reviewed" account
 // type (crew/volunteer/vendor/sponsor/venue/private client). Each of these
@@ -42,7 +43,7 @@ const fmtDate = (d) => {
 };
 
 const Empty = ({ children }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">
+  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
     {children}
   </div>
 );
@@ -61,7 +62,8 @@ const Empty = ({ children }) => (
 export const RoleApplicationDashboard = ({ config }) => {
   const navigate = useNavigate();
   const { user, logout } = useUserAuth();
-  const [activeTab, setActiveTab] = useState('applications');
+  const portal = usePortalTab('applications', ['applications', 'profile', 'help', 'settings']);
+  const activeTab = portal.tab;
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState([]);
   const [profile, setProfile] = useState(null);
@@ -142,15 +144,16 @@ export const RoleApplicationDashboard = ({ config }) => {
       <section className="px-4 sm:px-6 max-w-6xl mx-auto">
         <nav className="flex flex-wrap gap-2 border-b-2 border-[#C99A2E]/40 pb-3 mb-6">
           {TABS.map((tab) => (
-            <button
+            <Link
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
+              to={portal.hrefFor(tab.id)}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+              className={`inline-flex items-center min-h-[36px] px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
                 activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
               }`}
             >
               {tab.label}
-            </button>
+            </Link>
           ))}
         </nav>
       </section>

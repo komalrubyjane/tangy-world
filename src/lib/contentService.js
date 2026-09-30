@@ -51,7 +51,7 @@ export const content = {
     const { data, error } = await supabase.from('gallery_photos')
       .select('id, image_url, caption, alt_text, sort_order, gallery_albums!inner(slug, title, status)')
       .eq('gallery_albums.status', 'published').order('sort_order').limit(limit);
-    return { data, error };
+    return { data: data ? (await withResolvedMedia(data, ['image_url'])).filter((p) => p.image_url) : data, error };
   },
 
   // Artists ------------------------------------------------------------------
@@ -77,16 +77,37 @@ export const content = {
   },
   remove: (table, id) => supabase.from(table).delete().eq('id', id),
 
-  // Uploads go to the content-media bucket under a random folder, so draft
-  // files aren't guessable. Returns the public URL.
+  // Uploads go to the PRIVATE content-media bucket (0029). The stored value is
+  // a site-relative reference, /storage/content-media/<path>; pages turn it
+  // into a short-lived signed URL (resolveMedia). The database only signs a
+  // file for content editors, or for anyone once the content using it is
+  // published — drafts' files stay private.
   upload: async (area, file) => {
     const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '');
     const path = `${area}/${crypto.randomUUID()}/${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from('content-media').upload(path, file, { contentType: file.type, upsert: false });
     if (error) return { error };
-    return { url: supabase.storage.from('content-media').getPublicUrl(path).data.publicUrl };
+    return { url: `${MEDIA_PREFIX}${path}`, path };
   },
 };
+
+export const MEDIA_PREFIX = '/storage/content-media/';
+export const isStoredMedia = (url) => typeof url === 'string' && url.startsWith(MEDIA_PREFIX);
+const signed = new Map();   // path -> { url, until }
+
+// Turns stored media references into URLs a browser can load. Plain site
+// paths (/media/...) and https links pass through unchanged. Files the
+// caller may not see resolve to null.
+export async function resolveMedia(urls) {
+  const list = [...new Set((urls || []).filter(isStoredMedia))];
+  const now = Date.now();
+  const missing = list.map((u) => u.slice(MEDIA_PREFIX.length)).filter((p) => !(signed.get(p)?.until > now + 60_000));
+  if (missing.length && isSupabaseConfigured) {
+    const { data } = await supabase.storage.from('content-media').createSignedUrls(missing, 3600);
+    (data || []).forEach((d) => { if (d.signedUrl && !d.error) signed.set(d.path, { url: d.signedUrl, until: now + 3_500_000 }); });
+  }
+  return (url) => (isStoredMedia(url) ? signed.get(url.slice(MEDIA_PREFIX.length))?.url || null : url || null);
+}
 
 export function slugify(text) {
   return String(text || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
@@ -104,4 +125,13 @@ export function contentErrorMessage(error) {
   if (/alt_text/i.test(msg)) return 'Every photo needs a short description (alt text).';
   if (/title_check/i.test(msg)) return 'A title is required.';
   return msg || 'Could not save — please try again.';
+}
+
+// Replaces the given URL fields on each row with loadable URLs (one signing
+// request for the whole batch). Rows whose media the caller may not see get
+// null for that field.
+export async function withResolvedMedia(rows, fields) {
+  const list = rows || [];
+  const get = await resolveMedia(list.flatMap((r) => fields.map((f) => r?.[f])));
+  return list.map((r) => (r ? { ...r, ...Object.fromEntries(fields.map((f) => [f, get(r[f])])) } : r));
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
@@ -9,6 +9,7 @@ import { generateQrDataUrl } from '../../lib/qr';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
 import { AdminPreviewBanner, ReadOnlyNote } from './portal/PortalUI';
+import { usePortalTab } from '../../portal/PortalSections';
 
 const STATUS_COLORS = {
   confirmed: 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]/40',
@@ -88,7 +89,7 @@ const fmtDate = (d) => {
 };
 
 const Empty = ({ children }) => (
-  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/50 border-2 border-dashed border-[#C99A2E]/30">
+  <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
     {children}
   </div>
 );
@@ -115,9 +116,8 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
   const navigate = useNavigate();
   const { user: authUser, logout } = useUserAuth();
   const user = overrideProfile || authUser;
-  // Deep links (notifications, "Book your held seats") open a tab: /dashboard?tab=waitlist.
-  const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(() => (!readOnly && TABS.some((t) => t.id === searchParams.get('tab')) ? searchParams.get('tab') : 'overview'));
+  const portal = usePortalTab('overview', TABS.map((t) => t.id));
+  const activeTab = portal.tab;
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [waitlist, setWaitlist] = useState([]);
@@ -242,17 +242,18 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       </section>
 
       <section className="px-4 sm:px-6 max-w-6xl mx-auto">
-        <nav className="flex flex-wrap gap-2 border-b-2 border-[#C99A2E]/40 pb-3 mb-6">
+        <nav aria-label="Dashboard sections" className="flex flex-wrap gap-2 border-b-2 border-[#C99A2E]/40 pb-3 mb-6">
           {TABS.map((tab) => (
-            <button
+            <Link
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
+              to={portal.hrefFor(tab.id)}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+              className={`inline-flex items-center min-h-[36px] px-3 py-2 text-[10px] sm:text-xs font-bold tracking-wider uppercase border transition-colors ${
                 activeTab === tab.id ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E] shadow-[3px_3px_0px_#11100C]' : 'bg-[#191410] text-[#E7D5A4]/80 border-[#C99A2E]/30 hover:border-[#C99A2E]'
               }`}
             >
               {tab.label}
-            </button>
+            </Link>
           ))}
         </nav>
       </section>

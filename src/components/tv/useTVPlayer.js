@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { FIRST_VIDEO, MIDDLE_VIDEO, shufflePlaylist } from './playlist.js';
-import { content } from '../../lib/contentService';
+import { content, withResolvedMedia } from '../../lib/contentService';
 
 // The boot (first.mp4) and channel-switch (middle.mp4) videos stay fixed,
 // discovered via playlist.js's glob — but the channel lineup is the
@@ -15,7 +15,8 @@ function getChannelPlaylist() {
 async function loadChannelPlaylist() {
   const { data, error } = await content.listTv();
   if (error) return channelCache;
-  channelCache = (data || []).filter((v) => v.in_player).map((v) => ({ filename: v.title, url: v.video_url, slug: v.slug }));
+  const playable = await withResolvedMedia((data || []).filter((v) => v.in_player), ['video_url']);
+  channelCache = playable.filter((v) => v.video_url).map((v) => ({ filename: v.title, url: v.video_url, slug: v.slug }));
   return channelCache;
 }
 

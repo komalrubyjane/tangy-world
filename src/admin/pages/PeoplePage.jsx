@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { insert, update, orIlike } from '../api';
 import { useServerTable, useDebounced, useAsync } from '../hooks';
 import {
   Page, Panel, Tabs, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Drawer, KeyValue, Field,
-  Input, Textarea, fmt, useToast,
+  Input, Textarea, Skeleton, EmptyState, ErrorState, fmt, useToast,
 } from '../ui';
 
 // One reusable CRUD surface for every people/partner entity. Each config
 // names its table, columns, editable fields and related-records query;
 // authorization is RLS (entities.manage / is_admin) on each table.
 const profileCols = (label) => [
-  { key: 'contact', header: 'Account', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.profiles?.full_name || '—'}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[220px]">{r.profiles?.email}</div></div>) },
+  { key: 'contact', header: 'Account', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.profiles?.full_name || '—'}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[220px]">{r.profiles?.email}</div></div>) },
   { key: 'active', header: 'Account status', mobileHidden: true, render: (r) => <Badge status={r.profiles?.is_active === false ? 'deactivated' : 'active'} /> },
-  { key: 'updated', header: 'Updated', mobileHidden: true, render: (r) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/45">{fmt.relative(r.updated_at)}</span> },
+  { key: 'updated', header: 'Updated', mobileHidden: true, render: (r) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/60">{fmt.relative(r.updated_at)}</span> },
 ].map((c, i) => (i === 0 ? { ...c, header: label } : c));
 
-const ENTITIES = {
+export const ENTITIES = {
   artists: {
     label: 'Artists', singular: 'artist', table: 'artists', order: 'name', search: ['name', 'email', 'genre', 'city'],
     title: (r) => r.name, canCreate: true,
     createDefaults: { status: 'approved' },
     filters: [{ key: 'status', label: 'Status', options: [{ value: '', label: 'Any status' }, { value: 'approved', label: 'Approved' }, { value: 'pending', label: 'Pending' }, { value: 'rejected', label: 'Rejected' }], initial: 'approved' }],
     columns: [
-      { key: 'name', header: 'Artist', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.name}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[220px]">{r.email}</div></div>) },
+      { key: 'name', header: 'Artist', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.name}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[220px]">{r.email}</div></div>) },
       { key: 'genre', header: 'Genre', render: (r) => r.genre || '—' },
       { key: 'city', header: 'City', mobileHidden: true, render: (r) => r.city || '—' },
       { key: 'account', header: 'Portal', mobileHidden: true, render: (r) => (r.user_id ? <Badge tone="good">Linked</Badge> : <Badge tone="muted">Roster only</Badge>) },
@@ -41,7 +41,7 @@ const ENTITIES = {
     title: (r) => r.name, canCreate: true,
     filters: [{ key: 'is_active', label: 'Active', options: [{ value: 'true', label: 'Active venues' }, { value: 'false', label: 'Inactive' }, { value: '', label: 'All' }], initial: 'true' }],
     columns: [
-      { key: 'name', header: 'Venue', render: (r) => (<div><div className="text-[#EFE2C0]">{r.name}</div><div className="text-[12px] text-[#E7D5A4]/45">{[r.address, r.city].filter(Boolean).join(', ')}</div></div>) },
+      { key: 'name', header: 'Venue', render: (r) => (<div><div className="text-[#EFE2C0]">{r.name}</div><div className="text-[12px] text-[#E7D5A4]/60">{[r.address, r.city].filter(Boolean).join(', ')}</div></div>) },
       { key: 'capacity', header: 'Capacity', align: 'right', render: (r) => fmt.num(r.capacity) },
       { key: 'contact', header: 'Contact', mobileHidden: true, render: (r) => [r.contact_name, r.contact_phone].filter(Boolean).join(' · ') || '—' },
       { key: 'active', header: 'Status', render: (r) => <Badge status={r.is_active ? 'active' : 'archived'}>{r.is_active ? 'Active' : 'Inactive'}</Badge> },
@@ -90,7 +90,7 @@ const ENTITIES = {
 const loadAssignments = async (r) => ((await supabase.from('event_assignments').select('title, status, events(id, name, event_date, status)').eq('assignee_id', r.id)).data || [])
   .map((a) => ({ ...a.events, sub: `${a.title} · ${a.status}` })).filter((e) => e.id);
 
-const EntityDrawer = ({ config, row, onClose, onSaved }) => {
+export const EntityDrawer = ({ config, row, onClose, onSaved, inline = false }) => {
   const toast = useToast();
   const isNew = !row.id;
   const [form, setForm] = useState(() => Object.fromEntries(config.fields.map(([k]) => [k, row[k] ?? ''])));
@@ -124,7 +124,7 @@ const EntityDrawer = ({ config, row, onClose, onSaved }) => {
   };
 
   return (
-    <Drawer title={isNew ? `New ${config.singular}` : config.title(row)} subtitle={row.profiles?.email} onClose={onClose}
+    <Drawer inline={inline} title={isNew ? `New ${config.singular}` : config.title(row)} subtitle={row.profiles?.email} onClose={onClose}
       footer={<>
         {config.toggle && !isNew && <Button variant="ghost" onClick={toggle}>{row[config.toggle.field] ? config.toggle.off : config.toggle.on}</Button>}
         <Button variant="primary" onClick={save} disabled={saving || missing}>{saving ? 'Saving…' : 'Save'}</Button>
@@ -132,7 +132,7 @@ const EntityDrawer = ({ config, row, onClose, onSaved }) => {
       {row.profiles && (
         <Panel title="Linked account">
           <KeyValue items={[['Name', row.profiles.full_name], ['Email', row.profiles.email], ['Phone', row.profiles.phone], ['Status', <Badge status={row.profiles.is_active === false ? 'deactivated' : 'active'} />]]} />
-          <p className="text-[12px] text-[#E7D5A4]/45 mt-3">Role and account status are managed by a Super Admin under Users & Roles.</p>
+          <p className="text-[12px] text-[#E7D5A4]/60 mt-3">Role and account status are managed by a Super Admin under Users & Roles.</p>
         </Panel>
       )}
       <form onSubmit={save} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -147,13 +147,13 @@ const EntityDrawer = ({ config, row, onClose, onSaved }) => {
       {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e] bg-[#a8322a]/10 border border-[#a8322a]/40 rounded px-3 py-2">{error}</div>}
       {!isNew && (
         <Panel title="Events" flush>
-          {(related.data || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/45">{related.loading ? 'Loading…' : 'Not linked to any events yet.'}</div> : (
+          {(related.data || []).length === 0 ? <div className="p-4 text-[12.5px] text-[#E7D5A4]/60">{related.loading ? 'Loading…' : 'Not linked to any events yet.'}</div> : (
             <ul className="divide-y divide-[#E7D5A4]/[0.06]">
               {related.data.map((e, i) => (
                 <li key={`${e.id}-${i}`}>
                   <Link to={`/admin-portal/events/${e.id}`} className="flex items-center gap-3 px-4 py-2.5 text-[12.5px] hover:bg-[#C99A2E]/[0.05]">
                     <span className="font-mono text-[#C99A2E] w-24 shrink-0">{fmt.date(e.event_date)}</span>
-                    <span className="flex-1 min-w-0 truncate">{e.name}{e.sub && <span className="text-[#E7D5A4]/40"> · {e.sub}</span>}</span>
+                    <span className="flex-1 min-w-0 truncate">{e.name}{e.sub && <span className="text-[#E7D5A4]/60"> · {e.sub}</span>}</span>
                     {e.status && <Badge status={e.status} />}
                   </Link>
                 </li>
@@ -169,9 +169,10 @@ const EntityDrawer = ({ config, row, onClose, onSaved }) => {
 const EntityManager = ({ kind }) => {
   const config = ENTITIES[kind];
   const [filters, setFilters] = useState(() => Object.fromEntries((config.filters || []).map((f) => [f.key, f.initial ?? ''])));
-  const [search, setSearch] = useState('');
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(params.get('q') || '');
   const q = useDebounced(search);
-  const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
 
   const table = useServerTable({
     table: config.table,
@@ -189,15 +190,15 @@ const EntityManager = ({ kind }) => {
       <div className="p-3 border-b border-[#C99A2E]/15">
         <Toolbar right={
           <>
-            <span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} {config.label.toLowerCase()}</span>
-            {config.canCreate && <Button size="sm" variant="primary" icon="Plus" onClick={() => setSelected({})}>Add {config.singular}</Button>}
+            <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} {config.label.toLowerCase()}</span>
+            {config.canCreate && <Button size="sm" variant="primary" icon="Plus" to={`/admin-portal/people/${kind}/new`}>Add {config.singular}</Button>}
           </>
         }>
           <SearchInput value={search} onChange={setSearch} placeholder={`Search ${config.label.toLowerCase()}…`} />
           {(config.filters || []).map((f) => <FilterSelect key={f.key} label={f.label} value={filters[f.key]} onChange={(v) => setFilters((s) => ({ ...s, [f.key]: v }))} options={f.options} />)}
         </Toolbar>
       </div>
-      <DataTable columns={config.columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload} onRowClick={setSelected}
+      <DataTable columns={config.columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload} onRowClick={(r) => navigate(`/admin-portal/people/${kind}/${r.id}`)}
         empty={{
           title: `No ${config.label.toLowerCase()} found`,
           hint: config.canCreate ? undefined : `${config.label} are added when their application is approved.`,
@@ -205,18 +206,42 @@ const EntityManager = ({ kind }) => {
           action: !config.canCreate && <Button size="sm" to={`/admin-portal/applications?type=${{ sponsors: 'sponsor', vendors: 'vendor', crew: 'crew', volunteers: 'volunteer' }[kind]}`}>View applications</Button>,
         }} />
       <Pagination {...table} />
-      {selected && <EntityDrawer key={selected.id || 'new'} config={config} row={selected} onClose={() => setSelected(null)} onSaved={() => { setSelected(null); table.reload(); }} />}
     </Panel>
   );
 };
 
-export default function PeoplePage() {
-  const { kind = 'artists' } = useParams();
+// /admin-portal/people/:kind/:id — one record as its own page.
+const EntityDetail = ({ kind, id }) => {
+  const config = ENTITIES[kind];
   const navigate = useNavigate();
-  const active = ENTITIES[kind] ? kind : 'artists';
+  const q = useAsync(async () => {
+    if (id === 'new') return {};
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+    const { data, error } = await supabase.from(config.table).select(config.select || '*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  }, [kind, id]);
+  const back = `/admin-portal/people/${kind}`;
+  const name = q.data && id !== 'new' ? config.title(q.data) : id === 'new' ? `New ${config.singular}` : 'Not found';
+  return (
+    <Page title={name} back={{ to: back, label: config.label }} crumbs={[{ label: name }]}>
+      {q.loading ? <Skeleton rows={6} /> : q.error ? <ErrorState error={q.error} onRetry={q.reload} /> : !q.data ? (
+        <Panel><EmptyState icon="Contact" title={`${config.singular[0].toUpperCase()}${config.singular.slice(1)} not found`} hint="It may have been removed, or the link is wrong." action={<Button to={back} icon="ChevronLeft">Back to {config.label.toLowerCase()}</Button>} /></Panel>
+      ) : (
+        <EntityDrawer inline key={id} config={config} row={q.data} onClose={() => navigate(back)} onSaved={() => navigate(back)} />
+      )}
+    </Page>
+  );
+};
+
+export default function PeoplePage() {
+  const { kind = 'artists', id } = useParams();
+  const active = ENTITIES[kind] ? kind : null;
+  if (!active) return <Page title="Not found"><Panel><EmptyState title="No such section" action={<Button to="/admin-portal/people/artists">Artists & partners</Button>} /></Panel></Page>;
+  if (id) return <EntityDetail kind={active} id={id} />;
   return (
     <Page title="Artists & partners" subtitle="The people and organizations behind every session. Partner records are created when their application is approved.">
-      <Tabs tabs={Object.entries(ENTITIES).map(([id, c]) => ({ id, label: c.label }))} value={active} onChange={(k) => navigate(`/admin-portal/people/${k}`)} />
+      <Tabs tabs={Object.entries(ENTITIES).map(([k, c]) => ({ id: k, label: c.label, to: `/admin-portal/people/${k}` }))} value={active} />
       <EntityManager key={active} kind={active} />
     </Page>
   );

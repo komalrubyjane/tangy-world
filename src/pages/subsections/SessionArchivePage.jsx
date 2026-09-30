@@ -19,7 +19,7 @@ export const SessionArchivePage = () => {
       {lightboxSrc && (
         <div className="fixed inset-0 z-[99999] bg-black/95 flex items-center justify-center p-4 cursor-pointer" onClick={() => setLightboxSrc(null)}>
           <img src={lightboxSrc} alt="Archive preview" className="max-w-full max-h-[90vh] object-contain border-4 border-[#E7D5A4]/30" />
-          <button className="absolute top-4 right-4 text-[#E7D5A4] font-mono text-xs font-bold border border-[#E7D5A4]/50 px-3 py-1">CLOSE ✕</button>
+          <button type="button" onClick={() => setLightboxSrc(null)} className="absolute top-4 right-4 min-h-[44px] text-[#E7D5A4] font-mono text-xs font-bold border border-[#E7D5A4]/50 px-3 py-1">CLOSE ✕</button>
         </div>
       )}
 
@@ -54,7 +54,7 @@ export const SessionArchivePage = () => {
         </div>
 
         {filteredGallery.length === 0 && (
-          <p className="font-mono text-xs text-[#E7D5A4]/40 uppercase text-center py-10">NO RECORDS MATCH YOUR SEARCH.</p>
+          <p className="font-mono text-xs text-[#E7D5A4]/60 uppercase text-center py-10">NO RECORDS MATCH YOUR SEARCH.</p>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">

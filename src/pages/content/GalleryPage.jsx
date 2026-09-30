@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { Link, useParams } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
@@ -7,6 +8,7 @@ import { useContent, formatDate } from '../../hooks/useContent';
 import { usePageMeta } from '../../hooks/usePageMeta';
 import { ContentLoading, ContentError, ContentEmpty } from '../../components/ui/ContentStates';
 import { NotFoundPage } from './NotFoundPage';
+import { MediaImg } from '../../components/ui/Media';
 
 // /gallery — published albums.
 export const GalleryPage = () => {
@@ -28,7 +30,7 @@ export const GalleryPage = () => {
           {albums.map((a) => (
             <li key={a.id}>
               <Link to={`/gallery/${a.slug}`} className="block bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] hover:-translate-y-1 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]" data-album-card>
-                <div className="aspect-[4/3] bg-[#11100C]/10 overflow-hidden">{a.cover_url && <img src={a.cover_url} alt="" loading="lazy" className="w-full h-full object-cover" />}</div>
+                <div className="aspect-[4/3] bg-[#11100C]/10 overflow-hidden">{a.cover_url && <MediaImg src={a.cover_url} alt="" loading="lazy" className="w-full h-full object-cover" />}</div>
                 <div className="p-3">
                   <div className="font-condensed text-lg font-bold uppercase">{a.title}</div>
                   <div className="text-[10px] opacity-70">{[formatDate(a.taken_on), `${a.gallery_photos?.[0]?.count ?? 0} photos`].filter(Boolean).join(' · ')}</div>
@@ -48,6 +50,8 @@ export const GalleryAlbumPage = () => {
   const { album: slug } = useParams();
   const { data: album, loading, error, retry } = useContent(() => content.getAlbum(slug), [slug]);
   const [open, setOpen] = useState(null);
+  const lightbox = useRef(null);
+  useFocusTrap(lightbox, open != null);
   usePageMeta({ title: album?.title || (loading ? 'Gallery' : 'Not found'), description: album?.description, image: album?.cover_url, noindex: !loading && !album });
   const photos = album?.gallery_photos || [];
 
@@ -81,7 +85,7 @@ export const GalleryAlbumPage = () => {
                 <li key={ph.id}>
                   <button type="button" onClick={() => setOpen(i)} className="block w-full aspect-square overflow-hidden border-2 border-[#C99A2E]/40 hover:border-[#C99A2E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]"
                     aria-label={`Open photo: ${ph.alt_text}`}>
-                    <img src={ph.image_url} alt={ph.alt_text} loading="lazy" className="w-full h-full object-cover" />
+                    <MediaImg src={ph.image_url} alt={ph.alt_text} loading="lazy" className="w-full h-full object-cover" />
                   </button>
                 </li>
               ))}
@@ -90,8 +94,8 @@ export const GalleryAlbumPage = () => {
         )}
       </main>
       {open != null && photos[open] && (
-        <div role="dialog" aria-modal="true" aria-label={photos[open].alt_text} className="fixed inset-0 z-[10000] bg-black/90 flex flex-col items-center justify-center p-4 gap-3" onClick={() => setOpen(null)}>
-          <img src={photos[open].image_url} alt={photos[open].alt_text} className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
+        <div ref={lightbox} role="dialog" aria-modal="true" aria-label={photos[open].alt_text} className="fixed inset-0 z-[10000] bg-black/90 flex flex-col items-center justify-center p-4 gap-3" onClick={() => setOpen(null)}>
+          <MediaImg src={photos[open].image_url} alt={photos[open].alt_text} className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
           {(photos[open].caption || photos[open].credit) && <p className="text-xs text-center m-0">{[photos[open].caption, photos[open].credit && `Photo: ${photos[open].credit}`].filter(Boolean).join(' — ')}</p>}
           <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
             <button type="button" className="min-h-[44px] px-4 border border-[#E7D5A4]" onClick={() => setOpen((i) => (i - 1 + photos.length) % photos.length)}>← Previous</button>

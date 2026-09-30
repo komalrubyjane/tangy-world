@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { notificationService } from '../../services/notificationService';
 import { useAdminSession, useSetting } from '../AdminSession';
@@ -7,8 +7,7 @@ import { adminApi, orIlike } from '../api';
 import { useServerTable, useDebounced, useAsync } from '../hooks';
 import { P } from '../rbac';
 import {
-  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Drawer, KeyValue, Button,
-  ConfirmDialog, Input, fmt, useToast,
+  Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Drawer, KeyValue, Button, ConfirmDialog, Input, fmt, useToast, Skeleton, ErrorState, EmptyState,
 } from '../ui';
 import { collabLabel } from '../../lib/bookingForm';
 
@@ -32,7 +31,7 @@ function BookingLeads() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[#EFE2C0]">{l.attendee_name}</span>
               {l.collab_interests.map((k) => <Badge key={k} tone="gold">{collabLabel(k)}</Badge>)}
-              <span className="ml-auto font-mono text-[11px] text-[#E7D5A4]/45">{l.events?.name} · {fmt.date(l.created_at)}</span>
+              <span className="ml-auto font-mono text-[11px] text-[#E7D5A4]/60">{l.events?.name} · {fmt.date(l.created_at)}</span>
             </div>
             {l.collab_note && <p className="text-[12.5px] text-[#E7D5A4]/70 m-0">“{l.collab_note}”</p>}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#E7D5A4]/55">
@@ -77,7 +76,7 @@ function useReviewerNames(rows) {
   }, [ids.join(',')]).data || {};
 }
 
-const ApplicationDrawer = ({ app, reviewer, onClose, onChanged }) => {
+const ApplicationDrawer = ({ app, reviewer, onClose, onChanged, inline = false }) => {
   const { can } = useAdminSession();
   const toast = useToast();
   const sendEmails = useSetting('notifications.send_approval_emails', true);
@@ -114,6 +113,7 @@ const ApplicationDrawer = ({ app, reviewer, onClose, onChanged }) => {
 
   return (
     <Drawer
+      inline={inline}
       title={app.applicant_name}
       subtitle={`${TYPE_LABEL[app.type] || app.type} application · submitted ${fmt.dateTime(app.submitted_at)}`}
       onClose={onClose}
@@ -193,7 +193,7 @@ export default function ApplicationsPage() {
   const to = params.get('to') || '';
   const [search, setSearch] = useState('');
   const q = useDebounced(search);
-  const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
 
   const setParam = (key, value) => {
     const next = new URLSearchParams(params);
@@ -218,12 +218,12 @@ export default function ApplicationsPage() {
   const reviewers = useReviewerNames(table.rows);
 
   const columns = [
-    { key: 'applicant', header: 'Applicant', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.applicant_name}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[260px]">{r.applicant_email}</div></div>) },
+    { key: 'applicant', header: 'Applicant', render: (r) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{r.applicant_name}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[260px]">{r.applicant_email}</div></div>) },
     { key: 'type', header: 'Type', render: (r) => <Badge tone="gold">{TYPE_LABEL[r.type] || r.type}</Badge> },
     { key: 'summary', header: 'Summary', mobileHidden: true, render: (r) => <span className="text-[#E7D5A4]/60 truncate block max-w-[240px]">{r.summary || '—'}</span> },
     { key: 'submitted', header: 'Submitted', render: (r) => <span className="font-mono text-[12px]">{fmt.date(r.submitted_at)}</span> },
     { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-    { key: 'reviewer', header: 'Reviewer', mobileHidden: true, render: (r) => (r.reviewed_by ? <span className="text-[12.5px]">{reviewers[r.reviewed_by] || '—'}<span className="text-[#E7D5A4]/40"> · {fmt.date(r.reviewed_at)}</span></span> : <span className="text-[#E7D5A4]/30">—</span>) },
+    { key: 'reviewer', header: 'Reviewer', mobileHidden: true, render: (r) => (r.reviewed_by ? <span className="text-[12.5px]">{reviewers[r.reviewed_by] || '—'}<span className="text-[#E7D5A4]/60"> · {fmt.date(r.reviewed_at)}</span></span> : <span className="text-[#E7D5A4]/60">—</span>) },
   ];
 
   return (
@@ -231,7 +231,7 @@ export default function ApplicationsPage() {
       {can(P.BOOKINGS_ALL) && <BookingLeads />}
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
-          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} result{table.count === 1 ? '' : 's'}</span>}>
+          <Toolbar right={<span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} result{table.count === 1 ? '' : 's'}</span>}>
             <SearchInput value={search} onChange={setSearch} placeholder="Search name, email, details…" />
             <FilterSelect label="Type" value={type} onChange={(v) => setParam('type', v)} options={TYPES} />
             <FilterSelect label="Status" value={status} onChange={(v) => setParam('status', v)} options={STATUSES} />
@@ -246,20 +246,35 @@ export default function ApplicationsPage() {
           loading={table.loading}
           error={table.error}
           onRetry={table.reload}
-          onRowClick={setSelected}
+          onRowClick={(r) => navigate(`/admin-portal/applications/${r.id}`)}
           empty={{ title: status === 'pending' ? 'No pending applications' : 'No applications found', hint: 'Try a different filter.', icon: 'Inbox' }}
         />
         <Pagination {...table} />
       </Panel>
-      {selected && (
-        <ApplicationDrawer
-          app={selected}
-          reviewer={reviewers[selected.reviewed_by]}
-          onClose={() => setSelected(null)}
-          onChanged={() => { setSelected(null); table.reload(); }}
-        />
-      )}
     </Page>
   );
 }
 
+
+// /admin-portal/applications/:id — one application as its own page.
+export function ApplicationDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const q = useAsync(async () => {
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+    const { data, error } = await supabase.from('applications_overview').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  }, [id]);
+  const reviewers = useReviewerNames(q.data ? [q.data] : []);
+  const name = q.data?.applicant_name || (q.loading ? 'Application' : 'Application not found');
+  return (
+    <Page title={name} back={{ to: '/admin-portal/applications', label: 'Applications' }} crumbs={[{ label: name }]}>
+      {q.loading ? <Skeleton rows={6} /> : q.error ? <ErrorState error={q.error} onRetry={q.reload} /> : !q.data ? (
+        <Panel><EmptyState icon="Inbox" title="Application not found" hint="It may not exist, or the link is wrong." action={<Button to="/admin-portal/applications" icon="ChevronLeft">Back to applications</Button>} /></Panel>
+      ) : (
+        <ApplicationDrawer inline app={q.data} reviewer={reviewers[q.data.reviewed_by]} onClose={() => navigate('/admin-portal/applications')} onChanged={q.reload} />
+      )}
+    </Page>
+  );
+}

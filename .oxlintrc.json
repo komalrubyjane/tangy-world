@@ -1,8 +1,16 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "oxc"],
+  "env": { "browser": true, "es2024": true },
+  "globals": { "__TANGY_DEV_TOOLS__": "readonly" },
   "rules": {
     "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "no-undef": "error",
+    "react/jsx-no-undef": "error"
+  },
+  "overrides": [
+    { "files": ["vite.config.js", "scripts/**", "e2e/**"], "env": { "node": true } },
+    { "files": ["supabase/functions/**"], "globals": { "Deno": "readonly" } }
+  ]
 }

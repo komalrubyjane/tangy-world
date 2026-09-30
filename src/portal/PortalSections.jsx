@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Icon, Button, Badge, Panel, Textarea, EmptyState, ErrorState, Skeleton, Drawer, KeyValue, cx, fmt } from '../admin/ui';
 import { localISODate } from '../admin/rbac';
@@ -15,28 +15,46 @@ import { uploadWithProgress, openPrivateFile, safeFileName, formatBytes } from '
 const KIND_LABEL = { artist: 'Performing artist', sponsor: 'Sponsor', vendor: 'Vendor', venue: 'Venue host', volunteer: 'Volunteer', crew: 'Crew', staff: 'Staff' };
 const FEE_LABEL = { pending: 'Fee pending', invoiced: 'Invoiced', paid: 'Paid' };
 
-// ?tab= in the URL so notification deep links open the right section.
+// Each portal section is its own URL: /<role>/dashboard/<section>, and a
+// conversation is /<role>/dashboard/messages/<id>. Old ?tab=/&c= links are
+// redirected. Admin previews (no /dashboard segment in the path) keep the
+// query-string form.
 export function usePortalTab(defaultTab, tabIds) {
+  const { tab: pathTab, sub } = useParams();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const requested = params.get('tab');
+  const base = pathname.match(/^(.*?\/dashboard)(?:\/|$)/)?.[1] || null;
+  const legacyTab = params.get('tab');
+  const legacyConv = params.get('c');
+
+  useEffect(() => {
+    if (!base || !legacyTab) return;
+    navigate(legacyConv ? `${base}/messages/${legacyConv}` : `${base}/${legacyTab}`, { replace: true });
+  }, [base, legacyTab, legacyConv, navigate]);
+
+  const requested = base ? pathTab : legacyTab;
   const tab = tabIds.includes(requested) ? requested : defaultTab;
+  const hrefFor = useCallback((t) => (base ? (t === defaultTab ? base : `${base}/${t}`) : `?tab=${t}`), [base, defaultTab]);
   const setTab = useCallback((next) => {
+    if (base) { navigate(hrefFor(next)); return; }
     setParams((p) => {
       const n = new URLSearchParams(p);
       n.set('tab', next);
       if (next !== 'messages') n.delete('c');
       return n;
     }, { replace: true });
-  }, [setParams]);
-  const conversationId = params.get('c');
+  }, [base, hrefFor, navigate, setParams]);
+  const conversationId = base ? (pathTab === 'messages' ? sub || null : null) : legacyConv;
   const setConversationId = useCallback((id) => {
+    if (base) { navigate(id ? `${base}/messages/${id}` : `${base}/messages`); return; }
     setParams((p) => {
       const n = new URLSearchParams(p);
       if (id) n.set('c', id); else n.delete('c');
       return n;
     }, { replace: true });
-  }, [setParams]);
-  return { tab, setTab, conversationId, setConversationId };
+  }, [base, navigate, setParams]);
+  return { tab, setTab, conversationId, setConversationId, hrefFor, requestedTab: requested, unknownTab: !!requested && !tabIds.includes(requested) };
 }
 
 export function usePortalEvents(enabled = true) {
@@ -98,14 +116,14 @@ export const NextEventCard = ({ events, loading, error, onRetry, onOpen, emptyTi
       <div className="p-5">
         <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#C99A2E]">{artist ? 'Next performance' : 'Next event'}</div>
         <h3 className="font-condensed text-[26px] uppercase tracking-tight text-[#EFE2C0] mt-1.5 mb-0 leading-none">{next.name}</h3>
-        <p className="text-[13.5px] text-[#E7D5A4]/70 mt-2">{eventWhen(next)} <span className="text-[#E7D5A4]/40">· {tzAbbr(tz)}</span></p>
+        <p className="text-[13.5px] text-[#E7D5A4]/70 mt-2">{eventWhen(next)} <span className="text-[#E7D5A4]/60">· {tzAbbr(tz)}</span></p>
         <p className="text-[13.5px] text-[#E7D5A4]/70 flex items-start gap-1.5 mt-1"><Icon name="MapPin" size={14} className="text-[#C99A2E] mt-0.5 shrink-0" />
-          <span>{next.venue_name || 'Venue to be confirmed'}{where && <span className="text-[#E7D5A4]/50"> · {where}</span>}</span></p>
+          <span>{next.venue_name || 'Venue to be confirmed'}{where && <span className="text-[#E7D5A4]/60"> · {where}</span>}</span></p>
         {rows.length > 0 && (
           <dl className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {rows.map(([k, v]) => (
               <div key={k} className="bg-[#11100C] border border-[#C99A2E]/20 rounded px-3 py-2">
-                <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#E7D5A4]/50">{k}</dt>
+                <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#E7D5A4]/60">{k}</dt>
                 <dd className="font-condensed text-[17px] text-[#EFE2C0] m-0 mt-0.5">{v}</dd>
               </div>
             ))}
@@ -155,7 +173,7 @@ export const EventsPanel = ({ events, loading, error, onRetry, includePast, setI
             </span>
           </div>
           <div className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{KIND_LABEL[e.member_kind]}{e.responsibility && e.responsibility !== KIND_LABEL[e.member_kind] ? ` · ${e.responsibility}` : ''}</div>
-          <div className="text-[12.5px] text-[#E7D5A4]/50 mt-0.5">{[e.event_time, e.venue_name].filter(Boolean).join(' · ') || 'Details to be confirmed'}</div>
+          <div className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{[e.event_time, e.venue_name].filter(Boolean).join(' · ') || 'Details to be confirmed'}</div>
           {e.open_requirements > 0 && <div className="mt-2"><Badge tone="warn">{e.open_requirements} needed from you</Badge></div>}
         </div>
       </button>
@@ -168,15 +186,15 @@ export const EventsPanel = ({ events, loading, error, onRetry, includePast, setI
       ) : (
         <div className="flex flex-col gap-5">
           <div>
-            <h4 className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/50 mb-2">Upcoming</h4>
+            <h4 className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/60 mb-2">Upcoming</h4>
             {upcoming.length ? <ul className="flex flex-col gap-2">{upcoming.map((e) => <Card key={`${e.event_id}-${e.member_kind}`} e={e} />)}</ul>
-              : <p className="text-[13px] text-[#E7D5A4]/45 font-sans">No upcoming events.</p>}
+              : <p className="text-[13px] text-[#E7D5A4]/60 font-sans">No upcoming events.</p>}
           </div>
           {includePast && (
             <div>
-              <h4 className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/50 mb-2">Past</h4>
+              <h4 className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/60 mb-2">Past</h4>
               {past.length ? <ul className="flex flex-col gap-2 opacity-80">{past.map((e) => <Card key={`${e.event_id}-${e.member_kind}`} e={e} />)}</ul>
-                : <p className="text-[13px] text-[#E7D5A4]/45 font-sans">No past events.</p>}
+                : <p className="text-[13px] text-[#E7D5A4]/60 font-sans">No past events.</p>}
             </div>
           )}
         </div>
@@ -271,9 +289,9 @@ export const ScheduleTimeline = ({ events, loading, error, onRetry, onOpen }) =>
                 </button>
                 {slots.length > 0 ? (
                   <ul className="mt-2 flex flex-wrap gap-2">
-                    {slots.map(([k, t]) => <li key={k} className="font-mono text-[11px] bg-[#11100C] border border-[#C99A2E]/20 rounded px-2 py-1"><span className="text-[#E7D5A4]/50">{k}</span> <span className="text-[#EFE2C0]">{fmt.time(t)}</span></li>)}
+                    {slots.map(([k, t]) => <li key={k} className="font-mono text-[11px] bg-[#11100C] border border-[#C99A2E]/20 rounded px-2 py-1"><span className="text-[#E7D5A4]/60">{k}</span> <span className="text-[#EFE2C0]">{fmt.time(t)}</span></li>)}
                   </ul>
-                ) : <p className="text-[12px] text-[#E7D5A4]/40 mt-1">Times not set yet.</p>}
+                ) : <p className="text-[12px] text-[#E7D5A4]/60 mt-1">Times not set yet.</p>}
               </li>
             );
           })}
@@ -350,7 +368,7 @@ const RequirementItem = ({ r, onDone }) => {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="text-[14.5px] text-[#EFE2C0]">{r.title}</div>
-          <div className={cx('text-[12px]', overdue ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/50')}>{r.events?.name}{r.due_at ? ` · ${overdue ? 'overdue since' : 'due'} ${fmt.dateTime(r.due_at)}` : ''}</div>
+          <div className={cx('text-[12px]', overdue ? 'text-[#ef6b5e]' : 'text-[#E7D5A4]/60')}>{r.events?.name}{r.due_at ? ` · ${overdue ? 'overdue since' : 'due'} ${fmt.dateTime(r.due_at)}` : ''}</div>
         </div>
         <div className="flex flex-wrap justify-end gap-1.5">
           {PRIORITY_TONE[r.priority] && editable && <Badge tone={PRIORITY_TONE[r.priority]}>{r.priority}</Badge>}
@@ -365,7 +383,7 @@ const RequirementItem = ({ r, onDone }) => {
           <label className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#E7D5A4]/70">
             <Icon name="Paperclip" size={14} />
             <input type="file" aria-label={`Attach a file to ${r.title}`} onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-[12px] file:mr-2 file:h-7 file:px-2 file:rounded file:border file:border-[#C99A2E]/40 file:bg-transparent file:text-[#E7D5A4] file:font-mono file:text-[10.5px] file:uppercase" />
-            {file && <span className="text-[#E7D5A4]/50">{formatBytes(file.size)}</span>}
+            {file && <span className="text-[#E7D5A4]/60">{formatBytes(file.size)}</span>}
           </label>
           {progress !== null && <div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} className="h-1 rounded bg-[#E7D5A4]/10 overflow-hidden"><div className="h-full bg-[#C99A2E]" style={{ width: `${progress}%` }} /></div>}
           {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e]">{error}</div>}
@@ -436,7 +454,7 @@ export const DocumentsPanel = () => {
               <Icon name="FileText" size={18} className="text-[#C99A2E] shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="text-[14px] text-[#EFE2C0] truncate">{d.title}</div>
-                <div className="text-[12px] text-[#E7D5A4]/50">
+                <div className="text-[12px] text-[#E7D5A4]/60">
                   {[DOC_CATEGORY[d.category] || 'Document', d.events?.name, d.file_size_bytes ? formatBytes(d.file_size_bytes) : null, fmt.date(d.created_at)].filter(Boolean).join(' · ')}
                   {d.expires_at && <span className="text-[#f5b544]"> · available until {fmt.dateTime(d.expires_at)}</span>}
                 </div>
@@ -466,7 +484,7 @@ export const AnnouncementsPanel = ({ limit = 20, compact = false }) => {
             {a.priority === 'high' && <Badge tone="bad">Important</Badge>}
           </div>
           {a.body && <p className={cx('text-[13px] text-[#E7D5A4]/70 mt-1 whitespace-pre-line', compact && 'line-clamp-2')}>{a.body}</p>}
-          <div className="font-mono text-[10.5px] text-[#E7D5A4]/40 mt-1">{a.event_name || 'All'} · {fmt.relative(a.publish_at)}</div>
+          <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 mt-1">{a.event_name || 'All'} · {fmt.relative(a.publish_at)}</div>
         </li>
       ))}
     </ul>
@@ -529,9 +547,9 @@ export const NotificationsPanel = ({ filters = NOTIFICATION_FILTERS, settingsTo 
                       {pb && <Badge tone={pb[1]}>{pb[0]}</Badge>}
                     </div>
                     {n.body && <p className="text-[12.5px] text-[#E7D5A4]/60 mt-0.5">{n.body}</p>}
-                    <span className="font-mono text-[10.5px] text-[#E7D5A4]/40">{fmt.dateTime(n.created_at)}</span>
+                    <span className="font-mono text-[10.5px] text-[#E7D5A4]/60">{fmt.dateTime(n.created_at)}</span>
                   </div>
-                  {!n.read_at && !n.link && <button type="button" onClick={() => markOne(n)} className="self-start font-mono text-[10px] uppercase text-[#E7D5A4]/50 hover:text-[#E7D5A4]">Mark read</button>}
+                  {!n.read_at && !n.link && <button type="button" onClick={() => markOne(n)} className="self-start font-mono text-[10px] uppercase text-[#E7D5A4]/60 hover:text-[#E7D5A4]">Mark read</button>}
                 </li>
               );
             })}
@@ -581,7 +599,7 @@ export const CheckInAccessPanel = ({ events }) => {
           <div className="flex flex-col gap-3">
             {active.length === 0 && (
               <div className="rounded-md border border-[#E7D5A4]/15 bg-[#11100C] p-4" data-access-state={grants[0] ? grants[0].state : 'none'}>
-                <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/50">Status</div>
+                <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#E7D5A4]/60">Status</div>
                 <div className="font-condensed text-[24px] uppercase text-[#E7D5A4]/80 mt-0.5">{grants[0] ? (grants[0].state === 'revoked' ? 'Ended' : 'Expired') : 'No active check-in access'}</div>
                 <p className="text-[13px] text-[#E7D5A4]/55 mt-1">{grants[0] ? 'Contact the event admin if you need access.' : 'The event team grants check-in access for a set time when you are needed at the gate.'}</p>
               </div>
@@ -612,7 +630,7 @@ export const CheckInAccessPanel = ({ events }) => {
           <ul className="divide-y divide-[#E7D5A4]/[0.06]">
             {recent.map((g) => (
               <li key={g.grant_id} className="py-2.5 flex items-center justify-between gap-2 text-[13px]">
-                <span>{g.event_name}<span className="text-[#E7D5A4]/45"> · {fmt.dateTime(g.granted_at)} – {fmt.time(g.expires_at)}</span></span>
+                <span>{g.event_name}<span className="text-[#E7D5A4]/60"> · {fmt.dateTime(g.granted_at)} – {fmt.time(g.expires_at)}</span></span>
                 <Badge status={g.state === 'revoked' ? 'cancelled' : 'expired'}>{g.state === 'revoked' ? 'Ended' : 'Expired'}</Badge>
               </li>
             ))}

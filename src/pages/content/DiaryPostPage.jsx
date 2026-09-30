@@ -6,6 +6,7 @@ import { useContent, formatDate } from '../../hooks/useContent';
 import { usePageMeta } from '../../hooks/usePageMeta';
 import { ContentLoading, ContentError } from '../../components/ui/ContentStates';
 import { NotFoundPage } from './NotFoundPage';
+import { MediaImg } from '../../components/ui/Media';
 
 // /diary/:slug — one published post. The body is plain text (paragraphs
 // separated by blank lines); nothing is rendered as HTML.
@@ -25,7 +26,7 @@ export const DiaryPostPage = () => {
         {!loading && error && <ContentError onRetry={retry} />}
         {post && (
           <article className="mt-6 bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C]" data-diary-post>
-            {post.cover_url && <img src={post.cover_url} alt="" className="w-full max-h-[420px] object-cover border-b-4 border-[#11100C]" />}
+            {post.cover_url && <MediaImg src={post.cover_url} alt="" className="w-full max-h-[420px] object-cover border-b-4 border-[#11100C]" />}
             <div className="p-5 sm:p-10">
               <p className="font-mono text-[10px] font-bold text-[#7C2D18] uppercase tracking-widest m-0">
                 {[formatDate(post.published_at), post.location, post.author_name && `by ${post.author_name}`].filter(Boolean).join(' · ')}

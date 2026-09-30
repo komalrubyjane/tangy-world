@@ -108,6 +108,7 @@ export const VendorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tabHref={portal.hrefFor}
       onLogout={handleLogout}
       notificationsFor={portalMode ? user.id : null}
       preview={readOnly ? { label: `Viewing Vendor Portal — ${profile?.business_name || user.full_name || user.email}` } : undefined}

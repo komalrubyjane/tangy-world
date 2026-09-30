@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MediaImg } from '../../components/ui/Media';
 import { supabase } from '../../lib/supabaseClient';
 import { content, slugify, contentErrorMessage, TV_FIELDS, DIARY_FIELDS, ALBUM_FIELDS } from '../../lib/contentService';
 import { useAsync } from '../hooks';
 import { useAdminSession } from '../AdminSession';
 import { P } from '../rbac';
-import { Panel, Button, Input, Textarea, Select, Field, Badge, DataTable, Drawer, ConfirmDialog, SearchInput, Toolbar, FilterSelect, useToast, fmt } from '../ui';
+import { Panel, Button, Input, Textarea, Select, Field, Badge, DataTable, Drawer, ConfirmDialog, SearchInput, Toolbar, FilterSelect, Skeleton, EmptyState, ErrorState, useToast, fmt } from '../ui';
 
 // Admin → Content: Tangy TV, Diary, Gallery. The database is the authority
 // (RLS + content_guard_publish, migration 0028); these screens only hide
@@ -62,15 +64,20 @@ function MediaField({ label, value, onChange, area, accept, hint, error, canUplo
           </>
         )}
       </div>
-      {value && accept?.startsWith('image') && URL_RE.test(value) && <img src={value} alt="" className="mt-2 max-h-32 w-auto border border-[#C99A2E]/30" />}
+      {value && accept?.startsWith('image') && URL_RE.test(value) && <MediaImg src={value} alt="" className="mt-2 max-h-32 w-auto border border-[#C99A2E]/30" />}
     </Field>
   );
 }
 
-// Generic list + editor for one content table.
-function CollectionManager({ area, table, fields, noun, columns, validate, blank, toRow, fromRow, previewPath }) {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Generic list + editor for one content table. Each item has its own URL:
+// mode "list" is <base>, mode "detail" is <base>/<slug|id> (or <base>/new),
+// rendered as a full page — refresh, back/forward and deep links all work.
+function CollectionManager({ area, table, fields, noun, columns, validate, blank, toRow, fromRow, previewPath, mode = 'list', base, itemRef, onLoaded }) {
   const rights = useContentRights(area);
   const toast = useToast();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [editing, setEditing] = useState(null);   // form state
@@ -81,10 +88,25 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
   const slugTouched = useRef(false);
 
   const list = useAsync(async () => {
+    if (mode !== 'list') return [];
     const { data, error } = await supabase.from(table).select(fields).order('updated_at', { ascending: false });
     if (error) throw new Error(contentErrorMessage(error));
     return data || [];
-  }, [table]);
+  }, [table, mode]);
+
+  // Detail page: load the item named in the URL.
+  const item = useAsync(async () => {
+    if (mode !== 'detail' || itemRef === 'new') return null;
+    const { data, error } = await supabase.from(table).select(fields).eq(UUID_RE.test(itemRef) ? 'id' : 'slug', itemRef).maybeSingle();
+    if (error) throw new Error(contentErrorMessage(error));
+    return data;
+  }, [table, mode, itemRef]);
+  useEffect(() => {
+    if (mode !== 'detail') return;
+    if (itemRef === 'new') { slugTouched.current = false; const f = blank(); setEditing(f); setOriginal(f); setErrors({}); onLoaded?.(null); return; }
+    if (item.data) { slugTouched.current = true; const f = fromRow(item.data); setEditing(f); setOriginal(f); setErrors({}); onLoaded?.(item.data); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, itemRef, item.data]);
 
   const rows = useMemo(() => (list.data || []).filter((r) => (!status || r.status === status)
     && (!search || `${r.title} ${r.slug}`.toLowerCase().includes(search.toLowerCase()))), [list.data, status, search]);
@@ -92,16 +114,10 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
   const dirty = editing && JSON.stringify(editing) !== JSON.stringify(original);
   useBeforeUnload(dirty);
 
-  const open = (row) => {
-    const form = row ? fromRow(row) : blank();
-    slugTouched.current = !!row;
-    setEditing(form);
-    setOriginal(form);
-    setErrors({});
-  };
+  const open = (row) => navigate(`${base}/${row ? (row.slug || row.id) : 'new'}`);
   const close = () => {
     if (dirty && !window.confirm('Discard your unsaved changes?')) return;
-    setEditing(null);
+    navigate(base);
   };
   const set = (patch) => setEditing((f) => {
     const next = { ...f, ...patch };
@@ -124,7 +140,9 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
     setEditing(form);
     setOriginal(form);
     slugTouched.current = true;
-    list.reload();
+    onLoaded?.(data);
+    // The URL follows the item (new → its slug; a renamed slug).
+    if (itemRef !== data.slug) navigate(`${base}/${data.slug}`, { replace: true });
   };
 
   const remove = (row) => setConfirm({
@@ -135,12 +153,59 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
       const { error } = await content.remove(table, row.id);
       if (error) throw new Error(contentErrorMessage(error));
       toast(`${noun} deleted.`);
-      if (editing?.id === row.id) setEditing(null);
-      list.reload();
+      navigate(base);
     },
   });
 
   if (!rights.view) return <Panel><p className="text-[13px] text-[#E7D5A4]/70">You don’t have access to this area.</p></Panel>;
+
+  if (mode === 'detail') {
+    if (item.loading && !editing) return <Skeleton rows={6} />;
+    if (item.error) return <ErrorState error={item.error} onRetry={item.reload} />;
+    if (itemRef !== 'new' && !item.loading && !item.data) {
+      return <Panel><EmptyState icon="FileText" title={`${noun} not found`} hint="It may have been deleted, or the link is wrong." action={<Button to={base} icon="ChevronLeft">Back to {noun.toLowerCase()}s</Button>} /></Panel>;
+    }
+    if (!editing) return <Skeleton rows={6} />;
+  }
+
+  if (mode === 'detail') {
+    return (
+      <>
+        <Drawer
+          inline
+          title={editing.id ? editing.title || `Edit ${noun.toLowerCase()}` : `New ${noun.toLowerCase()}`}
+          subtitle={dirty ? 'Unsaved changes' : editing.id ? 'All changes saved' : undefined}
+          onClose={close}
+          footer={(
+            <>
+              {editing.id && rights.remove && <Button variant="danger" icon="Trash2" onClick={() => remove(editing)} className="mr-auto">Delete</Button>}
+              {editing.id && editing.status === 'published' && previewPath && <Button icon="ExternalLink" to={previewPath(editing)} target="_blank">View live</Button>}
+              <Button variant="ghost" onClick={close}>{dirty ? 'Cancel' : `Back to ${noun.toLowerCase()}s`}</Button>
+              <Button variant="primary" onClick={save} disabled={saving || !dirty || !(editing.id ? rights.edit : rights.create)}>{saving ? 'Saving…' : 'Save'}</Button>
+            </>
+          )}
+        >
+          <Field label="Title *" error={errors.title}><Input value={editing.title} onChange={(e) => set({ title: e.target.value })} maxLength={160} autoFocus={!editing.id} /></Field>
+          <Field label="URL slug *" hint={previewPath ? `Public address: ${previewPath(editing)}` : undefined} error={errors.slug}>
+            <Input value={editing.slug} onChange={(e) => { slugTouched.current = true; set({ slug: e.target.value.toLowerCase() }); }} maxLength={80} />
+          </Field>
+          {editing.__fields(editing, set, errors, rights)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#C99A2E]/15 pt-4">
+            <Field label="Publish status" hint={rights.publish ? undefined : 'Publishing needs the content.publish permission — you can save drafts.'}>
+              <Select value={editing.status} onChange={(e) => set({ status: e.target.value })}
+                disabled={!rights.publish && editing.status === 'published'}>
+                {STATUS_OPTIONS.map(([v, l]) => <option key={v} value={v} disabled={!rights.publish && (v === 'published' || original?.status === 'published')}>{l}</option>)}
+              </Select>
+            </Field>
+            <Field label="Publish at" hint="Leave empty to publish immediately. A future time schedules it.">
+              <Input type="datetime-local" value={editing.publishedAtLocal} disabled={!rights.publish} onChange={(e) => set({ publishedAtLocal: e.target.value })} />
+            </Field>
+          </div>
+        </Drawer>
+        {confirm && <ConfirmDialog {...confirm} onClose={() => setConfirm(null)} />}
+      </>
+    );
+  }
 
   return (
     <Panel flush>
@@ -165,38 +230,6 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
         ]}
       />
 
-      {editing && (
-        <Drawer
-          title={editing.id ? `Edit ${noun.toLowerCase()}` : `New ${noun.toLowerCase()}`}
-          subtitle={dirty ? 'Unsaved changes' : editing.id ? 'All changes saved' : undefined}
-          onClose={close}
-          footer={(
-            <>
-              {editing.id && rights.remove && <Button variant="danger" icon="Trash2" onClick={() => remove(editing)} className="mr-auto">Delete</Button>}
-              {editing.id && editing.status === 'published' && previewPath && <Button icon="ExternalLink" to={previewPath(editing)} target="_blank">View live</Button>}
-              <Button variant="ghost" onClick={close}>Close</Button>
-              <Button variant="primary" onClick={save} disabled={saving || !dirty || !(editing.id ? rights.edit : rights.create)}>{saving ? 'Saving…' : 'Save'}</Button>
-            </>
-          )}
-        >
-          <Field label="Title *" error={errors.title}><Input value={editing.title} onChange={(e) => set({ title: e.target.value })} maxLength={160} autoFocus /></Field>
-          <Field label="URL slug *" hint={previewPath ? `Public address: ${previewPath(editing)}` : undefined} error={errors.slug}>
-            <Input value={editing.slug} onChange={(e) => { slugTouched.current = true; set({ slug: e.target.value.toLowerCase() }); }} maxLength={80} />
-          </Field>
-          {editing.__fields(editing, set, errors, rights)}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#C99A2E]/15 pt-4">
-            <Field label="Publish status" hint={rights.publish ? undefined : 'Publishing needs the content.publish permission — you can save drafts.'}>
-              <Select value={editing.status} onChange={(e) => set({ status: e.target.value })}
-                disabled={!rights.publish && editing.status === 'published'}>
-                {STATUS_OPTIONS.map(([v, l]) => <option key={v} value={v} disabled={!rights.publish && (v === 'published' || original?.status === 'published')}>{l}</option>)}
-              </Select>
-            </Field>
-            <Field label="Publish at" hint="Leave empty to publish immediately. A future time schedules it.">
-              <Input type="datetime-local" value={editing.publishedAtLocal} disabled={!rights.publish} onChange={(e) => set({ publishedAtLocal: e.target.value })} />
-            </Field>
-          </div>
-        </Drawer>
-      )}
       {confirm && <ConfirmDialog {...confirm} onClose={() => setConfirm(null)} />}
     </Panel>
   );
@@ -205,7 +238,7 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
 const common = (row) => ({ id: row?.id, title: row?.title || '', slug: row?.slug || '', status: row?.status || 'draft', publishedAtLocal: toLocalInput(row?.published_at) });
 const commonRow = (f) => ({ id: f.id, title: f.title.trim(), slug: f.slug, status: f.status, published_at: f.publishedAtLocal ? new Date(f.publishedAtLocal).toISOString() : (f.status === 'published' ? undefined : null) });
 
-export function TvManager() {
+export function TvManager(routeProps) {
   const rights = useContentRights('tv');
   const fieldsUi = (f, set, errors) => (
     <>
@@ -223,6 +256,7 @@ export function TvManager() {
   );
   return (
     <CollectionManager
+      {...routeProps}
       area="tv" table="tv_videos" fields={TV_FIELDS} noun="Video"
       previewPath={(f) => `/tv/${f.slug}`}
       columns={[{ key: 'category', header: 'Category', render: (r) => r.category || '—' }, { key: 'in_player', header: 'On TV set', render: (r) => (r.in_player ? 'Yes' : 'No'), mobileHidden: true }]}
@@ -239,7 +273,7 @@ export function TvManager() {
   );
 }
 
-export function DiaryManager() {
+export function DiaryManager(routeProps) {
   const rights = useContentRights('diary');
   const fieldsUi = (f, set, errors) => (
     <>
@@ -256,6 +290,7 @@ export function DiaryManager() {
   );
   return (
     <CollectionManager
+      {...routeProps}
       area="diary" table="diary_posts" fields={DIARY_FIELDS} noun="Post"
       previewPath={(f) => `/diary/${f.slug}`}
       columns={[{ key: 'published_at', header: 'Published', render: (r) => (r.published_at ? fmt.date(r.published_at) : '—') }]}
@@ -316,7 +351,7 @@ function AlbumPhotos({ albumId, rights }) {
       <ul className="flex flex-col gap-2 list-none m-0 p-0">
         {list.map((p, i) => (
           <li key={p.id} className="flex items-center gap-3 border border-[#C99A2E]/20 p-2">
-            <img src={p.image_url} alt="" className="w-14 h-14 object-cover" />
+            <MediaImg src={p.image_url} alt="" className="w-14 h-14 object-cover" />
             <span className="flex-1 min-w-0 text-[12px]"><span className="block truncate">{p.alt_text}</span>{p.caption && <span className="block truncate opacity-60">{p.caption}</span>}</span>
             {rights.edit && (
               <span className="flex gap-1">
@@ -341,7 +376,7 @@ function AlbumPhotos({ albumId, rights }) {
   );
 }
 
-export function GalleryManager() {
+export function GalleryManager(routeProps) {
   const rights = useContentRights('media');
   const fieldsUi = (f, set, errors, r) => (
     <>
@@ -356,6 +391,7 @@ export function GalleryManager() {
   );
   return (
     <CollectionManager
+      {...routeProps}
       area="media" table="gallery_albums" fields={ALBUM_FIELDS} noun="Album"
       previewPath={(f) => `/gallery/${f.slug}`}
       columns={[{ key: 'taken_on', header: 'Date', render: (r) => (r.taken_on ? fmt.date(r.taken_on) : '—') }]}

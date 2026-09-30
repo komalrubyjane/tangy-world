@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams, useLocation } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { PatronDashboard } from '../../pages/dashboards/PatronDashboard';
 
@@ -25,8 +25,12 @@ const ROLE_DASHBOARD_PATH = {
 
 export const DashboardRedirect = () => {
   const { user } = useUserAuth();
+  const { tab } = useParams();
+  const { search } = useLocation();
   const target = user?.role ? ROLE_DASHBOARD_PATH[user.role] : undefined;
 
-  if (target) return <Navigate to={target} replace />;
+  // Keep the section (and any old ?tab= deep link) when forwarding.
+  const isConsole = target?.startsWith('/admin-portal');
+  if (target) return <Navigate to={`${target}${tab && !isConsole ? `/${tab}` : ''}${isConsole ? '' : search}`} replace />;
   return <PatronDashboard />;
 };

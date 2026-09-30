@@ -34,3 +34,16 @@ export function useGalleryPhotos(limit = 60) {
   }, [limit]);
   return photos;
 }
+
+// One media URL (stored reference, site path or https link) → loadable src.
+export function useMediaSrc(url) {
+  const [src, setSrc] = useState(() => (url && !url.startsWith('/storage/content-media/') ? url : null));
+  useEffect(() => {
+    let cancelled = false;
+    if (!url) { setSrc(null); return undefined; }
+    if (!url.startsWith('/storage/content-media/')) { setSrc(url); return undefined; }
+    import('../lib/contentService').then(({ resolveMedia }) => resolveMedia([url])).then((get) => { if (!cancelled) setSrc(get(url)); });
+    return () => { cancelled = true; };
+  }, [url]);
+  return src;
+}

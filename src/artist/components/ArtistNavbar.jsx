@@ -5,18 +5,18 @@ import { useAudio } from '../../audio/AudioContext';
 import { NotificationBell } from '../../portal/NotificationBell';
 
 // Artist workspace navigation. Sections that live as tabs inside the
-// dashboard are deep-linked with ?tab= so every item is a real route.
+// dashboard have their own URLs (/artist/dashboard/<section>).
 const ARTIST_NAV = [
   { label: 'Overview', to: '/artist/dashboard', desktop: true },
   { label: 'Calendar', to: '/artist/calendar', desktop: true },
-  { label: 'My events', to: '/artist/dashboard?tab=events' },
+  { label: 'My events', to: '/artist/dashboard/events' },
   { label: 'Requests', to: '/artist/requests', desktop: true },
-  { label: 'Requirements', to: '/artist/dashboard?tab=requirements' },
-  { label: 'Documents', to: '/artist/dashboard?tab=documents' },
+  { label: 'Requirements', to: '/artist/dashboard/requirements' },
+  { label: 'Documents', to: '/artist/dashboard/documents' },
   { label: 'Media', to: '/artist/media', desktop: true },
-  { label: 'Messages', to: '/artist/dashboard?tab=messages', desktop: true },
-  { label: 'Announcements', to: '/artist/dashboard?tab=announcements' },
-  { label: 'Notifications', to: '/artist/dashboard?tab=notifications' },
+  { label: 'Messages', to: '/artist/dashboard/messages', desktop: true },
+  { label: 'Announcements', to: '/artist/dashboard/announcements' },
+  { label: 'Notifications', to: '/artist/dashboard/notifications' },
   { label: 'Profile', to: '/artist/profile', desktop: true },
   { label: 'Settings', to: '/artist/settings', desktop: true },
 ];
@@ -114,7 +114,7 @@ export const ArtistNavbar = () => {
           <>
             {/* NOTIFICATION BELL — real notifications (0018), not sample data */}
             <div className="bg-[#0d0a07] border border-[#d1a437]">
-              <NotificationBell userId={user.userId} allHref="/artist/dashboard?tab=notifications" />
+              <NotificationBell userId={user.userId} allHref="/artist/dashboard/notifications" />
             </div>
 
             {/* LOGOUT (DESKTOP) */}

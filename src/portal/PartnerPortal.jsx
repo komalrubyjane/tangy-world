@@ -60,7 +60,7 @@ export const PartnerSection = ({ portal, user, overviewNote }) => {
   return (
     <div className="flex flex-col gap-4">
       {tab === 'overview' && (
-        <Overview kind={kind} user={user} ev={ev} copy={c} setTab={setTab} onOpen={setOpenEvent} note={overviewNote} />
+        <Overview kind={kind} user={user} ev={ev} copy={c} setTab={setTab} hrefFor={portal.hrefFor} onOpen={setOpenEvent} note={overviewNote} />
       )}
       {tab === 'events' && (
         <EventsPanel {...ev} includePast={events.includePast} setIncludePast={events.setIncludePast} onOpen={setOpenEvent} emptyHint={c.hint} />
@@ -89,7 +89,7 @@ export const PartnerSection = ({ portal, user, overviewNote }) => {
   );
 };
 
-const Overview = ({ kind, user, ev, copy, setTab, onOpen, note }) => {
+const Overview = ({ kind, user, ev, copy, setTab, hrefFor, onOpen, note }) => {
   const [counts, setCounts] = useState({ messages: null, notifications: null });
   useEffect(() => {
     let cancelled = false;
@@ -108,8 +108,8 @@ const Overview = ({ kind, user, ev, copy, setTab, onOpen, note }) => {
       {kind === 'artist' && <ProfileCompletionCard />}
       <NextEventCard {...ev} onOpen={onOpen} emptyTitle={copy.next} emptyHint={copy.hint}
         emptyAction={kind === 'artist' ? <Button size="sm" to="/artist/calendar" icon="CalendarDays">Set your availability</Button> : null}
-        messagesTo={kind === 'artist' ? '/artist/dashboard?tab=messages' : '?tab=messages'}
-        scheduleTo={kind === 'artist' ? '/artist/calendar' : '?tab=events'} />
+        messagesTo={hrefFor('messages')}
+        scheduleTo={kind === 'artist' ? '/artist/calendar' : hrefFor('events')} />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <PortalStat label={copy.events} value={ev.events ? upcoming : null} onClick={() => setTab('events')} />
         {kind !== 'volunteer' && <PortalStat label="Needed from you" value={ev.events ? openReqs : null} tone={openReqs ? 'warn' : undefined} onClick={() => setTab('requirements')} />}

@@ -35,9 +35,9 @@ function attentionItems(s, can) {
     const byType = Object.entries(s.applications.by_type || {}).map(([t, n]) => `${n} ${APP_TYPE_LABEL[t] || t}`).join(', ');
     items.push({ tone: 'warn', label: `${pending} application${pending === 1 ? '' : 's'} awaiting review`, sub: byType, to: '/admin-portal/applications?status=pending' });
   }
-  if (h.ticket_emails_failed) items.push({ tone: 'bad', label: `${h.ticket_emails_failed} ticket email${h.ticket_emails_failed === 1 ? '' : 's'} failed to send`, to: '/admin-portal/bookings?tab=payments&email=failed' });
+  if (h.ticket_emails_failed) items.push({ tone: 'bad', label: `${h.ticket_emails_failed} ticket email${h.ticket_emails_failed === 1 ? '' : 's'} failed to send`, to: '/admin-portal/payments?email=failed' });
   if (h.approval_emails_failed && can(P.OPERATIONS)) items.push({ tone: 'bad', label: `${h.approval_emails_failed} approval email${h.approval_emails_failed === 1 ? '' : 's'} failed`, to: '/admin-portal/ops/notifications' });
-  if (h.webhooks_unprocessed && can(P.PAYMENTS)) items.push({ tone: 'bad', label: `${h.webhooks_unprocessed} payment webhook${h.webhooks_unprocessed === 1 ? '' : 's'} not processed`, to: '/admin-portal/bookings?tab=webhooks' });
+  if (h.webhooks_unprocessed && can(P.PAYMENTS)) items.push({ tone: 'bad', label: `${h.webhooks_unprocessed} payment webhook${h.webhooks_unprocessed === 1 ? '' : 's'} not processed`, to: '/admin-portal/payments/webhooks' });
   if (h.stale_pending_bookings) items.push({ tone: 'warn', label: `${h.stale_pending_bookings} checkout${h.stale_pending_bookings === 1 ? '' : 's'} pending over 30 min`, sub: 'Abandoned checkouts still hold capacity', to: '/admin-portal/bookings?status=pending' });
   if (h.on_sale_past_date) items.push({ tone: 'warn', label: `${h.on_sale_past_date} event${h.on_sale_past_date === 1 ? '' : 's'} still on sale after the date`, sub: 'Mark as completed', to: '/admin-portal/events?when=past&status=on-sale' });
   if (h.open_tasks_overdue) items.push({ tone: 'warn', label: `${h.open_tasks_overdue} overdue event task${h.open_tasks_overdue === 1 ? '' : 's'}`, to: '/admin-portal/tasks?status=open' });
@@ -77,9 +77,9 @@ const AttentionPanel = ({ summary, loading, error, reload, extra = [] }) => {
                 <span className={cx('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', i.tone === 'bad' ? 'bg-[#ef6b5e]' : 'bg-[#f5b544]')} />
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] text-[#EFE2C0]">{i.label}</div>
-                  {i.sub && <div className="text-[12px] text-[#E7D5A4]/45 mt-0.5">{i.sub}</div>}
+                  {i.sub && <div className="text-[12px] text-[#E7D5A4]/60 mt-0.5">{i.sub}</div>}
                 </div>
-                <Icon name="ChevronRight" size={15} className="text-[#E7D5A4]/30 mt-0.5" />
+                <Icon name="ChevronRight" size={15} className="text-[#E7D5A4]/60 mt-0.5" />
               </Link>
             </li>
           ))}
@@ -105,11 +105,11 @@ const PeoplePanel = ({ summary }) => {
   const { can } = useAdminSession();
   return (
     <Panel title="People" subtitle={p ? `${fmt.num(p.users_total)} accounts · ${fmt.num(p.deactivated)} deactivated` : undefined} flush>
-      {!p ? <div className="p-4 text-[12px] text-[#E7D5A4]/40">—</div> : (
+      {!p ? <div className="p-4 text-[12px] text-[#E7D5A4]/60">—</div> : (
         <ul className="grid grid-cols-2 sm:grid-cols-3">
           {rows.map(([label, n, to]) => {
             const linkable = to.startsWith('/admin-portal/users') ? can(P.USERS_MANAGE) : can(P.ENTITIES);
-            const inner = (<><div className="font-condensed text-xl tabular-nums text-[#EFE2C0]">{fmt.num(n)}</div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45 mt-0.5">{label}</div></>);
+            const inner = (<><div className="font-condensed text-xl tabular-nums text-[#EFE2C0]">{fmt.num(n)}</div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60 mt-0.5">{label}</div></>);
             return (
               <li key={label} className="border-b border-r border-[#E7D5A4]/[0.06]">
                 {linkable ? <Link to={to} className="block px-4 py-3 hover:bg-[#C99A2E]/[0.05]">{inner}</Link> : <div className="px-4 py-3">{inner}</div>}
@@ -139,11 +139,11 @@ const RecentActivityPanel = () => {
         <ul className="divide-y divide-[#E7D5A4]/[0.06]">
           {(data || []).map((r) => (
             <li key={r.id} className="px-4 py-2.5 flex gap-3 text-[12.5px]">
-              <span className="w-14 shrink-0 font-mono text-[11px] text-[#E7D5A4]/40 pt-px">{fmt.relative(r.created_at)}</span>
+              <span className="w-14 shrink-0 font-mono text-[11px] text-[#E7D5A4]/60 pt-px">{fmt.relative(r.created_at)}</span>
               <div className="min-w-0">
                 <span className="text-[#EFE2C0]">{r.actor_email || 'System'}</span>
                 <span className="text-[#E7D5A4]/60"> · {auditLabel(r.action)}</span>
-                {auditSummary(r) && <div className="text-[#E7D5A4]/40 truncate">{auditSummary(r)}</div>}
+                {auditSummary(r) && <div className="text-[#E7D5A4]/60 truncate">{auditSummary(r)}</div>}
               </div>
             </li>
           ))}
@@ -169,9 +169,9 @@ const RecentBookingsPanel = () => {
         <ul className="divide-y divide-[#E7D5A4]/[0.06]">
           {(data || []).map((b) => (
             <li key={b.id}>
-              <Link to={`/admin-portal/bookings?booking=${b.id}`} className="flex items-center gap-3 px-4 py-2.5 text-[12.5px] hover:bg-[#C99A2E]/[0.05]">
+              <Link to={`/admin-portal/bookings/${b.id}`} className="flex items-center gap-3 px-4 py-2.5 text-[12.5px] hover:bg-[#C99A2E]/[0.05]">
                 <span className="font-mono text-[11.5px] text-[#C99A2E] w-24 shrink-0">{b.registration_code}</span>
-                <span className="flex-1 min-w-0 truncate">{b.attendee_name} <span className="text-[#E7D5A4]/40">· {b.events?.name}</span></span>
+                <span className="flex-1 min-w-0 truncate">{b.attendee_name} <span className="text-[#E7D5A4]/60">· {b.events?.name}</span></span>
                 <span className="tabular-nums text-[#E7D5A4]/70">{b.source === 'complimentary' ? 'Comp' : fmt.money(b.amount)}</span>
                 <Badge status={b.status} />
               </Link>
@@ -240,7 +240,7 @@ const Metric = ({ label, value, sub, to, tone }) => (value == null ? null : <Sta
 const TodayPanel = ({ today }) => (
   <Panel title="Today's operations" subtitle={today.length ? `${today.length} event${today.length === 1 ? '' : 's'} today` : undefined} flush>
     {today.length === 0 ? (
-      <p className="px-4 py-6 text-[13px] text-[#E7D5A4]/50">No events today. Upcoming events and anything that needs attention are listed alongside.</p>
+      <p className="px-4 py-6 text-[13px] text-[#E7D5A4]/60">No events today. Upcoming events and anything that needs attention are listed alongside.</p>
     ) : (
       <ul className="divide-y divide-[#E7D5A4]/[0.06]">
         {today.map((e) => {
@@ -255,17 +255,17 @@ const TodayPanel = ({ today }) => (
                 <div className="flex gap-1.5"><Badge status="live">Live today</Badge>{e.open_tasks > 0 && <Badge tone="warn">{e.open_tasks} open task{e.open_tasks === 1 ? '' : 's'}</Badge>}</div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[12.5px]">
-                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Checked in</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.checked_in)} / {fmt.num(e.tickets)} <span className="text-[#E7D5A4]/45">({pct}%)</span></div></div>
-                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Capacity</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.capacity)}</div></div>
-                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Staff</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.staff)}</div></div>
-                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Volunteers</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.volunteers)}</div></div>
+                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Checked in</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.checked_in)} / {fmt.num(e.tickets)} <span className="text-[#E7D5A4]/60">({pct}%)</span></div></div>
+                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Capacity</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.capacity)}</div></div>
+                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Staff</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.staff)}</div></div>
+                <div><div className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Volunteers</div><div className="text-[#EFE2C0] tabular-nums">{fmt.num(e.volunteers)}</div></div>
               </div>
               <div className="h-1.5 rounded-full bg-[#E7D5A4]/10 overflow-hidden" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`Check-in progress for ${e.name}`}>
                 <div className="h-full bg-[#2fb877]" style={{ width: `${pct}%` }} />
               </div>
               {e.artists.length > 0 ? (
                 <table className="w-full text-[12.5px]">
-                  <thead><tr className="text-left font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/40"><th className="font-normal py-1">Artist</th><th className="font-normal">Call</th><th className="font-normal">Soundcheck</th><th className="font-normal">Performance</th></tr></thead>
+                  <thead><tr className="text-left font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60"><th className="font-normal py-1">Artist</th><th className="font-normal">Call</th><th className="font-normal">Soundcheck</th><th className="font-normal">Performance</th></tr></thead>
                   <tbody>{e.artists.map((a) => (
                     <tr key={a.name} className="border-t border-[#E7D5A4]/[0.05]">
                       <td className="py-1.5 text-[#EFE2C0]">{a.name}</td>
@@ -302,7 +302,7 @@ const UpcomingPanel = ({ upcoming }) => (
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[13.5px] text-[#EFE2C0] truncate">{e.name}</div>
-                  <div className="text-[12px] text-[#E7D5A4]/45 truncate">{[d.toLocaleDateString('en-IN', { weekday: 'short' }), e.event_time, e.venue || 'Venue TBC'].filter(Boolean).join(' · ')}</div>
+                  <div className="text-[12px] text-[#E7D5A4]/60 truncate">{[d.toLocaleDateString('en-IN', { weekday: 'short' }), e.event_time, e.venue || 'Venue TBC'].filter(Boolean).join(' · ')}</div>
                 </div>
                 <div className="hidden sm:block"><Progress value={Number(e.tickets)} max={e.capacity} /></div>
                 <Badge tone={h.tone}>{h.label}</Badge>
@@ -355,6 +355,16 @@ const OrgDashboard = ({ superAdmin }) => {
   const { can, user } = useAdminSession();
   const { data: s, loading, error, reload } = useSummary();
   const ops = useAsync(() => adminApi.operationsOverview(), []);
+  // Waitlist and payment-review counts (0026/0027) — read under the admin's RLS.
+  const queue = useAsync(async () => {
+    const head = (table, build) => build(supabase.from(table).select('id', { count: 'exact', head: true })).then((r) => r.count ?? 0);
+    const [waiting, offered, review] = await Promise.all([
+      head('waitlist', (q) => q.eq('status', 'waiting').not('user_id', 'is', null)),
+      head('waitlist', (q) => q.eq('status', 'offered')),
+      can(P.PAYMENTS) ? head('bookings', (q) => q.eq('payment_status', 'needs_review')) : Promise.resolve(null),
+    ]);
+    return { waiting, offered, review };
+  }, []);
   const o = ops.data;
   const m = o?.metrics || {};
   const extra = o ? OPS_ATTENTION.filter(([k]) => o.attention[k] > 0).map(([k, label, to, tone]) => ({ label: `${o.attention[k]} ${label}`, to, tone })) : [];
@@ -375,7 +385,7 @@ const OrgDashboard = ({ superAdmin }) => {
       {(error || ops.error) && <Panel><AsyncBlock error={error || ops.error} onRetry={() => { reload(); ops.reload(); }} /></Panel>}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5" data-metrics>
         <Metric label="Upcoming events" value={m.upcoming_events} to="/admin-portal/events" />
-        <Metric label="Live today" value={m.live_events} tone={m.live_events ? 'good' : undefined} />
+        <Metric label="Live today" value={m.live_events} tone={m.live_events ? "good" : undefined} to="/admin-portal/events" />
         <Metric label="Tickets sold" value={m.tickets_sold_upcoming} sub="for today & upcoming" to="/admin-portal/bookings" />
         <Metric label="Checked in today" value={m.checked_in_today} sub={m.tickets_today ? `of ${fmt.num(m.tickets_today)} · ${fmt.pct((100 * m.checked_in_today) / m.tickets_today)}` : 'no tickets today'} to="/admin-portal/check-ins" />
         <Metric label="Pending applications" value={m.pending_applications} tone={m.pending_applications ? 'warn' : undefined} to="/admin-portal/applications?status=pending" />
@@ -384,6 +394,8 @@ const OrgDashboard = ({ superAdmin }) => {
         <Metric label="Partner messages" value={m.partner_messages_waiting} sub="awaiting reply" tone={m.partner_messages_waiting ? 'warn' : undefined} to="/admin-portal/messages?status=open" />
         <Metric label="Access requests" value={m.access_requests} tone={m.access_requests ? 'warn' : undefined} to="/admin-portal/volunteers?requests=1" />
         <Metric label="Overdue tasks" value={m.overdue_tasks} tone={m.overdue_tasks ? 'danger' : undefined} to="/admin-portal/tasks?status=overdue" />
+        <Metric label="Waitlist" value={queue.data?.waiting} sub={queue.data ? `${fmt.num(queue.data.offered)} holding an offer` : undefined} to="/admin-portal/waitlist" />
+        {queue.data?.review != null && <Metric label="Payments to review" value={queue.data.review} tone={queue.data.review ? 'danger' : undefined} sub="late / mismatched" to="/admin-portal/payments" />}
       </div>
       <KpiRow s={s} can={can} />
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -456,7 +468,7 @@ const StaffDashboard = () => {
                     <div className="min-w-0">
                       <div className="font-mono text-[11px] text-[#C99A2E]">{e.event_date === today ? 'TODAY' : fmt.date(e.event_date)}{e.event_time ? ` · ${e.event_time}` : ''}</div>
                       <div className="text-[14px] text-[#EFE2C0] mt-0.5">{e.name}</div>
-                      <div className="text-[12px] text-[#E7D5A4]/50">{e.venue || 'Venue TBC'} · Your role: {e.assignment_title}</div>
+                      <div className="text-[12px] text-[#E7D5A4]/60">{e.venue || 'Venue TBC'} · Your role: {e.assignment_title}</div>
                     </div>
                     <Badge status={e.assignment_status} />
                   </div>
@@ -485,7 +497,7 @@ const StaffDashboard = () => {
                     </button>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13.5px] text-[#EFE2C0]">{t.title}</div>
-                      <div className="text-[12px] text-[#E7D5A4]/45">{t.event_name}{t.due_at ? ` · due ${fmt.dateTime(t.due_at)}` : ''}</div>
+                      <div className="text-[12px] text-[#E7D5A4]/60">{t.event_name}{t.due_at ? ` · due ${fmt.dateTime(t.due_at)}` : ''}</div>
                     </div>
                     {t.priority === 'high' && <Badge tone="bad">High</Badge>}
                   </li>
@@ -505,7 +517,7 @@ const StaffDashboard = () => {
                       {a.priority === 'high' && <Badge tone="bad">Important</Badge>}
                     </div>
                     <p className="text-[12.5px] text-[#E7D5A4]/60 mt-1 whitespace-pre-line">{a.body}</p>
-                    <div className="font-mono text-[10.5px] text-[#E7D5A4]/35 mt-1">{a.events?.name ? `${a.events.name} · ` : ''}{fmt.relative(a.publish_at)}</div>
+                    <div className="font-mono text-[10.5px] text-[#E7D5A4]/60 mt-1">{a.events?.name ? `${a.events.name} · ` : ''}{fmt.relative(a.publish_at)}</div>
                   </li>
                 ))}
               </ul>

@@ -58,8 +58,14 @@ export function useEvents() {
           setError(err);
           setEvents([]);
         } else {
-          setEvents((data || []).map(mapDbEvent));
+          const rows = (data || []).map(mapDbEvent);
+          setEvents(rows);
           setError(null);
+          // Covers uploaded to the private media bucket need signed URLs.
+          if (rows.some((e) => e.image?.startsWith('/storage/'))) {
+            import('../lib/contentService').then(({ withResolvedMedia }) => withResolvedMedia(rows, ['image']))
+              .then((resolved) => { if (!cancelled) setEvents(resolved.map((e) => ({ ...e, image: e.image || '/media/gallery/tangy1.jpg' }))); });
+          }
         }
         setSource('live');
         setLoading(false);

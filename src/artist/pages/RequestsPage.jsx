@@ -73,19 +73,19 @@ export const RequestsPage = () => {
                     <Badge tone={tone}>{label}</Badge>
                   </div>
                   <dl className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[12.5px]">
-                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Proposed set</dt><dd className="m-0">{r.proposed_start ? `${fmt.dateTime(r.proposed_start)}${r.proposed_end ? ` – ${fmt.time(r.proposed_end)}` : ''}` : 'To be agreed'}</dd></div>
-                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">Fee offer</dt><dd className="m-0">{r.fee_offer != null ? fmt.money(r.fee_offer) : 'To be discussed'}</dd></div>
-                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/45">{r.status === 'pending' ? 'Reply by' : 'Answered'}</dt>
+                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Proposed set</dt><dd className="m-0">{r.proposed_start ? `${fmt.dateTime(r.proposed_start)}${r.proposed_end ? ` – ${fmt.time(r.proposed_end)}` : ''}` : 'To be agreed'}</dd></div>
+                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">Fee offer</dt><dd className="m-0">{r.fee_offer != null ? fmt.money(r.fee_offer) : 'To be discussed'}</dd></div>
+                    <div><dt className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60">{r.status === 'pending' ? 'Reply by' : 'Answered'}</dt>
                       <dd className="m-0">{r.status === 'pending' ? (r.expires_at ? fmt.dateTime(r.expires_at) : '—') : r.responded_at ? fmt.dateTime(r.responded_at) : '—'}</dd></div>
                   </dl>
-                  {r.message && <p className="text-[13px] text-[#E7D5A4]/80 border-l-2 border-[#C99A2E]/40 pl-3">“{r.message}” <span className="text-[#E7D5A4]/45">— {r.requested_by_name}</span></p>}
+                  {r.message && <p className="text-[13px] text-[#E7D5A4]/80 border-l-2 border-[#C99A2E]/40 pl-3">“{r.message}” <span className="text-[#E7D5A4]/60">— {r.requested_by_name}</span></p>}
                   {r.decline_reason && <p className="text-[12.5px] text-[#E7D5A4]/60">Your reason: {r.decline_reason}</p>}
                   <div className="flex flex-wrap gap-2 pt-1">
                     {r.status === 'pending' && <>
                       <Button variant="success" disabled={busy === r.id} onClick={() => respond(r, true)}>{busy === r.id ? 'Saving…' : 'Accept'}</Button>
                       <Button variant="ghost" disabled={busy === r.id} onClick={() => setDeclining(r)}>Decline</Button>
                     </>}
-                    <Button variant="ghost" icon="MessagesSquare" to="/artist/dashboard?tab=messages">Message Tangy</Button>
+                    <Button variant="ghost" icon="MessagesSquare" to="/artist/dashboard/messages">Message Tangy</Button>
                   </div>
                 </li>
               );

@@ -182,7 +182,7 @@ export const DashboardPage = () => {
 
       {/* ARTIST WORKSPACE */}
       <section id="workspace" aria-label="Artist workspace" className="bg-[#11100C] text-[#E7D5A4] border-2 sm:border-4 border-[#191410] p-3 sm:p-5 shadow-[6px_6px_0px_#4c1210] flex flex-col gap-4">
-        <Tabs tabs={partnerTabs('artist')} value={portal.tab} onChange={portal.setTab} />
+        <Tabs tabs={partnerTabs('artist').map((t) => ({ ...t, to: portal.hrefFor(t.id) }))} value={portal.tab} />
         <PartnerSection portal={portal} user={{ full_name: user?.name }} />
       </section>
 
@@ -217,7 +217,7 @@ export const DashboardPage = () => {
                         <span className={`inline-block mt-1.5 px-2 py-0.5 font-mono text-[8.5px] font-bold uppercase border ${
                           req.status === 'accepted' ? 'bg-[#2e6834] text-[#ecdcaf] border-[#2e6834]'
                           : req.status === 'declined' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]'
-                          : req.status === 'cancelled' ? 'bg-transparent text-[#ecdcaf]/50 border-[#ecdcaf]/30'
+                          : req.status === 'cancelled' ? 'bg-transparent text-[#ecdcaf]/60 border-[#ecdcaf]/30'
                           : 'bg-[#d1a437] text-[#191410] border-[#d1a437]'
                         }`}>
                           {req.status}

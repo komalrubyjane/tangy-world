@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Inbox, CalendarDays, Ticket, Users, ScanLine, History, ListChecks, Contact, UsersRound,
   ShieldCheck, Megaphone, Info, BarChart3, ScrollText, Settings, Sparkles, MessagesSquare, Mail, Hourglass,
@@ -37,7 +37,19 @@ export const cx = (...parts) => parts.filter(Boolean).join(' ');
 // Layout
 // ---------------------------------------------------------------------------
 
-export const Page = ({ title, subtitle, actions, children, back }) => (
+// Deep pages add their own breadcrumbs (e.g. the resource's name) and title;
+// AdminShell renders them after the nav-derived trail.
+export const CrumbContext = createContext(() => {});
+
+export const Page = ({ title, subtitle, actions, children, back, crumbs, docTitle }) => {
+  const setCrumbs = useContext(CrumbContext);
+  const key = JSON.stringify(crumbs || null) + (docTitle || '');
+  useEffect(() => {
+    setCrumbs({ crumbs: crumbs || [], title: docTitle || (crumbs?.length ? crumbs[crumbs.length - 1].label : null) });
+    return () => setCrumbs({ crumbs: [], title: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, setCrumbs]);
+  return (
   <div className="flex flex-col gap-5 min-w-0">
     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
       <div className="min-w-0">
@@ -53,7 +65,8 @@ export const Page = ({ title, subtitle, actions, children, back }) => (
     </div>
     {children}
   </div>
-);
+  );
+};
 
 export const Panel = ({ title, subtitle, actions, children, className = '', bodyClassName = '', flush = false }) => (
   <section className={cx('bg-[#17130F] border border-[#C99A2E]/20 rounded-md min-w-0', className)}>
@@ -61,7 +74,7 @@ export const Panel = ({ title, subtitle, actions, children, className = '', body
       <header className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#C99A2E]/15">
         <div className="min-w-0">
           {title && <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#C99A2E] m-0">{title}</h2>}
-          {subtitle && <p className="text-[12px] text-[#E7D5A4]/50 mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-[12px] text-[#E7D5A4]/60 mt-0.5">{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
       </header>
@@ -87,7 +100,7 @@ export const StatTile = ({ label, value, sub, to, tone }) => {
     <>
       <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#E7D5A4]/55">{label}</div>
       <div className={cx('mt-1.5 font-condensed text-[26px] leading-none font-medium tabular-nums', toneClass)}>{value ?? '—'}</div>
-      {sub && <div className="mt-1.5 text-[11.5px] text-[#E7D5A4]/50 leading-snug">{sub}</div>}
+      {sub && <div className="mt-1.5 text-[11.5px] text-[#E7D5A4]/60 leading-snug">{sub}</div>}
     </>
   );
   const cls = 'block bg-[#17130F] border border-[#C99A2E]/20 rounded-md p-3.5 min-w-0';
@@ -100,7 +113,7 @@ export const KeyValue = ({ items }) => (
   <dl className="grid grid-cols-[minmax(110px,auto)_1fr] gap-x-4 gap-y-2 text-[13px]">
     {items.filter(Boolean).map(([k, v]) => (
       <div key={k} className="contents">
-        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/45 pt-0.5">{k}</dt>
+        <dt className="font-mono text-[10.5px] uppercase tracking-wider text-[#E7D5A4]/60 pt-0.5">{k}</dt>
         <dd className="m-0 text-[#E7D5A4] break-words min-w-0">{v ?? '—'}</dd>
       </div>
     ))}
@@ -144,14 +157,14 @@ export const Field = ({ label, hint, error, children, className = '' }) => (
   <label className={cx('flex flex-col gap-1.5 min-w-0', className)}>
     <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#C99A2E]/85">{label}</span>
     {children}
-    {hint && !error && <span className="text-[11.5px] text-[#E7D5A4]/45">{hint}</span>}
+    {hint && !error && <span className="text-[11.5px] text-[#E7D5A4]/60">{hint}</span>}
     {error && <span className="text-[11.5px] text-[#ef6b5e]">{error}</span>}
   </label>
 );
 
 export const SearchInput = ({ value, onChange, placeholder = 'Search…', className = '' }) => (
   <div className={cx('relative w-full sm:w-72', className)}>
-    <Icon name="Search" size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#E7D5A4]/40 pointer-events-none" />
+    <Icon name="Search" size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#E7D5A4]/60 pointer-events-none" />
     <input
       type="search"
       value={value}
@@ -178,7 +191,22 @@ export const FilterSelect = ({ label, value, onChange, options, className = '' }
   </Select>
 );
 
-export const Tabs = ({ tabs, value, onChange }) => (
+// Tabs with `to` are real links (each subsection has its own URL); without
+// `to` they switch local state (for in-page views only).
+const TAB_CLS = (active) => cx(
+  'shrink-0 h-9 px-3 inline-flex items-center font-mono text-[11px] uppercase tracking-[0.1em] border-b-2 -mb-px transition-colors whitespace-nowrap',
+  active ? 'border-[#C99A2E] text-[#EFE2C0]' : 'border-transparent text-[#E7D5A4]/60 hover:text-[#E7D5A4]'
+);
+export const Tabs = ({ tabs, value, onChange }) => (tabs.some((t) => t.to) ? (
+  <nav aria-label="Sections" className="flex gap-0.5 overflow-x-auto border-b border-[#C99A2E]/20 -mx-1 px-1 scrollbar-none">
+    {tabs.map((t) => (
+      <NavLink key={t.id} to={t.to} end={t.end ?? true} className={({ isActive }) => TAB_CLS(t.active ?? isActive)}>
+        {t.label}
+        {typeof t.count === 'number' && <span className="ml-1.5 text-[#E7D5A4]/60">{t.count}</span>}
+      </NavLink>
+    ))}
+  </nav>
+) : (
   <div role="tablist" className="flex gap-0.5 overflow-x-auto border-b border-[#C99A2E]/20 -mx-1 px-1 scrollbar-none">
     {tabs.map((t) => (
       <button
@@ -188,15 +216,15 @@ export const Tabs = ({ tabs, value, onChange }) => (
         onClick={() => onChange(t.id)}
         className={cx(
           'shrink-0 h-9 px-3 font-mono text-[11px] uppercase tracking-[0.1em] border-b-2 -mb-px transition-colors',
-          value === t.id ? 'border-[#C99A2E] text-[#EFE2C0]' : 'border-transparent text-[#E7D5A4]/50 hover:text-[#E7D5A4]'
+          value === t.id ? 'border-[#C99A2E] text-[#EFE2C0]' : 'border-transparent text-[#E7D5A4]/60 hover:text-[#E7D5A4]'
         )}
       >
         {t.label}
-        {typeof t.count === 'number' && <span className="ml-1.5 text-[#E7D5A4]/40">{t.count}</span>}
+        {typeof t.count === 'number' && <span className="ml-1.5 text-[#E7D5A4]/60">{t.count}</span>}
       </button>
     ))}
   </div>
-);
+));
 
 // ---------------------------------------------------------------------------
 // Status
@@ -237,7 +265,7 @@ export const EmptyState = ({ title = 'Nothing here yet', hint, action, icon = 'I
   <div className="flex flex-col items-center justify-center text-center gap-2 py-12 px-4">
     <Icon name={icon} size={22} className="text-[#C99A2E]/50" />
     <div className="font-condensed text-base uppercase tracking-wide text-[#E7D5A4]/80">{title}</div>
-    {hint && <p className="text-[12.5px] text-[#E7D5A4]/45 max-w-sm">{hint}</p>}
+    {hint && <p className="text-[12.5px] text-[#E7D5A4]/60 max-w-sm">{hint}</p>}
     {action && <div className="mt-2">{action}</div>}
   </div>
 );
@@ -300,7 +328,7 @@ export const DataTable = ({ columns, rows, rowKey = 'id', onRowClick, loading, e
           <thead>
             <tr className="border-b border-[#C99A2E]/20">
               {visible.map((c) => (
-                <th key={c.key} scope="col" className={cx('px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#E7D5A4]/45 whitespace-nowrap', c.align === 'right' && 'text-right', c.width)}>
+                <th key={c.key} scope="col" className={cx('px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#E7D5A4]/60 whitespace-nowrap', c.align === 'right' && 'text-right', c.width)}>
                   {c.header}
                 </th>
               ))}
@@ -334,7 +362,7 @@ export const DataTable = ({ columns, rows, rowKey = 'id', onRowClick, loading, e
           >
             {visible.filter((c) => !c.mobileHidden).map((c, i) => (
               <div key={c.key} className={cx('flex justify-between gap-3 text-[13px]', i === 0 && 'font-medium')}>
-                {i > 0 && <span className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/40 shrink-0 pt-0.5">{c.header}</span>}
+                {i > 0 && <span className="font-mono text-[10px] uppercase tracking-wider text-[#E7D5A4]/60 shrink-0 pt-0.5">{c.header}</span>}
                 <span className={cx('min-w-0 break-words', i > 0 && 'text-right')}>{c.render ? c.render(row) : row[c.key] ?? '—'}</span>
               </div>
             ))}
@@ -365,20 +393,40 @@ export const Pagination = ({ page, pageCount, count, pageSize, setPage }) => {
 // Overlays
 // ---------------------------------------------------------------------------
 
-function useEscape(onClose) {
+function useEscape(onClose, active = true) {
   useEffect(() => {
+    if (!active) return undefined;
     const h = (e) => { if (e.key === 'Escape') onClose?.(); };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [onClose]);
+  }, [onClose, active]);
 }
 
-export const Drawer = ({ title, subtitle, onClose, children, footer, width = 'sm:max-w-xl' }) => {
-  useEscape(onClose);
+export { useFocusTrap } from '../hooks/useFocusTrap';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+
+// `inline` renders the same content as a section of a detail page (used when
+// the URL names the resource, e.g. /admin-portal/bookings/:id).
+export const Drawer = ({ title, subtitle, onClose, children, footer, width = 'sm:max-w-xl', inline = false }) => {
+  const ref = useRef(null);
+  useEscape(onClose, !inline);
+  useFocusTrap(ref, !inline);
+  if (inline) {
+    return (
+      <section className="bg-[#17130F] border border-[#C99A2E]/20 rounded-md min-w-0 flex flex-col" aria-label={typeof title === 'string' ? title : undefined} data-detail-page>
+        <header className="px-5 py-4 border-b border-[#C99A2E]/15">
+          <h2 className="font-condensed text-lg uppercase tracking-wide text-[#EFE2C0] m-0">{title}</h2>
+          {subtitle && <div className="text-[12px] text-[#E7D5A4]/55 mt-0.5">{subtitle}</div>}
+        </header>
+        <div className="px-5 py-4 flex flex-col gap-5">{children}</div>
+        {footer && <footer className="px-5 py-3 border-t border-[#C99A2E]/15 flex flex-wrap justify-end gap-2">{footer}</footer>}
+      </section>
+    );
+  }
   return (
     <div className="fixed inset-0 z-[10020] flex justify-end" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className={cx('relative w-full h-full bg-[#15110D] border-l border-[#C99A2E]/30 flex flex-col animate-[drawerIn_0.18s_ease]', width)}>
+      <div ref={ref} tabIndex={-1} className={cx('relative w-full h-full bg-[#15110D] border-l border-[#C99A2E]/30 flex flex-col animate-[drawerIn_0.18s_ease] outline-none', width)}>
         <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-[#C99A2E]/15">
           <div className="min-w-0">
             <h2 className="font-condensed text-lg uppercase tracking-wide text-[#EFE2C0] m-0 truncate">{title}</h2>
@@ -394,11 +442,13 @@ export const Drawer = ({ title, subtitle, onClose, children, footer, width = 'sm
 };
 
 export const Modal = ({ title, onClose, children, footer, wide = false }) => {
+  const ref = useRef(null);
   useEscape(onClose);
+  useFocusTrap(ref);
   return (
-    <div className="fixed inset-0 z-[10030] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[10030] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className={cx('relative w-full bg-[#15110D] border border-[#C99A2E]/35 rounded-t-lg sm:rounded-md max-h-[92dvh] flex flex-col', wide ? 'sm:max-w-2xl' : 'sm:max-w-md')}>
+      <div ref={ref} tabIndex={-1} className={cx('relative w-full bg-[#15110D] border border-[#C99A2E]/35 rounded-t-lg sm:rounded-md max-h-[92dvh] flex flex-col outline-none', wide ? 'sm:max-w-2xl' : 'sm:max-w-md')}>
         <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-[#C99A2E]/15">
           <h2 className="font-condensed text-base uppercase tracking-wide text-[#EFE2C0] m-0">{title}</h2>
           <Button variant="ghost" size="sm" icon="X" aria-label="Close" onClick={onClose} />

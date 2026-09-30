@@ -34,7 +34,7 @@ const InlineBar = ({ value, max, label }) => (
   </div>
 );
 
-const Th = ({ children, right }) => <th className={`px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#E7D5A4]/45 whitespace-nowrap ${right ? 'text-right' : 'text-left'}`}>{children}</th>;
+const Th = ({ children, right }) => <th className={`px-4 py-2 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#E7D5A4]/60 whitespace-nowrap ${right ? 'text-right' : 'text-left'}`}>{children}</th>;
 const Td = ({ children, right, className = '' }) => <td className={`px-4 py-2.5 ${right ? 'text-right tabular-nums' : ''} ${className}`}>{children}</td>;
 
 export default function ReportsPage() {
@@ -67,7 +67,7 @@ export default function ReportsPage() {
             <Input type="date" aria-label="To" value={custom.to} onChange={(e) => setCustom({ ...custom, to: e.target.value })} className="w-auto" />
           </>
         )}
-        <span className="font-mono text-[11px] text-[#E7D5A4]/45">Events by event date · revenue by booking date</span>
+        <span className="font-mono text-[11px] text-[#E7D5A4]/60">Events by event date · revenue by booking date</span>
       </Toolbar>
 
       <Grid cols={4}>
@@ -85,7 +85,7 @@ export default function ReportsPage() {
               <tbody>
                 {ev.map((e) => (
                   <tr key={e.event_id} className="border-b border-[#E7D5A4]/[0.06]">
-                    <Td><Link to={`/admin-portal/events/${e.event_id}?tab=reports`} className="hover:underline text-[#EFE2C0]">{e.name}</Link><div className="font-mono text-[11px] text-[#E7D5A4]/40">{fmt.date(e.event_date)}</div></Td>
+                    <Td><Link to={`/admin-portal/events/${e.event_id}/reports`} className="hover:underline text-[#EFE2C0]">{e.name}</Link><div className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.date(e.event_date)}</div></Td>
                     <Td><Badge status={e.status} /></Td>
                     <Td><InlineBar value={Number(e.tickets_sold)} max={maxSold} label={`${fmt.num(e.tickets_sold)} / ${fmt.num(e.capacity)}`} /></Td>
                     <Td right>{fmt.pct(e.sell_through)}</Td>
@@ -204,8 +204,8 @@ const PlatformActivity = ({ q }) => {
                 <ul className="text-[12.5px] flex flex-wrap gap-x-4 gap-y-1 text-[#E7D5A4]/70">
                   {Object.entries(d.communication.by_type).map(([k, n]) => <li key={k}>{TYPE_LABEL[k] || k}: <span className="text-[#EFE2C0] tabular-nums">{n}</span></li>)}
                 </ul>
-              ) : <p className="text-[12.5px] text-[#E7D5A4]/45">No data available</p>}
-              <p className="text-[12px] text-[#E7D5A4]/50">Requirements: {fmt.num(d.requirements.requested)} requested · {fmt.num(d.requirements.answered)} answered · {fmt.num(d.requirements.open)} open now</p>
+              ) : <p className="text-[12.5px] text-[#E7D5A4]/60">No data available</p>}
+              <p className="text-[12px] text-[#E7D5A4]/60">Requirements: {fmt.num(d.requirements.requested)} requested · {fmt.num(d.requirements.answered)} answered · {fmt.num(d.requirements.open)} open now</p>
             </div>
           )}
         </AsyncBlock>

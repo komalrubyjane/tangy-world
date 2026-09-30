@@ -19,7 +19,7 @@ const SECTIONS = {
 export default function OperationsPage() {
   const { section } = useParams();
   // Tangy TV moved into the content CMS (database-backed, 0028).
-  if (section === 'tv') return <Navigate to="/admin-portal/content?tab=tv" replace />;
+  if (section === 'tv') return <Navigate to="/admin-portal/content/tv" replace />;
   const s = SECTIONS[section];
   if (!s) return <NotFound />;
   const Cmp = s.component;

@@ -7,6 +7,7 @@ import { content } from '../lib/contentService';
 import { useContent, formatDate } from '../hooks/useContent';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { ContentLoading, ContentError, ContentEmpty } from '../components/ui/ContentStates';
+import { MediaImg } from '../components/ui/Media';
 
 // The Tangy Diary (/diary, /blogs): published diary_posts (Admin → Content →
 // Diary). Filters are the posts' own tags.
@@ -75,7 +76,7 @@ export const BlogsPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-0">
                 <div className="sm:col-span-1 w-full h-48 sm:h-auto overflow-hidden border-b-4 sm:border-b-0 sm:border-r-4 border-[#11100C] bg-[#11100C]/10">
                   {entry.cover_url && (
-                    <img
+                    <MediaImg
                       src={entry.cover_url}
                       alt=""
                       loading="lazy"

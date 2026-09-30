@@ -98,6 +98,7 @@ export const VenueDashboard = ({ overrideProfile, readOnly, demoData } = {}) => 
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tabHref={portal.hrefFor}
       onLogout={handleLogout}
       notificationsFor={portalMode ? user.id : null}
       preview={readOnly ? { label: `Viewing Venue Portal — ${profile?.property_name || user.full_name || user.email}` } : undefined}

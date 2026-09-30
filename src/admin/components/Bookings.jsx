@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { bookingService } from '../../lib/bookingService';
@@ -65,7 +66,7 @@ const TicketQr = ({ token, kind = 'TICKET' }) => {
   return url ? <img src={url} alt={alt} className="w-40 h-40 rounded" /> : <div className="w-40 h-40 bg-[#E7D5A4]/5 rounded" />;
 };
 
-export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
+export const BookingDrawer = ({ bookingId, onClose, onChanged, inline = false }) => {
   const { can } = useAdminSession();
   const toast = useToast();
   const [dialog, setDialog] = useState(null);
@@ -110,6 +111,7 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
 
   return (
     <Drawer
+      inline={inline}
       title={b ? b.registration_code : 'Booking'}
       subtitle={b ? `${b.attendee_name} · ${b.events?.name || ''}` : null}
       onClose={onClose}
@@ -122,7 +124,7 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
         </>
       ) : null}
     >
-      {loading && !b ? <div className="text-[13px] text-[#E7D5A4]/50">Loading…</div> : error ? <div className="text-[#ef6b5e] text-[13px]">{error.message}</div> : !b ? (
+      {loading && !b ? <div className="text-[13px] text-[#E7D5A4]/60">Loading…</div> : error ? <div className="text-[#ef6b5e] text-[13px]">{error.message}</div> : !b ? (
         <div className="text-[13px] text-[#E7D5A4]/60">Booking not found.</div>
       ) : (
         <>
@@ -176,7 +178,7 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
               </span>
             )}>
             {(b.tickets || []).length === 0 ? (
-              <div className="p-4 text-[12.5px] text-[#E7D5A4]/50">No tickets issued — tickets are created only when payment is confirmed.</div>
+              <div className="p-4 text-[12.5px] text-[#E7D5A4]/60">No tickets issued — tickets are created only when payment is confirmed.</div>
             ) : (
               <ul className="divide-y divide-[#E7D5A4]/[0.06]">
                 {[...b.tickets].sort((x, y) => x.ticket_number.localeCompare(y.ticket_number)).map((t) => {
@@ -185,12 +187,12 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
                     <li key={t.id} className="px-4 py-2.5">
                       <div className="flex items-center gap-3 text-[12.5px]">
                         <span className="font-mono text-[#C99A2E]">{t.ticket_number}</span>
-                        <span className="text-[#EFE2C0] flex-1 min-w-0 truncate">{t.attendee_name || <span className="text-[#E7D5A4]/50">Name not recorded</span>} <span className="text-[#E7D5A4]/45">· {TIER_NAME[t.tier] || t.tier}</span></span>
+                        <span className="text-[#EFE2C0] flex-1 min-w-0 truncate">{t.attendee_name || <span className="text-[#E7D5A4]/60">Name not recorded</span>} <span className="text-[#E7D5A4]/60">· {TIER_NAME[t.tier] || t.tier}</span></span>
                         <Badge status={t.status} />
                         {t.status === 'valid' && <Button size="sm" variant="ghost" icon="QrCode" aria-label="Show QR" onClick={() => setQrFor(qrFor === t.id ? null : t.id)} />}
                         {canManage && t.status === 'valid' && <Button size="sm" variant="ghost" icon="Ban" aria-label="Cancel ticket" onClick={() => setDialog({ ticket: t })} />}
                       </div>
-                      {c && <div className="text-[11.5px] text-[#E7D5A4]/45 mt-1">Checked in {fmt.dateTime(c.checked_in_at)} · {c.method}</div>}
+                      {c && <div className="text-[11.5px] text-[#E7D5A4]/60 mt-1">Checked in {fmt.dateTime(c.checked_in_at)} · {c.method}</div>}
                       {qrFor === t.id && <div className="mt-2"><TicketQr token={t.token} /></div>}
                     </li>
                   );
@@ -208,13 +210,13 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
                 </div>
               )}
               {qrFor === 'group' && b.group_token && <div className="px-4 py-3"><TicketQr token={b.group_token} kind="BOOKING" /></div>}
-              {(arrivals.data || []).length === 0 ? <div className="px-4 py-3 text-[12.5px] text-[#E7D5A4]/50">No one has checked in yet.</div> : (
+              {(arrivals.data || []).length === 0 ? <div className="px-4 py-3 text-[12.5px] text-[#E7D5A4]/60">No one has checked in yet.</div> : (
                 <ul className="divide-y divide-[#E7D5A4]/[0.06]" data-arrivals>
                   {arrivals.data.map((a) => (
                     <li key={a.ticket_number} className="px-4 py-2.5 text-[12.5px] flex flex-wrap items-center gap-x-3 gap-y-0.5">
                       <span className="font-mono text-[#E7D5A4]/60">{fmt.time(a.checked_in_at)}</span>
                       <span className="text-[#EFE2C0]">{a.attendee_name || `Guest ${Number(a.ticket_number.slice(-2))}`}</span>
-                      <span className="text-[#E7D5A4]/50">checked in by {a.checked_in_by_name || 'unknown'}{a.method === 'manual' ? ' · manual' : ''}</span>
+                      <span className="text-[#E7D5A4]/60">checked in by {a.checked_in_by_name || 'unknown'}{a.method === 'manual' ? ' · manual' : ''}</span>
                     </li>
                   ))}
                 </ul>
@@ -227,8 +229,8 @@ export const BookingDrawer = ({ bookingId, onClose, onChanged }) => {
                 {history.data.map((h) => (
                   <li key={h.id} className="px-4 py-2 text-[12px]">
                     <span className="text-[#EFE2C0]">{auditLabel(h.action)}</span>
-                    <span className="text-[#E7D5A4]/45"> · {h.actor_email || 'System'} · {fmt.dateTime(h.created_at)}</span>
-                    {auditSummary(h) && <div className="text-[#E7D5A4]/40">{auditSummary(h)}</div>}
+                    <span className="text-[#E7D5A4]/60"> · {h.actor_email || 'System'} · {fmt.dateTime(h.created_at)}</span>
+                    {auditSummary(h) && <div className="text-[#E7D5A4]/60">{auditSummary(h)}</div>}
                   </li>
                 ))}
               </ul>
@@ -335,16 +337,16 @@ export const CompBookingModal = ({ eventId: fixedEventId, onClose, onCreated }) 
 };
 
 // Server-filtered bookings list. `eventId` pins it to one event (event tab).
-export const BookingsTable = ({ eventId, initialStatus = '', initialEmail = '', openBookingId, compOpen = false, onCompClose }) => {
+export const BookingsTable = ({ eventId, initialStatus = '', initialEmail = '', initialSearch = '', compOpen = false, onCompClose }) => {
   const { can } = useAdminSession();
   const events = useEventOptions();
   const [event, setEvent] = useState('');
   const [status, setStatus] = useState(initialStatus);
   const [payment, setPayment] = useState('');
   const [email, setEmail] = useState(initialEmail);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const q = useDebounced(search);
-  const [selected, setSelected] = useState(openBookingId || null);
+  const navigate = useNavigate();
   const [comp, setComp] = useState(compOpen);
   const scopedEvent = eventId || event;
 
@@ -366,11 +368,11 @@ export const BookingsTable = ({ eventId, initialStatus = '', initialEmail = '', 
 
   const columns = [
     { key: 'code', header: 'Booking', render: (b) => <span className="font-mono text-[12px] text-[#C99A2E]">{b.registration_code}</span> },
-    { key: 'attendee', header: 'Attendee', render: (b) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{b.attendee_name}</div><div className="text-[12px] text-[#E7D5A4]/45 truncate max-w-[220px]">{b.attendee_email}</div></div>) },
+    { key: 'attendee', header: 'Attendee', render: (b) => (<div className="min-w-0"><div className="text-[#EFE2C0]">{b.attendee_name}</div><div className="text-[12px] text-[#E7D5A4]/60 truncate max-w-[220px]">{b.attendee_email}</div></div>) },
     { key: 'event', header: 'Event', hidden: !!eventId, render: (b) => <span className="text-[12.5px]">{b.events?.name || '—'}</span> },
     { key: 'qty', header: 'Tickets', render: (b) => <span className="text-[12.5px]">{b.quantity} × {TIER_NAME[b.tier]?.split(' ')[0] || b.tier || 'Gen'}</span> },
     { key: 'amount', header: 'Amount', align: 'right', hidden: !can(P.PAYMENTS), render: (b) => (b.source === 'complimentary' ? <Badge status="complimentary">Comp</Badge> : fmt.money(b.amount)) },
-    { key: 'payment', header: 'Payment', mobileHidden: true, hidden: !can(P.PAYMENTS), render: (b) => (b.source === 'complimentary' ? <span className="text-[#E7D5A4]/40">—</span> : b.razorpay_signature_verified ? <Badge tone="good">Verified</Badge> : <Badge tone="muted">Unverified</Badge>) },
+    { key: 'payment', header: 'Payment', mobileHidden: true, hidden: !can(P.PAYMENTS), render: (b) => (b.source === 'complimentary' ? <span className="text-[#E7D5A4]/60">—</span> : b.razorpay_signature_verified ? <Badge tone="good">Verified</Badge> : <Badge tone="muted">Unverified</Badge>) },
     { key: 'status', header: 'Status', render: (b) => <Badge status={b.status} /> },
     { key: 'created', header: 'Booked', mobileHidden: true, render: (b) => <span className="font-mono text-[11.5px] text-[#E7D5A4]/55">{fmt.dateTime(b.created_at)}</span> },
   ];
@@ -380,7 +382,7 @@ export const BookingsTable = ({ eventId, initialStatus = '', initialEmail = '', 
       <div className="p-3 border-b border-[#C99A2E]/15">
         <Toolbar right={
           <>
-            <span className="font-mono text-[11px] text-[#E7D5A4]/45">{fmt.num(table.count)} booking{table.count === 1 ? '' : 's'}</span>
+            <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} booking{table.count === 1 ? '' : 's'}</span>
             {can(P.BOOKINGS_MANAGE) && <Button size="sm" icon="Plus" onClick={() => setComp(true)}>Complimentary</Button>}
           </>
         }>
@@ -392,10 +394,9 @@ export const BookingsTable = ({ eventId, initialStatus = '', initialEmail = '', 
         </Toolbar>
       </div>
       <DataTable columns={columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload}
-        onRowClick={(b) => setSelected(b.id)} empty={{ title: 'No bookings found', hint: 'Adjust the filters, or wait for the first sale.', icon: 'Ticket' }} />
+        onRowClick={(b) => navigate(`/admin-portal/bookings/${b.id}`)} empty={{ title: 'No bookings found', hint: 'Adjust the filters, or wait for the first sale.', icon: 'Ticket' }} />
       <Pagination {...table} />
-      {selected && <BookingDrawer bookingId={selected} onClose={() => setSelected(null)} onChanged={table.reload} />}
-      {comp && <CompBookingModal eventId={eventId} onClose={() => { setComp(false); onCompClose?.(); }} onCreated={(bk) => { table.reload(); setSelected(bk.id); }} />}
+      {comp && <CompBookingModal eventId={eventId} onClose={() => { setComp(false); onCompClose?.(); }} onCreated={(bk) => navigate(`/admin-portal/bookings/${bk.id}`)} />}
     </Panel>
   );
 };

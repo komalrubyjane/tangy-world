@@ -33,6 +33,9 @@ export const RequireAuthToApply = ({ roleLabel, children, title, intro, showJoin
         </p>
       </div>
 
+      <p className="font-mono text-[10px] opacity-70 text-center m-0">
+        How we use what you send: <a href="/privacy" className="underline">privacy notice</a>.
+      </p>
       <div className="max-w-sm mx-auto w-full">
         <EmailOtpAuth copy={{ emailIntro: `Enter your email — we'll send a one-time verification code${roleLabel ? ` to start your ${roleLabel} application` : ''}.` }} />
       </div>

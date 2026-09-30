@@ -20,7 +20,7 @@ export const BookingPage = () => {
   const navigate = useNavigate();
   const { playSFX } = useAudio();
   const { user, isLoggedIn, openLoginModal } = useUserAuth();
-  const { session, availability, lineup, waitlist, loading: eventsLoading, error: loadError, refresh } = useSessionDetail(sessionId, user?.id);
+  const { session, availability, availabilityAt, live, lineup, waitlist, loading: eventsLoading, error: loadError, refresh } = useSessionDetail(sessionId, user?.id);
 
   const isPast = session?.dbStatus === 'past' || (session?.rawDate && session.rawDate < new Date().toISOString().slice(0, 10));
   const isCancelled = session?.dbStatus === 'cancelled';
@@ -138,6 +138,7 @@ export const BookingPage = () => {
         orderRef.current = null;
         setPay({ status: 'idle', message: '' });
         await finalizeConfirmedBooking(verifyRes.booking, verifyRes.tickets);
+        refresh();
       },
       modal: {
         ondismiss: () => setPay((p) => (p.status === 'failed' ? p : { status: 'dismissed', message: '' })),
@@ -257,7 +258,7 @@ export const BookingPage = () => {
 
           <div className="flex items-center gap-2 bg-[#EFE2C0] text-[#191410] px-3.5 py-1.5 font-mono text-xs font-bold border border-[#191410] -rotate-1 shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#B5532A] animate-pulse" />
-            <span data-seats-left>{isCancelled ? 'CANCELLED' : isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT' : remaining != null ? `${remaining} ${remaining === 1 ? 'SEAT' : 'SEATS'} LEFT` : 'ON SALE'}</span>
+            <span data-seats-left data-live={live ? 'true' : 'false'} title={live ? 'Seat count updates live' : availabilityAt ? `Updated ${availabilityAt.toLocaleTimeString()}` : undefined}>{isCancelled ? 'CANCELLED' : isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT' : remaining != null ? `${remaining} ${remaining === 1 ? 'SEAT' : 'SEATS'} LEFT` : 'ON SALE'}</span>
           </div>
         </div>
 
@@ -314,6 +315,28 @@ export const BookingPage = () => {
                 ))}
               </div>}
             </div>
+
+            {/* TICKETS — types and prices from the server (event_ticket_types, 0026). */}
+            {ticketTiers.length > 0 && (
+              <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-3" data-ticket-types-public>
+                <h2 className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase m-0">TICKETS</h2>
+                <ul className="list-none m-0 p-0 flex flex-col gap-2">
+                  {ticketTiers.map((t) => (
+                    <li key={t.id} className="flex flex-wrap justify-between gap-2 border-b border-[#ecdcaf]/10 pb-2 last:border-0">
+                      <span>
+                        <span className="font-poster text-lg text-[#ecdcaf] block">{t.name}</span>
+                        {t.desc && <span className="font-mono text-[10.5px] text-[#ecdcaf]/70">{t.desc}</span>}
+                      </span>
+                      <span className="text-right font-mono text-xs">
+                        <span className="block font-bold text-[#d1a437]">₹{t.price.toLocaleString('en-IN')}</span>
+                        {t.remaining != null && <span className="block text-[#ecdcaf]/60">{t.remaining === 0 ? 'Sold out' : `${t.remaining} left`}</span>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-mono text-[10px] text-[#ecdcaf]/55 m-0">Prices per person, before GST. The total is calculated at checkout.</p>
+              </div>
+            )}
 
             {/* 3. ABOUT THE EVENT / STORY */}
             <div className="w-full bg-[#EFE2C0] paperTexture text-[#191410] border-2 border-[#191410] p-6 shadow-[6px_6px_0px_#c2272a] text-left flex flex-col gap-3">

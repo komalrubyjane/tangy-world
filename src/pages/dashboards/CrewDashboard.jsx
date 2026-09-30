@@ -4,6 +4,7 @@ import { useUserAuth } from '../../context/UserAuthContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { AgentRequestForm } from '../../components/ai/AgentRequestForm';
 import { PortalShell, Badge, Empty, fmtDate, StatTile, ReadOnlyNote } from './portal/PortalUI';
+import { usePortalTab } from '../../portal/PortalSections';
 
 const TABS = [
   { id: 'overview', label: '📊 OVERVIEW' },
@@ -31,7 +32,9 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
   const navigate = useNavigate();
   const { user: authUser, logout } = useUserAuth();
   const user = overrideProfile || authUser;
-  const [activeTab, setActiveTab] = useState('overview');
+  const portal = usePortalTab('overview', TABS.map((t) => t.id));
+  const activeTab = portal.tab;
+  const setActiveTab = portal.setTab;
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState([]);
   const [profileForm, setProfileForm] = useState({ department: '', shift_preference: '', certifications: '' });
@@ -115,6 +118,7 @@ export const CrewDashboard = ({ overrideProfile, readOnly, demoData } = {}) => {
       tabs={TABS}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      tabHref={portal.hrefFor}
       onLogout={handleLogout}
       preview={readOnly ? { label: `Viewing Crew Portal — ${user.full_name || user.email}` } : undefined}
     >
