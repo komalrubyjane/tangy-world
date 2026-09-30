@@ -9,6 +9,7 @@ const text = async (page, sel = 'body') => (await page.locator(sel).innerText())
 const until = (p, ms = 12000) => p.waitFor({ timeout: ms }).then(() => true, () => false);
 const unread = async (page) => Number((await page.locator('[data-unread-count]').first().getAttribute('data-unread-count').catch(() => '0')) || 0);
 const allErrors = [];
+const expected = [];
 // The local stack runs without Realtime (websocket 503); the app falls back to polling.
 const track = (label, errors) => allErrors.push(...errors.filter((e) => !/\b(401|403)\b|Failed to load resource|realtime\/v1\/websocket/.test(e)).map((e) => `${label}: ${e}`));
 
@@ -160,8 +161,10 @@ const sponsor = await signIn('sponsor@tangy.test', '/join/login');
   const conv = (await api(admin.page, 'GET', '/rest/v1/conversations?conversation_type=eq.artist_support&select=id')).data?.[0]?.id;
   const leak = await api(p, 'GET', `/rest/v1/messages?conversation_id=eq.${conv}&select=content`);
   check(Array.isArray(leak.data) && leak.data.length === 0, 'sponsor cannot read the artist thread via API');
+  const before = sponsor.errors.length;
   await p.goto(`${BASE}/sponsor/dashboard?tab=messages&c=${conv}`);
   check(await until(p.getByText('Conversation not found.')), 'sponsor deep link to the artist thread is refused');
+  expected.push(...sponsor.errors.splice(before).map((e) => `sponsor deep link (refused by conversation_messages): ${e}`));
   const vend = await api(p, 'GET', '/rest/v1/event_assignments?assignee_role=eq.vendor&select=instructions');
   check(Array.isArray(vend.data) && vend.data.length === 0, 'sponsor cannot read vendor instructions via API');
 }
@@ -269,4 +272,5 @@ for (const [label, s] of [['admin', admin], ['artist', artist], ['vendor', vendo
   track(label, s.errors);
   await s.browser.close();
 }
+console.log('\nEXPECTED REFUSALS:\n' + (expected.join('\n') || '(none)'));
 console.log('\nERRORS:\n' + (allErrors.join('\n') || '(none)'));

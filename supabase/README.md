@@ -160,20 +160,24 @@ original unnamed constraint, which wasn't verified against a live database.
 22. `migrations/0022_artist_storage_policies.sql` — fixes the artist-media / artist-avatars ownership policies from 0013 (artists could not use their own files). Reverse: `rollbacks/0022_artist_storage_policies.down.sql`.
 23. `migrations/0023_named_group_checkin.sql` — named attendees, one booking QR and partial check-in by name. Reverse: `rollbacks/0023_named_group_checkin.down.sql`.
 24. `migrations/0024_event_booking_form.sql` — per-event booking form (tickets per booking, optional questions) and validated booking details. Reverse: `rollbacks/0024_event_booking_form.down.sql`.
+25. `migrations/0025_enquiries_auth_first.sql` — enquiries and applications require a signed-in account, duplicate guard, receipts and team alerts; message emails carry no message text. Reverse: `rollbacks/0025_enquiries_auth_first.down.sql`.
+26. `migrations/0026_ticket_types_and_settlement.sql` — per-event ticket types priced on the server (`booking_quote`), public availability, and safe payment settlement (`settle_payment`). Reverse: `rollbacks/0026_ticket_types_and_settlement.down.sql`.
+27. `migrations/0027_waitlist.sql` — server-authoritative waitlist with held seat offers. Reverse: `rollbacks/0027_waitlist.down.sql`.
+28. `migrations/0028_content_cms.sql` — Tangy TV, diary, gallery, artist slugs, session copy editing and granular content permissions. Reverse: `rollbacks/0028_content_cms.down.sql`.
 
-Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
-### Production application order (0017 → 0024)
+### Production application order (0017 → 0028)
 
 None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
 
-1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql`
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql`
 
-Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields).
+Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields). After 0026 redeploy **all three** Razorpay functions (`razorpay-create-order`, `razorpay-verify-payment`, `razorpay-webhook` — they call `settle_payment()` and price from ticket types; the old functions would still confirm late payments). After 0026–0028 also redeploy `send-ticket-email`, `send-approval-email` and `send-notification-emails` (shared email module, section 7).
 
-Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
 
-### 0019–0024 in detail
+### 0019–0028 in detail
 
 **0020 — platform finalization**
 
@@ -210,14 +214,33 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 - `attendee_tickets` adds `payment_status` and `checked_in_by_name` (exports).
 - **Rollback** restores 0023's `create_pending_booking` and `attendee_tickets` and **drops** booking answers, Instagram handles, notes, collaboration interests and the per-event form configuration (export first). Bookings, attendees and check-ins are untouched.
 
+**0025 — authentication-first enquiries.** `contact_enquiries` and `private_enquiries` no longer accept anonymous inserts: the caller must be signed in and `user_id = auth.uid()` (`contact_enquiries.user_id` added). Artist applications must be for the caller's own account (was: any `user_id`). `guard_duplicate_application()` (per-user advisory lock) refuses a second *pending* application of the same kind and the same contact message within 24 h (`DUPLICATE_APPLICATION: …`). Applicants get an `application.received` receipt (in-app + email outbox) that says applying never changes their account; private/contact enquiries alert `applications.review` holders (`enquiry.new`, linking to the right inbox). `notify()` allows a user as their own recipient only for receipts, and `message.new` emails say "open it to read" — the message text stays in the app. Choosing a path on the Membership Desk still never grants a role (`prevent_role_self_escalation`, 0003). **Rollback** restores the anonymous policies and 0021/0020's `notify()`/metadata and drops `contact_enquiries.user_id`.
+
+**0026 — ticket types and payment settlement.**
+
+- `event_ticket_types` (per event: code, name, description, price in ₹, optional per-type limit, sort order, on sale). Public read of on-sale types of published events; changes need `events.manage`. Existing events were backfilled with the three former tiers at their old prices (base, +₹500, +₹1,200) so nothing changes for customers until an admin edits them; new events start with General Admission at `events.price`, and `events.price` follows the cheapest on-sale type.
+- `booking_quote(event, type, quantity)` — the only price calculation (subtotal + `bookings.tax_percent`, default 18). `event_availability(event)` — seats left (counts only) and per-type remaining. Both callable by anyone.
+- `create_pending_booking` (customer path) validates the type and its limit and **charges the quote**; the client amount is ignored. Complimentary/admin paths keep their explicit amount.
+- `settle_payment(order, payment, amount_paise, source)` (service role only) is what verify-payment and the webhook call. Same lock order as checkout (event, then booking). Confirms idempotently (`already_confirmed`); accepts a late payment only if the seats are still free (`payment.late_accepted` audit); otherwise — amount mismatch, cancelled booking, or seats gone — records the payment as `needs_review`, audits `payment.needs_review` and alerts `payments.view` holders (`payment.review`). **No automatic refunds** are made: finance refunds in Razorpay or reseats the guest.
+- **Rollback** restores 0024's checkout and the late-payment flag trigger, maps `needs_review` back to `captured`, and drops ticket types (bookings keep their `tier` code and amount).
+
+**0027 — waitlist.** `waitlist` gains `user_id`, `quantity`, `status` (`waiting → offered → converted | expired | cancelled | skipped`), offer timestamps, `booking_id` and a strict arrival order (`queue_no`); one live entry per person per session. Only the RPCs write it (the anonymous insert policy is gone): `join_waitlist` (signed in; only when the party doesn't fit or others are already waiting, or the session is marked sold out), `leave_waitlist`, `my_waitlist` (position and offer), `admin_offer_waitlist` / `admin_remove_waitlist_entry` (`bookings.manage`, audited). `offer_waitlist_seats(event)` runs under the event row lock whenever seats free up — a booking leaves pending/confirmed (cancelled, expired checkout, failed, refunded), capacity rises, an offer is declined or lapses — and offers strictly first-come-first-served (a smaller party never jumps the queue), holding the seats for `waitlist.offer_hold_minutes` (default 120) and notifying the person (`waitlist.offer`, in-app + email outbox). Held seats count against capacity in checkout, `event_availability` and late settlement, so two people can never claim the same released seat; the holder's checkout converts the offer. `expire_waitlist_offers()` runs in `run_platform_jobs()`. Pre-0027 anonymous rows are listed for the team but never auto-offered. **Rollback** restores 0026's functions and 0020's jobs, the anonymous insert policy, and drops the offer/queue columns.
+
+**0028 — content CMS.** `tv_videos`, `diary_posts`, `gallery_albums` / `gallery_photos` with `draft / published / archived` and scheduled publishing (`published_at`); visitors read published items only. Validation: url-safe unique slugs, media links must be site paths or `https://` (no `http:`/`javascript:`), photo alt text required. Permissions: `content.view / create / edit / publish / delete` combined with an area (`content.manage_tv / manage_diary / manage_media`); publishing or unpublishing needs `content.publish` (trigger — also enforced for direct API writes); `content.manage_sessions` + `content.edit` may edit a session's public copy through `update_session_content()` (description, story, image, tags, featured — never price, capacity or dates). Admin and super admin get all of them; grant others on the Roles page. Changes are audited. `content-media` bucket: public read, 50 MB, images/MP4/WebM only, writes need a content area right. `artists.slug` (unique, from stage name) and `public_artists.slug` power `/artists/:slug`. Seeds: the bundled TV videos and gallery photos (published); the old static diary copy is imported as **drafts** to review. **Rollback** drops the content tables (export first), the slug and the permissions; the bucket remains (Storage blocks SQL deletes).
+
+## Messaging security
+
+Classification: **server-side access-controlled messaging, not end-to-end encrypted.** Messages (`messages.content`), thread previews and in-app notifications are stored as plaintext in Postgres, protected in transit by TLS and at rest by the platform's disk encryption; access is enforced by RLS and SECURITY DEFINER RPCs. Participants read their own threads; the Tangy team (`messages.manage`: admin, super admin) reads and replies to partner threads by design — it is a support inbox. Event staff, other partners, patrons and visitors cannot read or post (`tests/messaging_security.test.sql`); nobody can send as someone else, add themselves to a thread, or edit/delete sent messages. Message text never appears in audit logs or notification emails. The app does not claim encryption it doesn't have. True E2EE would need client-side key management (per-device keys, key backup, and a decision that the team can no longer read partner threads) — a product decision, not a patch.
+
 ## What's NOT covered by these migrations
 
-- Diary and Archive content are still static/editorial (`src/data/mockData.js` and the section components) — no CMS tables were added for them in this pass, since the existing authored content was already complete and doesn't need frequent editing.
-- Messaging is partner ↔ Tangy admin (0018), protected by TLS in transit and RLS at rest. It is deliberately **not** end-to-end encrypted — authorized admins read and reply. There is no partner-to-partner messaging and no file attachments inside chat (documents are shared through the event's Documents tab, 0020).
+- Museum exhibits (vinyl catalogue, sound archive, archive spread, merch previews) are still static decoration in `src/data/mockData.js`; the merch shop is labelled "coming soon" and sells nothing. Diary, gallery, Tangy TV and artist pages are database-backed since 0028.
+- Legal pages (terms, privacy, refund policy) are not written — they need the business's own text. `/faq` describes only how the platform behaves.
 - **Pending-booking expiry** is handled since 0020 (`expire_stale_bookings()`, run by `run_platform_jobs()` and before every new checkout) — but only if the jobs are actually scheduled (pg_cron or an external scheduler, see 0020 above).
 - **Refunds**: 0017 records refunds made in the Razorpay dashboard (`admin_record_refund`); it does not move money through the Razorpay API. The webhook (0020) only mirrors the refunded amount and payment state for reporting.
 - **Ticket cancellation**: available to admins since 0017 (`admin_cancel_ticket`).
 - **Notification email** needs `send-notification-emails` deployed and scheduled (section 7); until then `email_outbox` rows simply wait and in-app notifications still work.
+- **Razorpay**: without `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` checkout answers 503 "Online payment is not available yet" and releases the seats. Live keys, webhook subscription and a real test payment are still to be done before launch.
 
 ## 7. Notification emails and scheduled jobs (0020)
 
@@ -226,12 +249,12 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 ```
 supabase functions deploy send-notification-emails --no-verify-jwt   # it checks the service key / CRON_SECRET itself
 supabase secrets set CRON_SECRET=<long random string> SITE_URL=https://tangysessions.com
-# RESEND_API_KEY / RESEND_FROM_EMAIL as in section 5 (shared by every email function)
+# RESEND_API_KEY, EMAIL_FROM (or the older RESEND_FROM_EMAIL), optional EMAIL_REPLY_TO — shared by every email function
 ```
 
 Schedule a `POST` to the function every minute or two (Supabase dashboard → Integrations → Cron → HTTP request, or any external scheduler) with the `x-cron-secret` header. Links in emails are `SITE_URL` + the notification's path.
 
-`EMAIL_PROVIDER` (default `resend`) and `MAILPIT_URL` exist **only for local verification** (`EMAIL_PROVIDER=mailpit` delivers to the local stack's Mailpit inbox) — never set them in production.
+All email goes through `functions/_shared/email.ts`. `EMAIL_PROVIDER` is `resend` (default), `log` (development: logs recipient and subject only), `disabled`, or `mailpit` (local stack only, with `MAILPIT_URL`). **Without `RESEND_API_KEY` email is "not configured"**: nothing is sent and nothing crashes — `send-notification-emails` leaves the queue untouched (rows are not marked failed) and ticket/approval emails record "Email is not configured yet." so an admin can resend once it is. The sending domain must be verified in Resend. `node scripts/test-email-config.mjs` checks the provider logic without Deno or network.
 
 `run_platform_jobs()` (expiries, reminders, overdue/expiring notices) is scheduled by 0020 itself when `pg_cron` is available; otherwise call `select public.run_platform_jobs()` every 5 minutes with the service role.
 

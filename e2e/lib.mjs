@@ -37,9 +37,24 @@ async function latestCode(email, after) {
 export async function otpLogin(page, email, path = '/admin-portal') {
   await page.goto(BASE + path);
   await page.getByPlaceholder('you@example.com').fill(email);
-  const t0 = Date.now() - 2000;
-  await page.getByRole('button', { name: /send verification code/i }).click();
-  const code = await latestCode(email, t0);
+  // The local auth server allows 30 sign-ins per 5 minutes per IP; the full
+  // runner signs in more often than that, so back off and retry when no code
+  // arrives (a rate-limited request sends no email).
+  let code = null;
+  for (let attempt = 0; !code && attempt < 6; attempt++) {
+    if (attempt) {
+      console.log(`(otp send refused for ${email} — local auth rate limit; waiting 60s, attempt ${attempt + 1})`);
+      await page.waitForTimeout(60000);
+      await page.goto(BASE + path);
+      await page.getByPlaceholder('you@example.com').fill(email);
+    }
+    const t0 = Date.now() - 2000;
+    await page.getByRole('button', { name: /send verification code/i }).click();
+    // Either the code inputs appear (the email was sent) or the form shows an error.
+    const sent = await page.getByLabel('Digit 1 of 6').waitFor({ timeout: 15000 }).then(() => true, () => false);
+    if (sent) code = await latestCode(email, t0);
+  }
+  if (!code) throw new Error(`no OTP email for ${email}`);
   await page.getByLabel('Digit 1 of 6').waitFor();
   for (let i = 0; i < 6; i++) await page.getByLabel(`Digit ${i + 1} of 6`).fill(code[i]);
   await page.getByRole('button', { name: /verify email/i }).click();

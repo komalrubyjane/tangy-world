@@ -7,7 +7,7 @@ psql() { docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -q -v ON_ER
 mkdir -p shots
 fail=0
 # devmode.mjs drives the two dev-tools servers (DEV_MOCK_BASE / DEV_LOCAL_BASE, see README.md).
-for suite in superadmin manager staff session platform groupcheckin checkout enquiries waitlist content portals mobile devmode; do
+for suite in superadmin manager staff session platform groupcheckin checkout enquiries waitlist content portals mobile responsive devmode; do
   psql < reset.sql && psql < staff_setup.sql || exit 1
   [[ $suite == staff ]] && node make-cam.mjs
   echo "== $suite"
