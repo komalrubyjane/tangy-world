@@ -96,6 +96,12 @@ function devMockSession(env) {
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  // The demo admin entry must never ship. A build refuses VITE_DEMO_ADMIN_ENABLED=true
+  // unless someone deliberately builds a demo bundle (TANGY_ALLOW_DEMO_BUILD=1).
+  if (command === 'build' && env.VITE_DEMO_ADMIN_ENABLED === 'true' && env.TANGY_ALLOW_DEMO_BUILD !== '1') {
+    throw new Error('VITE_DEMO_ADMIN_ENABLED=true is set (check .env.local). Refusing to build: the demo admin must not ship. '
+      + 'Unset it, or set TANGY_ALLOW_DEMO_BUILD=1 for a deliberate local demo build.')
+  }
   return {
     plugins: [react(), tailwindcss(), devMockSession(env)],
     // TANGY_DEV_TOOLS=off serves a dev build without the switcher (used by e2e/).

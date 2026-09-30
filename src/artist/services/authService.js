@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { applicationErrorMessage } from '../../lib/enquiries';
 
 const NOT_CONFIGURED = { success: false, error: 'The artist portal is not connected yet — please try again shortly.' };
 
@@ -39,7 +40,7 @@ export const authService = {
       experience_level: experienceLevel,
       status: 'pending',
     });
-    if (insertError) return { success: false, error: insertError.message };
+    if (insertError) return { success: false, error: applicationErrorMessage(insertError, insertError.message) };
     return { success: true };
   },
 

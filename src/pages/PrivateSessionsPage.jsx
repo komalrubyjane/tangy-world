@@ -10,6 +10,7 @@ import { enquiryService } from '../services/enquiryService';
 import { useUserAuth } from '../context/UserAuthContext';
 import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
 import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const ENQUIRY_TYPES = [
   { id: 'private_gathering', label: 'Private Gathering' },
@@ -19,6 +20,7 @@ const ENQUIRY_TYPES = [
 ];
 
 export const PrivateSessionsPage = () => {
+  usePageMeta({ title: 'Private sessions', description: 'Book a private Tangy music experience — gatherings, corporate events, weddings and heritage evenings.' });
   const navigate = useNavigate();
   const { playSFX } = useAudio();
   const { user } = useUserAuth();

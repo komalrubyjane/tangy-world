@@ -7,6 +7,7 @@ import { EmailOtpAuth } from '../../components/auth/EmailOtpAuth';
 import { safeNext } from '../../lib/enquiries';
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
 import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 // Universal sign-in for every role (not just Guest/User) — a pending or
 // approved sponsor/vendor/venue/crew/volunteer account returning later
@@ -14,6 +15,7 @@ import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 // protected route here). DashboardRedirect reads the authoritative role
 // once signed in — this page never asks them to pick a role again.
 export const JoinLoginPage = () => {
+  usePageMeta({ title: 'Sign in', description: 'Sign in to your Tangy profile with a one-time email code.' });
   const navigate = useNavigate();
   const { isLoggedIn } = useUserAuth();
   // Where the visitor was headed before being asked to sign in (same-site paths only).

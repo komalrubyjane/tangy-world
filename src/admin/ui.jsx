@@ -480,7 +480,8 @@ export const ToastProvider = ({ children }) => {
       {children}
       <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-[10040] flex flex-col gap-2 items-end pointer-events-none" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={cx('pointer-events-auto max-w-sm w-full sm:w-auto px-4 py-2.5 rounded-md border text-[13px] shadow-lg bg-[#1b1611]', t.tone === 'bad' ? 'border-[#a8322a]/60 text-[#ef6b5e]' : 'border-[#1f8a5b]/50 text-[#9fe6c2]')}>
+          // Toasts carry no controls, so they never block clicks on what's underneath (e.g. a modal's Save).
+          <div key={t.id} className={cx('pointer-events-none max-w-sm w-full sm:w-auto px-4 py-2.5 rounded-md border text-[13px] shadow-lg bg-[#1b1611]', t.tone === 'bad' ? 'border-[#a8322a]/60 text-[#ef6b5e]' : 'border-[#1f8a5b]/50 text-[#9fe6c2]')}>
             {t.message}
           </div>
         ))}

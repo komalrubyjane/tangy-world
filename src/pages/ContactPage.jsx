@@ -7,8 +7,10 @@ import { enquiryService } from '../services/enquiryService';
 import { useUserAuth } from '../context/UserAuthContext';
 import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
 import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export const ContactPage = () => {
+  usePageMeta({ title: 'Contact', description: 'Write to Tangy Sessions — questions, press, collaborations and venues.' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');

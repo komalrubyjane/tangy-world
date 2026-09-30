@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
-import { eventService } from '../services/eventService';
+import { useEvents } from '../hooks/useEvents';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
 const MONTH_NAMES = [
@@ -35,9 +36,15 @@ export const SessionCalendarPage = () => {
   const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
   const [selectedDay, setSelectedDay] = useState(null);
 
+  // Real sessions (events table); drafts are hidden by RLS.
+  const { events } = useEvents();
+  usePageMeta({ title: 'Session calendar', description: 'Every upcoming Tangy session, month by month.' });
   const monthEvents = useMemo(
-    () => eventService.getByMonth(viewYear, viewMonth),
-    [viewYear, viewMonth]
+    () => events
+      .filter((e) => e.rawDate && e.dbStatus !== 'cancelled')
+      .map((e) => ({ ...e, date: e.rawDate, name: e.title }))
+      .filter((e) => { const d = new Date(`${e.date}T00:00:00`); return d.getFullYear() === viewYear && d.getMonth() === viewMonth; }),
+    [events, viewYear, viewMonth]
   );
 
   const eventsByDay = useMemo(() => {
@@ -246,39 +253,34 @@ export const SessionCalendarPage = () => {
                 SESSIONS ON {MONTH_NAMES[viewMonth]} {selectedDay}, {viewYear}
               </span>
               {selectedEvents.map((evt, evtIdx) => {
-                const spotsLeft = evt.capacity - evt.sold;
-                const isSoldOut = evt.status === 'sold-out' || spotsLeft <= 0;
+                const isSoldOut = evt.dbStatus === 'sold-out';
+                const isPast = evt.dbStatus === 'past' || evt.date < new Date().toISOString().slice(0, 10);
                 return (
                   <div key={evt.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 overflow-hidden">
                     <RetroGrain index={evtIdx % 2} opacity={0.1} blend="overlay" />
                     
                     <div className="relative sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square overflow-hidden border-2 border-[#11100C]">
-                      <img src={evt.image} alt={evt.name} className="w-full h-full object-cover filter grayscale contrast-125" />
+                      <img src={evt.image} alt="" className="w-full h-full object-cover filter grayscale contrast-125" />
                       <LotusStamp index={evtIdx} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center font-mono text-[9px] sm:text-[10px] font-bold text-[#B94717] uppercase mb-2 flex-wrap gap-1">
                         <span>{evt.time}</span>
                         <span className={isSoldOut ? 'text-[#5A120D]' : 'text-[#2D5A1B]'}>
-                          {isSoldOut ? 'SOLD OUT' : `${spotsLeft} SPOTS LEFT`}
+                          {isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT · WAITLIST OPEN' : 'ON SALE'}
                         </span>
                       </div>
                       <h3 className="display text-2xl sm:text-3xl text-[#11100C] leading-tight mb-2">{evt.name}</h3>
                       <p className="font-mono text-[10px] sm:text-xs text-[#B94717] font-bold uppercase mb-2">{evt.venue} · {evt.city}</p>
                       <p className="font-mono text-[10px] sm:text-xs text-[#11100C]/75 leading-relaxed mb-3">{evt.description}</p>
                       <p className="font-mono text-[9px] text-[#11100C]/60 uppercase mb-4">
-                        ARTISTS: {evt.artists?.length ? evt.artists.join(', ') : 'TO BE ANNOUNCED'} · ₹{evt.price}
+                        FROM {evt.price}
                       </p>
                       <button
-                        onClick={() => { playSFX('ticketClick'); !isSoldOut && navigate(`/sessions/${evt.slug || evt.id}`); }}
-                        disabled={isSoldOut}
-                        className={`w-full sm:w-auto px-6 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest border-2 transition-colors ${
-                          isSoldOut
-                            ? 'bg-[#5A120D] text-[#E7D5A4]/60 border-[#5A120D] cursor-not-allowed'
-                            : 'bg-[#11100C] text-[#E7D5A4] border-[#11100C] hover:bg-[#B94717] hover:border-[#B94717]'
-                        }`}
+                        onClick={() => { playSFX('ticketClick'); navigate(`/sessions/${evt.slug || evt.id}`); }}
+                        className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest border-2 transition-colors bg-[#11100C] text-[#E7D5A4] border-[#11100C] hover:bg-[#B94717] hover:border-[#B94717]"
                       >
-                        {isSoldOut ? 'SOLD OUT ✗' : 'BOOK →'}
+                        {isPast ? 'VIEW SESSION →' : isSoldOut ? 'JOIN WAITLIST →' : 'BOOK →'}
                       </button>
                     </div>
                   </div>
