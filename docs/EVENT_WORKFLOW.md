@@ -154,3 +154,17 @@ only), **Artist** signs in as the demo artist Ananya Rao — sessions, requests,
 calendar, availability, a private conversation and notifications to explore.
 `npm run dev` reads `.env.development.local` (git-ignored, local only), which
 points it at the local stack.
+
+## Team review deployment
+
+A temporary review deployment (for example a Vercel preview of the review
+branch) points at a disposable review Supabase project and sets
+`VITE_TEAM_REVIEW_MODE=true`. Its `/team-demo` page (also linked from every
+sign-in screen) signs in to one of nine demo accounts with one click — Super
+Admin, Admin / Manager, Staff, Artist, Sponsor, Vendor, Venue Host, Volunteer,
+Customer — using a real password session, so dashboards, guards and
+row-level security behave exactly as for real users; a strip at the top shows
+the role and switches it. Prepare the project with
+`DEMO_TARGET=review scripts/demo-data.sh migrate`, then `seed`, then
+`review-logins`. Normal builds compile all of this out, and a Vercel
+production build refuses review mode unless `TANGY_ALLOW_REVIEW_BUILD=1`.

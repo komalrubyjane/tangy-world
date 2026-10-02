@@ -8,6 +8,7 @@ import { ROLE_CARDS, MORE_WAYS_TO_JOIN } from '../../config/joinRoles';
 import { EmailOtpAuth } from '../auth/EmailOtpAuth';
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
 import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
+import { TEAM_REVIEW_MODE } from '../../config/teamReview';
 
 // The quick-login modal is the site's main "Login" entry point (opened from
 // MuseumQuickDock's LOGIN button and BookingPage's "log in to book" prompts
@@ -226,6 +227,11 @@ export const UserLoginModal = () => {
               ℹ️ {loginReason ? 'New here? The same code creates your free Tangy account.' : 'Guest / User account — for attending Tangy experiences.'}
             </div>
 
+            {TEAM_REVIEW_MODE && (
+              <a href="/team-demo" className="block text-center font-mono text-[10px] font-bold uppercase tracking-widest bg-[#C99A2E] text-[#11100C] p-3" data-team-demo-link>
+                Team demo login — pick a role →
+              </a>
+            )}
             {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
             {DEMO_ADMIN_ENABLED && (
               <button

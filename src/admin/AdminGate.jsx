@@ -5,6 +5,7 @@ import { useUserAuth } from '../context/UserAuthContext';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { EmailOtpAuth } from '../components/auth/EmailOtpAuth';
 import { DEMO_ADMIN_ENABLED } from '../config/demoAdmin';
+import { TEAM_REVIEW_MODE } from '../config/teamReview';
 import { useAdminSession } from './AdminSession';
 import { adminApi } from './api';
 import { ROLE_LABELS } from './rbac';
@@ -102,6 +103,11 @@ export const AdminLoginPanel = ({ title = 'Tangy Admin Portal', subtitle = 'Sign
         <Link to="/" className="text-[#E7D5A4]/60 hover:text-[#E7D5A4]">← Website</Link>
       </div>
 
+      {TEAM_REVIEW_MODE && (
+        <a href="/team-demo" className="mt-4 block text-center font-mono text-[11px] uppercase tracking-[0.18em] text-[#11100C] bg-[#C99A2E] rounded py-2.5 font-bold" data-team-demo-link>
+          Team demo login — pick a role →
+        </a>
+      )}
       {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
       {DEMO_ADMIN_ENABLED && !(import.meta.env.DEV && __TANGY_DEV_TOOLS__) && (
         <Link to="/demo-admin" className="mt-4 block text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#E7D5A4]/60 hover:text-[#E7D5A4] border border-[#E7D5A4]/15 rounded py-2">

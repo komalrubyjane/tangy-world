@@ -6,7 +6,8 @@ import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
 import { AudioProvider } from './audio/AudioContext';
-import { UserAuthProvider } from './context/UserAuthContext';
+import { UserAuthProvider, useUserAuth } from './context/UserAuthContext';
+import { TEAM_REVIEW_MODE } from './config/teamReview';
 import { DemoAdminProvider } from './context/DemoAdminContext';
 import { DevPortalStrip } from './admin/dev/DevRoleSelector';
 import { CustomCursor } from './components/ui/CustomCursor';
@@ -143,6 +144,9 @@ const PrivateGatheringsPage = lazy(() => import('./pages/subsections/PrivateOffe
 const CorporateEventsPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.CorporateEventsPage })));
 const WeddingsPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.WeddingsPage })));
 const HeritageExperiencesPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.HeritageExperiencesPage })));
+// TEAM REVIEW MODE only — compiled out unless the build sets VITE_TEAM_REVIEW_MODE=true.
+const TeamDemoLoginPage = __TANGY_REVIEW_MODE__ && lazy(() => import('./pages/review/TeamDemoLoginPage').then((m) => ({ default: m.TeamDemoLoginPage })));
+const TeamReviewStrip = __TANGY_REVIEW_MODE__ && lazy(() => import('./pages/review/TeamDemoLoginPage').then((m) => ({ default: m.TeamReviewStrip })));
 const MuseumJournalPage = lazy(() => import('./pages/subsections/MuseumJournalPage').then((m) => ({ default: m.MuseumJournalPage })));
 const RecentStoriesPage = lazy(() => import('./pages/subsections/RecentStoriesPage').then((m) => ({ default: m.RecentStoriesPage })));
 const LocationPage = lazy(() => import('./pages/subsections/LocationPage').then((m) => ({ default: m.LocationPage })));
@@ -313,6 +317,14 @@ function LegacyAdminRedirect() {
   return <Navigate to={`/admin-portal${pathname.replace(/^\/admin/, '')}${search}${hash}`} replace />;
 }
 
+// Review builds: show which demo account is signed in, with a way to switch.
+function ReviewStripMount() {
+  const { user } = useUserAuth();
+  const { pathname } = useLocation();
+  if (pathname === '/team-demo') return null;
+  return <Suspense fallback={null}><TeamReviewStrip email={user?.email} /></Suspense>;
+}
+
 function GlobalOverlays() {
   const { pathname } = useLocation();
   const operational = OPERATIONAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -356,6 +368,7 @@ export default function App() {
             <BrowserRouter>
               <ScrollToTop />
               <GlobalOverlays />
+              {TEAM_REVIEW_MODE && <ReviewStripMount />}
               <Suspense fallback={<RouteFallback />}>
               <Routes>
                 {/* PUBLIC WEBSITE HOMEPAGE */}
@@ -393,6 +406,7 @@ export default function App() {
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/refund-policy" element={<RefundPolicyPage />} />
                 <Route path="/invitation" element={<InvitationPage />} />
+                {TEAM_REVIEW_MODE && <Route path="/team-demo" element={<TeamDemoLoginPage />} />}
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="/inner-circle" element={<InnerCirclePage />} />
                 <Route path="/contact" element={<ContactPage />} />

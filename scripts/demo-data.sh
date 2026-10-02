@@ -163,10 +163,31 @@ migrate() {
   done
 }
 
+# Review project only: give the nine Team Demo Login accounts the shared review
+# password (TEAM_REVIEW_PASSWORD in .env.review.local — the same value the
+# review deployment gets as VITE_TEAM_REVIEW_PASSWORD) and the names the team
+# expects. Disposable demo accounts in a disposable project; never production.
+review_logins() {
+  [[ "${DEMO_TARGET:-local}" == review ]] || { echo "review-logins is for DEMO_TARGET=review" >&2; exit 1; }
+  local pw="${TEAM_REVIEW_PASSWORD:?Set TEAM_REVIEW_PASSWORD in .env.review.local}"
+  local esc=${pw//\\/\\\\}; esc=${esc//\"/\\\"}
+  for email in director ops desk ananya.rao saffron.tea kulhad.chai farah aisha meera.kulkarni; do
+    uid=$(psql_ -At -c "select id from auth.users where email = '$email@demo.tangy.local'")
+    [[ -n "$uid" ]] || { echo "no demo account $email@demo.tangy.local — run seed first" >&2; exit 1; }
+    code=$(auth PUT "/$uid" "{\"password\":\"$esc\"}")
+    [[ "$code" == 200 ]] || { echo "could not set the review password for $email (HTTP $code)" >&2; exit 1; }
+  done
+  psql_ -c "update profiles set full_name = v.name from (values
+      ('director@demo.tangy.local', 'Komal Tej'), ('ops@demo.tangy.local', 'Tangy Manager'), ('desk@demo.tangy.local', 'Tangy Staff')
+    ) v(email, name) where profiles.email = v.email" >/dev/null
+  echo "review logins ready: 9 demo accounts"
+}
+
 case "${1:-}" in
   migrate) migrate ;;
   seed) seed ;;
   remove) remove ;;
   status) status ;;
-  *) echo "usage: $0 seed|remove|status (DEMO_TARGET=review: also migrate)" >&2; exit 1 ;;
+  review-logins) review_logins ;;
+  *) echo "usage: $0 seed|remove|status (DEMO_TARGET=review: also migrate, review-logins)" >&2; exit 1 ;;
 esac

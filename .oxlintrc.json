@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "oxc"],
   "env": { "browser": true, "es2024": true },
-  "globals": { "__TANGY_DEV_TOOLS__": "readonly" },
+  "globals": { "__TANGY_DEV_TOOLS__": "readonly", "__TANGY_REVIEW_MODE__": "readonly" },
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }],

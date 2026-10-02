@@ -104,9 +104,25 @@ export default defineConfig(({ command, mode }) => {
     throw new Error('VITE_DEMO_ADMIN_ENABLED=true is set (check .env.local). Refusing to build: the demo admin must not ship. '
       + 'Unset it, or set TANGY_ALLOW_DEMO_BUILD=1 for a deliberate local demo build.')
   }
+  // TEAM REVIEW MODE (temporary review deployments only): a one-click demo
+  // login for disposable demo accounts. Off unless VITE_TEAM_REVIEW_MODE=true;
+  // a Vercel *production* build refuses it unless TANGY_ALLOW_REVIEW_BUILD=1 is
+  // set on purpose, and it needs VITE_TEAM_REVIEW_PASSWORD (set in the hosting
+  // settings, never in Git). Without the flag the screen is compiled out.
+  const reviewMode = env.VITE_TEAM_REVIEW_MODE === 'true'
+  if (command === 'build' && reviewMode) {
+    if (process.env.VERCEL_ENV === 'production' && env.TANGY_ALLOW_REVIEW_BUILD !== '1') {
+      throw new Error('VITE_TEAM_REVIEW_MODE=true on a production deployment. Refusing to build: the team-review demo login must not ship. '
+        + 'Deploy the review branch as a Preview, or set TANGY_ALLOW_REVIEW_BUILD=1 deliberately for a temporary review project.')
+    }
+    if (!env.VITE_TEAM_REVIEW_PASSWORD) throw new Error('VITE_TEAM_REVIEW_MODE=true needs VITE_TEAM_REVIEW_PASSWORD (the review demo accounts\' password).')
+  }
   return {
     plugins: [react(), tailwindcss(), devMockSession(env)],
     // TANGY_DEV_TOOLS=off serves a dev build without the switcher (used by e2e/).
-    define: { __TANGY_DEV_TOOLS__: JSON.stringify(command === 'serve' && env.TANGY_DEV_TOOLS !== 'off') },
+    define: {
+      __TANGY_DEV_TOOLS__: JSON.stringify(command === 'serve' && env.TANGY_DEV_TOOLS !== 'off'),
+      __TANGY_REVIEW_MODE__: JSON.stringify(reviewMode),
+    },
   }
 })

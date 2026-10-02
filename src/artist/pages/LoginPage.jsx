@@ -5,6 +5,7 @@ import { useAudio } from '../../audio/AudioContext';
 import { EmailOtpAuth } from '../../components/auth/EmailOtpAuth';
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
 import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
+import { TEAM_REVIEW_MODE } from '../../config/teamReview';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -105,6 +106,11 @@ export const LoginPage = () => {
             </button>
           </div>
 
+          {TEAM_REVIEW_MODE && (
+            <a href="/team-demo" className="w-full block text-center font-mono text-[10px] font-bold uppercase tracking-widest bg-[#191410] text-[#ecdcaf] p-3 border-2 border-[#191410]" data-team-demo-link>
+              Team demo login — pick a role →
+            </a>
+          )}
           {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
           {DEMO_ADMIN_ENABLED && (
             <button
