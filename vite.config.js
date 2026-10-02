@@ -98,24 +98,31 @@ function devMockSession(env) {
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  // The demo admin entry must never ship. A build refuses VITE_DEMO_ADMIN_ENABLED=true
-  // unless someone deliberately builds a demo bundle (TANGY_ALLOW_DEMO_BUILD=1).
-  if (command === 'build' && env.VITE_DEMO_ADMIN_ENABLED === 'true' && env.TANGY_ALLOW_DEMO_BUILD !== '1') {
-    throw new Error('VITE_DEMO_ADMIN_ENABLED=true is set (check .env.local). Refusing to build: the demo admin must not ship. '
-      + 'Unset it, or set TANGY_ALLOW_DEMO_BUILD=1 for a deliberate local demo build.')
+  // Build-time guards. A guard switches the feature OFF in the bundle (with a
+  // warning) instead of failing the build, so a stray hosting variable can never
+  // break a deployment and can never ship a demo login either.
+  const warn = (msg) => console.warn(`\n[tangy] ${msg}\n`)
+  // The demo admin entry must never ship: a build compiles VITE_DEMO_ADMIN_ENABLED
+  // to false unless someone deliberately builds a demo bundle (TANGY_ALLOW_DEMO_BUILD=1).
+  const demoAdmin = env.VITE_DEMO_ADMIN_ENABLED === 'true'
+    && (command === 'serve' || env.TANGY_ALLOW_DEMO_BUILD === '1')
+  if (command === 'build' && env.VITE_DEMO_ADMIN_ENABLED === 'true' && !demoAdmin) {
+    warn('VITE_DEMO_ADMIN_ENABLED=true ignored: the demo admin is compiled out of this build. Unset it, or set TANGY_ALLOW_DEMO_BUILD=1 for a deliberate local demo build.')
   }
   // TEAM REVIEW MODE (temporary review deployments only): a one-click demo
-  // login for disposable demo accounts. Off unless VITE_TEAM_REVIEW_MODE=true;
-  // a Vercel *production* build refuses it unless TANGY_ALLOW_REVIEW_BUILD=1 is
-  // set on purpose, and it needs VITE_TEAM_REVIEW_PASSWORD (set in the hosting
-  // settings, never in Git). Without the flag the screen is compiled out.
-  const reviewMode = env.VITE_TEAM_REVIEW_MODE === 'true'
+  // login for disposable demo accounts. Off unless VITE_TEAM_REVIEW_MODE=true
+  // and VITE_TEAM_REVIEW_PASSWORD is set (hosting settings, never Git); always
+  // off on a Vercel *production* deployment unless TANGY_ALLOW_REVIEW_BUILD=1 is
+  // set on purpose. When off, the screen is compiled out.
+  let reviewMode = env.VITE_TEAM_REVIEW_MODE === 'true'
   if (command === 'build' && reviewMode) {
     if (process.env.VERCEL_ENV === 'production' && env.TANGY_ALLOW_REVIEW_BUILD !== '1') {
-      throw new Error('VITE_TEAM_REVIEW_MODE=true on a production deployment. Refusing to build: the team-review demo login must not ship. '
-        + 'Deploy the review branch as a Preview, or set TANGY_ALLOW_REVIEW_BUILD=1 deliberately for a temporary review project.')
+      warn('VITE_TEAM_REVIEW_MODE=true ignored on a production deployment: the team-review demo login is compiled out. Deploy the review branch as a Preview, or set TANGY_ALLOW_REVIEW_BUILD=1 deliberately for a temporary review project.')
+      reviewMode = false
+    } else if (!env.VITE_TEAM_REVIEW_PASSWORD) {
+      warn('VITE_TEAM_REVIEW_MODE=true ignored: VITE_TEAM_REVIEW_PASSWORD (the review demo accounts\' password) is not set.')
+      reviewMode = false
     }
-    if (!env.VITE_TEAM_REVIEW_PASSWORD) throw new Error('VITE_TEAM_REVIEW_MODE=true needs VITE_TEAM_REVIEW_PASSWORD (the review demo accounts\' password).')
   }
   return {
     plugins: [react(), tailwindcss(), devMockSession(env)],
@@ -123,6 +130,7 @@ export default defineConfig(({ command, mode }) => {
     define: {
       __TANGY_DEV_TOOLS__: JSON.stringify(command === 'serve' && env.TANGY_DEV_TOOLS !== 'off'),
       __TANGY_REVIEW_MODE__: JSON.stringify(reviewMode),
+      'import.meta.env.VITE_DEMO_ADMIN_ENABLED': JSON.stringify(demoAdmin ? 'true' : 'false'),
     },
   }
 })
