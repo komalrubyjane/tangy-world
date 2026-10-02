@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { SectionNav } from '../components/layout/SectionNav';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 import { content } from '../lib/contentService';
 import { useContent, formatDate } from '../hooks/useContent';
@@ -35,6 +36,7 @@ export const BlogsPage = () => {
         <p className="font-mono text-xs sm:text-sm text-[#E7D5A4]/80 tracking-widest max-w-3xl mx-auto leading-relaxed border-y border-[#D19A24]/30 py-3 sm:py-4 uppercase">
           HANDWRITTEN DIARY ENTRIES, UNRELEASED RECORDING LOGS, SHOW STORIES, AND BEHIND THE SCENES EDITORIALS.
         </p>
+        <SectionNav className="mt-6" />
 
         {/* CATEGORY FILTERS (the posts' tags) */}
         {tags.length > 1 && <div id="stories" className="flex gap-2 sm:gap-3 mt-6 sm:mt-8 overflow-x-auto pb-1 sm:justify-center sm:flex-wrap scrollbar-none">
@@ -64,7 +66,7 @@ export const BlogsPage = () => {
           return (
             <article
               key={entry.id}
-              className="relative bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] sm:shadow-[15px_15px_0px_#11100C] overflow-hidden"
+              className="relative bg-[#EFE2C0] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] overflow-hidden"
             >
               <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
               <LotusStamp index={idx} bg="transparent" border="#7C2D18" className="hidden sm:block absolute -top-3 -right-3 w-9 h-9 z-20 opacity-95 rotate-[-8deg]" />

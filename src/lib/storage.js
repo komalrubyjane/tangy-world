@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { supabase, isSupabaseConfigured, SUPABASE_PUBLIC_KEY } from './supabaseClient';
 
 // One way to handle files across portals and the admin portal.
 //
@@ -8,7 +8,7 @@ import { supabase, isSupabaseConfigured } from './supabaseClient';
 // Storage only signs a URL when the caller passes the same SELECT policy.
 // The only public bucket is artist-avatars (profile photos on the public site).
 
-export const PRIVATE_BUCKETS = ['artist-media', 'event-documents', 'sponsor-assets'];
+export const PRIVATE_BUCKETS = ['artist-media', 'event-documents', 'sponsor-assets', 'artist-documents'];
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 export const safeFileName = (name) =>
@@ -35,7 +35,7 @@ export function uploadWithProgress(bucket, path, file, { onProgress, upsert = fa
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${base}/storage/v1/object/${bucket}/${path.split('/').map(encodeURIComponent).join('/')}`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      xhr.setRequestHeader('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
+      xhr.setRequestHeader('apikey', SUPABASE_PUBLIC_KEY);
       xhr.setRequestHeader('x-upsert', upsert ? 'true' : 'false');
       if (file.type) xhr.setRequestHeader('Content-Type', file.type);
       xhr.upload.onprogress = (e) => { if (e.lengthComputable && onProgress) onProgress(Math.round((100 * e.loaded) / e.total)); };

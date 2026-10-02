@@ -1,15 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
-import { useAudio } from '../audio/AudioContext';
-import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { isMockAuth } from '../config/auth';
-import { enquiryService } from '../services/enquiryService';
-import { useUserAuth } from '../context/UserAuthContext';
-import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
-import { applicationErrorMessage, useApplicantPrefill, FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
+import { SectionNav } from '../components/layout/SectionNav';
+import { PrivateEnquiryForm } from '../components/private/PrivateEnquiryForm';
+import { PRIVATE_OFFERINGS } from '../config/privateOfferings';
 import { usePageMeta } from '../hooks/usePageMeta';
 
 const ENQUIRY_TYPES = [
@@ -22,73 +17,6 @@ const ENQUIRY_TYPES = [
 export const PrivateSessionsPage = () => {
   usePageMeta({ title: 'Private sessions', description: 'Book a private Tangy music experience — gatherings, corporate events, weddings and heritage evenings.' });
   const navigate = useNavigate();
-  const { playSFX } = useAudio();
-  const { user } = useUserAuth();
-
-  const [enquiryType, setEnquiryType] = useState('private_gathering');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [date, setDate] = useState('');
-  const [venue, setVenue] = useState('');
-  const [guests, setGuests] = useState('50-100');
-  const [budget, setBudget] = useState('₹50,000 - ₹100,000');
-  const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState('');
-  useApplicantPrefill(user, { setName, setEmail, setPhone });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!date || !venue || !name || !email) return;
-    playSFX('ticketClick');
-    setFormError('');
-    const guestCount = parseInt(guests, 10) || null;
-    if (isMockAuth) {
-      enquiryService.createPrivate({
-        type: enquiryType,
-        name,
-        email,
-        phone,
-        preferredDate: date,
-        guestCount,
-        budget,
-        message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
-      });
-      setSubmitted(true);
-      return;
-    }
-    if (!isSupabaseConfigured) {
-      setFormError(FORMS_OFFLINE_MESSAGE);
-      return;
-    }
-    setSubmitting(true);
-    const { error } = await supabase.from('private_enquiries').insert({
-      user_id: user.id,
-      type: enquiryType,
-      name,
-      email,
-      phone,
-      preferred_date: date,
-      guest_count: guestCount,
-      message: `Venue: ${venue}\nGuests: ${guests}\nBudget: ${budget}\n\n${message}`,
-    });
-    setSubmitting(false);
-    if (error) {
-      setFormError(applicationErrorMessage(error, 'Something went wrong submitting your request — please try again.'));
-      return;
-    }
-    setSubmitted(true);
-  };
-
-  const offerings = [
-    { id: 'gatherings', title: "PRIVATE GATHERINGS", desc: "Intimate acoustic soundscapes hosted inside private courtyards, living rooms, and rooftops." },
-    { id: 'corporate', title: "CORPORATE EVENTS", desc: "Unplugged music curation for brand launches, executive retreats, and private dinners." },
-    { id: 'weddings', title: "WEDDINGS & RITUALS", desc: "Acoustic Sufi and Carnatic fusion for intimate wedding gatherings and ceremonies." },
-    { id: 'heritage', title: "HERITAGE EXPERIENCES", desc: "Transform historic palaces, stepwells, and havelis into private music sanctuaries." }
-  ];
-
   const packages = [
     { name: "ACOUSTIC TRIO", price: "₹45,000+", desc: "3 Artists · 2 Hours · Portable Vintage Sound Setup · Ideal for Living Rooms & Courtyards" },
     { name: "HERITAGE SANCTUARY SPECIAL", price: "₹95,000+", desc: "5 Artists · Full 1970s Analog Audio System · Stepwell Lighting & Chai Station" },
@@ -107,7 +35,7 @@ export const PrivateSessionsPage = () => {
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {/* HERO BANNER */}
-        <div id="gatherings" className="w-full bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[10px_10px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="gatherings" className="w-full bg-[#181614] border-2 border-[#ecdcaf] p-6 sm:p-8 shadow-[4px_4px_0px_#191410] mb-10 text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">
               PRIVATE SESSIONS // BESPOKE CURATION
@@ -125,23 +53,7 @@ export const PrivateSessionsPage = () => {
           </div>
         </div>
 
-        {/* Quick Section Anchors */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {[
-            { label: 'PRIVATE GATHERINGS', hash: '#gatherings' },
-            { label: 'CORPORATE EVENTS', hash: '#corporate' },
-            { label: 'WEDDINGS', hash: '#weddings' },
-            { label: 'HERITAGE EXPERIENCES', hash: '#heritage' }
-          ].map((link) => (
-            <a
-              key={link.hash}
-              href={link.hash}
-              className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#ecdcaf]/40 bg-[#181614] text-[#ecdcaf] hover:bg-[#EFE2C0] hover:text-[#191410] transition-colors"
-            >
-              {link.label} ↓
-            </a>
-          ))}
-        </div>
+        <SectionNav section="Private" className="mb-10" />
 
         {/* OFFERINGS GRID */}
         <div className="mb-12">
@@ -151,18 +63,19 @@ export const PrivateSessionsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {offerings.map((item, idx) => (
-              <div 
-                key={idx}
-                id={item.id}
-                className="bg-[#181614] border-2 border-[#ecdcaf]/40 p-5 shadow-[6px_6px_0px_#191410] text-left flex flex-col justify-between hover:border-[#d1a437] transition-all"
+            {PRIVATE_OFFERINGS.map((item) => (
+              <Link
+                key={item.slug}
+                to={`/private/${item.slug}`}
+                className="bg-[#181614] border-2 border-[#ecdcaf]/40 p-5 shadow-[4px_4px_0px_#191410] text-left flex flex-col justify-between hover:border-[#d1a437] focus-visible:border-[#d1a437] transition-all"
               >
                 <div>
-                  <span className="font-mono text-[9px] font-bold text-[#d1a437]">CATEGORY #0{idx+1}</span>
+                  <span className="font-mono text-[9px] font-bold text-[#d1a437]">CATEGORY #{item.number}</span>
                   <h3 className="font-poster text-xl text-[#ecdcaf] my-1">{item.title}</h3>
-                  <p className="font-mono text-xs text-[#ecdcaf]/80 leading-relaxed">{item.desc}</p>
+                  <p className="font-mono text-xs text-[#ecdcaf]/80 leading-relaxed">{item.summary}</p>
                 </div>
-              </div>
+                <span className="mt-4 font-mono text-[10px] font-bold uppercase tracking-widest text-[#d1a437]">Explore &amp; enquire →</span>
+              </Link>
             ))}
           </div>
         </div>
@@ -174,7 +87,7 @@ export const PrivateSessionsPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {packages.map((pkg, idx) => (
-              <div key={idx} className="bg-[#EFE2C0] paperTexture text-[#191410] p-6 border-4 border-[#191410] shadow-[8px_8px_0px_#191410] flex flex-col justify-between">
+              <div key={idx} className="bg-[#EFE2C0] paperTexture text-[#191410] p-6 border-2 border-[#191410] shadow-[4px_4px_0px_#191410] flex flex-col justify-between">
                 <div>
                   <span className="font-mono text-[9px] font-bold text-[#315D73]">TIER #0{idx+1}</span>
                   <h3 className="font-poster text-2xl text-[#191410] my-1">{pkg.name}</h3>
@@ -187,7 +100,7 @@ export const PrivateSessionsPage = () => {
         </div>
 
         {/* HERITAGE & WEDDINGS SPECIFIC SECTION */}
-        <div id="weddings" className="mb-12 bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-8 shadow-[8px_8px_0px_#191410] text-left">
+        <div id="weddings" className="mb-12 bg-[#181614] border-2 border-[#ecdcaf] p-6 sm:p-8 shadow-[4px_4px_0px_#191410] text-left">
           <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase block mb-1">
             03 // WEDDINGS &amp; HERITAGE EXPERIENCES
           </span>
@@ -198,62 +111,23 @@ export const PrivateSessionsPage = () => {
         </div>
 
         {/* RESERVATION FORM */}
-        <div className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div className="bg-[#181614] border-2 border-[#ecdcaf] p-6 sm:p-10 shadow-[4px_4px_0px_#191410] text-left">
           <div className="mb-6">
             <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 // RESERVATION DESK</span>
             <h2 className="font-poster text-3xl text-[#ecdcaf]">REQUEST A PRIVATE SESSION</h2>
           </div>
 
-          {submitted ? (
-            <div className="bg-[#211915] border-2 border-[#ecdcaf] p-8 text-center">
-              <h3 className="font-poster text-3xl text-[#ecdcaf] mb-2">RESERVATION REQUEST TRANSMITTED!</h3>
-              <p className="font-mono text-xs text-[#ecdcaf]/80">Our private session coordinator will review your request and get back to you within 48 hours.</p>
-            </div>
-          ) : (
-            <RequireAuthToApply title="SIGN IN TO SEND YOUR REQUEST" intro="Verify your email with a one-time code. Your request is linked to your Tangy profile so you can follow it and our coordinator can reply." showJoinLink={false}>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-              <div className="flex flex-wrap gap-1.5">
-                {ENQUIRY_TYPES.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setEnquiryType(t.id)}
-                    className={`px-2.5 py-1.5 text-[9px] font-bold uppercase border transition-colors ${enquiryType === t.id ? 'bg-[#ecdcaf] text-[#191410] border-[#ecdcaf]' : 'bg-[#241a12] text-[#ecdcaf]/70 border-[#ecdcaf]/30'}`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" placeholder="YOUR NAME *" value={name} onChange={(e) => setName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
-                <input required type="email" placeholder="YOUR EMAIL *" value={email} onChange={(e) => setEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
-              </div>
-              <input type="tel" placeholder="PHONE NUMBER (OPTIONAL)" value={phone} onChange={(e) => setPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
-                <input required type="text" placeholder="EVENT VENUE / LOCATION *" value={venue} onChange={(e) => setVenue(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select value={guests} onChange={(e) => setGuests(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
-                  <option value="20-50">20 - 50 GUESTS</option>
-                  <option value="50-100">50 - 100 GUESTS</option>
-                  <option value="100-200">100 - 200 GUESTS</option>
-                  <option value="200+">200+ GUESTS</option>
-                </select>
-                <select value={budget} onChange={(e) => setBudget(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
-                  <option value="₹50,000 - ₹100,000">₹50,000 - ₹100,000</option>
-                  <option value="₹100,000 - ₹200,000">₹100,000 - ₹200,000</option>
-                  <option value="₹200,000+">₹200,000+</option>
-                </select>
-              </div>
-              <textarea rows={4} placeholder="DETAILS ABOUT YOUR EVENT & PREFERRED MUSIC TYPE..." value={message} onChange={(e) => setMessage(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-              {formError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{formError}</div>}
-              <button type="submit" disabled={submitting} className="py-4 bg-[#EFE2C0] text-[#191410] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#C89D35] border-2 border-[#191410] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
-                {submitting ? 'SUBMITTING...' : 'SUBMIT RESERVATION REQUEST →'}
-              </button>
-            </form>
-            </RequireAuthToApply>
-          )}
+          <PrivateEnquiryForm
+            types={ENQUIRY_TYPES}
+            guestOptions={[['20-50', '20 - 50 GUESTS'], ['50-100', '50 - 100 GUESTS'], ['100-200', '100 - 200 GUESTS'], ['200+', '200+ GUESTS']]}
+            defaultGuests="50-100"
+            budgetOptions={['₹50,000 - ₹100,000', '₹100,000 - ₹200,000', '₹200,000+']}
+            venuePlaceholder="EVENT VENUE / LOCATION *"
+            messagePlaceholder="DETAILS ABOUT YOUR EVENT & PREFERRED MUSIC TYPE..."
+            cta="SUBMIT RESERVATION REQUEST →"
+            successTitle="RESERVATION REQUEST TRANSMITTED!"
+            successText="Our private session coordinator will review your request and get back to you within 48 hours."
+          />
         </div>
 
       </main>

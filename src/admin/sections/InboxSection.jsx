@@ -217,7 +217,7 @@ export const InboxSection = () => {
                   </>
                 }
               />
-              <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410]" style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}>
+              <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410]">
                 {messagesLoading ? (
                   <div className="p-10 text-center font-mono text-xs font-bold text-[#E7D5A4]/60">LOADING MESSAGES...</div>
                 ) : messages.length === 0 ? (

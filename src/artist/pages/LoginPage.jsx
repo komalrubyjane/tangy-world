@@ -29,7 +29,7 @@ export const LoginPage = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-4xl bg-[#EFE2C0] text-[#241a12] border-4 border-[#191410] shadow-[14px_14px_0px_#4c1210] grid grid-cols-1 md:grid-cols-2 overflow-hidden text-left">
+      <div className="w-full max-w-4xl bg-[#EFE2C0] text-[#241a12] border-2 border-[#191410] shadow-[4px_4px_0px_#4c1210] grid grid-cols-1 md:grid-cols-2 overflow-hidden text-left">
 
         {/* LEFT PANEL: PORTAL OVERVIEW & CHECKLIST */}
         <div className="bg-[#181614] text-[#ecdcaf] p-8 border-b-4 md:border-b-0 md:border-r-4 border-[#191410] flex flex-col justify-between">
@@ -98,7 +98,7 @@ export const LoginPage = () => {
           <div className="border-t border-[#191410]/20 pt-4 text-center font-mono text-xs">
             <span className="text-[#241a12]/70">NEW ARTIST? </span>
             <button
-              onClick={() => { playSFX('ticketClick'); navigate('/artist/register'); }}
+              onClick={() => { playSFX('ticketClick'); navigate('/artist/apply'); }}
               className="text-[#c2272a] font-bold underline ml-1 uppercase"
             >
               APPLY AS ARTIST →

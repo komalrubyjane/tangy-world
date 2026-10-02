@@ -1,5 +1,6 @@
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { SectionNav } from '../components/layout/SectionNav';
 import { Manifesto } from '../components/sections/Manifesto';
 import { History } from '../components/sections/History';
 import { Founders } from '../components/sections/Founders';
@@ -29,23 +30,7 @@ export const AboutPage = () => {
             A RECORD OF EVERYTHING THAT HAPPENED IN BETWEEN THE MUSIC. HERITAGE SANCTUARIES, INDEPENDENT ARTISTS, AND UNAMPLIFIED SOUNDSCAPES.
           </p>
 
-          {/* Quick section anchors */}
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
-            {[
-              { label: 'WHY TANGY', hash: '#manifesto' },
-              { label: 'CHRONOLOGY', hash: '#history' },
-              { label: 'OUR SPACES', hash: '#spaces' },
-              { label: 'TANGY TEAM', hash: '/about/team' }
-            ].map((link) => (
-              <a
-                key={link.hash}
-                href={link.hash}
-                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors"
-              >
-                {link.label} {link.hash.startsWith('/') ? '→' : '↓'}
-              </a>
-            ))}
-          </div>
+          <SectionNav section="About" className="mt-6 sm:mt-8" />
         </div>
       </section>
 
@@ -80,7 +65,7 @@ export const AboutPage = () => {
 
       {/* MISSION & VISION SUMMARY CARD */}
       <section className="py-16 sm:py-24 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 md:p-14 border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] sm:shadow-[20px_20px_0px_#11100C]">
+        <div className="max-w-4xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 md:p-14 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C]">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-[#11100C] pb-3 mb-4 sm:mb-6 font-mono text-xs font-bold uppercase gap-1">
             <span>MISSION &amp; VISION</span>
             <span className="hidden sm:block">HYDERABAD CULTURAL ARCHIVE</span>

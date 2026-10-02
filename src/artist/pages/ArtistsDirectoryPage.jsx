@@ -58,7 +58,7 @@ export const ArtistsDirectoryPage = () => {
 
       {/* HERO HEADER — a poster masthead, not a settings-page banner: a bleeding Rangoli */}
       {/* medallion, a huge outline "01" plate mark, and oversized rotated title type. */}
-      <div className="relative bg-[#EFE2C0] paperTexture text-[#241a12] border-2 sm:border-4 border-[#191410] p-5 sm:p-10 shadow-[6px_6px_0px_#4c1210] sm:shadow-[12px_12px_0px_#4c1210] overflow-hidden max-w-full isolate">
+      <div className="relative bg-[#EFE2C0] paperTexture text-[#241a12] border-2 sm:border-2 border-[#191410] p-5 sm:p-10 shadow-[4px_4px_0px_#4c1210] sm:shadow-[4px_4px_0px_#4c1210] overflow-hidden max-w-full isolate">
         <PatternBackground category="textile" index={1} size="cover" blend="normal" />
         <RetroGrain index={0} opacity={0.09} blend="overlay" />
         <div className="hidden sm:block absolute -right-[8%] -top-[30%] w-[46%] max-w-[300px] aspect-square opacity-[0.18] animate-[spin_150s_linear_infinite] pointer-events-none">
@@ -91,7 +91,7 @@ export const ArtistsDirectoryPage = () => {
           </div>
 
           <button
-            onClick={() => { playSFX('ticketClick'); navigate('/artist/register'); }}
+            onClick={() => { playSFX('ticketClick'); navigate('/artist/apply'); }}
             className="w-full md:w-auto shrink-0 px-6 py-3.5 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] hover:bg-[#191410] active:scale-95 transition-all text-center min-h-[44px] rotate-1"
           >
             APPLY AS ARTIST →
@@ -156,7 +156,7 @@ export const ArtistsDirectoryPage = () => {
               <div
                 key={artist.id}
                 onClick={() => { playSFX('ticketClick'); navigate(artist.slug ? `/artists/${artist.slug}` : `/artist/profile/${artist.id}`); }}
-                className="group relative aspect-[3/4] border-2 sm:border-4 border-[#191410] shadow-[6px_6px_0px_#191410] sm:shadow-[10px_10px_0px_#191410] hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all cursor-pointer overflow-hidden isolate"
+                className="group relative aspect-[3/4] border-2 sm:border-2 border-[#191410] shadow-[4px_4px_0px_#191410] sm:shadow-[4px_4px_0px_#191410] hover:-translate-y-1.5 hover:rotate-[0.5deg] transition-all cursor-pointer overflow-hidden isolate"
                 style={{ backgroundColor: palette.bg }}
               >
                 {/* REAL PAPER-GRAIN LAYER — a physical-print imperfection, subtly more visible */}

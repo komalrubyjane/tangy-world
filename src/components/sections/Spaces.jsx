@@ -115,7 +115,7 @@ export const Spaces = () => {
 
         {/* Heritage Card */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none px-4">
-          <div className="heritage-card bg-[#EFE2C0] p-14 border-4 border-[#11100C] text-center max-w-2xl pointer-events-auto opacity-0 shadow-[20px_20px_0px_#11100C] text-[#11100C]">
+          <div className="heritage-card bg-[#EFE2C0] p-14 border-2 border-[#11100C] text-center max-w-2xl pointer-events-auto opacity-0 shadow-[4px_4px_0px_#11100C] text-[#11100C]">
             <p className="font-mono text-[11px] tracking-[0.3em] text-tangy-orange mb-4 font-bold uppercase">17TH CENTURY MONUMENT</p>
             <h3 className="display text-6xl text-[#11100C] mb-6 ink-bleed">BANSILALPET<br/>STEPWELL</h3>
             <p className="font-body text-[#11100C]/90 text-lg leading-relaxed mb-8 border-l-2 border-tangy-orange pl-4">
@@ -145,7 +145,7 @@ export const Spaces = () => {
 
         <div className="flex flex-col gap-6 relative z-10">
           {VENUES.map((venue, idx) => (
-            <div key={venue.id} className="venue-mobile-card bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] overflow-hidden">
+            <div key={venue.id} className="venue-mobile-card bg-[#EFE2C0] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] overflow-hidden">
               <div className="w-full h-44 overflow-hidden relative">
                 <img
                   src={venue.image}

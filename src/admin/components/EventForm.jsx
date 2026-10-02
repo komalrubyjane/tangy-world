@@ -20,7 +20,7 @@ const toLocalInput = (iso) => {
 export function useVenueOptions() {
   return useAsync(async () => {
     const [{ data: venues }, { data: partners }] = await Promise.all([
-      supabase.from('venues').select('id, name, capacity').eq('is_active', true).order('name'),
+      supabase.from('venues').select('id, name, capacity, address, city').eq('is_active', true).order('name'),
       supabase.from('venue_profiles').select('id, property_name, profiles(full_name, email)'),
     ]);
     return {

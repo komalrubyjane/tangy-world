@@ -27,6 +27,8 @@ export function friendlyError(error) {
     return new AdminApiError('Network error — check your connection and try again.', { code });
   }
   if (code === '23505') return new AdminApiError('That already exists.', { code });
+  // Server messages written for people (raised with hint 'tangy:user', 0034).
+  if (error.hint === 'tangy:user') return new AdminApiError(message, { code });
   if (code === 'P0001' && SAFE_RPC_MESSAGE.test(message)) {
     return new AdminApiError(message, { code, forbidden: /permission/i.test(message) });
   }
@@ -145,8 +147,11 @@ export const adminApi = {
   reportApplications: (from, to) => rpc('report_applications', { p_from: from || null, p_to: to || null }),
   reportStaffActivity: (from, to) => rpc('report_staff_activity', { p_from: from || null, p_to: to || null }),
 
-  // Creating a login needs the service role key, so it runs in an Edge
-  // Function that re-verifies the caller is a super admin.
+  // Invitations (0030): the Edge Function creates a hashed, expiring,
+  // single-use invitation and emails the link; the database decides who may
+  // invite which role. The role is granted only when the recipient accepts.
+  listInvitations: () => rpc('list_account_invitations', { p_limit: 50 }),
+  revokeInvitation: (id) => rpc('revoke_account_invitation', { p_id: id }),
   inviteUser: async ({ email, fullName, role }) => {
     const { data, error } = await client().functions.invoke('admin-invite-user', { body: { email, full_name: fullName, role } });
     if (error) throw new AdminApiError(data?.error || error.message || 'Could not invite user.');

@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { NotFoundPage } from '../../pages/content/NotFoundPage';
+import { usePageMeta } from '../../hooks/usePageMeta';
 import { useAuth } from '../contexts/AuthContext';
 import { workspaceApi } from '../services/workspaceApi';
+import { portalApi } from '../../portal/portalApi';
 import { uploadWithProgress, signedUrl, removeFile, safeFileName, formatBytes } from '../../lib/storage';
 import { Panel, Badge, Button, Input, Select, Field, EmptyState, ErrorState, Skeleton, Modal, Icon, fmt, cx } from '../../admin/ui';
 
@@ -17,11 +21,22 @@ const STATUS = {
   rejected: ['Changes needed', 'bad'], archived: ['Archived', 'muted'],
 };
 const FILTERS = [['active', 'Active'], ['approved', 'Approved'], ['under_review', 'Under review'], ['rejected', 'Changes needed'], ['archived', 'Archived']];
+// Upload details (0033): what it is, when, and which session it belongs to.
+const KINDS = [['photo', 'Photo'], ['video', 'Video'], ['recording', 'Performance recording'], ['press', 'Press material'], ['poster', 'Poster']];
+const guessKind = (file) => (file.type.startsWith('image/') ? 'photo' : file.type.startsWith('video/') ? 'video' : file.type.startsWith('audio/') ? 'recording' : 'press');
+const detailFields = (d) => ({
+  description: d.description?.trim() || null, kind: d.kind || null, performance_type: d.performance_type?.trim() || null,
+  taken_on: d.taken_on || null, event_id: d.event_id || null,
+  tags: [...new Set((d.tags || '').split(',').map((t) => t.trim().toLowerCase()).filter(Boolean))],
+});
 const guessType = (file) => (file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : file.type === 'application/pdf' ? 'press_kit' : 'demo');
 const kindOf = (m) => (m.mime_type || '').split('/')[0];
 
 export const MediaPage = () => {
+  usePageMeta({ title: 'Media', noindex: true });
   const { user } = useAuth();
+  const [sessions, setSessions] = useState([]);
+  useEffect(() => { portalApi.myEvents(true).then(setSessions, () => {}); }, []);
   const inputRef = useRef(null);
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
@@ -44,7 +59,7 @@ export const MediaPage = () => {
     if (!file) return;
     if (file.size > MAX_BYTES) { setMsg(`That file is ${formatBytes(file.size)} — the limit is ${formatBytes(MAX_BYTES)}.`); return; }
     setMsg('');
-    setPending({ file, title: file.name.replace(/\.[^.]+$/, ''), media_type: guessType(file), submit: true });
+    setPending({ file, title: file.name.replace(/\.[^.]+$/, ''), media_type: guessType(file), submit: true, kind: guessKind(file), description: '', tags: '', taken_on: '', event_id: '', performance_type: '' });
   };
 
   const upload = async () => {
@@ -56,7 +71,7 @@ export const MediaPage = () => {
       try {
         await workspaceApi.addMedia({
           artist_id: user.id, storage_path: path, file_name: file.name, file_size_bytes: file.size,
-          mime_type: file.type || null, title: title.trim() || file.name, media_type, status: submit ? 'under_review' : 'uploaded',
+          mime_type: file.type || null, title: title.trim() || file.name, media_type, status: submit ? 'under_review' : 'uploaded', ...detailFields(pending),
         });
       } catch (err) {
         await removeFile('artist-media', path).catch(() => {});
@@ -93,7 +108,7 @@ export const MediaPage = () => {
   const shown = (items || []).filter((m) => (filter === 'active' ? m.status !== 'archived' : m.status === filter));
 
   return (
-    <div className="w-full p-3 sm:p-6 md:p-8 max-w-5xl mx-auto flex flex-col gap-4 text-left font-sans text-[#E7D5A4]">
+    <div className="w-full flex flex-col gap-4 text-left font-body text-[#E7D5A4]">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#d1a437]">Artist workspace</p>
@@ -106,9 +121,9 @@ export const MediaPage = () => {
 
       {msg && <p role="status" className="text-[13px] text-[#f5b544]">{msg}</p>}
 
-      <div role="tablist" aria-label="Filter media" className="flex gap-1.5 overflow-x-auto pb-1">
+      <div role="group" aria-label="Filter media" className="flex gap-1.5 overflow-x-auto pb-1">
         {FILTERS.map(([k, label]) => (
-          <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
+          <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)}
             className={cx('h-8 px-3 rounded-full border font-mono text-[11px] uppercase tracking-[0.08em] whitespace-nowrap', filter === k ? 'border-[#C99A2E] bg-[#C99A2E] text-[#11100C]' : 'border-[#E7D5A4]/25 text-[#ecdcaf]/80')}>
             {label}{items ? ` (${items.filter((m) => (k === 'active' ? m.status !== 'archived' : m.status === k)).length})` : ''}
           </button>
@@ -130,7 +145,7 @@ export const MediaPage = () => {
                     <Icon name={kindOf(m) === 'image' ? 'Image' : kindOf(m) === 'video' ? 'Video' : kindOf(m) === 'audio' ? 'Music' : 'FileText'} size={18} />
                   </button>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[15px] text-[#EFE2C0] truncate">{m.title || m.file_name}</div>
+                    <Link to={`/artist/media/${m.id}`} className="block text-[15px] text-[#EFE2C0] truncate hover:underline" data-media-link>{m.title || m.file_name}</Link>
                     <div className="text-[12px] text-[#E7D5A4]/55">{[TYPE_LABEL[m.media_type] || m.media_type, formatBytes(m.file_size_bytes), fmt.date(m.created_at)].join(' · ')}</div>
                     {m.review_note && <p className="text-[12.5px] text-[#E7D5A4]/80 mt-1 border-l-2 border-[#C99A2E]/40 pl-2">Tangy: {m.review_note}</p>}
                   </div>
@@ -161,6 +176,7 @@ export const MediaPage = () => {
             <Field label="Type">
               <Select value={pending.media_type} onChange={(e) => setPending({ ...pending, media_type: e.target.value })}>{TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select>
             </Field>
+            <MediaDetailFields value={pending} onChange={(v) => setPending({ ...pending, ...v })} sessions={sessions} />
             <label className="flex items-center gap-2 text-[13px]">
               <input type="checkbox" checked={pending.submit} onChange={(e) => setPending({ ...pending, submit: e.target.checked })} className="accent-[#C99A2E]" />
               Submit to Tangy for review now
@@ -184,6 +200,78 @@ export const MediaPage = () => {
           <p className="text-[11.5px] text-[#E7D5A4]/60 mt-3">This private link expires in 10 minutes.</p>
         </Modal>
       )}
+    </div>
+  );
+};
+
+// The upload details, shared by the upload dialog and the media page.
+function MediaDetailFields({ value, onChange, sessions }) {
+  return (
+    <>
+      <Field label="What is it?"><Select value={value.kind || ''} onChange={(e) => onChange({ kind: e.target.value })}>{KINDS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select></Field>
+      <Field label="Description"><Input maxLength={1000} value={value.description || ''} onChange={(e) => onChange({ description: e.target.value })} placeholder="Live acoustic set at …" /></Field>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Field label="Date"><Input type="date" value={value.taken_on || ''} onChange={(e) => onChange({ taken_on: e.target.value })} /></Field>
+        <Field label="Performance type"><Input maxLength={80} value={value.performance_type || ''} onChange={(e) => onChange({ performance_type: e.target.value })} placeholder="Acoustic set, DJ set…" /></Field>
+      </div>
+      <Field label="Related session"><Select value={value.event_id || ''} onChange={(e) => onChange({ event_id: e.target.value })}>
+        <option value="">None</option>{sessions.map((s) => <option key={s.event_id} value={s.event_id}>{s.name} · {s.event_date}</option>)}
+      </Select></Field>
+      <Field label="Tags" hint="Comma separated"><Input value={value.tags || ''} onChange={(e) => onChange({ tags: e.target.value })} /></Field>
+    </>
+  );
+}
+
+// /artist/media/:mediaId — one item: preview, status and its details.
+export const MediaDetailPage = () => {
+  const { mediaId } = useParams();
+  const { user } = useAuth();
+  const [item, setItem] = useState(undefined);
+  const [form, setForm] = useState(null);
+  const [url, setUrl] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [msg, setMsg] = useState('');
+  usePageMeta({ title: item?.title || 'Media', noindex: true });
+  useEffect(() => {
+    if (!user?.id) return;
+    workspaceApi.media(user.id).then((rows) => {
+      const m = rows.find((r) => r.id === mediaId) || null;
+      setItem(m);
+      if (m) {
+        setForm({ title: m.title || '', kind: m.kind || '', description: m.description || '', taken_on: m.taken_on || '', event_id: m.event_id || '', performance_type: m.performance_type || '', tags: (m.tags || []).join(', ') });
+        signedUrl('artist-media', m.storage_path).then(setUrl, () => {});
+      }
+    }, () => setItem(null));
+    portalApi.myEvents(true).then(setSessions, () => {});
+  }, [user?.id, mediaId]);
+  if (item === undefined) return <Skeleton rows={4} />;
+  if (!item) return <NotFoundPage what="media item" back={{ to: '/artist/media', label: 'Back to media' }} />;
+  const [label, tone] = STATUS[item.status] || [item.status, 'muted'];
+  const save = async () => {
+    try { setItem(await workspaceApi.updateMedia(item.id, { title: form.title.trim() || item.file_name, ...detailFields(form) })); setMsg('Saved.'); } catch (err) { setMsg(err.message); }
+  };
+  return (
+    <div className="flex flex-col gap-4 text-[#E7D5A4]" data-media-page={item.id}>
+      <nav aria-label="Breadcrumb" className="text-xs text-[#E7D5A4]/70"><Link to="/artist/media" className="hover:underline">Media</Link> › <span aria-current="page">{item.title || item.file_name}</span></nav>
+      <header className="flex flex-wrap items-center gap-3"><h1 className="font-condensed text-3xl uppercase text-[#F3E7C9] m-0">{item.title || item.file_name}</h1><Badge tone={tone}>{label}</Badge></header>
+      {item.review_note && <p className="text-sm border-l-2 border-[#C99A2E]/50 pl-3">Tangy: {item.review_note}</p>}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Panel title="Preview">
+          {!url ? <Skeleton rows={3} /> : kindOf(item) === 'image' ? <img src={url} alt={item.title || ''} className="max-h-[50vh] mx-auto rounded" />
+            : kindOf(item) === 'video' ? <video src={url} controls className="w-full max-h-[50vh] rounded" />
+            : kindOf(item) === 'audio' ? <audio src={url} controls className="w-full" />
+            : <Button icon="ExternalLink" onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}>Open file</Button>}
+          <p className="text-[11.5px] text-[#E7D5A4]/60 mt-3">Private link — expires in 10 minutes. Only you and the Tangy team can open this file.</p>
+        </Panel>
+        <Panel title="Details">
+          <div className="flex flex-col gap-3">
+            <Field label="Title"><Input maxLength={200} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+            <MediaDetailFields value={form} onChange={(v) => setForm({ ...form, ...v })} sessions={sessions} />
+            <Button variant="primary" onClick={save}>Save details</Button>
+            {msg && <p role="status" className="text-[13px] m-0">{msg}</p>}
+          </div>
+        </Panel>
+      </div>
     </div>
   );
 };

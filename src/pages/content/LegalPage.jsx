@@ -12,7 +12,7 @@ export const LegalPage = ({ doc }) => {
   const draft = d.status !== 'final';
   usePageMeta({ title: d.title, description: `${d.title} for Tangy Sessions.`, noindex: draft });
   return (
-    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body t-quiet">
       <Navbar />
       <main className="pt-28 pb-16 px-4 sm:px-6 max-w-3xl mx-auto" data-legal={doc}>
         <h1 className="display text-4xl sm:text-6xl uppercase m-0">{d.title}</h1>

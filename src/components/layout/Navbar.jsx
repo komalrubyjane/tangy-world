@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAudio } from '../../audio/AudioContext';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { useLenis } from './LenisProvider';
 import { HOME_CHAPTERS } from '../../data/homeChapters';
+import { NAV_SECTIONS, sectionFor } from '../../config/siteNav';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -31,127 +32,23 @@ export const Navbar = () => {
     return () => window.removeEventListener('tangy:chapter', onChapter);
   }, []);
 
-  // NAVIGATION CATEGORIES (Includes ARTISTS section with distinct Artist Portal links)
-  const navCategories = [
-    {
-      title: 'About',
-      path: '/about',
-      items: [
-        { label: 'Why Tangy', path: '/about#manifesto' },
-        { label: 'Chronology', path: '/about#history' },
-        { label: 'Tangy Team', path: '/about/team' },
-        { label: 'Full Story', path: '/about' }
-      ]
-    },
-    {
-      title: 'Sessions',
-      path: '/sessions',
-      items: [
-        { label: 'Upcoming Sessions', path: '/sessions#upcoming' },
-        { label: 'Concert Culture', path: '/sessions#culture' },
-        { label: 'Session Calendar', path: '/sessions#calendar' },
-        { label: 'Join Waitlist', path: '/sessions#waitlist' }
-      ]
-    },
-    {
-      title: 'Archive',
-      path: '/archive',
-      items: [
-        { label: 'Session Archive', path: '/archive#session-archive' },
-        { label: 'Museum Timeline', path: '/archive#museum-timeline' },
-        { label: 'Past Memories', path: '/archive#past-memories' },
-        { label: '35mm Contact Sheets', path: '/archive#contact-sheets' }
-      ]
-    },
-    {
-      title: 'Artists',
-      path: '/artist',
-      items: [
-        { label: 'Artists Directory', path: '/artist' },
-        { label: 'Apply as an Artist', path: '/artist/register' },
-        { label: 'Artist Login', path: '/artist/login' },
-        { label: 'Artist Portal', path: '/artist/dashboard' }
-      ]
-    },
-    {
-      title: 'Crew',
-      path: '/crew',
-      items: [
-        { label: 'Volunteer Opportunities', path: '/crew#volunteer' },
-        { label: 'Production Team', path: '/crew#production' },
-        { label: 'Stage Operations', path: '/crew#stage' },
-        { label: 'Apply Now', path: '/apply/crew' }
-      ]
-    },
-    {
-      title: 'Collaborate',
-      path: '/collaborate',
-      items: [
-        { label: 'Vendors', path: '/apply/vendors' },
-        { label: 'Sponsors', path: '/apply/sponsors' },
-        { label: 'Venue / Host', path: '/apply/venue-host' },
-        { label: 'Explore Opportunities', path: '/collaborate' }
-      ]
-    },
-    {
-      title: 'Private',
-      path: '/private-sessions',
-      items: [
-        { label: 'Private Gatherings', path: '/private-sessions#gatherings' },
-        { label: 'Corporate Events', path: '/private-sessions#corporate' },
-        { label: 'Weddings', path: '/private-sessions#weddings' },
-        { label: 'Heritage Experiences', path: '/private-sessions#heritage' }
-      ]
-    },
-    {
-      title: 'Diary',
-      path: '/blogs',
-      items: [
-        { label: 'Museum Journal', path: '/blogs#journal' },
-        { label: 'Recent Stories', path: '/blogs#stories' },
-        { label: 'Behind the Scenes', path: '/blogs#behind-the-scenes' }
-      ]
-    },
-    {
-      title: 'Contact',
-      path: '/contact',
-      items: [
-        { label: 'Location & Map', path: '/contact#location' },
-        { label: 'Email Dispatch', path: '/contact#dispatch' },
-        { label: 'Instagram', path: 'https://instagram.com/tangysessions', external: true }
-      ]
-    }
-  ];
+  // Every section and item is a real route (src/config/siteNav.js); the
+  // section of the current URL is highlighted, nested pages included.
+  const navCategories = NAV_SECTIONS;
+  const { pathname } = useLocation();
+  const activeSection = sectionFor(pathname)?.title;
 
-  const handleNav = (item) => {
+  // Brand / utility buttons. Section and item links are <Link>s (below).
+  const handleNav = (path) => {
     playSFX('ticketClick');
     setActiveDropdown(null);
     setIsMobileMenuOpen(false);
-
-    if (typeof item === 'object' && item.external) {
-      window.open(item.path, '_blank', 'noopener,noreferrer');
-      return;
-    }
-
-    const pathStr = typeof item === 'string' ? item : item.path;
-    if (!pathStr) return;
-
-    if (pathStr.includes('#')) {
-      const [routePath, hashTag] = pathStr.split('#');
-      const targetRoute = routePath || '/';
-      if (window.location.pathname !== targetRoute) {
-        navigate(pathStr);
-      } else {
-        try {
-          const el = document.getElementById(hashTag) || document.querySelector(`#${hashTag}`);
-          el?.scrollIntoView({ behavior: 'smooth' });
-        } catch (e) {
-          document.getElementById(hashTag)?.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    } else {
-      navigate(pathStr);
-    }
+    navigate(path);
+  };
+  const onLinkClick = () => {
+    playSFX('ticketClick');
+    setActiveDropdown(null);
+    setIsMobileMenuOpen(false);
   };
 
   const handleMouseEnter = (title) => {
@@ -176,7 +73,7 @@ export const Navbar = () => {
     lenis?.stop();
     const onKey = (e) => { if (e.key === 'Escape') setIsMobileMenuOpen(false); };
     window.addEventListener('keydown', onKey);
-    const focusTimer = setTimeout(() => menuPanelRef.current?.querySelector('button')?.focus(), 60);
+    const focusTimer = setTimeout(() => menuPanelRef.current?.querySelector('a, button')?.focus(), 60);
     const toggle = menuToggleRef.current;
     return () => {
       document.body.style.overflow = '';
@@ -210,19 +107,24 @@ export const Navbar = () => {
             <div 
               key={cat.title}
               className="relative group flex items-center"
+              data-nav-section={cat.title}
               onMouseEnter={() => handleMouseEnter(cat.title)}
               onMouseLeave={handleMouseLeave}
             >
               {/* Hairline separator between index entries, like a printed contents strip */}
               {idx > 0 && <span className="w-px h-3 bg-[#EFE2C0]/20 mx-4" aria-hidden="true" />}
               {/* Category Header Button */}
-              <button 
-                onClick={() => handleNav(cat.path)}
-                className={`relative py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] after:absolute after:left-0 after:right-3 after:-bottom-0.5 after:h-px after:bg-current after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 ${isOpen ? 'text-[#C99A2E] after:scale-x-100' : 'text-[#E7D5A4]/90'}`}
+              <Link
+                to={cat.path}
+                onClick={onLinkClick}
+                onFocus={() => handleMouseEnter(cat.title)}
+                data-active={activeSection === cat.title ? 'true' : 'false'}
+                aria-current={pathname === cat.path ? 'page' : undefined}
+                className={`relative py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] after:absolute after:left-0 after:right-3 after:-bottom-0.5 after:h-px after:bg-current after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 ${isOpen || activeSection === cat.title ? 'text-[#C99A2E] after:scale-x-100' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
-                <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180">▾</span>
-              </button>
+                <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180" aria-hidden="true">▾</span>
+              </Link>
 
               {/* Cream Paper Dropdown Menu */}
               <div 
@@ -233,14 +135,18 @@ export const Navbar = () => {
                 {/* Dropdown Items List */}
                 <div className="relative z-10 flex flex-col gap-1">
                   {cat.items.map((item) => (
-                    <button
+                    <Link
                       key={item.label}
-                      onClick={() => handleNav(item)}
-                      className="group/item flex items-center justify-between p-1.5 rounded-sm hover:bg-[#11100C]/10 text-left font-mono text-[10.5px] font-bold text-[#11100C] hover:text-[#C2272A] transition-colors"
+                      to={item.path}
+                      onClick={onLinkClick}
+                      onFocus={() => handleMouseEnter(cat.title)}
+                      onBlur={handleMouseLeave}
+                      aria-current={pathname === item.path ? 'page' : undefined}
+                      className={`group/item flex items-center justify-between p-1.5 rounded-sm hover:bg-[#11100C]/10 text-left font-mono text-[10.5px] font-bold transition-colors hover:text-[#C2272A] ${pathname === item.path ? 'text-[#C2272A] bg-[#11100C]/10' : 'text-[#11100C]'}`}
                     >
                       <span>{item.label}</span>
-                      <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all text-[#C2272A]">→</span>
-                    </button>
+                      <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all text-[#C2272A]" aria-hidden="true">→</span>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -319,12 +225,15 @@ export const Navbar = () => {
                 <li key={cat.title} className="index-item border-b border-[#EFE2C0]/12" style={{ '--i': idx + 1 }}>
                   <div className="flex items-center gap-4">
                     <span className="archiveMetadata text-[#C89D35] w-6 shrink-0 tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
-                    <button
-                      onClick={() => handleNav(cat.path)}
-                      className="flex-1 text-left font-display uppercase text-[clamp(1.9rem,9vw,2.75rem)] leading-none py-3 text-[#EFE2C0] hover:text-[#C89D35] focus-visible:text-[#C89D35]"
+                    <Link
+                      to={cat.path}
+                      onClick={onLinkClick}
+                      data-active={activeSection === cat.title ? 'true' : 'false'}
+                      aria-current={pathname === cat.path ? 'page' : undefined}
+                      className={`flex-1 text-left font-display uppercase text-[clamp(1.9rem,9vw,2.75rem)] leading-none py-3 hover:text-[#C89D35] focus-visible:text-[#C89D35] ${activeSection === cat.title ? 'text-[#C89D35]' : 'text-[#EFE2C0]'}`}
                     >
                       {cat.title}
-                    </button>
+                    </Link>
                     <button
                       onClick={() => setActiveDropdown(isCatOpen ? null : cat.title)}
                       aria-expanded={isCatOpen}
@@ -339,13 +248,15 @@ export const Navbar = () => {
                     <ul className="list-none m-0 mb-4 ml-10 p-0 border-l border-[#C89D35]/40">
                       {cat.items.map((item) => (
                         <li key={item.label}>
-                          <button
-                            onClick={() => handleNav(item)}
-                            className="w-full min-h-[44px] pl-4 pr-2 text-left font-mono text-xs uppercase tracking-[0.14em] text-[#EFE2C0]/85 hover:text-[#C89D35] flex justify-between items-center"
+                          <Link
+                            to={item.path}
+                            onClick={onLinkClick}
+                            aria-current={pathname === item.path ? 'page' : undefined}
+                            className={`w-full min-h-[44px] pl-4 pr-2 text-left font-mono text-xs uppercase tracking-[0.14em] hover:text-[#C89D35] flex justify-between items-center ${pathname === item.path ? 'text-[#C89D35]' : 'text-[#EFE2C0]/85'}`}
                           >
                             <span>{item.label}</span>
                             <span className="text-[#C89D35]" aria-hidden="true">→</span>
-                          </button>
+                          </Link>
                         </li>
                       ))}
                     </ul>

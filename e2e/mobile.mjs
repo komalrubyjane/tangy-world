@@ -122,40 +122,36 @@ const artist = await signIn('artist@tangy.test', '/artist/login');
 {
   const p = artist.page;
   await p.waitForURL('**/artist/dashboard', { timeout: 15000 });
-  check(await until(p.getByText('YOUR TANGY SESSIONS WORKSPACE')), 'artist dashboard on a phone');
+  check(await until(p.locator('[data-artist-dashboard]')), 'artist dashboard on a phone');
   check(await p.getByRole('button', { name: 'Dismiss announcement' }).waitFor({ state: 'hidden', timeout: 3000 }).then(() => true, () => false), 'artist: public pop-up from the sign-in page does not follow into the portal');
   await fits(p, 'artist dashboard');
   await shot(p, 'm03-artist-dashboard');
 
-  // mobile menu → calendar (agenda by default on phones)
-  await p.getByRole('button', { name: 'Toggle mobile menu' }).tap();
-  await p.getByRole('button', { name: /Calendar/ }).first().tap();
+  // portal menu (a drawer on phones) → calendar
+  await p.getByRole('button', { name: /^Menu/ }).tap();
+  const drawer = p.getByRole('dialog', { name: 'Artist portal menu' });
+  await dialogFits(p, 'artist portal menu');
+  await drawer.getByRole('link', { name: 'Calendar' }).tap();
   await p.waitForURL('**/artist/calendar');
-  const cal = p.locator('[data-artist-calendar]');
-  check(await until(cal.locator('.fc-list')), 'artist calendar opens in Agenda view on a phone');
-  check(await until(cal.getByText(/Tangy Sessions Vol\. 5/).first()), 'agenda lists the confirmed performance');
-  await fits(p, 'artist calendar (agenda)');
-  await p.getByRole('tab', { name: 'Month' }).tap();
-  check(await until(cal.locator('.fc-daygrid')), 'artist can switch to month view');
+  check(await drawer.count() === 0, 'the menu closes after navigating');
+  check(await until(p.locator('[data-calendar-view="month"]')), 'artist calendar opens on a phone');
   await fits(p, 'artist calendar (month)');
-  await p.getByRole('tab', { name: 'Agenda' }).tap();
-  await cal.getByText(/Tangy Sessions Vol\. 5/).first().tap();
-  await dialogFits(p, 'artist calendar event drawer');
-  await shot(p, 'm04-artist-drawer');
-  await p.getByRole('dialog').last().getByRole('button', { name: 'Close' }).tap();
+  await p.getByRole('button', { name: 'agenda', exact: true }).tap();
+  const entry = p.locator('[data-calendar-view="agenda"] [data-cal-entry="confirmed"]').filter({ hasText: 'Tangy Sessions Vol. 5' }).first();
+  check(await until(entry), 'agenda lists the confirmed performance');
+  await fits(p, 'artist calendar (agenda)');
+  await entry.tap();
+  check(await until(p.locator('[data-artist-session-page]')), 'a performance opens its session page');
+  await fits(p, 'artist session page');
+  await shot(p, 'm04-artist-session');
 
-  // workspace tabs
-  await p.goto(BASE + '/artist/dashboard?tab=events');
-  await p.getByRole('button', { name: /Tangy Sessions Vol\. 5/ }).first().tap();
-  await dialogFits(p, 'artist events drawer');
-  await p.getByRole('dialog').last().getByRole('button', { name: 'Close' }).tap();
-  for (const tab of ['Notifications', 'Documents', 'Payments']) {
-    await tapTab(p, tab);
-    check(await until(p.locator('section[aria-label="Artist workspace"]').getByText(tab, { exact: true }).first()), `artist ${tab.toLowerCase()} tab opens`);
-    await fits(p, `artist ${tab.toLowerCase()}`);
+  for (const [path, label] of [['/artist/notifications', 'Notifications'], ['/artist/documents', 'Documents'], ['/artist/sessions', 'Sessions']]) {
+    await p.goto(BASE + path);
+    check(await until(p.locator('main h1').filter({ hasText: new RegExp(`^${label}$`, 'i') })), `artist ${label.toLowerCase()} page opens`);
+    await fits(p, `artist ${label.toLowerCase()}`);
   }
   // messages: compose on the phone
-  await tapTab(p, 'Messages');
+  await p.goto(BASE + '/artist/messages');
   await p.getByRole('button', { name: 'New message' }).tap();
   await dialogFits(p, 'artist new message');
   const dlg = p.getByRole('dialog').last();
@@ -168,13 +164,13 @@ const artist = await signIn('artist@tangy.test', '/artist/login');
   await fits(p, 'artist message thread');
 
   for (const [path, heading, label] of [
-    ['/artist/requests', 'Booking requests', 'artist requests'],
+    ['/artist/requests', 'Requests', 'artist requests'],
     ['/artist/media', 'Media', 'artist media'],
     ['/artist/profile', null, 'artist profile'],
     ['/artist/settings', 'Settings', 'artist settings'],
   ]) {
     await p.goto(BASE + path);
-    check(await until(heading ? p.getByRole('heading', { name: heading, exact: true }) : p.getByRole('tab', { name: 'Identity' })), `${label} opens`);
+    check(await until(heading ? p.getByRole('heading', { name: heading, exact: true }) : p.getByLabel('Stage name')), `${label} opens`);
     await fits(p, label);
   }
   await p.goto(BASE + '/artist/media');
@@ -183,7 +179,6 @@ const artist = await signIn('artist@tangy.test', '/artist/login');
   await p.getByRole('dialog').last().getByRole('button', { name: 'Upload' }).tap();
   check(await until(p.getByText('Uploaded and sent to Tangy for review.')), 'artist uploads media from the phone');
   await p.goto(BASE + '/artist/profile');
-  await p.getByRole('tab', { name: 'Performance' }).tap();
   await p.getByLabel('Typical set length (minutes)').fill('75');
   const save = p.getByRole('button', { name: 'Save profile' });
   await save.evaluate((el) => el.scrollIntoView({ block: 'center' }));
@@ -225,7 +220,7 @@ const artist = await signIn('artist@tangy.test', '/artist/login');
 }
 {
   const p = artist.page;
-  await p.goto(BASE + '/artist/dashboard?tab=messages');
+  await p.goto(BASE + '/artist/messages');
   await p.getByRole('button', { name: /Parking/ }).first().tap();
   check(await until(p.getByRole('region', { name: 'Conversation' }).getByText('Yes — bay 2 behind the stepwell.')), 'artist reads the reply on the phone');
   await p.getByRole('button', { name: 'Back to conversations' }).tap();

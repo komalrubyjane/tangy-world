@@ -266,7 +266,8 @@ check(await seen(g.page.locator('[data-ticket-types-public]').getByText('Patron 
 // Private media (0029): a published album's uploaded cover is served through a
 // signed URL; a draft's upload can't be fetched or signed by visitors.
 await g.page.goto(`${BASE}/gallery`);
-const cover = g.page.locator('[data-album-card]', { hasText: 'Rhythm at the Stepwell' }).locator('img');
+// By its link: the archive also holds a past "Rhythm at the Stepwell" album.
+const cover = g.page.locator('a[href="/gallery/demo-rhythm-at-the-stepwell"] img');
 check(await seen(cover) && /\/object\/sign\/content-media\//.test(await cover.getAttribute('src')), 'a published album cover loads through a short-lived signed URL');
 const probeBefore = g.errors.length;
 const probe = await g.page.evaluate(async (anon) => {

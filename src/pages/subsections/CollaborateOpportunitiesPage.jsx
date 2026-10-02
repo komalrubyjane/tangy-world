@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { useAudio } from '../../audio/AudioContext';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 const COLLABORATION_TRACKS = [
   {
@@ -40,6 +42,7 @@ const COLLABORATION_TRACKS = [
 ];
 
 export const CollaborateOpportunitiesPage = () => {
+  usePageMeta({ title: 'Explore Opportunities', description: 'Ways to work with Tangy Sessions — vendors, sponsors, venues and hosts.' });
   const navigate = useNavigate();
   const { playSFX } = useAudio();
 
@@ -49,7 +52,7 @@ export const CollaborateOpportunitiesPage = () => {
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/collaborate" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO COLLABORATE</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             TANGY PARTNERSHIPS // COLLABORATION DESK
           </span>
@@ -64,7 +67,7 @@ export const CollaborateOpportunitiesPage = () => {
 
       <section className="py-12 sm:py-20 max-w-6xl mx-auto px-4 sm:px-6 flex flex-col gap-10 sm:gap-14">
         {COLLABORATION_TRACKS.map((track, idx) => (
-          <div key={track.id} className="border-4 border-[#11100C] p-6 sm:p-10 shadow-[8px_8px_0px_#11100C] sm:shadow-[16px_16px_0px_#11100C] relative overflow-hidden" style={{ backgroundColor: track.bg, color: track.text }}>
+          <div key={track.id} className="border-2 border-[#11100C] p-6 sm:p-10 shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] relative overflow-hidden" style={{ backgroundColor: track.bg, color: track.text }}>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-current pb-3 mb-6 font-mono text-[10px] sm:text-xs font-bold uppercase gap-1">
               <span>PATHWAY NO. 0{idx + 1} // {track.category}</span>
               <span>HYDERABAD ARCHIVE</span>
@@ -97,6 +100,8 @@ export const CollaborateOpportunitiesPage = () => {
           </div>
         ))}
       </section>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

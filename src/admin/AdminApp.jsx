@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { AdminSessionProvider, useAdminSession } from './AdminSession';
 import { AdminGate } from './AdminGate';
 import { AdminShell } from './AdminShell';
@@ -10,6 +10,9 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const ApplicationsPage = lazy(() => import('./pages/ApplicationsPage'));
 const EventsPage = lazy(() => import('./pages/EventsPage'));
 const EventDetailPage = lazy(() => import('./pages/EventDetailPage'));
+const ArtistDetailPage = lazy(() => import('./pages/ArtistDetailPage'));
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const EventCreatePage = lazy(() => import('./pages/EventsPage').then((m) => ({ default: m.EventCreatePage })));
 const MyEventsPage = lazy(() => import('./pages/MyEventsPage'));
 const StaffEventPage = lazy(() => import('./pages/StaffEventPage'));
 const BookingsPage = lazy(() => import('./pages/BookingsPage'));
@@ -17,6 +20,8 @@ const BookingDetailPage = lazy(() => import('./pages/BookingsPage').then((m) => 
 const PaymentsPage = lazy(() => import('./pages/BookingsPage').then((m) => ({ default: m.PaymentsPage })));
 const WaitlistPage = lazy(() => import('./pages/WaitlistPage'));
 const ApplicationDetailPage = lazy(() => import('./pages/ApplicationsPage').then((m) => ({ default: m.ApplicationDetailPage })));
+const ArtistApplicationsPage = lazy(() => import('./pages/ArtistApplicationsPage').then((m) => ({ default: m.ArtistApplicationsPage })));
+const ArtistApplicationDetailPage = lazy(() => import('./pages/ArtistApplicationsPage').then((m) => ({ default: m.ArtistApplicationDetailPage })));
 const UserDetailPage = lazy(() => import('./pages/UsersPage').then((m) => ({ default: m.UserDetailPage })));
 const VolunteerDetailPage = lazy(() => import('./pages/VolunteersPage').then((m) => ({ default: m.VolunteerDetailPage })));
 const AttendeesPage = lazy(() => import('./pages/AttendeesPage'));
@@ -46,6 +51,12 @@ const Guard = ({ requires, anyOf, children }) => {
   return can(requires, anyOf) ? children : <Forbidden />;
 };
 
+// /admin-portal/artists/:id[/:tab] → the artist's page under Artists & partners.
+const ArtistRedirect = () => {
+  const { id, '*': rest } = useParams();
+  return <Navigate to={`/admin-portal/people/artists/${id}${rest ? `/${rest}` : ''}`} replace />;
+};
+
 const DashboardIndex = () => {
   const [params] = useSearchParams();
   const tab = params.get('tab');
@@ -63,7 +74,13 @@ export const AdminApp = () => (
               <Route index element={<Guard requires={P.DASHBOARD}><DashboardIndex /></Guard>} />
               <Route path="applications" element={<Guard requires={P.APPLICATIONS_VIEW}><ApplicationsPage /></Guard>} />
               <Route path="applications/:id" element={<Guard requires={P.APPLICATIONS_VIEW}><ApplicationDetailPage /></Guard>} />
+              <Route path="artists" element={<Navigate to="/admin-portal/people/artists" replace />} />
+              <Route path="artists/applications" element={<Guard requires={P.APPLICATIONS_VIEW}><ArtistApplicationsPage /></Guard>} />
+              <Route path="artists/applications/:id" element={<Guard requires={P.APPLICATIONS_VIEW}><ArtistApplicationDetailPage /></Guard>} />
+              <Route path="artists/:id/*" element={<ArtistRedirect />} />
               <Route path="events" element={<Guard requires={P.EVENTS_ALL}><EventsPage /></Guard>} />
+              <Route path="events/new" element={<Guard requires={P.EVENTS_MANAGE}><EventCreatePage /></Guard>} />
+              <Route path="calendar" element={<Guard requires={P.EVENTS_ALL}><CalendarPage /></Guard>} />
               <Route path="events/:id" element={<Guard requires={P.EVENTS_ALL}><EventDetailPage /></Guard>} />
               <Route path="events/:id/:tab" element={<Guard requires={P.EVENTS_ALL}><EventDetailPage /></Guard>} />
               <Route path="my-events" element={<Guard requires={P.EVENTS_ASSIGNED}><MyEventsPage /></Guard>} />
@@ -81,11 +98,14 @@ export const AdminApp = () => (
               <Route path="people" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
               <Route path="people/:kind" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
               <Route path="people/:kind/:id" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
+              <Route path="people/artists/new" element={<Guard requires={P.ENTITIES}><PeoplePage /></Guard>} />
+              <Route path="people/artists/:id" element={<Guard requires={P.ENTITIES}><ArtistDetailPage /></Guard>} />
+              <Route path="people/artists/:id/:tab" element={<Guard requires={P.ENTITIES}><ArtistDetailPage /></Guard>} />
               <Route path="reviews" element={<Guard requires={P.ENTITIES}><ReviewsPage /></Guard>} />
               <Route path="reviews/:tab" element={<Guard requires={P.ENTITIES}><ReviewsPage /></Guard>} />
               <Route path="invoices" element={<Guard requires={[P.PAYMENTS, P.BOOKINGS_MANAGE]}><InvoicesPage /></Guard>} />
               <Route path="team" element={<Guard requires={P.TEAM}><TeamPage /></Guard>} />
-              <Route path="users" element={<Guard requires={P.USERS_MANAGE}><UsersPage /></Guard>} />
+              <Route path="users" element={<Guard anyOf={[P.USERS_MANAGE, P.STAFF_INVITE]}><UsersPage /></Guard>} />
               <Route path="users/:id" element={<Guard requires={P.USERS_MANAGE}><UserDetailPage /></Guard>} />
               <Route path="content" element={<Guard anyOf={[P.CONTENT, P.CONTENT_VIEW, P.CONTENT_SESSIONS]}><ContentPage /></Guard>} />
               <Route path="content/:section" element={<Guard anyOf={[P.CONTENT, P.CONTENT_VIEW, P.CONTENT_SESSIONS, P.EVENTS_MANAGE, P.ENTITIES]}><ContentPage /></Guard>} />

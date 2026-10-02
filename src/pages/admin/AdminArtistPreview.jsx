@@ -69,7 +69,7 @@ export const AdminArtistPreviewInner = () => {
       <AdminPreviewBanner label={`Viewing Artist Portal — ${artist.name}`} />
 
       <main className="pt-6 pb-20 px-4 sm:px-6 max-w-5xl mx-auto flex flex-col gap-6">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] flex items-start gap-4">
+        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[4px_4px_0px_#11100C] flex items-start gap-4">
           {artist.avatar_url ? (
             <img src={artist.avatar_url} alt={artist.name} className="w-16 h-16 rounded-full object-cover border-2 border-[#B94717]" />
           ) : (

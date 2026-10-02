@@ -1,4 +1,4 @@
-import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
+import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
 
 // Operations platform (0018): partner portals, partner↔admin messaging,
 // notifications, requirements, logistics, event announcements, temporary
@@ -28,7 +28,7 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
 // ---------------------------------------------------------------- A. messaging
 {
   const p = artist.page;
-  await sectionTab(p, 'Messages').click();
+  await p.goto(BASE + '/artist/messages');
   check(await until(p.getByText('No messages yet').first()), 'artist: empty messages state');
   await p.getByRole('button', { name: 'New message' }).click();
   const dlg = p.getByRole('dialog').last();
@@ -60,9 +60,9 @@ await artist.page.waitForURL('**/artist/dashboard', { timeout: 15000 });
   await p.reload();
   // The artist had the thread open while the reply arrived, so polling marks
   // it read (mark_conversation_read) — the notification must still exist.
-  await sectionTab(p, 'Notifications', { exact: true }).first().click();
+  await p.goto(BASE + '/artist/notifications');
   check(await until(p.locator('[data-notifications]').getByText('New message from Tangy').first()), 'artist notification center lists the reply');
-  await sectionTab(p, 'Messages', { exact: true }).first().click();
+  await p.goto(BASE + '/artist/messages');
   await p.getByRole('button', { name: /Soundcheck timing/ }).first().click();
   check(await until(p.getByRole('region', { name: 'Conversation' }).getByText('Yes — soundcheck moved to 4:30 PM.')), 'artist sees the reply');
   check(await until(p.locator('[data-messages-panel]').getByText('Read', { exact: false }).last()), 'artist sees their message was read');
@@ -100,15 +100,14 @@ const evtId = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local
 }
 {
   const p = artist.page;
-  await p.goto(BASE + '/artist/dashboard?tab=overview');
-  const next = p.getByRole('region', { name: 'Next event' });
-  check(await until(next), 'artist overview: next performance card');
-  const t = await text(p, 'section[aria-label="Next event"]');
-  check(/Next performance/i.test(t) && /8:00\s*pm/i.test(t) && /Call time/i.test(t), `artist sees performance + call time (${t.slice(0, 120)})`);
-  await next.getByRole('button', { name: 'View event' }).click();
-  check(await until(p.getByText('Green room B, dinner at 6')), 'artist sees private hospitality in the event drawer');
-  await p.keyboard.press('Escape');
-  await sectionTab(p, 'Requirements').click();
+  await p.goto(BASE + '/artist/dashboard');
+  const next = p.locator('[data-next-session]');
+  check(await until(next), 'artist dashboard: next session card');
+  const t = (await next.innerText()).replace(/\s+/g, ' ');
+  check(/8:00\s*pm/i.test(t) && /Call time/i.test(t), `artist sees performance + call time (${t.slice(0, 120)})`);
+  await next.click();
+  check(await until(p.getByText('Green room B, dinner at 6')), 'artist sees private hospitality on the session page');
+  await p.goto(BASE + '/artist/sessions#requirements');
   await p.getByLabel('Response to Tech rider').fill('16 channels, 2 vocal mics, DI for harmonium');
   await p.getByRole('button', { name: 'Submit' }).click();
   check(await until(p.getByText('Submitted', { exact: true })), 'artist submits the requirement');

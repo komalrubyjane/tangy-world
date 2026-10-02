@@ -3,18 +3,19 @@ import { Footer } from '../../components/layout/Footer';
 import { useEvents } from '../../hooks/useEvents';
 import { usePageMeta } from '../../hooks/usePageMeta';
 import { WaitlistDirectory } from '../../components/booking/WaitlistDirectory';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
 
 export const WaitlistPage = () => {
   const { events, loading } = useEvents();
-  usePageMeta({ title: 'Waitlist', description: 'Join the waitlist for sold-out Tangy sessions — released seats are offered in order and held for you.' });
+  usePageMeta({ title: 'Join Waitlist', description: 'Join the waitlist for sold-out Tangy sessions — released seats are offered in order and held for you.' });
 
   return (
-    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
+    <div className="theme-sessions min-h-screen text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/sessions" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO SESSIONS</a>
+          <PageCrumbs />
           <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             SOLD-OUT SESSIONS
           </span>
@@ -28,10 +29,12 @@ export const WaitlistPage = () => {
       </section>
 
       <section className="py-14 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 border-4 border-[#11100C] shadow-[12px_12px_0px_#B94717]">
+        <div className="max-w-2xl mx-auto bg-[#EFE2C0] paperTexture text-[#11100C] p-6 sm:p-10 border-2 border-[#11100C] shadow-[4px_4px_0px_#B94717]">
           {loading ? <p className="m-0 text-center font-mono text-xs">Loading sessions…</p> : <WaitlistDirectory events={events} />}
         </div>
       </section>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

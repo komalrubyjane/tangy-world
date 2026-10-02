@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSessionDetail, useBookingQuote } from '../hooks/useSessionDetail';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -10,6 +10,7 @@ import { useAudio } from '../audio/AudioContext';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { CheckoutSteps } from '../components/booking/CheckoutSteps';
+import { useSessionBackground } from '../lib/sessionBackground';
 import { WaitlistPanel, WaitlistOfferBanner } from '../components/booking/WaitlistPanel';
 
 // The public session page (/sessions/:slug; /book/:id is kept as an alias).
@@ -190,9 +191,11 @@ export const BookingPage = () => {
     openCheckout(orderRes.order);
   };
 
+  // This session's own background (set in the event editor), on its page and its checkout.
+  const pageBackground = useSessionBackground(session?.background, session?.image);
   if (eventsLoading) {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#4A171D] text-[#ecdcaf] flex items-center justify-center font-mono text-xs font-bold textileTexture">
+      <div className="theme-sessions w-full min-h-[100dvh] text-[#ecdcaf] flex items-center justify-center font-mono text-xs font-bold">
         LOADING SESSION...
       </div>
     );
@@ -200,7 +203,7 @@ export const BookingPage = () => {
 
   if (!session) {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#4A171D] textileTexture text-[#ecdcaf] flex flex-col items-center justify-center gap-4 font-mono text-xs font-bold p-8 text-center">
+      <div className="theme-sessions w-full min-h-[100dvh] text-[#ecdcaf] flex flex-col items-center justify-center gap-4 font-mono text-xs font-bold p-8 text-center">
         <h1 className="font-poster text-3xl">{loadError ? 'We couldn’t load this session' : 'Session not found'}</h1>
         <p className="font-normal max-w-sm">{loadError ? 'Check your connection and try again.' : 'It may have been moved or is no longer listed.'}</p>
         {loadError && <button onClick={refresh} className="px-4 py-2 bg-[#ecdcaf] text-[#191410] border-2 border-[#ecdcaf] uppercase">Try again</button>}
@@ -214,197 +217,190 @@ export const BookingPage = () => {
     );
   }
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="w-full min-h-[100dvh] bg-[#3c0f0e] text-[#ecdcaf] font-sans antialiased overflow-x-hidden selection:bg-[#c2272a] selection:text-[#ecdcaf] pt-16 pb-20"
-    >
-      {/* 1970S PRINT NOISE TEXTURE OVERLAY */}
-      <div className="fixed inset-0 pointer-events-none z-[80] shadow-[inset_0_0_140px_rgba(0,0,0,0.85)]" />
+  // A session that has happened lives in the archive (/sessions/archive/:slug).
+  if (isPast) return <Navigate to={`/sessions/archive/${session.slug || sessionId}`} replace />;
 
-      {/* TOP NAVBAR */}
+  const fromPrice = ticketTiers.length ? Math.min(...ticketTiers.map((t) => t.price)) : null;
+  const statusText = isCancelled ? 'CANCELLED' : isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT' : remaining != null ? `${remaining} ${remaining === 1 ? 'SEAT' : 'SEATS'} LEFT` : 'ON SALE';
+  const day = session.rawDate ? new Date(`${session.rawDate}T00:00:00`) : null;
+  // The site's two materials: ink panels and cream paper documents, both with hard ink shadows.
+  const ink = 'w-full bg-[#181614] text-[#EFE2C0] border-2 border-[#EFE2C0]/20 shadow-[4px_4px_0px_#0b0907] p-6 sm:p-7 text-left';
+  const paper = 'w-full bg-[#EFE2C0] paperTexture text-[#181614] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] p-6 sm:p-7 text-left';
+  const label = 'font-mono text-[10px] font-bold tracking-[0.3em] uppercase m-0';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="theme-sessions relative isolate w-full min-h-[100dvh] font-sans antialiased overflow-x-clip selection:bg-[#c2272a] selection:text-[#ecdcaf] pt-16 pb-20"
+      data-page-background={session.background || 'default'}
+    >
+      {/* The site's textured background (theme-sessions); a session can add its own backdrop
+          (cover photo, colour or image, chosen in the event editor) under the same grain. */}
+      <div aria-hidden="true" className="fixed inset-0 -z-10 pointer-events-none" style={pageBackground} data-session-backdrop />
+      <div aria-hidden="true" className="fixed inset-0 -z-10 pointer-events-none opacity-60" style={{ backgroundImage: "url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp')", backgroundSize: '160px, 720px' }} />
+
       <Navbar onOpenProgramme={() => navigate('/')} />
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        
-        {/* BACK TO SESSIONS NAVIGATION LINK */}
-        <div className="mb-6 flex items-center justify-between">
+      <main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <button
             onClick={() => { playSFX('ticketClick'); navigate('/sessions'); }}
-            className="font-mono text-xs font-bold text-[#ecdcaf] hover:text-[#d1a437] flex items-center gap-2 border border-[#ecdcaf]/30 px-3 py-1.5 bg-[#191410] shadow-[4px_4px_0px_#191410] active:scale-95 transition-all"
+            className="t-btn t-btn-light min-h-[44px]"
           >
             ← BACK TO ALL SESSIONS
           </button>
-
-          <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-widest border border-[#d1a437]/40 px-3 py-1 uppercase bg-[#181614]">
-            CONCERT TICKET BOX OFFICE // 1974
-          </span>
+          <span className="t-label sec-accent">03 — Box office // {session.city}</span>
         </div>
 
-        {/* PAGE TITLE BANNER */}
-        <div className="w-full bg-[#181614] border-4 border-[#d1a437] p-5 mb-8 shadow-[8px_8px_0px_#4c1210] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <span className="font-mono text-[9.5px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">
-              OFFICIAL BOX OFFICE DESK · {session.city}
-            </span>
-            <h1 className="font-poster text-3xl sm:text-4xl text-[#ecdcaf] leading-tight my-0.5">
-              {session.title}
-            </h1>
-            <p className="font-mono text-xs text-[#d1a437]">{[session.venue, session.date, session.time].filter(Boolean).join(' · ')}</p>
-          </div>
-
-          <div className="flex items-center gap-2 bg-[#EFE2C0] text-[#191410] px-3.5 py-1.5 font-mono text-xs font-bold border border-[#191410] -rotate-1 shadow-md">
-            <span className="w-2 h-2 rounded-full bg-[#B5532A] animate-pulse" />
-            <span data-seats-left data-live={live ? 'true' : 'false'} title={live ? 'Seat count updates live' : availabilityAt ? `Updated ${availabilityAt.toLocaleTimeString()}` : undefined}>{isCancelled ? 'CANCELLED' : isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT' : remaining != null ? `${remaining} ${remaining === 1 ? 'SEAT' : 'SEATS'} LEFT` : 'ON SALE'}</span>
-          </div>
-        </div>
-
-        {/* 2-COLUMN DESKTOP / STACKED MOBILE BOOKING GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* LEFT COLUMN (COL-7): POSTER, EVENT DETAILS, GALLERY, ARTISTS, MAP */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
-            
-            {/* 1. LARGE EVENT POSTER WITH VINTAGE TAPE */}
-            <div className="w-full bg-[#EFE2C0] paperTexture text-[#241a12] p-4 border-4 border-[#191410] shadow-[10px_10px_0px_#191410] relative rotate-[-1deg]">
-              <div className="absolute -top-3 left-[40%] -rotate-3 w-20 h-6 bg-[rgba(255,255,255,0.45)] border border-[rgba(255,255,255,0.5)] z-20 pointer-events-none" />
-              <img 
-                src={session.image} 
-                alt={session.title} 
-                className="w-full aspect-[16/10] object-cover border-2 border-[#191410] filter contrast-110" 
-              />
-              <div className="flex justify-between items-center mt-3 font-mono text-[10px] font-bold uppercase border-t border-[#191410]/20 pt-2">
-                <span>HYDERABAD LIVE ARCHIVE</span>
-                <span className="text-[#c2272a]">ISSUE 001 · STAGE A</span>
-              </div>
+        {/* HERO — poster on the left, the ticket's facts on the right; same height, top-aligned */}
+        <header className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch mb-10" data-session-hero>
+          <figure className="lg:col-span-7 m-0 relative bg-[#EFE2C0] paperTexture border-2 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-3 sm:p-4 flex flex-col">
+            <div className="flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-[#181614] pb-3">
+              <span>VOL. TK-1974 · SESSION</span>
+              <span className="border-2 border-[#181614] px-2 py-0.5 -rotate-2">{isCancelled ? 'Cancelled' : isSoldOut ? 'Sold out' : 'Available'}</span>
             </div>
-
-            {/* 2. EVENT INFORMATION & METRICS */}
-            <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-4">
-              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">01 // EVENT DETAILS & METRICS</span>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs border-y border-[#ecdcaf]/15 py-3">
-                <div>
-                  <span className="text-[#ecdcaf]/60 block text-[9px]">DATE</span>
-                  <span className="font-bold text-[#ecdcaf]">{session.date}</span>
-                </div>
-                <div>
-                  <span className="text-[#ecdcaf]/60 block text-[9px]">TIME</span>
-                  <span className="font-bold text-[#ecdcaf]">{session.time}</span>
-                </div>
-                <div>
-                  <span className="text-[#ecdcaf]/60 block text-[9px]">FROM</span>
-                  <span className="font-bold text-[#ecdcaf]">{ticketTiers.length ? `₹${Math.min(...ticketTiers.map((t) => t.price)).toLocaleString()}` : '—'}</span>
-                </div>
-                <div>
-                  <span className="text-[#ecdcaf]/60 block text-[9px]">CAPACITY</span>
-                  <span className="font-bold text-[#c2272a]">{session.capacity} SEATS</span>
-                </div>
-              </div>
-
-              {/* GENRE TAGS */}
-              {session.tags.length > 0 && <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[9px] text-[#ecdcaf]/60">TAGS:</span>
-                {session.tags.map((tag, idx) => (
-                  <span key={idx} className="font-mono text-[9px] font-bold bg-[#C89D35]/20 text-[#d1a437] border border-[#d1a437]/40 px-2.5 py-0.5 uppercase">
-                    {tag}
-                  </span>
-                ))}
-              </div>}
+            <div className="relative flex-1 min-h-[240px] sm:min-h-[340px] border-2 border-[#11100C] overflow-hidden">
+              <img src={session.image} alt={`${session.title} — poster`} className="absolute inset-0 w-full h-full object-cover contrast-110" />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              {day && (
+                <span aria-hidden="true" className="absolute left-4 bottom-3 font-display uppercase leading-[0.85] text-[#EFE2C0] drop-shadow-[3px_3px_0_#11100C]">
+                  <span className="block text-5xl sm:text-6xl">{day.toLocaleDateString('en-IN', { month: 'short' })} {day.getDate()}</span>
+                  <span className="block text-4xl sm:text-5xl">{day.getFullYear()}</span>
+                </span>
+              )}
             </div>
+            <figcaption className="flex justify-between items-center pt-3 font-mono text-[10px] font-bold uppercase text-[#181614]">
+              <span>Hyderabad live archive</span>
+              <span className="text-[#B5532A]">Admit one · Stage A</span>
+            </figcaption>
+          </figure>
 
-            {/* TICKETS — types and prices from the server (event_ticket_types, 0026). */}
-            {ticketTiers.length > 0 && (
-              <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-3" data-ticket-types-public>
-                <h2 className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase m-0">TICKETS</h2>
-                <ul className="list-none m-0 p-0 flex flex-col gap-2">
-                  {ticketTiers.map((t) => (
-                    <li key={t.id} className="flex flex-wrap justify-between gap-2 border-b border-[#ecdcaf]/10 pb-2 last:border-0">
-                      <span>
-                        <span className="font-poster text-lg text-[#ecdcaf] block">{t.name}</span>
-                        {t.desc && <span className="font-mono text-[10.5px] text-[#ecdcaf]/70">{t.desc}</span>}
-                      </span>
-                      <span className="text-right font-mono text-xs">
-                        <span className="block font-bold text-[#d1a437]">₹{t.price.toLocaleString('en-IN')}</span>
-                        {t.remaining != null && <span className="block text-[#ecdcaf]/60">{t.remaining === 0 ? 'Sold out' : `${t.remaining} left`}</span>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-mono text-[10px] text-[#ecdcaf]/55 m-0">Prices per person, before GST. The total is calculated at checkout.</p>
+          <div className="lg:col-span-5 bg-[#181614] border-2 border-[#EFE2C0]/25 shadow-[6px_6px_0px_#0b0907] p-6 sm:p-8 flex flex-col">
+            <span className={`${label} text-[#C89D35]`}>Tangy Sessions · Live</span>
+            <h1 className="display uppercase text-[#EFE2C0] text-4xl sm:text-5xl lg:text-[3.4rem] leading-[0.95] mt-3 mb-5 ink-bleed">{session.title}</h1>
+            <dl className="m-0 grid grid-cols-1 gap-0 border-t border-[#EFE2C0]/20">
+              {[['Date', session.date], ['Doors', session.time || 'To be announced'], ['Venue', session.venue || 'To be announced']].map(([k, v]) => (
+                <div key={k} className="flex items-baseline justify-between gap-4 py-3 border-b border-[#EFE2C0]/20">
+                  <dt className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-[#C89D35]">{k}</dt>
+                  <dd className="m-0 font-mono text-sm text-[#EFE2C0] text-right">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            {session.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-5">
+                {session.tags.map((tag) => <span key={tag} className="font-mono text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-[#C89D35]/15 text-[#E4C77A] border border-[#C89D35]/50">{tag}</span>)}
               </div>
             )}
+            <div className="mt-auto pt-6">
+              <span className={`inline-flex items-center gap-2 px-3.5 py-2 font-mono text-xs font-bold border-2 border-[#11100C] -rotate-1 shadow-[3px_3px_0_#11100C] ${isCancelled || isSoldOut ? 'bg-[#B5532A] text-[#EFE2C0]' : 'bg-[#EFE2C0] text-[#181614]'}`}>
+                <span aria-hidden="true" className={`w-2 h-2 rounded-full ${isCancelled || isSoldOut ? 'bg-[#EFE2C0]' : 'bg-[#2e8a5b] animate-pulse'}`} />
+                <span data-seats-left data-live={live ? 'true' : 'false'} title={live ? 'Seat count updates live' : availabilityAt ? `Updated ${availabilityAt.toLocaleTimeString()}` : undefined}>{statusText}</span>
+              </span>
+            </div>
+          </div>
+        </header>
 
-            {/* 3. ABOUT THE EVENT / STORY */}
-            <div className="w-full bg-[#EFE2C0] paperTexture text-[#191410] border-2 border-[#191410] p-6 shadow-[6px_6px_0px_#c2272a] text-left flex flex-col gap-3">
-              <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">02 // ABOUT THE SESSION</span>
-              <p className="font-sans text-sm text-[#191410]/90 leading-relaxed font-normal whitespace-pre-line">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          {/* LEFT — the session, in the site's numbered sections */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
+            <section className={ink} aria-label="At a glance">
+              <span className={`${label} text-[#C89D35]`}>01 // At a glance</span>
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 mb-0 border-t border-[#EFE2C0]/15 pt-4">
+                {[['Date', session.date], ['Time', session.time || 'TBA'], ['From', fromPrice != null ? `₹${fromPrice.toLocaleString('en-IN')}` : '—'], ['Capacity', `${session.capacity} seats`]].map(([k, v]) => (
+                  <div key={k} className="min-w-0">
+                    <dt className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#EFE2C0]/55">{k}</dt>
+                    <dd className="m-0 mt-1 font-condensed uppercase text-xl text-[#EFE2C0] leading-tight">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+
+            <section className={paper} aria-labelledby="about-title">
+              <h2 id="about-title" className={`${label} text-[#B5532A]`}>02 // About the session</h2>
+              <p className="mt-3 mb-0 font-body text-[15px] text-[#181614]/90 leading-relaxed whitespace-pre-line">
                 {session.description || 'Details for this session will be announced soon.'}
               </p>
               {session.story && (
-                <blockquote className="p-3 bg-[#191410] text-[#ecdcaf] border-l-4 border-[#c2272a] font-serif italic text-xs mt-1">
-                  "{session.story}"
+                <blockquote className="mt-4 mb-0 p-3 bg-[#181614] text-[#EFE2C0] border-l-4 border-[#B5532A] font-serif italic text-sm">
+                  “{session.story}”
                 </blockquote>
               )}
-            </div>
+            </section>
 
-            {/* 4. LINEUP — approved artists linked to this session */}
             {lineup.length > 0 && (
-              <div className="w-full bg-[#181614] border-2 border-[#ecdcaf]/30 p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-4" data-lineup>
-                <h2 className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase m-0">03 // LINEUP</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 list-none m-0 p-0">
+              <section className={ink} aria-labelledby="lineup-title" data-lineup>
+                <h2 id="lineup-title" className={`${label} text-[#C89D35]`}>03 // Line-up</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 list-none mt-4 mb-0 p-0">
                   {lineup.map((art) => (
                     <li key={art.id}>
-                      <Link to={art.slug ? `/artists/${art.slug}` : '/artist'} className="bg-[#EFE2C0] paperTexture text-[#191410] p-3 border border-[#191410] flex items-center gap-3 shadow-md hover:-translate-y-0.5 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d1a437]">
+                      <Link to={art.slug ? `/artists/${art.slug}` : '/artist'} className="flex items-center gap-3 bg-[#EFE2C0] paperTexture text-[#181614] p-3 border-2 border-[#11100C] shadow-[3px_3px_0_#0b0907] hover:-translate-y-0.5 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C89D35]">
                         {art.avatar_url
-                          ? <img src={art.avatar_url} alt="" className="w-14 h-14 object-cover border border-[#191410]" loading="lazy" />
-                          : <span aria-hidden="true" className="w-14 h-14 flex items-center justify-center border border-[#191410] font-poster text-xl">{(art.stage_name || art.name).slice(0, 1)}</span>}
-                        <span className="flex flex-col">
-                          <span className="font-poster text-lg text-[#191410] leading-none my-0.5">{art.stage_name || art.name}</span>
-                          <span className="font-mono text-[9px] text-[#191410]/70">{[art.genre, art.city].filter(Boolean).join(' · ')}</span>
+                          ? <img src={art.avatar_url} alt="" className="w-12 h-12 object-cover border-2 border-[#11100C]" loading="lazy" />
+                          : <span aria-hidden="true" className="w-12 h-12 flex items-center justify-center border-2 border-[#11100C] font-display text-xl">{(art.stage_name || art.name).slice(0, 1)}</span>}
+                        <span className="flex flex-col min-w-0">
+                          <span className="font-condensed uppercase text-lg leading-tight truncate">{art.stage_name || art.name}</span>
+                          <span className="font-mono text-[10px] text-[#181614]/70 truncate">{[art.genre, art.city].filter(Boolean).join(' · ')}</span>
                         </span>
                       </Link>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             )}
 
-            {/* 6. LOCATION MAP & SANCTUARY */}
-            <div className="w-full bg-[#4A171D] border-2 border-[#d1a437] p-6 shadow-[6px_6px_0px_#191410] text-left flex flex-col gap-3">
-              <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">04 // VENUE</span>
-              <h3 className="font-poster text-xl text-[#ecdcaf]">{session.venue || 'Venue to be announced'}</h3>
-              <p className="font-mono text-xs text-[#ecdcaf]/80">{session.city}</p>
+            {/* TICKETS — types and prices from the server (event_ticket_types, 0026). */}
+            {ticketTiers.length > 0 && (
+              <section className={paper} aria-labelledby="tickets-title" data-ticket-types-public>
+                <h2 id="tickets-title" className={`${label} text-[#B5532A]`}>04 // Tickets</h2>
+                <ul className="list-none mt-4 mb-0 p-0 flex flex-col divide-y-2 divide-dashed divide-[#181614]/25">
+                  {ticketTiers.map((t) => (
+                    <li key={t.id} className="flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                      <span className="min-w-0">
+                        <span className="font-condensed uppercase text-xl block leading-tight">{t.name}</span>
+                        {t.desc && <span className="block mt-0.5 font-body text-[13px] text-[#181614]/75">{t.desc}</span>}
+                      </span>
+                      <span className="text-right font-mono text-xs shrink-0">
+                        <span className="block text-base font-bold text-[#B5532A]">₹{t.price.toLocaleString('en-IN')}</span>
+                        {t.remaining != null && <span className="block text-[#181614]/60">{t.remaining === 0 ? 'Sold out' : `${t.remaining} left`}</span>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-mono text-[10px] text-[#181614]/60 mt-4 mb-0">Prices per person, before GST. The total is calculated at checkout.</p>
+              </section>
+            )}
+
+            <section className={ink} aria-labelledby="venue-title">
+              <h2 id="venue-title" className={`${label} text-[#C89D35]`}>05 // Venue</h2>
+              <p className="font-condensed uppercase text-2xl text-[#EFE2C0] mt-3 mb-0 leading-tight">{session.venue || 'Venue to be announced'}</p>
+              <p className="font-mono text-xs text-[#EFE2C0]/70 mt-1 mb-0">{session.city}</p>
               {session.venue && (
                 <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${session.venue}, ${session.city}`)}`} target="_blank" rel="noopener noreferrer"
-                  className="self-start p-3 bg-[#181614] border border-[#d1a437]/40 font-mono text-[10px] text-[#d1a437] hover:text-[#ecdcaf]">
-                  📍 Open in Google Maps ↗
+                  className="t-btn t-btn-light mt-4 min-h-[44px] inline-flex">
+                  Open in Google Maps ↗
                 </a>
               )}
-            </div>
-
+            </section>
           </div>
 
-          {/* RIGHT COLUMN (COL-5): STICKY TICKET TIER SELECTION, FORM & PAYMENT */}
-          <div className="lg:col-span-5 sticky top-20 flex flex-col gap-6">
-            
-            {/* TICKET STUB SELECTION CARD */}
-            <div className="w-full bg-[#EFE2C0] paperTexture text-[#241a12] border-4 border-[#191410] p-6 shadow-[10px_10px_0px_#4c1210] text-left relative flex flex-col gap-5">
-              
-              {/* TICKET STUB HEAD */}
-              <div className="flex justify-between items-center border-b-2 border-dashed border-[#191410]/40 pb-3">
+          {/* RIGHT — the box office, sticky beside the details */}
+          <aside className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-6" aria-label="Booking">
+            <div className="w-full bg-[#EFE2C0] paperTexture text-[#241a12] border-2 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-6 sm:p-7 text-left relative flex flex-col gap-5">
+              <div className="flex justify-between items-center border-b-2 border-dashed border-[#191410]/40 pb-4">
                 <div>
-                  <span className="font-mono text-[9px] font-bold text-[#c2272a] uppercase tracking-widest">BOX OFFICE ADMIT</span>
-                  <h3 className="font-poster text-2xl text-[#191410] leading-none">
+                  <span className="font-mono text-[9.5px] font-bold text-[#B5532A] uppercase tracking-[0.25em]">Box office admit</span>
+                  <h2 className="display uppercase text-3xl text-[#191410] leading-none mt-1 mb-0">
                     {isSubmitted ? 'YOUR BOOKING' : 'BOOK YOUR PLACE'}
-                  </h3>
+                  </h2>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-[#B5532A] text-[#ecdcaf] flex items-center justify-center font-poster text-sm shadow-md">
-                  1974
-                </div>
+                {fromPrice != null && !isSubmitted ? (
+                  <span className="text-right font-mono text-[10px] uppercase tracking-wider text-[#241a12]/70">From<span className="block font-condensed text-2xl text-[#191410] normal-case tracking-normal">₹{fromPrice.toLocaleString('en-IN')}</span></span>
+                ) : (
+                  <span aria-hidden="true" className="w-11 h-11 rounded-full bg-[#B5532A] text-[#EFE2C0] flex items-center justify-center font-display text-sm shadow-md">1974</span>
+                )}
               </div>
 
               {isSubmitted && confirmedBooking ? (
@@ -425,7 +421,7 @@ export const BookingPage = () => {
                     </ol>
                   )}
                   {groupQr ? (
-                    <img src={groupQr} alt="Booking QR code" className="w-48 h-48 border-4 border-[#191410]" data-booking-qr />
+                    <img src={groupQr} alt="Booking QR code" className="w-48 h-48 border-2 border-[#191410]" data-booking-qr />
                   ) : (
                     <p className="font-mono text-[10px] text-[#241a12]/70">Issuing your booking QR — refresh your Passport in a moment if it doesn't appear here.</p>
                   )}
@@ -477,11 +473,8 @@ export const BookingPage = () => {
               )}
 
             </div>
-
-          </div>
-
+          </aside>
         </div>
-
       </main>
 
       <Footer />

@@ -1,72 +1,14 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
-import { useAudio } from '../../audio/AudioContext';
-import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { isMockAuth } from '../../config/auth';
-import { userService } from '../../services/userService';
-import { useUserAuth } from '../../context/UserAuthContext';
-import { RequireAuthToApply } from '../../components/apply/RequireAuthToApply';
+import { CrewApplicationForm } from '../../components/crew/CrewApplicationForm';
 import { ApplicationReceivedNotice } from '../../components/apply/ApplicationReceivedNotice';
-
-const volunteerRoles = [
-  "PHOTOGRAPHY", "VIDEOGRAPHY", "BACKSTAGE & ARTIST CARE",
-  "PRODUCTION & SOUND", "TICKETING & RECEPTION", "SOCIAL MEDIA & DISPATCH"
-];
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const CrewApplyPage = () => {
+  usePageMeta({ title: 'Crew Application', description: 'Apply to join the Tangy crew — photography, video, backstage, sound, reception and social.' });
   const navigate = useNavigate();
-  const { playSFX } = useAudio();
-  const { user } = useUserAuth();
-
-  const [volName, setVolName] = useState('');
-  const [volPhone, setVolPhone] = useState('');
-  const [volEmail, setVolEmail] = useState('');
-  const [volCollege, setVolCollege] = useState('');
-  const [volRole, setVolRole] = useState(volunteerRoles[0]);
-  const [volExperience, setVolExperience] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [crewSubmitting, setCrewSubmitting] = useState(false);
-  const [crewError, setCrewError] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!volName || !volPhone || !volEmail) return;
-    playSFX('ticketClick');
-    setCrewError('');
-    if (isMockAuth) {
-      userService.applyForRole('volunteer', {
-        name: volName,
-        email: volEmail,
-        phone: volPhone,
-        interest: volRole,
-        notes: `College/Institution: ${volCollege || '—'}\n\n${volExperience}`,
-      });
-      setSubmitted(true);
-      return;
-    }
-    if (!isSupabaseConfigured) {
-      setSubmitted(true);
-      return;
-    }
-    setCrewSubmitting(true);
-    const { error } = await supabase.from('crew_applications').insert({
-      name: volName,
-      email: volEmail,
-      phone: volPhone,
-      role_interest: volRole,
-      category: 'crew',
-      message: `College/Institution: ${volCollege || '—'}\n\n${volExperience}`,
-      user_id: user?.id ?? null,
-    });
-    setCrewSubmitting(false);
-    if (error) {
-      setCrewError('Something went wrong submitting your application — please try again.');
-      return;
-    }
-    setSubmitted(true);
-  };
 
   return (
     <div className="min-h-screen bg-[#4A171D] text-[#ecdcaf] font-mono selection:bg-[#EFE2C0] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20 textileTexture">
@@ -74,7 +16,7 @@ export const CrewApplyPage = () => {
 
       <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         <div className="flex items-center gap-4 flex-wrap">
-          <a href="/crew" className="font-mono text-[10px] text-[#ecdcaf]/70 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors">← BACK TO CREW</a>
+          <PageCrumbs className="[&_ol]:justify-start" />
           <button
             type="button"
             onClick={() => navigate('/join')}
@@ -92,36 +34,12 @@ export const CrewApplyPage = () => {
           </p>
         </div>
 
-        <div className="bg-[#181614] border-4 border-[#ecdcaf] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
-          {submitted ? (
-            <ApplicationReceivedNotice roleLabel="Crew" statusRoute="/crew/dashboard" />
-          ) : (
-            <RequireAuthToApply roleLabel="Crew">
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-mono text-xs">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input required type="text" placeholder="YOUR FULL NAME *" value={volName} onChange={(e) => setVolName(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                  <input required type="email" placeholder="YOUR EMAIL ADDRESS *" value={volEmail} onChange={(e) => setVolEmail(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input required type="tel" placeholder="PHONE NUMBER *" value={volPhone} onChange={(e) => setVolPhone(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                  <input type="text" placeholder="COLLEGE / INSTITUTION (OPTIONAL)" value={volCollege} onChange={(e) => setVolCollege(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none focus:border-[#ecdcaf]" />
-                </div>
-                <div>
-                  <label className="font-bold text-[#c2272a] block mb-2 uppercase text-[10px]">PREFERRED CREW ROLE *</label>
-                  <select value={volRole} onChange={(e) => setVolRole(e.target.value)} className="w-full p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none">
-                    {volunteerRoles.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <textarea rows={4} placeholder="RELEVANT EXPERIENCE OR WHY YOU WANT TO JOIN TANGY CREW..." value={volExperience} onChange={(e) => setVolExperience(e.target.value)} className="p-3 bg-[#241a12] border border-[#ecdcaf]/40 text-[#ecdcaf] focus:outline-none resize-none" />
-                {crewError && <div className="p-3 bg-[#B5532A] text-white font-bold border-2 border-[#ecdcaf]">{crewError}</div>}
-                <button type="submit" disabled={crewSubmitting} className="py-4 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410] disabled:opacity-50">
-                  {crewSubmitting ? 'SUBMITTING...' : 'SUBMIT CREW APPLICATION →'}
-                </button>
-              </form>
-            </RequireAuthToApply>
-          )}
+        <div className="bg-[#181614] border-2 border-[#ecdcaf] p-6 sm:p-10 shadow-[4px_4px_0px_#191410] text-left">
+          <CrewApplicationForm renderSuccess={() => <ApplicationReceivedNotice roleLabel="Crew" statusRoute="/crew/dashboard" />} />
         </div>
       </main>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

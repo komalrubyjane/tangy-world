@@ -1,6 +1,7 @@
 /* global __TANGY_DEV_TOOLS__ */
 import { useState, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { LEGACY_TAB as ARTIST_LEGACY_TAB, isArtistWorkspace } from './artist/portal/portalNav';
 import { ScrollToTop } from './components/layout/ScrollToTop';
 import { LenisProvider } from './components/layout/LenisProvider';
 import { CursorProvider } from './hooks/useCursor';
@@ -45,6 +46,16 @@ const TermsPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ 
 const PrivacyPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ default: m.PrivacyPage })));
 const RefundPolicyPage = lazy(() => import('./pages/content/LegalPage').then((m) => ({ default: m.RefundPolicyPage })));
 const NotFoundPage = lazy(() => import('./pages/content/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
+const InvitationPage = lazy(() => import('./pages/InvitationPage').then((m) => ({ default: m.InvitationPage })));
+// Old /blogs/:slug links → the canonical /diary/:slug.
+// Old tabbed-portal links (/artist/dashboard/<tab>) → that section's page.
+// Old tabbed links; a conversation id in an old messages link is kept.
+const LegacyArtistTab = () => {
+  const { tab, sub } = useParams();
+  const to = ARTIST_LEGACY_TAB[tab] || '/artist/dashboard';
+  return <Navigate to={tab === 'messages' && sub ? `${to}/${sub}` : to} replace />;
+};
+const BlogPostRedirect = () => <Navigate to={`/diary/${useParams().slug}`} replace />;
 const InnerCirclePage = lazy(() => import('./pages/InnerCirclePage').then((m) => ({ default: m.InnerCirclePage })));
 const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
 const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
@@ -62,17 +73,27 @@ const PassportProfilePage = lazy(() => import('./pages/ProfilePage').then((m) =>
 
 // Artist Portal Migration Imports
 const ArtistLayout = lazy(() => import('./artist/layouts/ArtistLayout').then((m) => ({ default: m.ArtistLayout })));
-import { ArtistProtectedRoute } from './artist/components/ArtistProtectedRoute';
 const LoginPage = lazy(() => import('./artist/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
-const RegisterPage = lazy(() => import('./artist/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
-const DashboardPage = lazy(() => import('./artist/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })));
-const ProfilePage = lazy(() => import('./artist/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
-const CalendarPage = lazy(() => import('./artist/pages/CalendarPage').then((m) => ({ default: m.CalendarPage })));
 const ArtistsDirectoryPage = lazy(() => import('./artist/pages/ArtistsDirectoryPage').then((m) => ({ default: m.ArtistsDirectoryPage })));
 const ArtistDetailsPage = lazy(() => import('./artist/pages/ArtistDetailsPage').then((m) => ({ default: m.ArtistDetailsPage })));
+// Artist portal (one dedicated shell) and the artist application (0033).
+const ArtistPortalShell = lazy(() => import('./artist/portal/ArtistPortalShell').then((m) => ({ default: m.ArtistPortalShell })));
+const PortalDashboardPage = lazy(() => import('./artist/portal/pages/PortalDashboardPage').then((m) => ({ default: m.PortalDashboardPage })));
+const ArtistSessionsPage = lazy(() => import('./artist/portal/pages/SessionsPage').then((m) => ({ default: m.SessionsPage })));
+const ArtistSessionDetailPage = lazy(() => import('./artist/portal/pages/SessionsPage').then((m) => ({ default: m.SessionDetailPage })));
+const ArtistCalendarPage = lazy(() => import('./artist/portal/pages/CalendarPage').then((m) => ({ default: m.CalendarPage })));
+const ArtistRequestsPage = lazy(() => import('./artist/portal/pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
+const ArtistRequestDetailPage = lazy(() => import('./artist/portal/pages/RequestsPage').then((m) => ({ default: m.RequestDetailPage })));
+const ArtistAvailabilityPage = lazy(() => import('./artist/portal/pages/AvailabilityPage').then((m) => ({ default: m.AvailabilityPage })));
 const MediaPage = lazy(() => import('./artist/pages/MediaPage').then((m) => ({ default: m.MediaPage })));
-const SettingsPage = lazy(() => import('./artist/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
-const RequestsPage = lazy(() => import('./artist/pages/RequestsPage').then((m) => ({ default: m.RequestsPage })));
+const MediaDetailPage = lazy(() => import('./artist/pages/MediaPage').then((m) => ({ default: m.MediaDetailPage })));
+const ProfilePage = lazy(() => import('./artist/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const ArtistNotificationsPage = lazy(() => import('./artist/portal/pages/InboxPages').then((m) => ({ default: m.NotificationsPage })));
+const ArtistMessagesPage = lazy(() => import('./artist/portal/pages/InboxPages').then((m) => ({ default: m.MessagesPage })));
+const ArtistDocumentsPage = lazy(() => import('./artist/portal/pages/InboxPages').then((m) => ({ default: m.DocumentsPage })));
+const ArtistSettingsPage = lazy(() => import('./artist/portal/pages/InboxPages').then((m) => ({ default: m.SettingsPage })));
+const ArtistApplyPage = lazy(() => import('./artist/portal/pages/ApplyPage').then((m) => ({ default: m.ApplyPage })));
+const ArtistApplicationStatusPage = lazy(() => import('./artist/portal/pages/ApplicationStatusPage').then((m) => ({ default: m.ApplicationStatusPage })));
 
 // Real, role-based account dashboards — backed by Supabase Auth
 // (UserAuthContext) + RLS, gated by ProtectedRoute (not the removed mock
@@ -101,11 +122,14 @@ const WhyTangyPage = lazy(() => import('./pages/subsections/WhyTangyPage').then(
 const ChronologyPage = lazy(() => import('./pages/subsections/ChronologyPage').then((m) => ({ default: m.ChronologyPage })));
 const TeamPage = lazy(() => import('./pages/subsections/TeamPage').then((m) => ({ default: m.TeamPage })));
 const FullStoryPage = lazy(() => import('./pages/subsections/FullStoryPage').then((m) => ({ default: m.FullStoryPage })));
-const UpcomingSessionsPage = lazy(() => import('./pages/subsections/UpcomingSessionsPage').then((m) => ({ default: m.UpcomingSessionsPage })));
 const ConcertCulturePage = lazy(() => import('./pages/subsections/ConcertCulturePage').then((m) => ({ default: m.ConcertCulturePage })));
 const WaitlistPage = lazy(() => import('./pages/subsections/WaitlistPage').then((m) => ({ default: m.WaitlistPage })));
 const SessionCalendarPage = lazy(() => import('./pages/SessionCalendarPage').then((m) => ({ default: m.SessionCalendarPage })));
-const SessionArchivePage = lazy(() => import('./pages/subsections/SessionArchivePage').then((m) => ({ default: m.SessionArchivePage })));
+const PreviousSessionsPage = lazy(() => import('./pages/archive/PreviousSessionsPage').then((m) => ({ default: m.PreviousSessionsPage })));
+const PastSessionPage = lazy(() => import('./pages/archive/PastSessionPage').then((m) => ({ default: m.PastSessionPage })));
+const ProgrammesPage = lazy(() => import('./pages/archive/ProgrammesPage').then((m) => ({ default: m.ProgrammesPage })));
+const ProgrammePage = lazy(() => import('./pages/archive/ProgrammesPage').then((m) => ({ default: m.ProgrammePage })));
+const GalleryArchivePage = lazy(() => import('./pages/archive/GalleryArchivePage').then((m) => ({ default: m.GalleryArchivePage })));
 const MuseumTimelinePage = lazy(() => import('./pages/subsections/MuseumTimelinePage').then((m) => ({ default: m.MuseumTimelinePage })));
 const PastMemoriesPage = lazy(() => import('./pages/subsections/PastMemoriesPage').then((m) => ({ default: m.PastMemoriesPage })));
 const ContactSheetsPage = lazy(() => import('./pages/subsections/ContactSheetsPage').then((m) => ({ default: m.ContactSheetsPage })));
@@ -115,10 +139,10 @@ const StageOperationsPage = lazy(() => import('./pages/subsections/StageOperatio
 const CrewApplyPage = lazy(() => import('./pages/subsections/CrewApplyPage').then((m) => ({ default: m.CrewApplyPage })));
 const VolunteerApplyPage = lazy(() => import('./pages/subsections/VolunteerApplyPage').then((m) => ({ default: m.VolunteerApplyPage })));
 const CollaborateOpportunitiesPage = lazy(() => import('./pages/subsections/CollaborateOpportunitiesPage').then((m) => ({ default: m.CollaborateOpportunitiesPage })));
-const PrivateGatheringsPage = lazy(() => import('./pages/subsections/PrivateGatheringsPage').then((m) => ({ default: m.PrivateGatheringsPage })));
-const CorporateEventsPage = lazy(() => import('./pages/subsections/CorporateEventsPage').then((m) => ({ default: m.CorporateEventsPage })));
-const WeddingsPage = lazy(() => import('./pages/subsections/WeddingsPage').then((m) => ({ default: m.WeddingsPage })));
-const HeritageExperiencesPage = lazy(() => import('./pages/subsections/HeritageExperiencesPage').then((m) => ({ default: m.HeritageExperiencesPage })));
+const PrivateGatheringsPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.PrivateGatheringsPage })));
+const CorporateEventsPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.CorporateEventsPage })));
+const WeddingsPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.WeddingsPage })));
+const HeritageExperiencesPage = lazy(() => import('./pages/subsections/PrivateOfferingPage').then((m) => ({ default: m.HeritageExperiencesPage })));
 const MuseumJournalPage = lazy(() => import('./pages/subsections/MuseumJournalPage').then((m) => ({ default: m.MuseumJournalPage })));
 const RecentStoriesPage = lazy(() => import('./pages/subsections/RecentStoriesPage').then((m) => ({ default: m.RecentStoriesPage })));
 const LocationPage = lazy(() => import('./pages/subsections/LocationPage').then((m) => ({ default: m.LocationPage })));
@@ -130,6 +154,7 @@ import { Hero } from './components/sections/Hero';
 import { Manifesto } from './components/sections/Manifesto';
 import { Archive } from './components/sections/Archive';
 import { TangyDiary } from './components/sections/TangyDiary';
+import { TangyCalendar } from './components/sections/TangyCalendar';
 import { UpcomingEvents } from './components/sections/UpcomingEvents';
 import { Volunteer } from './components/sections/Volunteer';
 import { PrivateSessions } from './components/sections/PrivateSessions';
@@ -219,6 +244,9 @@ function MainWorld() {
             {/* 03 — SESSIONS */}
             <UpcomingEvents onSelectBooking={handleNavigateBooking} />
 
+            {/* TANGY CALENDAR — the same events as /sessions/calendar */}
+            <TangyCalendar />
+
             {/* 04 — ARCHIVE */}
             <Archive />
 
@@ -228,7 +256,7 @@ function MainWorld() {
             {/* 07 — PRIVATE SESSIONS */}
             <PrivateSessions onRequestPrivate={handleNavigatePrivate} />
 
-            {/* 08 — TANGY DIARY */}
+            {/* 08 — TANGY DIARY: the field journal (scroll turns its pages) */}
             <TangyDiary />
 
             {/* 09 — INNER CIRCLE */}
@@ -260,12 +288,17 @@ function RouteFallback() {
 // the public assistant or announcement overlay.
 const OPERATIONAL_PREFIXES = ['/admin-portal', '/admin', '/check-in', '/demo-admin'];
 const PORTAL_PREFIXES = [
-  '/artist/dashboard', '/artist/calendar', '/artist/media', '/artist/requests', '/artist/settings',
   '/sponsor/dashboard', '/vendor/dashboard', '/venue/dashboard', '/volunteer/dashboard', '/crew/dashboard', '/dashboard',
 ];
-// Exact matches only: /artist/profile is the artist's own editor, while
-// /artist/profile/:id is the public artist page and keeps the public overlays.
-const PORTAL_PAGES = ['/artist/profile'];
+// The artist workspace is handled by isArtistWorkspace() (portalNav.js).
+const PORTAL_PAGES = [];
+// A session's own page is also its checkout: no marketing pop-up over the
+// booking form (the /sessions/<section> pages keep it).
+const SESSION_SECTIONS = new Set(['upcoming', 'concert-culture', 'calendar', 'waitlist', 'archive']);
+const isSessionBookingPage = (pathname) => {
+  const m = pathname.match(/^\/sessions\/([^/]+)\/?$/);
+  return Boolean(m && !SESSION_SECTIONS.has(m[1]));
+};
 
 // /admin/<anything>?q#h → /admin-portal/<anything>?q#h (the /admin/preview/*
 // inspectors are declared as their own, more specific routes).
@@ -283,11 +316,15 @@ function LegacyAdminRedirect() {
 function GlobalOverlays() {
   const { pathname } = useLocation();
   const operational = OPERATIONAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const workspace = isArtistWorkspace(pathname);
   // Portals are working screens too: no marketing pop-up over their content.
   const portal = PORTAL_PAGES.includes(pathname) || PORTAL_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  const { announcement, show, dismiss } = useAnnouncementTrigger({ suppressed: operational || portal });
+  const booking = isSessionBookingPage(pathname);
+  const { announcement, show, dismiss } = useAnnouncementTrigger({ suppressed: operational || portal || workspace || booking });
   const devStrip = (import.meta.env.DEV && __TANGY_DEV_TOOLS__) ? <DevPortalStrip /> : null;
   if (operational) return <GlobalDock />;
+  // The artist workspace keeps the local dev strip, but no assistant or pop-ups.
+  if (workspace) return <>{devStrip}</>;
   return (
     <>
       <GlobalDock />
@@ -300,7 +337,7 @@ function GlobalOverlays() {
         duration={6000}
         // Suppression only prevents a new pick; one already open (e.g. from a
         // public sign-in page) must not follow the user into their portal.
-        isOpen={show && !portal}
+        isOpen={show && !portal && !booking}
         onClose={dismiss}
       />
     </>
@@ -326,28 +363,28 @@ export default function App() {
 
                 {/* DEDICATED STANDALONE PAGES */}
                 <Route path="/about" element={<AboutPage />} />
-                <Route path="/about/*" element={<AboutPage />} />
                 <Route path="/sessions" element={<SessionsPage />} />
                 {/* One page per session; /book/:id is the older alias. */}
                 <Route path="/sessions/:sessionId" element={<BookingPage />} />
                 <Route path="/archive" element={<ArchivePage />} />
-                <Route path="/archive/*" element={<ArchivePage />} />
                 <Route path="/crew" element={<CrewPage />} />
-                <Route path="/apply/crew" element={<CrewPage />} />
-                <Route path="/volunteer" element={<CrewPage />} />
+                <Route path="/apply/crew" element={<Navigate to="/crew/apply" replace />} />
+                <Route path="/volunteer" element={<Navigate to="/crew/volunteer" replace />} />
                 <Route path="/collaborate" element={<CollaboratePage />} />
                 <Route path="/apply/vendors" element={<VendorApplyPage />} />
                 <Route path="/apply/sponsors" element={<SponsorApplyPage />} />
                 <Route path="/apply/venue-host" element={<VenueHostApplyPage />} />
                 <Route path="/apply/host" element={<VenueHostApplyPage />} />
                 <Route path="/private-sessions" element={<PrivateSessionsPage />} />
-                <Route path="/blogs" element={<BlogsPage />} />
-                <Route path="/blogs/:slug" element={<DiaryPostPage />} />
+                {/* /diary is canonical; the old /blogs URLs redirect. */}
+                <Route path="/blogs" element={<Navigate to="/diary" replace />} />
+                <Route path="/blogs/:slug" element={<BlogPostRedirect />} />
                 <Route path="/diary" element={<BlogsPage />} />
                 <Route path="/diary/:slug" element={<DiaryPostPage />} />
                 <Route path="/tv" element={<TvPage />} />
                 <Route path="/tv/:slug" element={<TvVideoPage />} />
                 <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/gallery/archive" element={<GalleryArchivePage />} />
                 <Route path="/gallery/:album" element={<GalleryAlbumPage />} />
                 <Route path="/artists/:slug" element={<ArtistPage />} />
                 <Route path="/faq" element={<FaqPage />} />
@@ -355,6 +392,7 @@ export default function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/refund-policy" element={<RefundPolicyPage />} />
+                <Route path="/invitation" element={<InvitationPage />} />
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="/inner-circle" element={<InnerCirclePage />} />
                 <Route path="/contact" element={<ContactPage />} />
@@ -386,75 +424,35 @@ export default function App() {
                 <Route path="/check-in" element={<TangyWorldCheckInPage />} />
 
                 {/* ARTIST PORTAL ROUTE GROUP (/artist/*) */}
+                {/* Public artist pages (artist navbar). */}
                 <Route path="/artist" element={<ArtistLayout />}>
                   <Route index element={<ArtistsDirectoryPage />} />
                   <Route path="login" element={<LoginPage />} />
-                  <Route path="register" element={<RegisterPage />} />
                   <Route path="profile/:id" element={<ArtistDetailsPage />} />
-                  <Route 
-                    path="dashboard" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <DashboardPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="dashboard/:tab" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <DashboardPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="dashboard/:tab/:sub" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <DashboardPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="profile" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <ProfilePage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route
-                    path="requests"
-                    element={
-                      <ArtistProtectedRoute>
-                        <RequestsPage />
-                      </ArtistProtectedRoute>
-                    }
-                  />
-                  <Route 
-                    path="calendar" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <CalendarPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="media" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <MediaPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="settings" 
-                    element={
-                      <ArtistProtectedRoute>
-                        <SettingsPage />
-                      </ArtistProtectedRoute>
-                    } 
-                  />
+                </Route>
+                {/* The application (any signed-in person) and its status. */}
+                <Route path="/artist/apply" element={<ArtistApplyPage />} />
+                <Route path="/artist/register" element={<Navigate to="/artist/apply" replace />} />
+                <Route path="/artist/application" element={<ArtistApplicationStatusPage />} />
+                {/* The Artist Portal: one shell, every section its own route. */}
+                <Route element={<ArtistPortalShell />}>
+                  <Route path="/artist/dashboard" element={<PortalDashboardPage />} />
+                  <Route path="/artist/dashboard/:tab" element={<LegacyArtistTab />} />
+                  <Route path="/artist/dashboard/:tab/:sub" element={<LegacyArtistTab />} />
+                  <Route path="/artist/sessions" element={<ArtistSessionsPage />} />
+                  <Route path="/artist/sessions/:sessionId" element={<ArtistSessionDetailPage />} />
+                  <Route path="/artist/calendar" element={<ArtistCalendarPage />} />
+                  <Route path="/artist/requests" element={<ArtistRequestsPage />} />
+                  <Route path="/artist/requests/:requestId" element={<ArtistRequestDetailPage />} />
+                  <Route path="/artist/availability" element={<ArtistAvailabilityPage />} />
+                  <Route path="/artist/media" element={<MediaPage />} />
+                  <Route path="/artist/media/:mediaId" element={<MediaDetailPage />} />
+                  <Route path="/artist/messages" element={<ArtistMessagesPage />} />
+                  <Route path="/artist/messages/:conversationId" element={<ArtistMessagesPage />} />
+                  <Route path="/artist/notifications" element={<ArtistNotificationsPage />} />
+                  <Route path="/artist/profile" element={<ProfilePage />} />
+                  <Route path="/artist/documents" element={<ArtistDocumentsPage />} />
+                  <Route path="/artist/settings" element={<ArtistSettingsPage />} />
                 </Route>
 
 
@@ -510,19 +508,25 @@ export default function App() {
                 <Route path="/about/full-story" element={<FullStoryPage />} />
 
                 {/* Sessions */}
-                <Route path="/sessions/upcoming" element={<UpcomingSessionsPage />} />
+                {/* Upcoming Sessions is /sessions itself. */}
+                <Route path="/sessions/upcoming" element={<Navigate to="/sessions" replace />} />
                 <Route path="/sessions/concert-culture" element={<ConcertCulturePage />} />
                 <Route path="/sessions/calendar" element={<SessionCalendarPage />} />
                 <Route path="/sessions/waitlist" element={<WaitlistPage />} />
 
                 {/* Archive */}
-                <Route path="/archive/session-archive" element={<SessionArchivePage />} />
+                {/* Previous sessions live under Sessions; the old archive URL redirects. */}
+                <Route path="/archive/session-archive" element={<Navigate to="/sessions/archive" replace />} />
+                <Route path="/sessions/archive" element={<PreviousSessionsPage />} />
+                <Route path="/sessions/archive/:slug" element={<PastSessionPage />} />
+                <Route path="/archive/programmes" element={<ProgrammesPage />} />
+                <Route path="/archive/programmes/:slug" element={<ProgrammePage />} />
                 <Route path="/archive/museum-timeline" element={<MuseumTimelinePage />} />
                 <Route path="/archive/past-memories" element={<PastMemoriesPage />} />
                 <Route path="/archive/contact-sheets" element={<ContactSheetsPage />} />
 
                 {/* Artists (plural) — real system lives at /artist/*, these are just aliases */}
-                <Route path="/artists/apply" element={<Navigate to="/artist/register" replace />} />
+                <Route path="/artists/apply" element={<Navigate to="/artist/apply" replace />} />
                 <Route path="/artists/login" element={<Navigate to="/artist/login" replace />} />
                 <Route path="/artists/portal" element={<Navigate to="/artist/dashboard" replace />} />
 

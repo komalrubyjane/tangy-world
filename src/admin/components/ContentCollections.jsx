@@ -20,7 +20,7 @@ const URL_RE = /^(\/|https:\/\/)\S+$/;
 
 export function useContentRights(area) {
   const { can } = useAdminSession();
-  const areaPerm = { tv: P.CONTENT_TV, diary: P.CONTENT_DIARY, media: P.CONTENT_MEDIA }[area];
+  const areaPerm = { tv: P.CONTENT_TV, diary: P.CONTENT_DIARY, media: P.CONTENT_MEDIA, sessions: P.CONTENT_SESSIONS }[area];
   return {
     view: can([P.CONTENT_VIEW, areaPerm]),
     create: can([P.CONTENT_CREATE, areaPerm]),
@@ -74,7 +74,9 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 // Generic list + editor for one content table. Each item has its own URL:
 // mode "list" is <base>, mode "detail" is <base>/<slug|id> (or <base>/new),
 // rendered as a full page — refresh, back/forward and deep links all work.
-function CollectionManager({ area, table, fields, noun, columns, validate, blank, toRow, fromRow, previewPath, mode = 'list', base, itemRef, onLoaded }) {
+// `afterSave(row, form)` (optional) runs after the row is saved — e.g. linked
+// records — and may return { form } fields to keep or { error } to report.
+function CollectionManager({ area, table, fields, noun, columns, validate, blank, toRow, fromRow, previewPath, mode = 'list', base, itemRef, onLoaded, afterSave }) {
   const rights = useContentRights(area);
   const toast = useToast();
   const navigate = useNavigate();
@@ -135,8 +137,10 @@ function CollectionManager({ area, table, fields, noun, columns, validate, blank
     const { data, error } = await content.save(table, toRow(editing));
     setSaving(false);
     if (error) { toast(contentErrorMessage(error), 'bad'); return; }
-    toast(`${noun} saved${data.status === 'published' ? ' and live' : ''}.`);
-    const form = fromRow(data);
+    const extra = afterSave ? await afterSave(data, editing) : null;
+    if (extra?.error) toast(extra.error, 'bad');
+    else toast(`${noun} saved${data.status === 'published' ? ' and live' : ''}.`);
+    const form = { ...fromRow(data), ...(extra?.form || {}) };
     setEditing(form);
     setOriginal(form);
     slugTouched.current = true;
@@ -403,3 +407,84 @@ export function GalleryManager(routeProps) {
   );
 }
 
+
+// Programmes (0031) ------------------------------------------------------------------
+const PROGRAMME_FIELDS = 'id, slug, title, year, season, description, venue, cover_url, sort_order, status, published_at, updated_at, programme_events(event_id)';
+
+// Which sessions belong to the programme (programme_events), newest first.
+function ProgrammeSessionsField({ value, onChange, disabled }) {
+  const events = useAsync(async () => {
+    const { data, error } = await supabase.from('events').select('id, name, event_date, status').neq('status', 'draft').order('event_date', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }, []);
+  const [q, setQ] = useState('');
+  const rows = (events.data || []).filter((e) => !q || e.name.toLowerCase().includes(q.toLowerCase()) || String(e.event_date).startsWith(q));
+  const toggle = (id) => onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
+  return (
+    <Field label={`Sessions (${value.length})`} hint="The sessions in this programme, shown on its public page.">
+      <div className="flex flex-col gap-2">
+        <SearchInput value={q} onChange={setQ} placeholder="Filter by name or year…" />
+        <div className="max-h-64 overflow-y-auto border border-[#C99A2E]/20 rounded" data-programme-sessions>
+          {events.loading && <p className="p-3 text-[12.5px] text-[#E7D5A4]/60 m-0">Loading sessions…</p>}
+          {rows.map((e) => (
+            <label key={e.id} className="flex items-center gap-2 px-3 py-2 text-[13px] border-b border-[#E7D5A4]/[0.06] cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 accent-[#C99A2E]" checked={value.includes(e.id)} onChange={() => toggle(e.id)} disabled={disabled} />
+              <span className="flex-1">{e.name}</span>
+              <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.date(e.event_date)}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </Field>
+  );
+}
+
+export function ProgrammesManager(routeProps) {
+  const rights = useContentRights('sessions');
+  const fieldsUi = (f, set, errors) => (
+    <>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Year *" error={errors.year}><Input inputMode="numeric" value={f.year} onChange={(e) => set({ year: e.target.value })} /></Field>
+        <Field label="Season"><Input value={f.season} onChange={(e) => set({ season: e.target.value })} maxLength={40} placeholder="Monsoon, Winter…" /></Field>
+      </div>
+      <Field label="Description"><Textarea rows={4} value={f.description} onChange={(e) => set({ description: e.target.value })} maxLength={4000} /></Field>
+      <Field label="Venue(s)"><Input value={f.venue} onChange={(e) => set({ venue: e.target.value })} maxLength={200} /></Field>
+      <MediaField label="Cover image" area="sessions" accept="image/*" value={f.cover_url} onChange={(v) => set({ cover_url: v })} error={errors.cover_url} canUpload={false}
+        hint="An https:// link or a /media/ path." />
+      <ProgrammeSessionsField value={f.event_ids} onChange={(v) => set({ event_ids: v })} disabled={!(rights.create || rights.edit)} />
+    </>
+  );
+  const syncSessions = async (row, form) => {
+    const { error: delError } = await supabase.from('programme_events').delete().eq('programme_id', row.id);
+    if (delError) return { error: `Saved, but the sessions could not be updated: ${contentErrorMessage(delError)}`, form: { event_ids: form.event_ids } };
+    if (form.event_ids.length) {
+      const { error } = await supabase.from('programme_events').insert(form.event_ids.map((event_id, position) => ({ programme_id: row.id, event_id, position })));
+      if (error) return { error: `Saved, but the sessions could not be linked: ${contentErrorMessage(error)}`, form: { event_ids: form.event_ids } };
+    }
+    return { form: { event_ids: form.event_ids } };
+  };
+  return (
+    <CollectionManager
+      {...routeProps}
+      area="sessions" table="programmes" fields={PROGRAMME_FIELDS} noun="Programme"
+      previewPath={(f) => `/archive/programmes/${f.slug}`}
+      columns={[
+        { key: 'year', header: 'Year', render: (r) => r.year },
+        { key: 'sessions', header: 'Sessions', render: (r) => (r.programme_events || []).length },
+      ]}
+      blank={() => ({ ...common(null), year: String(new Date().getFullYear()), season: '', description: '', venue: '', cover_url: '', event_ids: [], __fields: fieldsUi })}
+      fromRow={(r) => ({ ...common(r), year: String(r.year ?? ''), season: r.season || '', description: r.description || '', venue: r.venue || '', cover_url: r.cover_url || '',
+        event_ids: (r.programme_events || []).map((pe) => pe.event_id), __fields: fieldsUi })}
+      toRow={(f) => ({ ...commonRow(f), year: Number(f.year), season: f.season.trim() || null, description: f.description.trim(), venue: f.venue.trim() || null, cover_url: f.cover_url.trim() || null })}
+      afterSave={syncSessions}
+      validate={(f) => {
+        const e = {};
+        const y = Number(f.year);
+        if (!Number.isInteger(y) || y < 2000 || y > 2100) e.year = 'A year between 2000 and 2100.';
+        if (f.cover_url.trim() && !URL_RE.test(f.cover_url.trim())) e.cover_url = 'Use an https:// link or /media/ path.';
+        return e;
+      }}
+    />
+  );
+}

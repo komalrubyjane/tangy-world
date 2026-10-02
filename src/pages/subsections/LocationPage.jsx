@@ -1,14 +1,17 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const LocationPage = () => {
+  usePageMeta({ title: 'Location & Map', description: 'Where Tangy Sessions happen — Hyderabad’s heritage spaces, with directions.' });
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/contact" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO CONTACT</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             HERITAGE SANCTUARIES // HYDERABAD
           </span>
@@ -22,7 +25,7 @@ export const LocationPage = () => {
       </section>
 
       <section className="py-12 sm:py-20 max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="bg-[#211915] border-4 border-[#C99A2E] p-6 sm:p-10 mb-8 text-center">
+        <div className="bg-[#211915] border-2 border-[#C99A2E] p-6 sm:p-10 mb-8 text-center">
           <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
             PRIMARY HERITAGE SANCTUARY
           </span>
@@ -35,7 +38,7 @@ export const LocationPage = () => {
             { name: 'TARAMATI BARADARI', address: 'Ibrahim Bagh, Hyderabad, Telangana 500008' },
             { name: 'OLD CITY HAVELI COURTYARD', address: 'Charminar Lane, Hyderabad, Telangana 500002' }
           ].map((v) => (
-            <div key={v.name} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-5 sm:p-6 shadow-[6px_6px_0px_#11100C]">
+            <div key={v.name} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-5 sm:p-6 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1 block">ROTATING VENUE</span>
               <h4 className="display text-xl sm:text-2xl text-[#11100C] mb-1">{v.name}</h4>
               <p className="font-mono text-xs text-[#11100C]/70">{v.address}</p>
@@ -43,6 +46,8 @@ export const LocationPage = () => {
           ))}
         </div>
       </section>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

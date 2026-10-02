@@ -80,6 +80,31 @@ export const UserAuthProvider = ({ children }) => {
     };
   }, [loadProfile]);
 
+  // The role lives on the server (profiles.role, read by every RLS check). If a
+  // Super Admin changes it while this person is signed in, pick it up when the
+  // tab regains focus and once a minute, so menus, guards and the dashboard
+  // follow — the server has already stopped honouring the old role.
+  const userId = user?.id;
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return undefined;
+    let cancelled = false;
+    const check = async () => {
+      if (document.visibilityState === 'hidden') return;
+      const { data } = await supabase.from('profiles').select('role, is_active').eq('id', userId).maybeSingle();
+      if (cancelled || !data) return;
+      setUser((u) => (u && u.id === userId && (u.role !== data.role || u.is_active !== data.is_active) ? { ...u, ...data } : u));
+    };
+    const timer = setInterval(check, 60000);
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', check);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+      window.removeEventListener('focus', check);
+      document.removeEventListener('visibilitychange', check);
+    };
+  }, [userId]);
+
   const signUp = async (email, password, fullName) => {
     setAuthError('');
 

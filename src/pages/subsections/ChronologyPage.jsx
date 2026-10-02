@@ -1,10 +1,13 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { History } from '../../components/sections/History';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const ChronologyPage = () => {
+  usePageMeta({ title: 'Chronology', description: 'How Tangy Sessions grew, year by year.' });
   return (
-    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
+    <div className="theme-inner min-h-screen text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
@@ -12,7 +15,7 @@ export const ChronologyPage = () => {
           <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">SINCE 2016</span>
         </div>
         <div className="relative z-10">
-          <a href="/about" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO ABOUT</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             ABOUT TANGY SESSIONS // TEN YEARS OF NIGHTS
           </span>
@@ -27,15 +30,11 @@ export const ChronologyPage = () => {
 
       <History />
 
-      <section className="py-12 sm:py-16 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
+      <section className="theme-footer py-12 sm:py-16 printNoise border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">
           CONTINUE READING
         </span>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/about/why-tangy" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">WHY TANGY →</a>
-          <a href="/about/team" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">TANGY TEAM →</a>
-          <a href="/about/full-story" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">FULL STORY →</a>
-        </div>
+        <SectionNav section="About" />
       </section>
 
       <Footer />

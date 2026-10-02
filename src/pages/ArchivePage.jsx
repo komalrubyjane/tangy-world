@@ -1,38 +1,12 @@
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { SectionNav } from '../components/layout/SectionNav';
+import { ArchiveIndex } from '../components/archive/ArchiveIndex';
 import { archiveItems } from '../data/mockData';
 import { useGalleryPhotos } from '../hooks/useContent';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
 
-const TABS = ['ALL', 'GALLERY', 'ARCHIVE OBJECTS', 'PRESS'];
-
-const PRESS_CLIPS = [
-  {
-    id: 'p1',
-    title: '"Tangy Sessions: Hyderabad\'s Most Intimate Music Night"',
-    pub: 'THE DECCAN CHRONICLE',
-    year: '2024',
-    quote: 'In a city building more auditoriums, Tangy Sessions is doing the opposite — digging up forgotten stepwells and staging music inside them.',
-    image: '/media/gallery/tangy5.jpg'
-  },
-  {
-    id: 'p2',
-    title: '"Heritage Acoustics and the Underground Sound Movement"',
-    pub: 'ROLLING STONE INDIA',
-    year: '2024',
-    quote: 'What happens when you stop building stages and start collaborating with 350-year-old stone? You get Tangy Sessions.',
-    image: '/media/gallery/tangy8.jpg'
-  },
-  {
-    id: 'p3',
-    title: '"Sold Out in 3 Minutes: The New Breed of Cultural Events"',
-    pub: 'INDIAN EXPRESS',
-    year: '2025',
-    quote: 'Tangy Sessions tickets disappear faster than any stadium show in Hyderabad. The reason: authenticity is genuinely rare.',
-    image: '/media/gallery/tangy3.jpg'
-  }
-];
 
 const MUSEUM_MILESTONES = [
   { year: '2016', event: 'FIRST STEPWELL SESSION', details: 'Bansilalpet Stepwell cleared of debris; 45 guests gather for acoustic raga.' },
@@ -43,7 +17,6 @@ const MUSEUM_MILESTONES = [
 
 export const ArchivePage = () => {
   const gallery = useGalleryPhotos();
-  const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
   const [lightboxSrc, setLightboxSrc] = useState(null);
 
@@ -64,7 +37,7 @@ export const ArchivePage = () => {
           <img
             src={lightboxSrc}
             alt="Archive preview"
-            className="max-w-full max-h-[90vh] object-contain border-4 border-[#E7D5A4]/30"
+            className="max-w-full max-h-[90vh] object-contain border-2 border-[#E7D5A4]/30"
           />
           <button type="button" onClick={() => setLightboxSrc(null)} className="absolute top-4 right-4 min-h-[44px] text-[#E7D5A4] font-mono text-xs font-bold border border-[#E7D5A4]/50 px-3 py-1">
             CLOSE ✕
@@ -90,43 +63,16 @@ export const ArchivePage = () => {
             EXPLORE RECORDINGS, 35MM CONTACT SHEETS, PERFORMANCE MEMORIES, AND HERITAGE ARCHIVES FROM 2016 TO PRESENT.
           </p>
 
-          {/* Quick Section Anchors */}
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
-            {[
-              { label: 'SESSION ARCHIVE', hash: '#session-archive' },
-              { label: 'MUSEUM TIMELINE', hash: '#museum-timeline' },
-              { label: 'PAST MEMORIES', hash: '#past-memories' },
-              { label: '35MM CONTACT SHEETS', hash: '#contact-sheets' }
-            ].map((link) => (
-              <a
-                key={link.hash}
-                href={link.hash}
-                className="px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors"
-              >
-                {link.label} ↓
-              </a>
-            ))}
-          </div>
+          <SectionNav section="Archive" className="mt-6 sm:mt-8" />
 
           {/* FILTERS + SEARCH */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mt-6 sm:mt-10">
-            <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none w-full sm:w-auto">
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`whitespace-nowrap px-3 py-1.5 font-mono text-[9px] sm:text-xs font-bold uppercase tracking-wider border border-[#C99A2E] flex-shrink-0 transition-colors ${
-                    activeTab === tab ? 'bg-[#C99A2E] text-[#11100C]' : 'bg-transparent text-[#E7D5A4] hover:bg-[#C99A2E]/20'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
 
+            <label htmlFor="archive-photo-search" className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold">Search photos</label>
             <input
-              type="text"
-              placeholder="SEARCH ARCHIVE RECORDS..."
+              id="archive-photo-search"
+              type="search"
+              placeholder="SEARCH ARCHIVE PHOTOS..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="bg-[#191410] border border-[#C99A2E]/60 text-[#E7D5A4] px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#C99A2E] w-full sm:w-56"
@@ -134,6 +80,8 @@ export const ArchivePage = () => {
           </div>
         </div>
       </section>
+
+      <ArchiveIndex />
 
       {/* 35MM CONTACT SHEETS GRID */}
       <section id="contact-sheets" className="py-10 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6">
@@ -201,7 +149,7 @@ export const ArchivePage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
           {archiveItems.map((item, i) => (
-            <div key={item.id} className="relative bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C] sm:shadow-[12px_12px_0px_#11100C] flex gap-4 items-start overflow-hidden">
+            <div key={item.id} className="relative bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] flex gap-4 items-start overflow-hidden">
               <RetroGrain index={i % 2} opacity={0.1} blend="overlay" />
               
               <div className="relative w-20 sm:w-28 flex-shrink-0 border-2 border-[#11100C] overflow-hidden">
@@ -215,33 +163,6 @@ export const ArchivePage = () => {
                 <h3 className="display text-base sm:text-xl text-[#11100C] mb-2 leading-tight">{item.title}</h3>
                 <p className="font-mono text-[10px] sm:text-xs text-[#B94717] font-bold uppercase mb-1">{item.headline}</p>
                 <p className="font-mono text-[9px] sm:text-[10px] text-[#11100C]/75 leading-relaxed">{item.details}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* PRESS CLIPPINGS */}
-      <section className="py-10 sm:py-16 max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="font-mono text-[10px] text-[#C99A2E] font-bold uppercase tracking-[0.3em] mb-6 border-b border-[#C99A2E]/30 pb-2">
-          PRESS ARCHIVE // MEDIA COVERAGE & EDITORIAL FEATURES
-        </div>
-
-        <div className="flex flex-col gap-5 sm:gap-6">
-          {PRESS_CLIPS.map((clip, i) => (
-            <div key={clip.id} className="relative bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 sm:p-8 shadow-[4px_4px_0px_#11100C] sm:shadow-[10px_10px_0px_#11100C] grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 items-center overflow-hidden">
-              <RetroGrain index={i % 2} opacity={0.09} blend="overlay" />
-              <div className="relative sm:col-span-1 w-full h-28 sm:h-full overflow-hidden border-2 border-[#11100C]">
-                <img src={clip.image} alt={clip.title} className="w-full h-full object-cover filter grayscale sepia-[0.4]" />
-              </div>
-              <div className="relative sm:col-span-3">
-                <div className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-2">
-                  {clip.pub} // {clip.year}
-                </div>
-                <h3 className="font-serif italic text-lg sm:text-2xl text-[#11100C] mb-3 leading-tight">{clip.title}</h3>
-                <p className="font-body text-xs sm:text-sm text-[#11100C]/80 leading-relaxed italic border-l-4 border-[#C99A2E] pl-3">
-                  "{clip.quote}"
-                </p>
               </div>
             </div>
           ))}

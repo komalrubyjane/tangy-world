@@ -6,6 +6,7 @@ import { useAudio } from '../audio/AudioContext';
 import { useEvents } from '../hooks/useEvents';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { RetroGrain, LotusStamp } from '../components/ui/RetroAssets';
+import { PageCrumbs, SectionNav } from '../components/layout/SectionNav';
 
 const MONTH_NAMES = [
   'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -38,7 +39,7 @@ export const SessionCalendarPage = () => {
 
   // Real sessions (events table); drafts are hidden by RLS.
   const { events } = useEvents();
-  usePageMeta({ title: 'Session calendar', description: 'Every upcoming Tangy session, month by month.' });
+  usePageMeta({ title: 'Session Calendar', description: 'Every upcoming Tangy session, month by month.' });
   const monthEvents = useMemo(
     () => events
       .filter((e) => e.rawDate && e.dbStatus !== 'cancelled')
@@ -106,13 +107,13 @@ export const SessionCalendarPage = () => {
   const selectedEvents = selectedDay != null ? (eventsByDay[selectedDay] || []) : [];
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden printNoise">
+    <div className="theme-sessions min-h-screen text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       {/* HERO */}
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/sessions" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO SESSIONS</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             2026 SEASON SCHEDULE
           </span>
@@ -160,7 +161,7 @@ export const SessionCalendarPage = () => {
         </div>
 
         {/* DESKTOP / TABLET GRID (sm and up) */}
-        <div className="hidden sm:block bg-[#F5E9C9] border-4 border-[#11100C] shadow-[10px_10px_0px_#11100C] p-4 sm:p-6">
+        <div className="hidden sm:block bg-[#F5E9C9] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] p-4 sm:p-6">
           <div className="grid grid-cols-7 gap-1 mb-2">
             {WEEKDAY_LABELS.map((wd) => (
               <div key={wd} className="text-center font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-wider py-1">
@@ -198,7 +199,7 @@ export const SessionCalendarPage = () => {
         </div>
 
         {/* MOBILE COMPACT LIST-PER-WEEK VIEW (< sm) */}
-        <div className="sm:hidden bg-[#F5E9C9] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-3">
+        <div className="sm:hidden bg-[#F5E9C9] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] p-3">
           {Array.from({ length: grid.length / 7 }).map((_, weekIdx) => {
             const week = grid.slice(weekIdx * 7, weekIdx * 7 + 7);
             if (week.every((d) => d == null)) return null;
@@ -256,7 +257,7 @@ export const SessionCalendarPage = () => {
                 const isSoldOut = evt.dbStatus === 'sold-out';
                 const isPast = evt.dbStatus === 'past' || evt.date < new Date().toISOString().slice(0, 10);
                 return (
-                  <div key={evt.id} className="relative bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 overflow-hidden">
+                  <div key={evt.id} className="relative bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 overflow-hidden">
                     <RetroGrain index={evtIdx % 2} opacity={0.1} blend="overlay" />
                     
                     <div className="relative sm:w-40 shrink-0 aspect-[4/3] sm:aspect-square overflow-hidden border-2 border-[#11100C]">
@@ -290,6 +291,8 @@ export const SessionCalendarPage = () => {
           )}
         </div>
       </section>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

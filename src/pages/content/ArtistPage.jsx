@@ -33,7 +33,7 @@ export const ArtistPage = () => {
         {!loading && error && <ContentError onRetry={retry} />}
         {artist && (
           <article className="mt-6 grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-6" data-artist-page>
-            <div className="aspect-square bg-[#11100C] border-4 border-[#C99A2E]/60 flex items-center justify-center overflow-hidden">
+            <div className="aspect-square bg-[#11100C] border-2 border-[#C99A2E]/60 flex items-center justify-center overflow-hidden">
               {artist.avatar_url ? <img src={artist.avatar_url} alt={name} className="w-full h-full object-cover" /> : <span aria-hidden="true" className="display text-6xl">{name.slice(0, 1)}</span>}
             </div>
             <div className="flex flex-col gap-3">
@@ -53,7 +53,7 @@ export const ArtistPage = () => {
                     <h2 className="font-condensed text-xl uppercase text-[#C99A2E] mb-2">{title}</h2>
                     <ul className="list-none m-0 p-0 flex flex-col gap-2">
                       {list.map((s) => (
-                        <li key={s.id}><Link to={`/sessions/${s.slug || s.id}`} className="flex justify-between gap-3 border border-[#C99A2E]/40 p-3 hover:border-[#C99A2E]"><span className="font-bold">{s.name}</span><span className="text-xs opacity-70">{formatDate(s.event_date)} · {s.venue}</span></Link></li>
+                        <li key={s.id}><Link to={list === past ? `/sessions/archive/${s.slug}` : `/sessions/${s.slug || s.id}`} data-artist-session={s.slug} className="flex justify-between gap-3 border border-[#C99A2E]/40 p-3 hover:border-[#C99A2E]"><span className="font-bold">{s.name}</span><span className="text-xs opacity-70">{formatDate(s.event_date)} · {s.venue}</span></Link></li>
                       ))}
                     </ul>
                   </div>

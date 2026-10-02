@@ -32,7 +32,12 @@ it has to be done once, directly, by whoever owns the Supabase project:
 2. In the Supabase dashboard → Table Editor → `profiles`, find that row and set `role` to `admin` (or `super_admin`).
 3. Sign in at `/admin` with that account from then on.
 
-Every admin after the first can be promoted from inside `/admin` → Users tab, by an existing admin.
+Use `super_admin` for this first account. Every console account after it joins **by invitation** (0030):
+Admin → Users & roles → *Invite team member*. A Super Admin can invite Super Admins, Admin / Managers and
+Staff; an Admin / Manager can invite Staff (`staff.invite`). The invitation fixes the role; the recipient
+opens the emailed link (`/invitation#token=…`, single-use, 72 hours), signs in with the invited email
+address and accepts — only then is the role applied. There is no public screen where anyone picks a
+console role, and the database refuses self-promotion (role guard, 0003/0017/0018/0030).
 
 ## 2a. Temporary team demo admin
 
@@ -166,19 +171,19 @@ original unnamed constraint, which wasn't verified against a live database.
 28. `migrations/0028_content_cms.sql` — Tangy TV, diary, gallery, artist slugs, session copy editing and granular content permissions. Reverse: `rollbacks/0028_content_cms.down.sql`.
 29. `migrations/0029_private_media_realtime_jobs.sql` — private content media with signed URLs, live seat-availability signal, waitlist allocation policy, upload limits on every bucket, single-flight scheduled jobs with a run log. Reverse: `rollbacks/0029_private_media_realtime_jobs.down.sql`.
 
-Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`, `invitations_volunteer`, `programmes`, `artist_portal`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
-### Production application order (0017 → 0029)
+### Production application order (0017 → 0033)
 
 None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
 
-1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql` → 13. `0029_private_media_realtime_jobs.sql`
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql` → 13. `0029_private_media_realtime_jobs.sql` → 14. `0030_invitations_and_volunteer_access.sql` (then redeploy `admin-invite-user`) → 15. `0031_programmes_and_history.sql` → 16. `0032_booking_request_states.sql` (must be committed before 0033 runs) → 17. `0033_artist_portal.sql`
 
 Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields). After 0026 redeploy **all three** Razorpay functions (`razorpay-create-order`, `razorpay-verify-payment`, `razorpay-webhook` — they call `settle_payment()` and price from ticket types; the old functions would still confirm late payments). After 0026–0028 also redeploy `send-ticket-email`, `send-approval-email` and `send-notification-emails` (shared email module, section 7).
 
-Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0029` → `0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0033` → `0032` → `0031` → `0030` → `0029` → `0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
 
-### 0019–0029 in detail
+### 0019–0033 in detail
 
 **0020 — platform finalization**
 
@@ -237,6 +242,18 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 - Size limits and MIME allowlists on every bucket; the public `artist-avatars` bucket takes raster images only (no HTML, no SVG).
 - `run_platform_jobs(source)` takes a transaction advisory lock (an overlapping run is skipped and recorded) and logs each run in `platform_job_runs`.
 - Tests: `tests/media_realtime_jobs.test.sql`; two-session races in `scripts/test-concurrency.sh`. **Rollback** makes content-media public again, restores 0027's offer engine and jobs function, removes the signal, the run log and the upload limits.
+
+**0030 — account invitations and event-scoped volunteer access.**
+
+- `account_invitations`: invited email, intended role (`super_admin` / `admin` / `staff`), inviter, created / expires (72 h) / accepted / revoked timestamps, email delivery status, and the **SHA-256 hash** of a 32-byte random token (the raw token exists only in the emailed link's URL fragment). One open invitation per email; a new one replaces the old. No table access for anyone — only RPCs: `create_account_invitation` (called by `admin-invite-user` under the inviter's JWT; Super Admin / Admin invitations need `roles.manage`, Staff invitations need `staff.invite` or `users.manage`), `list_account_invitations`, `revoke_account_invitation`, `invitation_preview` (what `/invitation` shows), `accept_account_invitation` (signed in as the invited address; refuses expired, used, revoked, wrong-account and deactivated cases). The role guard allows exactly one self role change: the one made in the same transaction that accepted a matching invitation. All of it is audited (`user.invited`, `user.invitation_revoked`, `user.invitation_accepted`).
+- `admin-invite-user` no longer creates the auth user or sets the role; it creates the invitation and emails the link. If email isn't configured or fails, the console says so and shows the link once for manual delivery — it never reports a send that didn't happen. It no longer uses the service role key.
+- Security fixes: `is_assigned_to_event()` counts **staff** assignments only (a volunteer/crew place no longer gives staff access to that session, and partners can't call admin RPCs such as `event_health`); new `crew_applications` rows from end users always start `pending` (a self-submitted "approved" row used to unlock the volunteer portal UI).
+- Volunteer applications may name a session (`crew_applications.event_id`; open sessions only, one pending application per session). Approval adds a `volunteer` place on that session's team; members become Volunteers, staff keep their role. Staff must name a session. Volunteer access never adds console permissions.
+- Tests: `tests/invitations_volunteer.test.sql`, `e2e/invitations.mjs`. **Rollback** drops the invitations (accepted roles stay), the session column and the new checks, and restores 0018's role guard and assignment check, 0017's staff scoping and approval, and 0025's duplicate guard.
+
+**0031 — programmes and session history.** `programmes` (title, slug, year, season, description, venue, cover, draft / published / archived with scheduled `published_at`) and `programme_events` (which sessions belong to it, in order). Same content rules as 0028: visitors read published programmes only, publishing needs `content.publish`, editing needs `content.*` + `content.manage_sessions` (Admin → Content → Programmes), every change audited. `events.attendance_recorded` holds the head count for past sessions held before online ticketing (shown on `/sessions/archive/:slug` only when set). Tests: `tests/programmes.test.sql`, `e2e/archive.mjs`. **Rollback** drops both tables and the column.
+
+**0032 / 0033 — artist portal and applications.** See `docs/ARTIST_PORTAL.md`. Security fixes: internal review notes move from applicant-readable rows (artists, collaborations, crew_applications) to `application_reviews` (a trigger keeps the existing approve functions working); artist availability is no longer publicly readable. New: `artist_applications` (multi-step drafts, review cycle via `review_artist_application`), artist profile fields, booking-request details and states (draft / confirmed / completed — enum values in 0032), `artist_schedule_check`, `set_artist_availability`, artist media metadata, `artist_documents` + private `artist-documents` bucket, applicant uploads under `artist-media/applications/<user id>/`. Tests: `tests/artist_portal.test.sql`, `e2e/artist-portal.mjs`. **Rollback**: 0033's down file (export `application_reviews` first); 0032's enum values cannot be dropped — the 0033 rollback maps those requests back to cancelled / accepted.
 
 ## Local review tools
 

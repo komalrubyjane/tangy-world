@@ -18,14 +18,14 @@ export const DiaryPostPage = () => {
   if (!loading && !error && !post) return <NotFoundPage what="diary entry" back={{ to: '/diary', label: 'Back to the diary' }} />;
 
   return (
-    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono printNoise">
+    <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono t-quiet">
       <Navbar />
       <main className="pt-28 pb-16 px-4 sm:px-6 max-w-3xl mx-auto">
         <Link to="/diary" className="font-mono text-[10px] text-[#D19A24] tracking-widest uppercase hover:underline">← The diary</Link>
         {loading && <ContentLoading label="Loading entry…" />}
         {!loading && error && <ContentError onRetry={retry} />}
         {post && (
-          <article className="mt-6 bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C]" data-diary-post>
+          <article className="mt-6 bg-[#EFE2C0] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C]" data-diary-post>
             {post.cover_url && <MediaImg src={post.cover_url} alt="" className="w-full max-h-[420px] object-cover border-b-4 border-[#11100C]" />}
             <div className="p-5 sm:p-10">
               <p className="font-mono text-[10px] font-bold text-[#7C2D18] uppercase tracking-widest m-0">

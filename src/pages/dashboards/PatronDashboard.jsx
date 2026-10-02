@@ -202,19 +202,19 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
+      <div className="min-h-screen ui-texture text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
         LOADING PASSPORT...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen ui-texture text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
       {readOnly && <AdminPreviewBanner label={`Viewing Patron Portal — ${user.full_name || user.email}`} />}
 
       <section className="pt-24 sm:pt-28 pb-4 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 shrink-0 bg-[#E7D5A4] text-[#11100C] rounded-full border-2 border-[#B94717] flex flex-col items-center justify-center text-center">
               <span className="font-condensed text-base font-bold leading-none">TS</span>
@@ -261,17 +261,17 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       <section className="px-4 sm:px-6 max-w-6xl mx-auto pb-20">
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
+            <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
               <div className="font-condensed text-4xl font-bold mt-1">{stampsCount}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">confirmed bookings</p>
             </div>
-            <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
+            <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming Bookings</span>
               <div className="font-condensed text-4xl font-bold mt-1">{upcomingBookings.length}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">tickets on file</p>
             </div>
-            <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
+            <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Waitlist</span>
               <div className="font-condensed text-4xl font-bold mt-1">{waitlist.length}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">sessions you're waiting on</p>
@@ -296,7 +296,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
         )}
 
         {activeTab === 'passport' && (
-          <div className="bg-[#3c0f0e] border-4 border-[#C99A2E] p-5 sm:p-8 shadow-[10px_10px_0px_#11100C]">
+          <div className="bg-[#3c0f0e] border-2 border-[#C99A2E] p-5 sm:p-8 shadow-[4px_4px_0px_#11100C]">
             <span className="font-mono text-xs font-bold text-[#C99A2E] tracking-[0.3em]">PASSPORT // MEMBER STAMP BOOK</span>
             <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1 mb-5">Each confirmed Tangy Session booking earns a stamp in your passport.</p>
             {stampsCount === 0 ? (
@@ -391,7 +391,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div className="max-w-md"><ReadOnlyNote>Account settings can't be edited in admin preview.</ReadOnlyNote></div>
           ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-3xl">
-            <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C]">
+            <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-6 shadow-[4px_4px_0px_#11100C]">
               <h3 className="font-condensed text-lg font-bold uppercase mb-4">Account Settings</h3>
               <form onSubmit={handleSettingsSave} className="flex flex-col gap-4 text-xs">
                 <div>

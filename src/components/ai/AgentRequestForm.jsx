@@ -58,7 +58,7 @@ export const AgentRequestForm = ({ conversationId, initialCategory = '', initial
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-4 border-[#11100C] bg-[#F5E9C9] text-[#11100C] p-4 shadow-[6px_6px_0px_#11100C] flex flex-col gap-3"
+      className="border-2 border-[#11100C] bg-[#F5E9C9] text-[#11100C] p-4 shadow-[4px_4px_0px_#11100C] flex flex-col gap-3"
     >
       <div className="flex items-center justify-between border-b-2 border-[#11100C] pb-2">
         <span className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-[#B94717]">

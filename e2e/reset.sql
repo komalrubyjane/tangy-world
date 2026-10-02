@@ -38,6 +38,9 @@ delete from sponsor_deliverables;
 delete from partner_invoices;
 delete from notification_preferences;
 update events set doors_at = null where slug = 'vol-5-local';
+-- The test nights are published only while suites run (run.sh unpublishes them at the end,
+-- so they never sit among the real sessions on the review site).
+update events set status = 'on-sale' where slug in ('vol-5-local', 'vol-6-local') and status = 'draft';
 -- Last, so fixture updates above (they fire event-change triggers) leave no notifications behind.
 delete from notifications;
 delete from email_outbox;
@@ -60,3 +63,18 @@ delete from diary_posts where slug like 'e2e-%';
 delete from gallery_albums where slug like 'e2e-%';
 delete from tv_videos where slug like 'e2e-%';
 update tv_videos set title = 'Field Recording — Vol. 22402' where slug = 'field-recording-22402';
+
+-- Invitations / volunteer access (0030): invited test accounts, their invitations,
+-- and the staff member's volunteer application and session place.
+delete from account_invitations where email like '%@tangy.test';
+delete from auth.users where email like 'invitee-%@tangy.test';
+delete from event_assignments where assignee_role = 'volunteer' and assignee_id = (select id from profiles where email = 'staff@tangy.test');
+delete from crew_applications where category = 'volunteer' and email = 'staff@tangy.test';
+
+-- Artist portal (0033): the E2E applicant and anything it created.
+delete from assignment_requests where artist_id in (select id from artists where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test'));
+delete from event_artists where artist_id in (select id from artists where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test'));
+delete from event_artist_details where artist_id in (select id from artists where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test'));
+delete from application_reviews where source_id in (select id from artist_applications where user_id in (select id from auth.users where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test')));
+delete from artists where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test');
+delete from auth.users where email in ('artist-applicant@tangy.test', 'artist-applicant-2@tangy.test', 'artist-applicant-3@tangy.test');

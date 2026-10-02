@@ -18,7 +18,7 @@ begin;
 -- migrations (permissions, settings, announcements) survives; the rollback at
 -- the end restores everything else.
 delete from conversations;
-delete from bookings; delete from waitlist; delete from collaborations; delete from crew_applications;
+delete from bookings; delete from waitlist; delete from collaborations; delete from crew_applications; delete from application_reviews;
 delete from announcements where audience = 'staff';
 delete from events; delete from artists; delete from auth.users;
 alter table audit_logs disable trigger audit_logs_append_only;
@@ -98,9 +98,9 @@ insert into events (id, slug, name, event_date, venue, capacity, price, status) 
 
 \echo '--- 1. Permission sets'
 select tt.login('00000000-0000-0000-0000-00000000a001');
-select tt.check(array_length(my_permissions(), 1) = 38, 'super admin has all 38 permissions (29 + 9 content permissions from 0028)');
+select tt.check(array_length(my_permissions(), 1) = 39, 'super admin has all 39 permissions (29 + 9 content permissions from 0028 + staff.invite from 0030)');
 select tt.login('00000000-0000-0000-0000-00000000a002');
-select tt.check(array_length(my_permissions(), 1) = 30, 'admin has 30 permissions (21 + 9 content permissions from 0028)');
+select tt.check(array_length(my_permissions(), 1) = 31, 'admin has 31 permissions (21 + 9 content permissions from 0028 + staff.invite from 0030)');
 select tt.check(not has_permission('settings.manage') and not has_permission('audit.view') and not has_permission('roles.manage'), 'admin lacks settings/audit/roles');
 select tt.login('00000000-0000-0000-0000-00000000a003');
 select tt.check(my_permissions() = array['announcements.view','attendees.view_assigned','checkin.history','checkin.perform','dashboard.view','events.view_assigned','tasks.view_own'], 'staff has exactly the 7 staff permissions');
@@ -139,8 +139,10 @@ select tt.check((select count(*) from applications_overview) = 0, 'staff cannot 
 select tt.login('00000000-0000-0000-0000-00000000a002');
 select tt.check((select count(*) from applications_overview where status = 'pending') >= 2, 'admin sees all pending applications');
 select approve_collaboration('00000000-0000-0000-0000-0000000c0001', 'Great fit for Vol. 5');
-select tt.check((select status = 'approved' and reviewed_by = '00000000-0000-0000-0000-00000000a002' and review_notes = 'Great fit for Vol. 5' and reviewed_at is not null
-                      from collaborations where id = '00000000-0000-0000-0000-0000000c0001'), 'approval records status, reviewer, notes, time');
+select tt.check((select status = 'approved' and reviewed_by = '00000000-0000-0000-0000-00000000a002' and review_notes is null and reviewed_at is not null
+                      from collaborations where id = '00000000-0000-0000-0000-0000000c0001')
+            and (select notes from application_reviews where source_table = 'collaborations' and source_id = '00000000-0000-0000-0000-0000000c0001') = 'Great fit for Vol. 5',
+  'approval records status, reviewer and time; the note goes to the private review (0033)');
 select tt.check((select role from profiles where id = '00000000-0000-0000-0000-00000000a006') = 'vendor', 'approval activates the vendor role');
 select tt.check(exists (select 1 from vendor_profiles where id = '00000000-0000-0000-0000-00000000a006'), 'approval provisions vendor profile');
 select tt.check(exists (select 1 from application_notifications where source_id = '00000000-0000-0000-0000-0000000c0001' and status = 'pending'), 'approval queues approval email');

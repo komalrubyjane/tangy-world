@@ -83,7 +83,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
     : TABS;
 
   if (loading || !user) {
-    return <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">LOADING SPONSOR DASHBOARD...</div>;
+    return <div className="min-h-screen ui-texture text-[#E7D5A4] flex items-center justify-center font-mono text-xs">LOADING SPONSOR DASHBOARD...</div>;
   }
 
   return (
@@ -155,7 +155,7 @@ export const SponsorDashboard = ({ overrideProfile, readOnly, demoData } = {}) =
         !isApproved ? (
           <Empty>YOUR SPONSOR PROFILE UNLOCKS ONCE YOUR APPLICATION IS APPROVED.</Empty>
         ) : (
-          <form onSubmit={saveProfile} className="max-w-md bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C] flex flex-col gap-4 text-xs">
+          <form onSubmit={saveProfile} className="max-w-md bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-6 shadow-[4px_4px_0px_#11100C] flex flex-col gap-4 text-xs">
             <div>
               <label className="block text-[10px] font-bold uppercase mb-1">Organization</label>
               <input disabled={readOnly} value={profileForm.organization_name} onChange={(e) => { setProfileForm({ ...profileForm, organization_name: e.target.value }); setProfileMsg(''); }} className="w-full p-3 bg-[#F5E9C9] border-2 border-[#11100C] outline-none disabled:opacity-60" />

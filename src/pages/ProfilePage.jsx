@@ -157,7 +157,7 @@ export const ProfilePage = () => {
       <main className="pt-24 sm:pt-28 pb-20 px-4 sm:px-6 max-w-5xl mx-auto">
         {/* HEADER */}
         <Section delay={0}>
-          <div className="bg-[#4A171D] border-4 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] relative overflow-hidden">
+          <div className="bg-[#4A171D] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[4px_4px_0px_#11100C] relative overflow-hidden">
             <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-[#EFE2C0] text-[#11100C] rounded-full border-2 border-[#B94717] flex items-center justify-center">
                 <span className="font-condensed text-xl sm:text-2xl font-bold">{initials(displayName)}</span>
@@ -213,15 +213,15 @@ export const ProfilePage = () => {
         {!isAdmin && (
           <Section title="Activity" delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{bookings.length}</div>
               </div>
-              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{upcomingBookings.length}</div>
               </div>
-              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 shadow-[5px_5px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Past Sessions</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{pastBookings.length}</div>
               </div>
@@ -274,7 +274,7 @@ export const ProfilePage = () => {
         <Section title="Account" delay={0.15}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Edit profile */}
-            <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C]">
+            <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <h3 className="font-condensed text-base font-bold uppercase mb-3">Edit profile</h3>
               {!editing ? (
                 <button onClick={startEdit} className="w-full py-2.5 bg-[#181614] text-[#E7D5A4] hover:bg-[#B5532A] font-bold uppercase text-[10px] tracking-widest border-2 border-[#11100C]">

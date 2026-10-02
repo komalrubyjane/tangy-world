@@ -8,7 +8,7 @@ export const ArtistProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/artist/login');
+      navigate('/artist/login', { replace: true });
     }
   }, [user, loading, navigate]);
 

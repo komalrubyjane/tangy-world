@@ -1,15 +1,19 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
+import { CrewProfiles } from '../../components/crew/CrewProfiles';
 
 export const StageOperationsPage = () => {
+  usePageMeta({ title: 'Stage Operations', description: 'Heritage stage logistics at Tangy Sessions.' });
   return (
     <div className="min-h-screen bg-[#4A171D] text-[#ecdcaf] font-mono selection:bg-[#EFE2C0] selection:text-[#8a2320] overflow-x-hidden pt-16 pb-20 textileTexture">
       <Navbar />
 
       <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        <a href="/crew" className="font-mono text-[10px] text-[#ecdcaf]/70 tracking-widest uppercase hover:text-[#ecdcaf] transition-colors">← BACK TO CREW</a>
+        <PageCrumbs className="[&_ol]:justify-start" />
 
-        <div className="mt-6 mb-8 bg-[#EFE2C0] paperTexture text-[#191410] border-4 border-[#191410] p-6 sm:p-10 shadow-[10px_10px_0px_#191410] text-left">
+        <div className="mt-6 mb-8 bg-[#EFE2C0] paperTexture text-[#191410] border-2 border-[#191410] p-6 sm:p-10 shadow-[4px_4px_0px_#191410] text-left">
           <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase block mb-1">
             STAGE OPERATIONS
           </span>
@@ -34,12 +38,16 @@ export const StageOperationsPage = () => {
           </div>
         </div>
 
+        <CrewProfiles team="stage" title="MEET THE STAGE CREW" />
+
         <div className="text-center">
           <a href="/crew/apply" className="inline-block px-6 py-3 bg-[#B5532A] text-[#ecdcaf] font-mono text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#EFE2C0] hover:text-[#191410] border-2 border-[#ecdcaf] transition-colors shadow-[4px_4px_0px_#191410]">
             JOIN STAGE CREW →
           </a>
         </div>
       </main>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

@@ -130,7 +130,7 @@ export const InnerCirclePage = () => {
               )}
 
               <div
-                className="border-4 border-[#11100C] p-5 sm:p-6 h-full flex flex-col"
+                className="border-2 border-[#11100C] p-5 sm:p-6 h-full flex flex-col"
                 style={{
                   backgroundColor: tier.color,
                   color: tier.accent,
@@ -169,7 +169,7 @@ export const InnerCirclePage = () => {
         </div>
 
         {/* SIGNUP FORM */}
-        <div id="join" className="bg-[#181614] p-6 sm:p-12 border-4 border-[#C99A2E] max-w-2xl mx-auto">
+        <div id="join" className="bg-[#181614] p-6 sm:p-12 border-2 border-[#C99A2E] max-w-2xl mx-auto">
           {/* Masking tape decoration */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-[rgba(201,154,46,0.6)] rotate-[-1deg] border border-[#C99A2E]/40 pointer-events-none hidden sm:block" />
 
@@ -254,7 +254,7 @@ export const InnerCirclePage = () => {
               { quote: 'The physical ticket alone is worth it. I have all six framed on my wall.', member: 'STONE CIRCLE · 2022', name: 'Aakash N.' },
               { quote: 'The field tape recordings they send are unlike anything you will find publicly.', member: 'VINYL LISTENER · 2023', name: 'Meera S.' }
             ].map((t, i) => (
-              <div key={i} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-4 sm:p-6 shadow-[6px_6px_0px_#11100C]">
+              <div key={i} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C]">
                 <p className="font-body text-sm italic leading-relaxed mb-4 border-l-4 border-[#C99A2E] pl-3">
                   "{t.quote}"
                 </p>

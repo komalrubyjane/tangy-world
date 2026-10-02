@@ -22,6 +22,10 @@ delete from event_assignments where pg_temp.demo(id) or pg_temp.demo(event_id) o
 delete from event_artist_details where pg_temp.demo(event_id) or pg_temp.demo(artist_id);
 delete from event_artists where pg_temp.demo(event_id) or pg_temp.demo(artist_id);
 delete from announcements where pg_temp.demo(id) or pg_temp.demo(event_id);
+delete from programmes where pg_temp.demo(id);  -- programme_events cascade (0031)
+delete from application_reviews where pg_temp.demo(source_id);
+delete from artist_applications where pg_temp.demo(id) or pg_temp.demo(user_id);
+delete from assignment_requests where pg_temp.demo(id) or pg_temp.demo(session_id) or pg_temp.demo(artist_id);
 delete from gallery_albums where pg_temp.demo(id);
 delete from diary_posts where pg_temp.demo(id);
 delete from tv_videos where pg_temp.demo(id);

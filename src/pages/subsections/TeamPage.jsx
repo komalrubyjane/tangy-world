@@ -1,8 +1,11 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { Founders } from '../../components/sections/Founders';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const TeamPage = () => {
+  usePageMeta({ title: 'Tangy Team', description: 'The people behind Tangy Sessions.' });
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
@@ -12,7 +15,7 @@ export const TeamPage = () => {
           <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">TEAM</span>
         </div>
         <div className="relative z-10">
-          <a href="/about" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO ABOUT</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             ABOUT TANGY SESSIONS // PERSONNEL FILE
           </span>
@@ -44,7 +47,7 @@ export const TeamPage = () => {
           ].map((member) => (
             <div
               key={member.name}
-              className="relative bg-[#EFE2C0] paperTexture text-[#15120D] border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] p-6 pt-8 flex flex-col items-center text-center"
+              className="relative bg-[#EFE2C0] paperTexture text-[#15120D] border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] p-6 pt-8 flex flex-col items-center text-center"
             >
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#181614] text-[#EAD9A6] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24] whitespace-nowrap">
                 FILE {member.file}
@@ -63,11 +66,7 @@ export const TeamPage = () => {
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">
           CONTINUE READING
         </span>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/about/why-tangy" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">WHY TANGY →</a>
-          <a href="/about/chronology" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">CHRONOLOGY →</a>
-          <a href="/about/full-story" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">FULL STORY →</a>
-        </div>
+        <SectionNav section="About" />
       </section>
 
       <Footer />

@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAdminSession } from '../AdminSession';
 import { orIlike } from '../api';
 import { useServerTable, useDebounced } from '../hooks';
 import { P, EVENT_STATUSES, EVENT_STATUS_LABELS, eventPhase, localISODate } from '../rbac';
-import { Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Modal, fmt } from '../ui';
-import { EventForm, useVenueOptions } from '../components/EventForm';
+import { Page, Panel, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, fmt, useToast } from '../ui';
+import { useVenueOptions } from '../components/EventForm';
+import { EventEditor } from '../components/EventEditor';
 
 const WHEN = [
   { value: '', label: 'Any date' },
@@ -24,7 +25,6 @@ export default function EventsPage() {
   const venue = params.get('venue') || '';
   const [search, setSearch] = useState('');
   const q = useDebounced(search);
-  const creating = params.get('new') === '1' && can(P.EVENTS_MANAGE);
 
   const setParam = (k, v) => {
     const next = new URLSearchParams(params);
@@ -57,11 +57,12 @@ export default function EventsPage() {
     { key: 'price', header: 'Base price', align: 'right', mobileHidden: true, render: (e) => fmt.money(e.price) },
   ];
 
+  if (params.get('new') === '1') return <Navigate to="/admin-portal/events/new" replace />;
   return (
     <Page
       title="Events"
       subtitle="Every Tangy session — drafts, on sale, completed and cancelled."
-      actions={can(P.EVENTS_MANAGE) && <Button variant="primary" icon="Plus" onClick={() => setParam('new', '1')}>New event</Button>}
+      actions={can(P.EVENTS_MANAGE) && <Button variant="primary" icon="Plus" to="/admin-portal/events/new">New event</Button>}
     >
       <Panel flush>
         <div className="p-3 border-b border-[#C99A2E]/15">
@@ -74,14 +75,25 @@ export default function EventsPage() {
         </div>
         <DataTable columns={columns} rows={table.rows} loading={table.loading} error={table.error} onRetry={table.reload}
           onRowClick={(e) => navigate(`/admin-portal/events/${e.id}`)}
-          empty={{ title: 'No events yet', hint: status || when || venue || q ? 'No events match these filters.' : 'Create the first Tangy session.', icon: 'CalendarDays', action: can(P.EVENTS_MANAGE) && <Button size="sm" icon="Plus" onClick={() => setParam('new', '1')}>New event</Button> }} />
+          empty={{ title: 'No events yet', hint: status || when || venue || q ? 'No events match these filters.' : 'Create the first Tangy session.', icon: 'CalendarDays', action: can(P.EVENTS_MANAGE) && <Button size="sm" icon="Plus" to="/admin-portal/events/new">New event</Button> }} />
         <Pagination {...table} />
       </Panel>
-      {creating && (
-        <Modal title="Create event" wide onClose={() => setParam('new', '')}>
-          <EventForm onCancel={() => setParam('new', '')} onSaved={(evt) => navigate(`/admin-portal/events/${evt.id}`)} />
-        </Modal>
-      )}
+    </Page>
+  );
+}
+
+// /admin-portal/events/new — the event editor as its own page.
+export function EventCreatePage() {
+  const navigate = useNavigate();
+  const toast = useToast();
+  return (
+    <Page title="Create event" back={{ to: '/admin-portal/events', label: 'Events' }} crumbs={[{ label: 'Create event' }]}
+      subtitle="Basics, date, venue and artists — the line-up is checked against each artist's calendar.">
+      <EventEditor onCancel={() => navigate('/admin-portal/events')} onSaved={(evt, r) => {
+        if (r.lineupError) { toast(`Event created, but the line-up was not saved: ${r.lineupError}`, 'bad'); navigate(`/admin-portal/events/${evt.id}/artists`); return; }
+        toast(r.lineup ? `Event created with ${r.lineup} artist${r.lineup === 1 ? '' : 's'}` : 'Event created');
+        navigate(`/admin-portal/events/${evt.id}`);
+      }} />
     </Page>
   );
 }

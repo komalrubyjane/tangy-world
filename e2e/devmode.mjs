@@ -1,4 +1,3 @@
-import { sectionTab } from './lib.mjs';
 // Development-only role selector (src/admin/dev/). Needs two `vite` dev
 // servers against the LOCAL stack — see e2e/README.md:
 //   DEV_MOCK_BASE   no SUPABASE_SERVICE_ROLE_KEY  → mock-only identities
@@ -21,10 +20,10 @@ const EXPECT = {
   },
   admin: {
     label: 'Admin / Manager', heading: /good (morning|afternoon|evening)/i,
-    nav: ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers'],
-    hidden: ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'],
-    allowed: ['/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/attendees', '/admin-portal/reports', '/admin-portal/team'],
-    blocked: ['/admin-portal/users', '/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai'],
+    nav: ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Users & Roles'],
+    hidden: ['Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'],
+    allowed: ['/admin-portal/events', '/admin-portal/applications', '/admin-portal/bookings', '/admin-portal/attendees', '/admin-portal/reports', '/admin-portal/team', '/admin-portal/users'],
+    blocked: ['/admin-portal/audit', '/admin-portal/settings', '/admin-portal/ai'],
   },
   staff: {
     label: 'Staff', heading: /hello/i,
@@ -57,7 +56,7 @@ async function run(base, modeName) {
     check(await page.getByText(/Partner portals need a local Supabase session/).waitFor({ timeout: 10000 }).then(() => true, () => false), 'mock: partner portal refuses cleanly without a local session');
   } else {
     await page.waitForURL('**/artist/dashboard', { timeout: 15000 });
-    check(await sectionTab(page, 'Messages').waitFor({ timeout: 10000 }).then(() => true, () => false), 'local: artist portal opens with a real session');
+    check(await page.locator('[data-artist-dashboard]').waitFor({ timeout: 10000 }).then(() => true, () => false), 'local: artist portal opens with a real session');
     check(await page.getByText(/local test account/i).first().isVisible(), 'local: dev strip on the portal');
     await page.getByRole('button', { name: 'Change role' }).click();
     await page.waitForURL('**/admin-portal');

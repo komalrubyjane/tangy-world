@@ -22,8 +22,7 @@ export const DemoAdminLogin = () => {
   return (
     <div className="min-h-screen bg-[#11100C] flex items-center justify-center p-4 text-[#E7D5A4] font-mono">
       <div
-        className="w-full max-w-md bg-[#191410] border-2 border-[#C99A2E] p-8 rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative"
-        style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
+        className="w-full max-w-md bg-[#191410] t-quiet border-2 border-[#C99A2E] p-8 rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative"
       >
         <div className="absolute -top-3 left-1/3 w-24 h-5 bg-[rgba(201,154,46,0.4)] rotate-[-2deg] border border-[#C99A2E]/50 pointer-events-none" />
 

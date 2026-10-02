@@ -107,14 +107,19 @@
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
-    overflow-x: hidden;
-    overflow-y: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  #root { width: 100%; min-height: 100%; overflow-x: hidden; }
+  /* No sideways scrolling. The page scrolls on the viewport (html); body and
+     #root use clip, not hidden — hidden made them scroll containers that never
+     scroll, so every position: sticky inside (admin sidebar and top bar, the
+     session page's booking card) stopped sticking. */
+  html { overflow-x: hidden; }
+  body, #root { overflow-x: hidden; }
+  @supports (overflow-x: clip) { body, #root { overflow-x: clip; } }
+  #root { width: 100%; min-height: 100%; }
 
   h1, h2 { font-family: var(--font-display); font-weight: 400; }
   h3, h4 { font-family: var(--font-condensed); font-weight: 600; }
@@ -275,6 +280,23 @@
   .theme-collab { background-image: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 160px, 560px; }
   .theme-private, .theme-contact { background-image: url('/textures/grain-soft.webp'); background-size: 160px; }
 
+  /* The same printed grain + fibre as the public site, on the console and
+     portal dark (admin, artist portal, partner dashboards). Text colours are
+     unchanged, so contrast stays as before. */
+  .ui-texture { background-color: #11100C; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .ui-texture-deep { background-color: #141009; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+
+  /* Admin console: one material per section, from the site's own section
+     themes but on darker tints so the console's secondary text stays readable.
+     Chosen in AdminShell from the page's navigation group. */
+  .admin-bg-dashboard   { background-color: #1f0f10; background-image: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 160px, 420px; }
+  .admin-bg-operate     { background-color: #1a1310; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .admin-bg-people      { background-color: #171a12; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .admin-bg-communicate { background-color: #121812; background-image: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 160px, 560px; }
+  .admin-bg-insight     { background-color: #11171d; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 160px, 720px; }
+  .admin-bg-system      { background-color: #131211; background-image: url('/textures/grain-soft.webp'); background-size: 160px; }
+  .admin-bg-more        { background-color: #18120f; background-image: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp'); background-size: 160px, 720px; }
+
   /* Section accent helpers */
   .sec-accent { color: var(--sec-accent); }
   .sec-accent-2 { color: var(--sec-accent-2); }
@@ -288,6 +310,59 @@
     border: 1px solid rgba(24, 22, 20, 0.8);
     box-shadow: var(--shadow-print-soft);
   }
+  /* ── BACKGROUND TIERS ──────────────────────────────────────────────
+     One family of baked textures, used at different strengths so pages
+     don't all look alike and texture never competes with content:
+       1. Feature   .theme-* (homepage chapters) — full material (textile,
+                    botanical, fibres) as the page's identity.
+       2. Page      .printNoise / .paperTexture — grain + fine fibres, for
+                    interior pages (sessions, archive, apply, portals).
+       3. Reading   .t-quiet — grain only, for long-form and forms
+                    (diary posts, legal pages, FAQ, contact, 404).
+       4. Console   flat colour (admin / check-in) — no texture.
+       5. Surface   .surface-modal / .paper-surface — paper laid on top:
+                    modals, cards, documents.
+     The retired /noise.png multiply layer (dark blotches) is not used. */
+  .t-quiet { background-image: url('/textures/grain-soft.webp'); background-size: 160px; }
+
+  /* A modal's paper: one sheet, soft grain only, a single ink rule and the
+     standard print shadow. */
+  .surface-modal {
+    background-color: #f2e7cb;
+    background-image: url('/textures/grain-soft.webp');
+    background-size: 160px;
+    color: var(--color-tangy-ink);
+    border: 1px solid var(--color-tangy-ink);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-print);
+  }
+
+  /* A choice card (Membership Desk, /join): quiet paper, a fine rule, the
+     print shadow on hover/focus. */
+  .t-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    text-align: left;
+    padding: 1rem;
+    min-height: 44px;
+    background: #f8f0db;
+    color: var(--color-tangy-ink);
+    border: 1px solid rgba(24, 22, 20, 0.35);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-print-soft);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, translate 0.2s ease, background-color 0.2s ease;
+  }
+  .t-choice:hover,
+  .t-choice:focus-visible {
+    border-color: var(--color-tangy-ink);
+    box-shadow: var(--shadow-print);
+    translate: 0 -2px;
+    background: #fbf5e6;
+  }
+  .t-choice:focus-visible { outline: 2px solid var(--color-tangy-clay); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .t-choice:hover, .t-choice:focus-visible { translate: none; } }
+
   .paper-surface-dark {
     background: #1d1916;
     border: 1px solid rgba(200, 157, 53, 0.35);

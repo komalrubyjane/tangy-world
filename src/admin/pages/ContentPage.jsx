@@ -11,7 +11,7 @@ import {
   Skeleton, EmptyState, ErrorState, fmt, useToast,
 } from '../ui';
 import { AnnouncementsManager } from '../components/Announcements';
-import { TvManager, DiaryManager, GalleryManager } from '../components/ContentCollections';
+import { TvManager, DiaryManager, GalleryManager, ProgrammesManager } from '../components/ContentCollections';
 import { EventForm } from '../components/EventForm';
 import { MediaLibrary } from '../components/MediaLibrary';
 import { ENTITIES, EntityDrawer } from './PeoplePage';
@@ -28,6 +28,7 @@ const SECTIONS = [
   { id: 'artists', label: 'Artists', icon: 'Mic', anyOf: [P.ENTITIES, P.CONTENT_VIEW], hint: 'Public artist pages (/artists/…).' },
   { id: 'gallery', label: 'Gallery', icon: 'Image', requires: [P.CONTENT_VIEW, P.CONTENT_MEDIA], hint: 'Albums and photos on /gallery.' },
   { id: 'tv', label: 'Tangy TV', icon: 'Tv', requires: [P.CONTENT_VIEW, P.CONTENT_TV], hint: 'Videos on /tv and the retro TV set.' },
+  { id: 'programmes', label: 'Programmes', icon: 'ScrollText', requires: [P.CONTENT_VIEW, P.CONTENT_SESSIONS], hint: 'Seasons and series on /archive/programmes.' },
   { id: 'diary', label: 'Diary', icon: 'ScrollText', requires: [P.CONTENT_VIEW, P.CONTENT_DIARY], hint: 'Stories and field notes on /diary.' },
   { id: 'announcements', label: 'Announcements', icon: 'Megaphone', requires: P.CONTENT, hint: 'Website pop-ups and team notices.' },
   { id: 'media', label: 'Media library', icon: 'Paperclip', requires: [P.CONTENT_VIEW, P.CONTENT_MEDIA], hint: 'Every file uploaded for content.' },
@@ -248,6 +249,7 @@ const ArtistDetail = ({ itemRef }) => {
 const COLLECTION = {
   tv: { Manager: TvManager, label: 'Tangy TV', noun: 'video', area: 'tv', subtitle: 'Videos on /tv. Those marked "plays on the TV set" run on the retro TV.' },
   diary: { Manager: DiaryManager, label: 'Diary', noun: 'post', area: 'diary', subtitle: 'Stories and field notes on /diary. Drafts are never public.' },
+  programmes: { Manager: ProgrammesManager, label: 'Programmes', noun: 'programme', area: 'sessions', subtitle: 'Seasons and series on /archive/programmes, with the sessions in each.' },
   gallery: { Manager: GalleryManager, label: 'Gallery', noun: 'album', area: 'media', subtitle: 'Albums on /gallery. Photos need alt text.' },
 };
 

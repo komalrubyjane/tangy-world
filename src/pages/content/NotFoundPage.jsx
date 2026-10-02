@@ -8,7 +8,7 @@ import { usePageMeta } from '../../hooks/usePageMeta';
 export const NotFoundPage = ({ what = 'page', back = { to: '/', label: 'Go to the home page' } }) => {
   usePageMeta({ title: 'Not found', noindex: true });
   return (
-    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono flex flex-col printNoise">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body flex flex-col t-quiet">
       <Navbar />
       <main className="flex-1 flex flex-col items-center justify-center text-center gap-5 px-4 pt-28 pb-16" data-not-found>
         <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold">404</span>

@@ -80,7 +80,7 @@ export const VenueHostApplyPage = () => {
       </section>
 
       <section className="py-20 max-w-4xl mx-auto px-6">
-        <div className="bg-[#EFE2C0] paperTexture text-[#17120D] p-8 md:p-14 border-4 border-[#17120D] shadow-[20px_20px_0px_#17120D]">
+        <div className="bg-[#EFE2C0] paperTexture text-[#17120D] p-8 md:p-14 border-2 border-[#17120D] shadow-[4px_4px_0px_#17120D]">
 
           <div className="flex justify-between items-center font-mono text-xs font-bold text-[#C69A32] border-b-2 border-[#17120D] pb-3 mb-6 uppercase">
             <span>FILE NO. VENUE-1974</span>

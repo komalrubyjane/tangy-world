@@ -98,7 +98,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
       <div onClick={handleClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* 1970s CASSETTE TAPE DECK PLAYER */}
-      <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-4 border-[#d1a437] p-6 shadow-[12px_12px_0px_#4c1210] flex flex-col gap-6 z-10 overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-2 border-[#d1a437] p-6 shadow-[4px_4px_0px_#4c1210] flex flex-col gap-6 z-10 overflow-hidden">
         
         {/* TOP HEADER */}
         <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-3">
@@ -119,7 +119,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
           
           {/* TAPE REELS */}
           <div className="w-full flex justify-around items-center py-3">
-            <div className={`w-20 h-20 rounded-full border-4 border-[#ecdcaf]/50 flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
+            <div className={`w-20 h-20 rounded-full border-2 border-[#ecdcaf]/50 flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
               <div className="w-8 h-8 rounded-full bg-[#d1a437]/30 border-2 border-[#d1a437]" />
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[#ecdcaf]/60" />
             </div>
@@ -131,7 +131,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
               <span className="font-mono text-[10px] text-[#c2272a] font-bold mt-1 truncate max-w-[200px]">{selectedTrack.title}</span>
             </div>
 
-            <div className={`w-20 h-20 rounded-full border-4 border-[#ecdcaf]/50 flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
+            <div className={`w-20 h-20 rounded-full border-2 border-[#ecdcaf]/50 flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
               <div className="w-8 h-8 rounded-full bg-[#d1a437]/30 border-2 border-[#d1a437]" />
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[#ecdcaf]/60" />
             </div>

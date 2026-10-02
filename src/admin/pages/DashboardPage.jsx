@@ -287,7 +287,7 @@ const TodayPanel = ({ today }) => (
 const UpcomingPanel = ({ upcoming }) => (
   <Panel title="Upcoming (next 30 days)" actions={<Button size="sm" variant="ghost" to="/admin-portal/events">All events</Button>} flush>
     {upcoming.length === 0 ? (
-      <EmptyState icon="CalendarDays" title="No upcoming events" hint="Create an event to start selling tickets." action={<Button size="sm" to="/admin-portal/events?new=1" icon="Plus">Create event</Button>} />
+      <EmptyState icon="CalendarDays" title="No upcoming events" hint="Create an event to start selling tickets." action={<Button size="sm" to="/admin-portal/events/new" icon="Plus">Create event</Button>} />
     ) : (
       <ul className="divide-y divide-[#E7D5A4]/[0.06]">
         {upcoming.map((e) => {
@@ -329,13 +329,13 @@ const OPS_ATTENTION = [
 
 const QuickActions = ({ can }) => {
   const actions = [
-    [P.EVENTS_MANAGE, 'Create event', '/admin-portal/events?new=1', 'Plus'],
+    [P.EVENTS_MANAGE, 'Create event', '/admin-portal/events/new', 'Plus'],
     [P.ENTITIES, 'Add artist', '/admin-portal/people/artists?new=1', 'Mic'],
     [P.APPLICATIONS_REVIEW, 'Review applications', '/admin-portal/applications?status=pending', 'Inbox'],
     [P.CONTENT, 'Send announcement', '/admin-portal/content?new=1', 'Megaphone'],
     [P.CHECKIN, 'Open check-in', '/check-in', 'ScanLine'],
     [P.EVENTS_MANAGE, 'Create requirement', '/admin-portal/events', 'ClipboardList'],
-    [P.USERS_MANAGE, 'Invite staff', '/admin-portal/users?invite=1', 'UserPlus'],
+    [P.STAFF_INVITE, 'Invite staff', '/admin-portal/users?invite=1', 'UserPlus'],
     [P.MESSAGES, 'Open messages', '/admin-portal/messages', 'MessagesSquare'],
   ].filter(([perm]) => can(perm));
   return (
@@ -347,6 +347,34 @@ const QuickActions = ({ can }) => {
           </Link>
         ))}
       </div>
+    </Panel>
+  );
+};
+
+// Today at a glance for artists — artist_day_summary (0034).
+const ArtistsTodayPanel = () => {
+  const day = localISODate();
+  const q = useAsync(async () => {
+    const { data, error } = await supabase.rpc('artist_day_summary', { p_date: day });
+    if (error) throw error;
+    return data;
+  }, []);
+  const d = q.data;
+  return (
+    <Panel title="Today · artists" subtitle="From the event line-ups and each artist's calendar.">
+      <AsyncBlock loading={q.loading} error={q.error} onRetry={q.reload}>
+        <div className="grid grid-cols-2 gap-2" data-artist-today>
+          <StatTile label="Sessions" value={d?.sessions} to="/admin-portal/events?when=today" />
+          <StatTile label="Artists booked" value={d?.artists_booked} to={`/admin-portal/calendar?day=${day}`} />
+          <StatTile label="Artists available" value={d?.artists_available} to={`/admin-portal/calendar?day=${day}`} tone="good" />
+          <StatTile label="Pending requests" value={d?.pending_requests} tone={d?.pending_requests ? 'warn' : undefined} to="/admin-portal/calendar" />
+        </div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Button size="sm" icon="Plus" to="/admin-portal/events/new">Create event</Button>
+          <Button size="sm" icon="CalendarDays" to={`/admin-portal/calendar?day=${day}`}>Find available artists</Button>
+          <Button size="sm" icon="Send" to="/admin-portal/events?when=upcoming">Send artist request</Button>
+        </div>
+      </AsyncBlock>
     </Panel>
   );
 };
@@ -377,7 +405,7 @@ const OrgDashboard = ({ superAdmin }) => {
       subtitle={<span data-ops-status>{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })} · {superAdmin ? 'Super Admin' : ROLE_LABELS[user?.role]} · {status}</span>}
       actions={
         <>
-          {can(P.EVENTS_MANAGE) && <Button icon="Plus" to="/admin-portal/events?new=1">New event</Button>}
+          {can(P.EVENTS_MANAGE) && <Button icon="Plus" to="/admin-portal/events/new">New event</Button>}
           {can(P.APPLICATIONS_REVIEW) && <Button variant="primary" icon="Inbox" to="/admin-portal/applications?status=pending">Review applications</Button>}
         </>
       }
@@ -405,6 +433,7 @@ const OrgDashboard = ({ superAdmin }) => {
           {superAdmin ? <RecentActivityPanel /> : <RecentBookingsPanel />}
         </div>
         <div className="flex flex-col gap-4 min-w-0">
+          {can(P.EVENTS_MANAGE) && <ArtistsTodayPanel />}
           <AttentionPanel summary={s} loading={loading} error={error} reload={reload} extra={extra} />
           <QuickActions can={can} />
           <PeoplePanel summary={s} />
@@ -449,7 +478,11 @@ const StaffDashboard = () => {
     <Page
       title={`Hello${user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}`}
       subtitle={todays.length ? `You're working ${todays.length === 1 ? todays[0].name : `${todays.length} events`} today.` : 'No event on your schedule today.'}
-      actions={<Button variant="primary" size="lg" icon="ScanLine" to="/check-in">Open QR check-in</Button>}
+      actions={<>
+        {/* Volunteer access is applied for per session and approved by an admin; it never changes the staff role. */}
+        <Button variant="ghost" size="lg" icon="HeartHandshake" to="/volunteer/apply">Volunteer at a session</Button>
+        <Button variant="primary" size="lg" icon="ScanLine" to="/check-in">Open QR check-in</Button>
+      </>}
     >
       <Grid cols={3}>
         <StatTile label="Assigned events" value={loading ? '…' : events.length} sub="From yesterday onward" to="/admin-portal/my-events" />

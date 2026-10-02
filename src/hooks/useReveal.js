@@ -34,6 +34,18 @@ export function useReveal(rescanKey) {
     );
     targets.forEach((el) => { if (!el.classList.contains('is-visible')) io.observe(el); });
 
+    // Reveal elements rendered later (data that arrives after mount) are
+    // observed too, so they can never be stuck at the hidden starting state.
+    const mo = new MutationObserver((records) => {
+      records.forEach((r) => r.addedNodes.forEach((node) => {
+        if (node.nodeType !== 1) return;
+        const found = node.matches(REVEAL_SELECTOR) ? [node] : [];
+        node.querySelectorAll(REVEAL_SELECTOR).forEach((el) => found.push(el));
+        found.forEach((el) => { if (!el.classList.contains('is-visible')) io.observe(el); });
+      }));
+    });
+    mo.observe(root, { childList: true, subtree: true });
+
     const rootIo = new IntersectionObserver(([entry]) => {
       root.classList.toggle('in-view', entry.isIntersecting);
     });
@@ -41,6 +53,7 @@ export function useReveal(rescanKey) {
 
     return () => {
       io.disconnect();
+      mo.disconnect();
       rootIo.disconnect();
     };
   }, [rescanKey]);

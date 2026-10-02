@@ -1,4 +1,4 @@
-import { useEvents } from '../../hooks/useEvents';
+import { useEvents, isUpcomingEvent } from '../../hooks/useEvents';
 import { useAudio } from '../../audio/AudioContext';
 import { useReveal } from '../../hooks/useReveal';
 import { PosterEventCard } from '../ui/PosterEventCard';
@@ -12,8 +12,10 @@ const TABLE_ANGLES = ['-0.9deg', '0.6deg', '-0.4deg'];
 export const UpcomingEvents = ({ onSelectBooking }) => {
   const { playSFX } = useAudio();
   const { events: allEvents, loading } = useEvents();
-  const events = allEvents.filter((e) => e.dbStatus !== 'past').slice(0, 3);
-  const sectionRef = useReveal();
+  const events = allEvents.filter(isUpcomingEvent).slice(0, 3);
+  // The cards arrive after the section mounts (they come from the database), so
+  // re-scan when they do — otherwise they stay at the reveal's opacity 0.
+  const sectionRef = useReveal(events.map((e) => e.id).join(','));
 
   const handleBookClick = (event) => {
     playSFX('ticketClick');

@@ -609,7 +609,7 @@ export const TangyDiary = () => {
           Every Tangy Session leaves another page waiting to be written.
         </p>
         <a
-          href="/blogs"
+          href="/diary"
           className="t-btn t-btn-light"
         >
           Read the Complete Tangy Diary →

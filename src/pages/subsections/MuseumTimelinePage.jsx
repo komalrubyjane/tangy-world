@@ -1,15 +1,18 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { museumTimeline } from '../../data/mock/archive';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const MuseumTimelinePage = () => {
+  usePageMeta({ title: 'Museum Timeline', description: 'The Tangy Sessions story as a museum timeline.' });
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/archive" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO ARCHIVE</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             ARCHIVAL CHRONOLOGY
           </span>
@@ -27,7 +30,7 @@ export const MuseumTimelinePage = () => {
           {museumTimeline.map((m, i) => (
             <div key={i} className="relative">
               <div className="absolute -left-[31px] sm:-left-[47px] top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#C89D35] border-2 border-[#11100C]" />
-              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] p-4 sm:p-6 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[8px_8px_0px_#11100C]">
+              <div className="bg-[#EFE2C0] paperTexture text-[#11100C] p-4 sm:p-6 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-xs font-bold text-[#B94717] block mb-1">{m.year}</span>
                 <h3 className="display text-xl sm:text-3xl text-[#11100C] mb-2">{m.title}</h3>
                 <p className="font-mono text-[10px] sm:text-xs text-[#11100C]/80 leading-relaxed">{m.description}</p>
@@ -39,11 +42,7 @@ export const MuseumTimelinePage = () => {
 
       <section className="py-12 sm:py-16 bg-[#211915] printNoise border-t-8 border-[#11100C] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase font-bold block mb-4">EXPLORE MORE OF THE ARCHIVE</span>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/archive/session-archive" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">SESSION ARCHIVE →</a>
-          <a href="/archive/past-memories" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">PAST MEMORIES →</a>
-          <a href="/archive/contact-sheets" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#C99A2E]/60 text-[#C99A2E] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">CONTACT SHEETS →</a>
-        </div>
+        <SectionNav section="Archive" />
       </section>
 
       <Footer />

@@ -13,7 +13,7 @@ import { DevRoleSelector } from './dev/DevRoleSelector';
 export const SIGNOUT_REASON_KEY = 'tangy_admin_signout_reason';
 
 const Screen = ({ children }) => (
-  <div data-lenis-prevent className="min-h-[100dvh] bg-[#11100C] text-[#E7D5A4] flex items-center justify-center p-4 font-sans">
+  <div data-lenis-prevent className="min-h-[100dvh] ui-texture text-[#E7D5A4] flex items-center justify-center p-4 font-sans">
     {children}
   </div>
 );

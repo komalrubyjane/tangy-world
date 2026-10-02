@@ -1,13 +1,15 @@
-import { launch, otpLogin, shot, check, api, BASE, sectionTab } from './lib.mjs';
+import { execFileSync } from 'node:child_process';
+import { launch, otpLogin, shot, check, api, BASE } from './lib.mjs';
 
-// Partner workspaces from 0020: the artist workspace (dashboard, calendar,
-// availability, booking requests, media with signed-URL preview, settings and
+// Partner workspaces: the Artist Portal (dashboard, requests, calendar,
+// availability, profile, media with signed-URL preview, settings and
 // notification preferences), sponsor / vendor / venue host portals (events,
 // deliverables, brand assets, requirements, logistics, payments,
 // notifications, messages) and the storage / document / message isolation
 // between them. Every account signs in through the real Email OTP flow and
 // every fixture is created through the admin UI the way the team would.
 
+const sql = (q) => execFileSync('docker', ['exec', process.env.DB_CONTAINER || 'supabase_db_localstack', 'psql', '-U', 'postgres', '-d', 'postgres', '-Atc', q]).toString().trim();
 const text = async (page, sel = 'body') => (await page.locator(sel).first().innerText()).replace(/\s+/g, ' ');
 const until = (p, ms = 12000) => p.waitFor({ timeout: ms }).then(() => true, () => false);
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -52,20 +54,22 @@ const ev5 = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-5-local&s
 const ev6 = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-6-local&select=id,event_date')).data?.[0];
 
 // ================================================================ ARTIST
+// The Artist Portal (0033): its own shell and one page per section.
 // ---------------------------------------------------------------- dashboard
 {
   const p = artist.page;
-  check(await until(p.getByText('YOUR TANGY SESSIONS WORKSPACE')), 'artist dashboard: workspace header');
-  const stats = await text(p, 'main');
-  check(/UPCOMING SHOWS\s*1\b/.test(stats), `artist dashboard: 1 upcoming show (Vol. 5 today) (${stats.match(/UPCOMING SHOWS\s*\S+/)?.[0]})`);
-  check(await until(p.getByText(/PROFILE COMPLETE\s*\d+%/)), 'artist dashboard: server-computed profile completion');
-  const tabs = await text(p, 'section[aria-label="Artist workspace"] nav[aria-label="Sections"]');
-  check(['Overview', 'My performances', 'Schedule', 'Requirements', 'Messages', 'Documents', 'Payments', 'Notifications'].every((t) => tabs.toLowerCase().includes(t.toLowerCase())), `artist workspace tabs are complete (${tabs})`);
-  check(await until(p.getByRole('region', { name: 'Next event' }).getByText('Tangy Sessions Vol. 5')), 'artist overview: next event is the confirmed performance');
+  const dash = p.locator('[data-artist-dashboard]');
+  check(await until(dash), 'artist dashboard opens in the portal shell');
+  check(await p.locator('[data-nav-section]').count() === 0, 'the portal has its own navigation, not the site Navbar');
+  check(await until(dash.locator('[data-next-session]').getByText('Tangy Sessions Vol. 5')), 'artist dashboard: next session is the confirmed performance');
+  check(await until(dash.locator('[data-profile-completion]').getByText(/^\d+%$/)), 'artist dashboard: server-computed profile completion');
+  const nav = await text(p, 'nav[aria-label="Artist portal"]');
+  check(['Dashboard', 'Sessions', 'Calendar', 'Requests', 'Availability', 'Media', 'Messages', 'Notifications', 'Profile', 'Documents', 'Settings'].every((t) => nav.includes(t)), `artist portal navigation is complete (${nav})`);
   await shot(p, 'w01-artist-dashboard');
 }
 
 // ---------------------------------------------------------------- booking request flow
+let reqId;
 {
   const p = admin.page;
   await p.goto(`${BASE}/admin-portal/events/${ev6.id}?tab=artists`);
@@ -78,21 +82,24 @@ const ev6 = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-6-local&s
   await p.getByLabel('Message to artist').fill('Closing set for Vol. 6?');
   await p.getByRole('button', { name: 'Send request' }).click();
   check(await until(p.getByText('Request sent — the artist answers from their portal')), 'admin sends a booking request for Vol. 6');
+  reqId = sql(`select id from assignment_requests where session_id = '${ev6.id}' order by created_at desc limit 1`);
 }
 {
   const p = artist.page;
-  await p.goto(BASE + '/artist/dashboard?tab=notifications');
-  check(await until(p.locator('[data-notifications]').getByText('Booking request: Tangy Sessions Vol. 6')), 'artist is notified of the booking request');
+  await p.goto(BASE + '/artist/notifications');
+  check(await until(p.locator('[data-notifications]').getByText('New session request: Tangy Sessions Vol. 6')), 'artist is notified of the booking request');
   await p.goto(BASE + '/artist/requests');
-  const req = p.locator('[data-request="Tangy Sessions Vol. 6"]');
+  const req = p.locator(`[data-request="${reqId}"]`);
   check(await until(req), 'artist requests page lists the request');
-  const t = await text(p, '[data-request="Tangy Sessions Vol. 6"]');
-  check(/Awaiting your reply/i.test(t) && /15,000/.test(t) && /Closing set for Vol\. 6\?/i.test(t), `request shows status, fee offer and message (${t.slice(0, 200)})`);
-  check(/Pending \(1\)/i.test(await text(p, '[aria-label="Filter requests"]')), 'pending filter count = 1');
+  const t = await text(p, `[data-request="${reqId}"]`);
+  check(/Tangy Sessions Vol\. 6/i.test(t) && /15,000/.test(t), `request shows the session and fee offer (${t.slice(0, 200)})`);
+  check(/Waiting for your answer \(1\)/i.test(await text(p, 'main')), 'one request waiting for an answer');
+  await req.click();
+  check(await until(p.locator(`[data-request-page="${reqId}"]`).getByText('Closing set for Vol. 6?')), 'request page shows the message');
   await shot(p, 'w02-artist-request');
-  await req.getByRole('button', { name: 'Accept' }).click();
-  check(await until(p.getByText('Accepted — Tangy Sessions Vol. 6 is on your calendar.')), 'artist accepts the request');
-  check(await until(req.getByText('Accepted', { exact: true })), 'accepted request stays in the history');
+  await p.getByRole('button', { name: 'Accept' }).click();
+  check(await until(p.getByText(/Accepted — the session is now in your calendar/)), 'artist accepts the request');
+  check(await until(p.locator(`[data-request-page="${reqId}"]`).getByText('Accepted', { exact: true }).first()), 'accepted request keeps its history');
 }
 {
   const p = admin.page;
@@ -108,53 +115,57 @@ const ev6 = (await api(admin.page, 'GET', '/rest/v1/events?slug=eq.vol-6-local&s
 {
   const p = artist.page;
   await p.goto(BASE + '/artist/calendar');
-  const cal = p.locator('[data-artist-calendar]');
-  check(await until(cal.locator('.fc-daygrid')), 'calendar opens in month view on desktop');
-  check(await until(cal.locator('.fc-event', { hasText: 'Tangy Sessions Vol. 5' }).first()), 'month view shows the confirmed performance');
-  const title0 = await text(p, '[data-artist-calendar] h2');
-  await p.getByRole('tab', { name: 'Week' }).click();
-  check(await until(cal.locator('.fc-timegrid')) && (await text(p, '[data-artist-calendar] h2')) !== title0, 'week view renders with its own range title');
-  await p.getByRole('tab', { name: 'Agenda' }).click();
-  check(await until(cal.locator('.fc-list')), 'agenda view renders');
-  // Vol. 6 (accepted above) may fall in next month.
-  if (!(await cal.locator('.fc-list').innerText()).includes('Tangy Sessions Vol. 6')) await p.getByRole('button', { name: 'Next' }).click();
-  check(await until(cal.getByText(/Tangy Sessions Vol\. 6/).first()), 'accepted request now appears as a performance');
-  await p.getByRole('tab', { name: 'Month' }).click();
-  await p.getByRole('button', { name: 'Today' }).click();
+  check(await until(p.locator('[data-calendar-view="month"]')), 'calendar opens in month view');
+  check(await until(p.locator('[data-cal-entry="confirmed"]').filter({ hasText: 'Tangy Sessions Vol. 5' }).first()), 'month view shows the confirmed performance');
+  const title0 = await text(p, 'main h2');
+  await p.getByRole('button', { name: 'week', exact: true }).click();
+  check(await until(p.locator('[data-calendar-view="week"]')) && /view=week/.test(p.url()) && (await text(p, 'main h2')) !== title0, 'week view renders with its own range title (in the URL)');
+  await p.getByRole('button', { name: 'agenda', exact: true }).click();
+  check(await until(p.locator('[data-calendar-view="agenda"]').locator('[data-cal-entry="confirmed"]').filter({ hasText: 'Tangy Sessions Vol. 6' })), 'agenda shows the accepted request as a performance');
+  check(await p.getByRole('button', { name: 'Export performances (.ics)' }).isEnabled(), 'calendar export is available for upcoming performances');
+  const download = p.waitForEvent('download', { timeout: 8000 }).catch(() => null);
+  await p.getByRole('button', { name: 'Export performances (.ics)' }).click();
+  const dl = await download;
+  check(dl?.suggestedFilename() === 'tangy-performances.ics', 'the .ics export downloads');
+  // Confirmed performance → its session page with the private details.
+  await p.locator('[data-cal-entry="confirmed"]').filter({ hasText: 'Tangy Sessions Vol. 5' }).first().click();
+  check(await until(p.locator(`[data-artist-session-page="${ev5}"]`)) && await until(p.getByText('Requirements & hospitality')), 'a performance opens its session page');
+  await shot(p, 'w03-artist-session');
 
-  // Availability on a free day in view (+3 days is always inside the 6-week grid).
+  // Availability on a free day (+3) — always in this or next month.
+  await p.goto(BASE + '/artist/availability');
   const free = iso(addDays(3));
-  await p.getByRole('button', { name: 'Unavailable', exact: true }).click();
-  await cal.locator(`td.fc-daygrid-day[data-date="${free}"]`).click();
-  check(await until(p.getByRole('status').getByText(`${free} marked unavailable.`)), 'artist marks a day unavailable');
+  const day = (k) => p.locator(`[data-availability-grid] [data-day="${k}"]`);
+  if (!(await until(day(free), 5000)) || (await day(free).evaluate((el) => el.className.includes('opacity-40')))) await p.getByRole('button', { name: 'Next month' }).click();
+  await day(free).click();
+  await p.getByLabel('Status').selectOption('unavailable');
+  await p.getByRole('button', { name: 'Save', exact: true }).click();
+  check(await until(p.getByRole('status').getByText('Saved 1 day as unavailable.')), 'artist marks a day unavailable');
   const row = await api(p, 'GET', `/rest/v1/artist_availability?date=eq.${free}&select=status`);
   check(row.data?.[0]?.status === 'unavailable', 'availability stored server-side');
-  check(await until(cal.locator(`td[data-date="${free}"] .tc-avail-unavailable`)), 'calendar shades the unavailable day');
-  // A day with a confirmed performance can't be overwritten.
-  await cal.locator(`td.fc-daygrid-day[data-date="${iso(new Date())}"]`).click({ position: { x: 5, y: 5 } });
-  check(await until(p.getByRole('status').getByText('That date has a confirmed performance — it stays booked.')), 'booked date is protected');
-  await p.getByRole('button', { name: 'Clear', exact: true }).click();
-  await cal.locator(`td.fc-daygrid-day[data-date="${free}"]`).click();
-  check(await until(p.getByRole('status').getByText(`Cleared ${free}.`)), 'artist clears availability');
-
-  // Confirmed performance → event drawer with private details.
-  await cal.locator('.fc-event', { hasText: 'Tangy Sessions Vol. 5' }).first().click();
-  const drawer = p.getByRole('dialog').last();
-  check(await until(drawer.getByText('Your schedule', { exact: true })) && await until(drawer.getByText('Hospitality', { exact: true })), 'performance opens the artist event drawer');
-  await shot(p, 'w03-artist-calendar-drawer');
-  await p.keyboard.press('Escape');
-  check(await p.getByRole('button', { name: 'Export performances (.ics)' }).isEnabled(), 'calendar export is available for upcoming performances');
+  check(await until(p.locator(`[data-day="${free}"][data-status="unavailable"]`)), 'the grid shades the unavailable day');
+  // A day with a confirmed performance keeps its booking.
+  await p.goto(BASE + '/artist/availability');
+  const today = iso(new Date());
+  await day(today).click();
+  await p.getByLabel('Status').selectOption('unavailable');
+  await p.getByRole('button', { name: 'Save', exact: true }).click();
+  check(await until(p.getByRole('status').getByText(/1 booked day kept/)), 'booked date is protected');
+  if (!(await until(day(free), 3000)) || (await day(free).evaluate((el) => el.className.includes('opacity-40')))) await p.getByRole('button', { name: 'Next month' }).click();
+  await day(free).click();
+  await p.getByRole('button', { name: 'Clear these dates' }).click();
+  check(await until(p.getByRole('status').getByText('Cleared 1 day.')), 'artist clears availability');
 }
 
 // ---------------------------------------------------------------- profile (public vs private) + avatar
 {
   const p = artist.page;
   await p.goto(BASE + '/artist/profile');
-  check(await until(p.getByRole('tab', { name: 'Identity' })), 'profile editor opens');
+  check(await until(p.getByLabel('Stage name')), 'profile editor opens (one page, no tab row)');
+  check(await p.getByRole('tab').count() === 0, 'the profile has no tab row');
   await p.getByLabel('Stage name').fill('Aria of the Stepwell');
-  await p.getByLabel('Phone').fill('+91 90000 00001');
-  await p.getByRole('tab', { name: 'Performance' }).click();
-  await p.getByLabel('Technical rider').fill('E2E rider: 2 vocal mics, harmonium DI');
+  await p.getByRole('textbox', { name: /^Phone/ }).fill('+91 90000 00001');
+  await p.getByLabel('Technical rider', { exact: true }).fill('E2E rider: 2 vocal mics, harmonium DI');
   await p.getByRole('button', { name: 'Save profile' }).click();
   check(await until(p.getByRole('status').getByText('Profile saved.')), 'artist saves public + private profile sections');
   const [pub, priv] = await Promise.all([
@@ -202,7 +213,7 @@ let mediaPath;
   check(await until(p.getByRole('heading', { name: 'Media' })), 'media page opens');
   await p.locator('[data-media-input]').setInputFiles(file('e2e-press-photo.png'));
   const dlg = p.getByRole('dialog').last();
-  check(await dlg.getByLabel('Type').inputValue() === 'image', 'media type detected from the file (image → Photo)');
+  check(await dlg.locator('select').first().inputValue() === 'image', 'media type detected from the file (image → Photo)');
   await dlg.getByLabel('Title').fill('E2E Press photo');
   await dlg.getByLabel('Submit to Tangy for review now').uncheck();
   await dlg.getByRole('button', { name: 'Upload' }).click();
@@ -212,12 +223,13 @@ let mediaPath;
   mediaPath = (await api(p, 'GET', '/rest/v1/artist_media?title=eq.E2E%20Press%20photo&select=storage_path')).data?.[0]?.storage_path;
   check(!!mediaPath && mediaPath.includes('e2e-press-photo.png'), 'media row points at the private object');
 
+  const filters = p.getByRole('group', { name: 'Filter media' });
   await item.getByRole('button', { name: 'Archive' }).click();
   check(await until(p.getByText('Archived.', { exact: true })), 'artist archives media');
-  await p.getByRole('tab', { name: /Archived/ }).click();
+  await filters.getByRole('button', { name: /^Archived/ }).click();
   await item.getByRole('button', { name: 'Restore' }).click();
   check(await until(p.getByText('Restored.', { exact: true })), 'artist restores media');
-  await p.getByRole('tab', { name: /Active/ }).click();
+  await filters.getByRole('button', { name: /^Active/ }).click();
   await item.getByRole('button', { name: 'Submit for review' }).click();
   check(await until(item.getByText('Under review')), 'artist submits media for review');
 
@@ -552,7 +564,7 @@ let artistDocPath;
 }
 {
   const p = artist.page;
-  await p.goto(BASE + '/artist/dashboard?tab=documents');
+  await p.goto(BASE + '/artist/documents');
   check(await until(p.locator('[data-document="E2E Stage plot"]')), 'artist sees the artist-only document');
   check(!(await p.locator('[data-document="E2E Vendor pass"]').count()), 'artist does not see the vendor’s personal document');
   const [tab] = await Promise.all([artist.context.waitForEvent('page'), p.locator('[data-document="E2E Stage plot"]').getByRole('button', { name: 'Open' }).click()]);

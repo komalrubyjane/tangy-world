@@ -262,7 +262,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
 
   return (
     <div
-      className={`flex flex-col bg-[#11100C] border-4 border-[#11100C] shadow-[8px_8px_0px_#11100C] w-full ${
+      className={`flex flex-col bg-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] w-full ${
         isFloating ? 'h-[75dvh] max-h-[600px]' : 'h-[72vh] min-h-[520px] max-h-[760px]'
       }`}
     >
@@ -298,8 +298,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       {/* Message log */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410]"
-        style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
+        className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410] t-quiet"
       >
         {messages.map((m) => renderBubble(m))}
         {typing && <TypingIndicator reducedMotion={reducedMotion} />}

@@ -7,11 +7,14 @@ await page.getByRole('heading', { name: /operations/i }).waitFor({ timeout: 1500
 await shot(page, 'a01-manager-dashboard');
 
 const nav = await page.locator('nav[aria-label="Admin navigation"]').innerText();
-for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts'])
+for (const item of ['Dashboard', 'Applications', 'Events', 'Bookings', 'Payments', 'Waitlist', 'Attendees', 'Content', 'Team', 'Reports', 'Messages', 'Volunteers', 'Artists', 'Sponsors', 'Vendors', 'Venue Hosts', 'Users & Roles'])
   check(nav.includes(item), `manager nav has ${item}`);
-for (const item of ['Users & Roles', 'Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'])
+for (const item of ['Audit Logs', 'System Settings', 'Tangy AI', 'Roles & Permissions'])
   check(!nav.includes(item), `manager nav hides ${item}`);
-for (const path of ['/admin-portal/users', '/admin-portal/settings', '/admin-portal/audit', '/admin-portal/ai', '/admin-portal/roles']) {
+// Users & Roles: a manager may invite Staff (staff.invite, 0030) but not open
+// an account's role / deactivation page.
+const managerId = (await page.evaluate(async () => (await (await import('/src/lib/supabaseClient.js')).supabase.auth.getUser()).data.user.id));
+for (const path of [`/admin-portal/users/${managerId}`, '/admin-portal/settings', '/admin-portal/audit', '/admin-portal/ai', '/admin-portal/roles']) {
   await page.goto(BASE + path);
   await page.waitForTimeout(1200);
   check((await text(page)).includes("you don't have permission to access this section"), `direct URL ${path} is forbidden for manager`);

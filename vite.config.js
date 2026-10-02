@@ -10,7 +10,9 @@ const DEV_IDENTITIES = {
   super_admin: { email: 'superadmin@tangy.local', full_name: 'Tangy Super Admin' },
   admin: { email: 'admin@tangy.local', full_name: 'Tangy Admin' },
   staff: { email: 'staff@tangy.local', full_name: 'Tangy Staff' },
-  artist: { email: 'artist@tangy.local', full_name: 'Tangy Artist' },
+  // The artist button signs in as the populated demo artist (scripts/demo-data.sh): sessions,
+  // requests, calendar, messages and notifications to explore. Seeded locally only.
+  artist: { email: 'ananya.rao@demo.tangy.local', full_name: 'Ananya Rao' },
   sponsor: { email: 'sponsor@tangy.local', full_name: 'Tangy Sponsor' },
   vendor: { email: 'vendor@tangy.local', full_name: 'Tangy Vendor' },
   venue: { email: 'venue@tangy.local', full_name: 'Tangy Venue Host' },

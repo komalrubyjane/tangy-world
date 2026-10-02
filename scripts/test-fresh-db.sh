@@ -24,6 +24,13 @@ alter database tangy_fresh set search_path to "$user", public, extensions;
 create publication supabase_realtime;
 create extension if not exists pgcrypto with schema extensions;
 create extension if not exists "uuid-ossp" with schema extensions;
+-- The storage schema copy brings our own policies on storage.objects with it;
+-- the migrations create them, so start without them.
+do $$ declare p record; begin
+  for p in select policyname from pg_policies where schemaname = 'storage' and tablename = 'objects' loop
+    execute format('drop policy %I on storage.objects', p.policyname);
+  end loop;
+end $$;
 SQL
 for f in supabase/migrations/*.sql; do
   out=$(docker exec -i $C psql -U postgres -d tangy_fresh -q -v ON_ERROR_STOP=1 < "$f" 2>&1 | grep -v "NOTICE\|^$\|^DETAIL\|^HINT\|WARNING")

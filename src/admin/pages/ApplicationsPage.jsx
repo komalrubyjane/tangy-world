@@ -61,7 +61,7 @@ const STATUSES = [
   { value: 'rejected', label: 'Rejected' },
 ];
 const TYPE_LABEL = Object.fromEntries(TYPES.map((t) => [t.value, t.label]));
-const ROLE_ON_APPROVAL = { artist: 'Artist portal access', sponsor: 'Sponsor role', vendor: 'Vendor role', venue: 'Venue partner role', crew: 'Crew role', volunteer: 'Volunteer role' };
+const ROLE_ON_APPROVAL = { artist: 'Artist portal access', sponsor: 'Sponsor role', vendor: 'Vendor role', venue: 'Venue partner role', crew: 'Crew role', volunteer: 'Volunteer access — members become Volunteers (staff keep their role), plus a place on the session’s team if one was chosen' };
 const DETAIL_LABELS = {
   genre: 'Genre', city: 'City', bio: 'Bio', experience_level: 'Experience', instagram: 'Instagram', soundcloud: 'SoundCloud', spotify: 'Spotify',
   business_name: 'Business', contact_name: 'Contact', details: 'Details', role_interest: 'Role interest', event_interest: 'Event interest', message: 'Message',

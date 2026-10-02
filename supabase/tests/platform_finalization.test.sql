@@ -133,9 +133,9 @@ select tt.login('00000000-0000-0000-0000-0000000c0005');
 select tt.check(not exists (select 1 from artist_admin_notes), 'artist still cannot read their own admin notes');
 
 \echo '--- 2. Real profile completion'
-select tt.check((artist_profile_completion() ->> 'total')::int = 15 and (artist_profile_completion() ->> 'done')::int = 6
-  and (artist_profile_completion() ->> 'percent')::int = round(100.0 * 6 / 15),
-  'completion is computed from 15 defined fields (6 filled: name, genre, city, email, phone, rider)');
+select tt.check((artist_profile_completion() ->> 'total')::int = 19 and (artist_profile_completion() ->> 'done')::int = 6
+  and (artist_profile_completion() ->> 'percent')::int = round(100.0 * 6 / 19),
+  'completion is computed from 19 defined fields (0033; 6 filled: name, genre, city, email, phone, rider)');
 update artists set stage_name = 'Asha', bio = repeat('Qawwali singer from the Deccan. ', 3), instagram = 'asha' where id = '00000000-0000-0000-0000-00000000ac01';
 select tt.check((artist_profile_completion() ->> 'done')::int = 9 and artist_profile_completion() -> 'missing' ? 'Spotify', 'completion rises with real edits and lists what is missing');
 select tt.login('00000000-0000-0000-0000-0000000c0006');

@@ -101,7 +101,7 @@ export const RoleApplicationDashboard = ({ config }) => {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
+      <div className="min-h-screen ui-texture text-[#E7D5A4] flex items-center justify-center font-mono text-xs">
         LOADING...
       </div>
     );
@@ -115,11 +115,11 @@ export const RoleApplicationDashboard = ({ config }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+    <div className="min-h-screen ui-texture text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
 
       <section className="pt-24 sm:pt-28 pb-4 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 shrink-0 bg-[#E7D5A4] text-[#11100C] rounded-full border-2 border-[#B94717] flex items-center justify-center text-2xl">
               {config.icon}
@@ -228,7 +228,7 @@ export const RoleApplicationDashboard = ({ config }) => {
         )}
 
         {activeTab === 'settings' && (
-          <div className="max-w-md bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-6 shadow-[8px_8px_0px_#11100C]">
+          <div className="max-w-md bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-6 shadow-[4px_4px_0px_#11100C]">
             <h3 className="font-condensed text-lg font-bold uppercase mb-4">Account</h3>
             <div className="flex flex-col gap-3 text-xs">
               <div>

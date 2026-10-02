@@ -1,15 +1,18 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { TangyDiary } from '../../components/sections/TangyDiary';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const MuseumJournalPage = () => {
+  usePageMeta({ title: 'Museum Journal', description: 'The interactive Tangy diary — turn each handwritten page.' });
   return (
     <div className="min-h-screen bg-[#211915] text-[#EADFC5] font-mono selection:bg-[#A68853] selection:text-[#241A14] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#A68853]/30">
         <div className="relative z-10">
-          <a href="/diary" className="font-mono text-[10px] text-[#A68853]/70 tracking-widest uppercase hover:text-[#A68853] transition-colors">← BACK TO DIARY</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#A68853] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             ARCHIVAL FIELD JOURNAL // FILE NO. 1974-TS
           </span>
@@ -26,10 +29,7 @@ export const MuseumJournalPage = () => {
 
       <section className="py-12 sm:py-16 bg-[#211915] printNoise border-t-8 border-[#241A14] px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#A68853] tracking-[0.3em] uppercase font-bold block mb-4">MORE FROM THE DIARY</span>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/diary/stories" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#A68853]/60 text-[#A68853] hover:bg-[#A68853] hover:text-[#1C0E08] transition-colors">RECENT STORIES →</a>
-          <a href="/diary/behind-the-scenes" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#A68853]/60 text-[#A68853] hover:bg-[#A68853] hover:text-[#1C0E08] transition-colors">BEHIND THE SCENES →</a>
-        </div>
+        <SectionNav section="Diary" />
       </section>
 
       <Footer />

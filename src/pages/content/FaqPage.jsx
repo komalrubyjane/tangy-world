@@ -32,7 +32,7 @@ const FAQ = [
 export const FaqPage = () => {
   usePageMeta({ title: 'FAQ', description: 'How booking, the waitlist, applications and payments work at Tangy Sessions.' });
   return (
-    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
+    <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body t-quiet">
       <Navbar />
       <header className="pt-28 pb-10 px-4 sm:px-6 max-w-4xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <span className="text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-3">HELP DESK</span>

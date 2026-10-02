@@ -1,14 +1,17 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const InstagramPage = () => {
+  usePageMeta({ title: 'Instagram', description: 'Follow Tangy Sessions on Instagram for session clues, recaps and dispatches.' });
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
-          <a href="/contact" className="font-mono text-[10px] text-[#C99A2E]/70 tracking-widest uppercase hover:text-[#C99A2E] transition-colors">← BACK TO CONTACT</a>
+          <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             FIND US ONLINE
           </span>
@@ -22,7 +25,7 @@ export const InstagramPage = () => {
       </section>
 
       <section className="py-14 sm:py-20 max-w-2xl mx-auto px-4 sm:px-6 text-center">
-        <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-8 sm:p-12 shadow-[8px_8px_0px_#11100C]">
+        <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-8 sm:p-12 shadow-[4px_4px_0px_#11100C]">
           <div className="text-4xl mb-4">📷</div>
           <h2 className="display text-3xl sm:text-4xl mb-2">@TANGYSESSIONS</h2>
           <p className="font-mono text-xs text-[#11100C]/70 uppercase tracking-wider mb-6">
@@ -51,6 +54,8 @@ export const InstagramPage = () => {
           ))}
         </div>
       </section>
+
+      <SectionNav className="py-10 px-4" />
 
       <Footer />
     </div>

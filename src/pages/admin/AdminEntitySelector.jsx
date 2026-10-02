@@ -120,7 +120,7 @@ export const AdminEntitySelectorInner = () => {
     <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono">
       <Navbar />
       <main className="pt-24 sm:pt-28 pb-20 px-4 sm:px-6 max-w-3xl mx-auto">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C]">
+        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[4px_4px_0px_#11100C]">
           <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-widest block mb-1">ADMIN PREVIEW · {config.label.toUpperCase()} PORTAL</span>
           <h1 className="font-condensed text-2xl font-bold uppercase mb-4">SELECT {config.label.toUpperCase()} TO INSPECT</h1>
 

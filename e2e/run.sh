@@ -19,7 +19,7 @@ run() {
   echo "   $(grep -c '^PASS' "shots/$suite.log") passed"
 }
 # devmode.mjs drives the two dev-tools servers (DEV_MOCK_BASE / DEV_LOCAL_BASE, see README.md).
-for suite in superadmin manager staff session platform groupcheckin checkout enquiries waitlist content portals mobile responsive devmode; do
+for suite in superadmin manager staff session platform groupcheckin checkout enquiries waitlist content portals mobile responsive navigation invitations devmode; do
   psql < reset.sql && psql < staff_setup.sql || exit 1
   [[ $suite == staff ]] && node make-cam.mjs
   run "$suite"
@@ -28,5 +28,10 @@ done
 psql < reset.sql && psql < staff_setup.sql || exit 1
 ../scripts/demo-data.sh seed >/dev/null || { echo "could not load the demo dataset"; exit 1; }
 run routing
+run archive
+run artist-portal
+run workflow
 run sweep
+# Leave the review site as the demo data: the test nights go back to drafts.
+psql <<< "update events set status = 'draft' where slug in ('vol-5-local', 'vol-6-local'); delete from events where slug like 'e2e-wf-%';"
 exit $fail

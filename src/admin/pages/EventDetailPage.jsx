@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
-import { assignmentService } from '../../services/assignmentService';
 import { useAdminSession } from '../AdminSession';
 import { adminApi, friendlyError, update, remove, insert } from '../api';
 import { useAsync } from '../hooks';
@@ -9,9 +8,12 @@ import { P, EVENT_STATUS_LABELS, eventPhase } from '../rbac';
 import { TicketTypesEditor } from '../components/TicketTypesEditor';
 import {
   Page, Panel, Grid, StatTile, Tabs, Badge, Button, KeyValue, AsyncBlock, ConfirmDialog, NotFound, Forbidden, Skeleton, Select, Input,
-  Textarea, Field, Icon, fmt, useToast,
+  Textarea, Field, Icon, Modal, fmt, useToast,
 } from '../ui';
 import { EventForm } from '../components/EventForm';
+import { EventEditor } from '../components/EventEditor';
+import { zonedIso } from '../../lib/calendarDates';
+import { ArtistAvailabilityList, ArtistCalendarDrawer } from '../components/ArtistAvailability';
 import { BookingFormEditor } from '../components/BookingFormEditor';
 import { HEALTH } from './DashboardPage';
 import { BookingsTable } from '../components/Bookings';
@@ -103,65 +105,123 @@ const ArtistsTab = ({ evt }) => {
   const toast = useToast();
   const [artistId, setArtistId] = useState('');
   const [message, setMessage] = useState('');
-  const [slot, setSlot] = useState({ start: '', end: '', fee: '', deadline: '' });
+  const [slot, setSlot] = useState({ start: '', end: '', fee: '', deadline: '', type: '', minutes: '', call: '', soundcheck: '', tech: '', hospitality: '' });
+  const [conflict, setConflict] = useState(null);
   const data = useAsync(async () => {
-    const [{ data: linked, error: e1 }, { data: approved, error: e2 }, requests] = await Promise.all([
-      supabase.from('event_artists').select('artist_id, artists(id, name, genre, city, user_id)').eq('event_id', evt.id),
+    const [{ data: linked, error: e1 }, { data: details }, { data: approved, error: e2 }, requests] = await Promise.all([
+      supabase.from('event_artists').select('artist_id, artists(id, name, stage_name, genre, city, user_id)').eq('event_id', evt.id),
+      supabase.from('event_artist_details').select('artist_id, performance_start, performance_end, performance_order, performance_type, set_minutes, notes').eq('event_id', evt.id),
       supabase.from('artists').select('id, name, user_id').eq('status', 'approved').order('name'),
-      supabase.from('assignment_requests').select('id, artist_id, status, created_at, responded_at, proposed_start, proposed_end, fee_offer, expires_at, decline_reason, artists(name)')
+      supabase.from('assignment_requests').select('id, artist_id, status, created_at, responded_at, proposed_start, proposed_end, fee_offer, expires_at, decline_reason, performance_type, set_minutes, viewed_at, confirmed_at, cancel_reason, artists(name)')
         .eq('session_id', evt.id).order('created_at', { ascending: false }).then(({ data: rows, error }) => {
           if (error) throw friendlyError(error);
           return (rows || []).map((r) => ({ id: r.id, artistId: r.artist_id, artistName: r.artists?.name, status: r.status, createdAt: r.created_at,
-            respondedAt: r.responded_at, start: r.proposed_start, end: r.proposed_end, fee: r.fee_offer, expiresAt: r.expires_at, reason: r.decline_reason }));
+            respondedAt: r.responded_at, start: r.proposed_start, end: r.proposed_end, fee: r.fee_offer, expiresAt: r.expires_at, reason: r.decline_reason || r.cancel_reason,
+            type: r.performance_type, minutes: r.set_minutes, viewedAt: r.viewed_at }));
         }),
     ]);
     if (e1 || e2) throw friendlyError(e1 || e2);
-    return { linked: (linked || []).map((l) => l.artists).filter(Boolean), approved: approved || [], requests };
+    const byArtist = Object.fromEntries((details || []).map((d) => [d.artist_id, d]));
+    const lineup = (linked || []).map((l) => l.artists && { ...l.artists, details: byArtist[l.artist_id] || {} }).filter(Boolean)
+      .sort((x, y) => (x.details.performance_order ?? 99) - (y.details.performance_order ?? 99) || (x.details.performance_start || '').localeCompare(y.details.performance_start || ''));
+    return { linked: lineup, approved: approved || [], requests };
   }, [evt.id]);
   const linkedIds = new Set((data.data?.linked || []).map((a) => a.id));
-  const pendingIds = new Set((data.data?.requests || []).filter((r) => r.status === 'pending').map((r) => r.artistId));
+  const pendingIds = new Set((data.data?.requests || []).filter((r) => ['draft', 'pending'].includes(r.status)).map((r) => r.artistId));
   const selected = (data.data?.approved || []).find((a) => a.id === artistId);
 
-  const request = async () => {
+  // Before sending: the artist's availability that day and their other sessions (0033).
+  useEffect(() => {
+    if (!selected || !evt.event_date) { setConflict(null); return undefined; }
+    let cancelled = false;
+    supabase.rpc('artist_schedule_check', { p_artist_id: selected.id, p_date: evt.event_date }).then(({ data: c }) => { if (!cancelled) setConflict(c || null); });
+    return () => { cancelled = true; };
+  }, [selected?.id, evt.event_date]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const request = async (send) => {
     try {
       const toIso = (v) => (v ? new Date(v).toISOString() : null);
-      await adminApi.createBookingRequest({
-        eventId: evt.id, artistId: selected.id, message: message.trim() || null, start: toIso(slot.start), end: toIso(slot.end),
-        fee: slot.fee === '' ? null : Number(slot.fee), expiresAt: slot.deadline ? new Date(`${slot.deadline}T23:59:00`).toISOString() : null,
+      const { error } = await supabase.rpc('create_artist_request', {
+        p_event_id: evt.id, p_artist_id: selected.id, p_send: send,
+        p_details: {
+          message: message.trim() || null, proposed_start: toIso(slot.start), proposed_end: toIso(slot.end), fee_offer: slot.fee === '' ? null : Number(slot.fee),
+          expires_at: slot.deadline ? new Date(`${slot.deadline}T23:59:00`).toISOString() : null, performance_type: slot.type.trim() || null,
+          set_minutes: slot.minutes === '' ? null : Number(slot.minutes), call_time: toIso(slot.call), soundcheck_at: toIso(slot.soundcheck),
+          technical_notes: slot.tech.trim() || null, hospitality_notes: slot.hospitality.trim() || null,
+        },
       });
-      toast('Request sent — the artist answers from their portal');
-      setArtistId(''); setMessage(''); setSlot({ start: '', end: '', fee: '', deadline: '' });
+      if (error) throw error;
+      toast(send ? 'Request sent — the artist answers from their portal' : 'Draft saved — the artist does not see it until you send it');
+      setArtistId(''); setMessage(''); setSlot({ start: '', end: '', fee: '', deadline: '', type: '', minutes: '', call: '', soundcheck: '', tech: '', hospitality: '' });
       data.reload();
     } catch (err) { toast(friendlyError(err).message, 'bad'); }
   };
+  const manage = async (r, action) => {
+    const { error } = await supabase.rpc('manage_artist_request', { p_id: r.id, p_action: action, p_reason: null });
+    if (error) { toast(friendlyError(error).message, 'bad'); return; }
+    toast({ send: 'Request sent', confirm: 'Confirmed — the artist has been notified', cancel: 'Request cancelled', complete: 'Marked completed' }[action]);
+    data.reload();
+  };
   const addDirect = async () => {
-    const { error } = await supabase.from('event_artists').insert({ event_id: evt.id, artist_id: selected.id });
+    const { error } = await supabase.rpc('save_event_lineup', { p_event_id: evt.id, p_items: [{ artist_id: selected.id, mode: 'assign' }] });
     if (error) { toast(friendlyError(error).message, 'bad'); return; }
     toast(`${selected.name} added to the lineup`);
     setArtistId('');
     data.reload();
   };
-  const removeArtist = async (a) => {
-    const { error } = await supabase.from('event_artists').delete().eq('event_id', evt.id).eq('artist_id', a.id);
-    if (error) { toast(friendlyError(error).message, 'bad'); return; }
+  const removeArtist = async (a, reason) => {
+    const { error } = await supabase.rpc('remove_event_artist', { p_event_id: evt.id, p_artist_id: a.id, p_reason: reason || null });
+    if (error) throw friendlyError(error);
+    toast(`${a.stage_name || a.name} removed from the line-up`);
     data.reload();
   };
+  const [picking, setPicking] = useState(false);
+  const [chosen, setChosen] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [removing, setRemoving] = useState(null);
+  const [calendarOf, setCalendarOf] = useState(null);
+  const pendingReqs = (data.data?.requests || []).filter((r) => ['draft', 'pending'].includes(r.status) && !linkedIds.has(r.artistId));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Panel title="Confirmed lineup" flush>
-        <AsyncBlock loading={data.loading} error={data.error} onRetry={data.reload} empty={(data.data?.linked || []).length === 0}
-          emptyProps={{ title: 'No artists confirmed', icon: 'Contact' }}>
-          <ul className="divide-y divide-[#E7D5A4]/[0.06]">
-            {(data.data?.linked || []).map((a) => (
-              <li key={a.id} className="px-4 py-3 flex items-center gap-3">
-                <div className="flex-1 min-w-0"><div className="text-[13.5px] text-[#EFE2C0]">{a.name}</div><div className="text-[12px] text-[#E7D5A4]/60">{[a.genre, a.city].filter(Boolean).join(' · ')}</div></div>
-                {can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" icon="Trash2" aria-label={`Remove ${a.name}`} onClick={() => removeArtist(a)} />}
-              </li>
-            ))}
-          </ul>
-        </AsyncBlock>
-      </Panel>
+      <div className="flex flex-col gap-4">
+        <Panel title="Line-up" subtitle="Running order, set times and who has confirmed." flush
+          actions={can(P.EVENTS_MANAGE) && evt.status !== 'cancelled' && <Button size="sm" variant="primary" icon="Plus" onClick={() => setPicking(true)}>Add artists</Button>}>
+          <AsyncBlock loading={data.loading} error={data.error} onRetry={data.reload} empty={(data.data?.linked || []).length === 0 && pendingReqs.length === 0}
+            emptyProps={{ title: 'No artists yet', hint: 'Add artists — each is checked against their own calendar.', icon: 'Contact' }}>
+            <ul className="divide-y divide-[#E7D5A4]/[0.06]" data-event-lineup>
+              {(data.data?.linked || []).map((a) => (
+                <li key={a.id} className="px-4 py-3 grid grid-cols-[24px_1fr] gap-x-3 gap-y-2" data-lineup-artist={a.stage_name || a.name}>
+                  <span className="font-mono text-[11px] text-[#C99A2E] pt-0.5">{a.details.performance_order ?? '—'}</span>
+                  <div className="min-w-0">
+                    <div className="text-[13.5px] text-[#EFE2C0] flex flex-wrap items-center gap-2">{a.stage_name || a.name} <Badge status={evt.status === 'cancelled' ? 'cancelled' : 'confirmed'}>{evt.status === 'cancelled' ? 'Cancelled' : 'Confirmed'}</Badge></div>
+                    <div className="text-[12px] text-[#E7D5A4]/65">{[a.details.performance_start && `${fmt.time(a.details.performance_start)}${a.details.performance_end ? `–${fmt.time(a.details.performance_end)}` : ''}`,
+                      a.details.performance_type, a.details.set_minutes && `${a.details.set_minutes} min`, [a.genre, a.city].filter(Boolean).join(' · ')].filter(Boolean).join(' · ') || 'No set time yet'}</div>
+                    {a.details.notes && <div className="text-[12px] text-[#E7D5A4]/55">{a.details.notes}</div>}
+                  </div>
+                  <div className="col-start-2 flex flex-wrap gap-1 -ml-2.5">
+                    <Button size="sm" className="max-sm:h-11 max-sm:min-w-11" variant="ghost" icon="CalendarDays" onClick={() => setCalendarOf(a)} aria-label={`View ${a.stage_name || a.name}'s calendar`}>Calendar</Button>
+                    {a.user_id && <Button size="sm" className="max-sm:h-11 max-sm:min-w-11" variant="ghost" icon="MessagesSquare" to={`/admin-portal/people/artists/${a.id}/messages`} aria-label={`Message ${a.stage_name || a.name}`}>Message</Button>}
+                    {can(P.EVENTS_MANAGE) && evt.status !== 'cancelled' && <>
+                      <Button size="sm" className="max-sm:h-11 max-sm:min-w-11" variant="ghost" icon="Pencil" onClick={() => setEditing(a)} aria-label={`Change performance details for ${a.stage_name || a.name}`}>Details</Button>
+                      <Button size="sm" className="max-sm:h-11 max-sm:min-w-11" variant="ghost" icon="Trash2" aria-label={`Remove ${a.stage_name || a.name}`} onClick={() => setRemoving(a)} />
+                    </>}
+                  </div>
+                </li>
+              ))}
+              {pendingReqs.map((r) => (
+                <li key={r.id} className="px-4 py-3 flex flex-wrap items-center gap-x-3 gap-y-1" data-lineup-artist={r.artistName}>
+                  <span className="font-mono text-[11px] text-[#E7D5A4]/40 w-6">—</span>
+                  <div className="flex-1 min-w-[160px]">
+                    <div className="text-[13.5px] text-[#EFE2C0] flex flex-wrap items-center gap-2">{r.artistName} <Badge status={r.status === 'draft' ? 'draft' : 'pending'}>{r.status === 'draft' ? 'Draft request' : 'Pending'}</Badge></div>
+                    <div className="text-[12px] text-[#E7D5A4]/65">{r.status === 'draft' ? 'Not sent yet' : r.viewedAt ? 'Seen — awaiting response' : 'Awaiting response'}{r.start ? ` · ${fmt.time(r.start)}${r.end ? `–${fmt.time(r.end)}` : ''}` : ''}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </AsyncBlock>
+        </Panel>
+      </div>
       <div className="flex flex-col gap-4">
         {can(P.EVENTS_MANAGE) && (
           <Panel title="Book an artist">
@@ -178,9 +238,27 @@ const ArtistsTab = ({ evt }) => {
                 <Field label="Fee offer (₹)"><Input type="number" min="0" value={slot.fee} onChange={(e) => setSlot({ ...slot, fee: e.target.value })} placeholder="Optional" /></Field>
                 <Field label="Reply by" hint="Default: 7 days"><Input type="date" value={slot.deadline} onChange={(e) => setSlot({ ...slot, deadline: e.target.value })} /></Field>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Field label="Performance type"><Input value={slot.type} onChange={(e) => setSlot({ ...slot, type: e.target.value })} placeholder="Acoustic set" /></Field>
+                <Field label="Set length (minutes)"><Input type="number" min="5" max="600" value={slot.minutes} onChange={(e) => setSlot({ ...slot, minutes: e.target.value })} /></Field>
+                <Field label="Call time"><Input type="datetime-local" value={slot.call} onChange={(e) => setSlot({ ...slot, call: e.target.value })} /></Field>
+                <Field label="Soundcheck"><Input type="datetime-local" value={slot.soundcheck} onChange={(e) => setSlot({ ...slot, soundcheck: e.target.value })} /></Field>
+              </div>
+              <Field label="Technical requirements"><Textarea rows={2} value={slot.tech} onChange={(e) => setSlot({ ...slot, tech: e.target.value })} placeholder="Optional" /></Field>
+              <Field label="Hospitality"><Textarea rows={2} value={slot.hospitality} onChange={(e) => setSlot({ ...slot, hospitality: e.target.value })} placeholder="Optional" /></Field>
               <Field label="Message to artist"><Textarea rows={2} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Optional" /></Field>
+              {selected && conflict && (conflict.availability?.status === 'unavailable' || conflict.availability?.status === 'tentative' || (conflict.sessions || []).length > 0) && (
+                <div role="alert" className="text-[12.5px] text-[#f5b544] bg-[#C99A2E]/10 border border-[#C99A2E]/40 rounded px-3 py-2" data-conflict-warning>
+                  {conflict.availability?.status === 'unavailable' && <p className="m-0">{selected.name} marked {fmt.date(evt.event_date)} as unavailable{conflict.availability.note ? ` — “${conflict.availability.note}”` : ''}.</p>}
+                  {conflict.availability?.status === 'tentative' && <p className="m-0">{selected.name} is tentative that day{conflict.availability.note ? ` — “${conflict.availability.note}”` : ''}.</p>}
+                  {(conflict.sessions || []).filter((x) => x.event_id !== evt.id).map((x) => <p key={x.event_id} className="m-0">This artist has another session on this date: {x.name} ({x.status}).</p>)}
+                  <p className="m-0 mt-1 text-[#E7D5A4]/70">You can still send the request.</p>
+                </div>
+              )}
+              {selected && conflict?.availability?.status === 'available' && <p className="text-[12px] text-[#7FD3A0] m-0">{selected.name} marked this date as available.</p>}
               <div className="flex flex-wrap gap-2">
-                <Button variant="primary" disabled={!selected || !selected.user_id} onClick={request}>Send request</Button>
+                <Button variant="primary" disabled={!selected || !selected.user_id} onClick={() => request(true)}>Send request</Button>
+                <Button disabled={!selected || !selected.user_id} onClick={() => request(false)}>Save draft</Button>
                 <Button disabled={!selected} onClick={addDirect}>Add directly</Button>
               </div>
               {selected && !selected.user_id && <p className="text-[12px] text-[#E7D5A4]/60">This artist has no portal account — add them directly.</p>}
@@ -200,18 +278,109 @@ const ArtistsTab = ({ evt }) => {
                   </span>
                   <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.relative(r.createdAt)}</span>
                   <Badge status={r.status === 'accepted' ? 'approved' : r.status} />
-                  {r.status === 'pending' && can(P.EVENTS_MANAGE) && <Button size="sm" variant="ghost" onClick={async () => { await assignmentService.cancel(r.id); data.reload(); }}>Withdraw</Button>}
+                  {r.status === 'pending' && r.viewedAt && <Badge tone="info">Viewed</Badge>}
+                  {can(P.EVENTS_MANAGE) && r.status === 'draft' && <Button size="sm" onClick={() => manage(r, 'send')}>Send</Button>}
+                  {can(P.EVENTS_MANAGE) && r.status === 'accepted' && <Button size="sm" variant="primary" onClick={() => manage(r, 'confirm')}>Confirm</Button>}
+                  {can(P.EVENTS_MANAGE) && ['accepted', 'confirmed'].includes(r.status) && evt.event_date <= new Date().toLocaleDateString('en-CA', { timeZone: evt.timezone || 'Asia/Kolkata' }) && <Button size="sm" onClick={() => manage(r, 'complete')}>Mark completed</Button>}
+                  {can(P.EVENTS_MANAGE) && ['draft', 'pending', 'accepted', 'confirmed'].includes(r.status) && <Button size="sm" variant="ghost" onClick={() => manage(r, 'cancel')}>{r.status === 'pending' ? 'Withdraw' : 'Cancel'}</Button>}
                 </li>
               ))}
             </ul>
           )}
         </Panel>
       </div>
+      {picking && (
+        <Modal title={`Add artists · ${fmt.date(evt.event_date)}`} wide onClose={() => setPicking(false)}>
+          <ArtistAvailabilityList date={evt.event_date} eventId={evt.id} selectable exclude={new Set(pendingReqs.map((r) => r.artistId))}
+            onAdd={(rows) => { setPicking(false); setChosen(rows); }} addLabel="Continue" />
+        </Modal>
+      )}
+      {chosen && <AddArtistsDialog evt={evt} rows={chosen} onClose={() => setChosen(null)} onDone={(msg) => { setChosen(null); toast(msg); data.reload(); }} />}
+      {editing && <PerformanceDialog evt={evt} artist={editing} onClose={() => setEditing(null)} onDone={() => { setEditing(null); toast('Performance details saved'); data.reload(); }} />}
+      {removing && (
+        <ConfirmDialog title={`Remove ${removing.stage_name || removing.name}?`} tone="danger" confirmLabel="Remove from line-up"
+          message={['on-sale', 'sold-out'].includes(evt.status) ? 'The artist is notified. Their open requests for this event are cancelled.' : 'The event is a draft, so nobody is notified.'}
+          fields={[{ name: 'reason', label: 'Reason (optional, kept in the audit log)' }]}
+          onConfirm={({ reason }) => removeArtist(removing, reason).then(() => setRemoving(null))} onClose={() => setRemoving(null)} />
+      )}
+      {calendarOf && <ArtistCalendarDrawer artist={calendarOf} date={evt.event_date} onClose={() => setCalendarOf(null)} />}
     </div>
   );
 };
 
+// After choosing artists: add them directly or send session requests.
+const AddArtistsDialog = ({ evt, rows, onClose, onDone }) => {
+  const [mode, setMode] = useState(rows.every((r) => r.has_account) ? 'request' : 'assign');
+  const [override, setOverride] = useState(false);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const unavailable = rows.filter((r) => r.status === 'unavailable');
+  const noAccount = rows.filter((r) => !r.has_account);
+  const published = ['on-sale', 'sold-out'].includes(evt.status);
+  const go = async () => {
+    setBusy(true); setError('');
+    const items = rows.map((r) => ({ artist_id: r.artist_id, mode: mode === 'request' && r.has_account ? 'request' : 'assign', override }));
+    const { data, error: e } = await supabase.rpc('save_event_lineup', { p_event_id: evt.id, p_items: items });
+    setBusy(false);
+    if (e) { setError(friendlyError(e).message); return; }
+    onDone([data.added && `${data.added} added to the line-up`, data.requested && `${data.requested} session request${data.requested === 1 ? '' : 's'} sent`].filter(Boolean).join(' · '));
+  };
+  return (
+    <Modal title={`Add ${rows.length} artist${rows.length === 1 ? '' : 's'}`} onClose={onClose}
+      footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" disabled={busy || (unavailable.length > 0 && mode === 'assign' && !override)} onClick={go}>{busy ? 'Saving…' : mode === 'request' ? 'Send requests' : 'Add to line-up'}</Button></>}>
+      <ul className="m-0 pl-5 text-[13px]">{rows.map((r) => <li key={r.artist_id}>{r.stage_name || r.name} — {r.detail}</li>)}</ul>
+      <fieldset className="border-0 p-0 m-0 flex flex-col gap-1.5">
+        <legend className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#C99A2E]/85 mb-1">How</legend>
+        <label className="flex items-start gap-2 text-[13px] min-h-[36px]"><input type="radio" name="add-mode" checked={mode === 'request'} onChange={() => setMode('request')} className="mt-1 accent-[#C99A2E]" />
+          <span>Send session requests — each artist accepts or declines from their portal{noAccount.length ? ` (${noAccount.map((r) => r.stage_name || r.name).join(', ')}: no portal account, added directly)` : ''}.</span></label>
+        <label className="flex items-start gap-2 text-[13px] min-h-[36px]"><input type="radio" name="add-mode" checked={mode === 'assign'} onChange={() => setMode('assign')} className="mt-1 accent-[#C99A2E]" />
+          <span>Add straight to the line-up — {published ? 'they are told “You’re on the lineup” now.' : 'they are told when the event is published.'}</span></label>
+      </fieldset>
+      {unavailable.length > 0 && mode === 'assign' && (
+        <label className="flex items-start gap-2 text-[13px] text-[#f5b544]"><input type="checkbox" checked={override} onChange={(e) => setOverride(e.target.checked)} className="mt-1 accent-[#C99A2E] w-4 h-4" />
+          <span>{unavailable.map((r) => r.stage_name || r.name).join(', ')} marked this date unavailable. Override their calendar (recorded in the audit log).</span></label>
+      )}
+      {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e] bg-[#a8322a]/10 border border-[#a8322a]/40 rounded px-3 py-2">{error}</div>}
+    </Modal>
+  );
+};
+
+// Change one artist's running order, set and notes (update_event_artist re-checks the times).
+const toTimeInput = (iso, tz) => (iso ? new Date(iso).toLocaleTimeString('en-GB', { timeZone: tz || 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : '');
+const PerformanceDialog = ({ evt, artist, onClose, onDone }) => {
+  const d = artist.details || {};
+  const [f, setF] = useState({ performance_order: d.performance_order ?? '', performance_type: d.performance_type || '', set_minutes: d.set_minutes ?? '',
+    start: toTimeInput(d.performance_start, evt.timezone), end: toTimeInput(d.performance_end, evt.timezone), notes: d.notes || '' });
+  const [error, setError] = useState('');
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const save = async () => {
+    setError('');
+    const tz = evt.timezone || 'Asia/Kolkata';
+    const { error: e } = await supabase.rpc('update_event_artist', { p_event_id: evt.id, p_artist_id: artist.id, p_details: {
+      performance_order: f.performance_order === '' ? null : Number(f.performance_order), performance_type: f.performance_type || null,
+      set_minutes: f.set_minutes === '' ? null : Number(f.set_minutes), notes: f.notes || null,
+      start: zonedIso(evt.event_date, f.start, tz), end: zonedIso(evt.event_date, f.end, tz) } });
+    if (e) { setError(friendlyError(e).message); return; }
+    onDone();
+  };
+  return (
+    <Modal title={`Performance — ${artist.stage_name || artist.name}`} onClose={onClose}
+      footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button variant="primary" onClick={save}>Save details</Button></>}>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Order"><Input type="number" min="1" max="50" value={f.performance_order} onChange={set('performance_order')} /></Field>
+        <Field label="Set length (min)"><Input type="number" min="5" max="600" value={f.set_minutes} onChange={set('set_minutes')} /></Field>
+        <Field label="Performance" className="col-span-2"><Input value={f.performance_type} onChange={set('performance_type')} placeholder="Live set" /></Field>
+        <Field label="Start"><Input type="time" value={f.start} onChange={set('start')} /></Field>
+        <Field label="End"><Input type="time" value={f.end} onChange={set('end')} /></Field>
+        <Field label="Notes" className="col-span-2"><Textarea rows={2} value={f.notes} onChange={set('notes')} /></Field>
+      </div>
+      {error && <div role="alert" className="text-[12.5px] text-[#ef6b5e] bg-[#a8322a]/10 border border-[#a8322a]/40 rounded px-3 py-2">{error}</div>}
+    </Modal>
+  );
+};
+
 const VenueTab = ({ evt }) => {
+
   const venue = useAsync(async () => {
     const [v, partner] = await Promise.all([
       evt.venue_id ? supabase.from('venues').select('*').eq('id', evt.venue_id).maybeSingle() : Promise.resolve({ data: null }),
@@ -433,9 +602,9 @@ export default function EventDetailPage() {
       {tab === 'overview' && <OverviewTab evt={evt} perf={perf.data} stats={stats.data} onTab={setTab} health={health.data} />}
       {tab === 'details' && (
         <div className="flex flex-col gap-4">
-          <Panel title="Event details">
-            {can(P.EVENTS_MANAGE) ? <EventForm key={evt.updated_at} initial={evt} onSaved={() => { toast('Event saved'); refresh(); }} /> : <p className="text-[13px]">Read only.</p>}
-          </Panel>
+          {can(P.EVENTS_MANAGE)
+            ? <EventEditor key={evt.updated_at} initial={evt} onSaved={(_, r) => { toast(r.lineupError ? `Saved, but the line-up was not: ${r.lineupError}` : 'Event saved', r.lineupError ? 'bad' : undefined); refresh(); }} />
+            : <Panel title="Event details"><p className="text-[13px]">Read only.</p></Panel>}
           {can(P.EVENTS_MANAGE) && <BookingFormEditor evt={evt} onSaved={refresh} />}
         </div>
       )}
@@ -481,12 +650,12 @@ export default function EventDetailPage() {
       {tab === 'activity' && <ActivityTab evt={evt} />}
 
       {confirm === 'publish' && (
-        <ConfirmDialog title="Publish event?" message="The event becomes visible on the website and checkout opens." confirmLabel="Publish & open sales" tone="success"
+        <ConfirmDialog title="Publish event?" message="The event becomes visible on the website and checkout opens. Every artist on the line-up is told “You're on the lineup”, with their set time." confirmLabel="Publish & open sales" tone="success"
           onConfirm={async () => { await update('events', evt.id, { status: 'on-sale' }); toast('Event published'); refresh(); }} onClose={() => setConfirm(null)} />
       )}
       {confirm === 'cancel' && (
         <ConfirmDialog title="Cancel this event?" confirmLabel="Cancel event" tone="danger"
-          message={`Checkout closes and the event shows as cancelled. Existing bookings are NOT refunded automatically — cancel/refund them from the Bookings tab (${fmt.num(perf.data?.tickets_sold ?? 0)} tickets sold).`}
+          message={`Checkout closes and the event shows as cancelled. Artists on the line-up and anyone holding a request are notified; the line-up is kept as history. Existing bookings are NOT refunded automatically — cancel/refund them from the Bookings tab (${fmt.num(perf.data?.tickets_sold ?? 0)} tickets sold).`}
           onConfirm={async () => { await update('events', evt.id, { status: 'cancelled' }); toast('Event cancelled'); refresh(); }} onClose={() => setConfirm(null)} />
       )}
       {confirm === 'delete' && (

@@ -20,7 +20,7 @@ export async function launch({ mobile = false, camera = null } = {}) {
   return { browser, context, page, errors };
 }
 
-async function latestCode(email, after) {
+export async function latestCode(email, after) {
   for (let i = 0; i < 30; i++) {
     const res = await fetch(`${MAIL}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`).then((r) => r.json());
     const msg = (res.messages || []).find((m) => new Date(m.Created).getTime() >= after);

@@ -17,7 +17,7 @@ export const ProgrammeBoardModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[250] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="programme-title">
       <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
-      <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-4 border-[#d1a437] p-6 shadow-[12px_12px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-2 border-[#d1a437] p-6 shadow-[4px_4px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-hidden">
         <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-3">
           <span id="programme-title" className="font-mono text-xs font-bold text-[#d1a437] tracking-[0.3em]">📜 THE PROGRAMME // UPCOMING SESSIONS</span>
           <button onClick={onClose} className="font-mono text-xs font-bold border border-[#ecdcaf] px-3 py-1 min-h-[36px] text-[#ecdcaf] hover:bg-[#c2272a] transition-all">

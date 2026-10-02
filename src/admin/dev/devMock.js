@@ -25,14 +25,14 @@ export const MOCK_IDENTITIES = {
 // External portals need a real (local) session — their data is RLS-scoped to
 // the signed-in account — so they're only offered with a local Supabase stack.
 export const PORTAL_IDENTITIES = {
-  artist: { role: 'artist', full_name: 'Tangy Artist', email: 'artist@tangy.local', label: 'Artist', tagline: 'Performances, schedule, messages', path: '/artist/dashboard' },
+  artist: { role: 'artist', full_name: 'Ananya Rao', email: 'ananya.rao@demo.tangy.local', label: 'Artist (demo: Ananya Rao)', tagline: 'Performances, schedule, messages', path: '/artist/dashboard' },
   sponsor: { role: 'sponsor', full_name: 'Tangy Sponsor', email: 'sponsor@tangy.local', label: 'Sponsor', tagline: 'Sponsorship, deliverables, messages', path: '/sponsor/dashboard' },
   vendor: { role: 'vendor', full_name: 'Tangy Vendor', email: 'vendor@tangy.local', label: 'Vendor', tagline: 'Assigned events, instructions', path: '/vendor/dashboard' },
   venue: { role: 'venue', full_name: 'Tangy Venue Host', email: 'venue@tangy.local', label: 'Venue Host', tagline: 'Hosted events, setup, access', path: '/venue/dashboard' },
   volunteer: { role: 'volunteer', full_name: 'Tangy Volunteer', email: 'volunteer@tangy.local', label: 'Volunteer', tagline: 'Events, notices, check-in access', path: '/volunteer/dashboard' },
 };
 
-// Mirror of role_permissions (0017_admin_system.sql + 0018_operations_platform.sql).
+// Mirror of role_permissions (0017_admin_system.sql + 0018_operations_platform.sql + 0030).
 // Used only when there is no real session (mock-only mode). With a local
 // Supabase stack, permissions come from my_permissions() like production.
 const STAFF = ['dashboard.view', 'events.view_assigned', 'attendees.view_assigned', 'checkin.perform', 'checkin.history', 'announcements.view', 'tasks.view_own'];
@@ -40,7 +40,7 @@ const ADMIN = [
   'dashboard.view', 'applications.view', 'applications.review', 'events.view_all', 'events.manage',
   'bookings.view_all', 'bookings.manage', 'payments.view', 'attendees.view_all', 'checkin.perform', 'checkin.history',
   'content.manage', 'announcements.view', 'team.manage', 'entities.manage', 'users.view', 'reports.view', 'operations.manage',
-  'messages.manage', 'volunteers.manage', 'access.grant',
+  'messages.manage', 'volunteers.manage', 'access.grant', 'staff.invite',
   'content.view', 'content.create', 'content.edit', 'content.publish', 'content.delete',
   'content.manage_tv', 'content.manage_diary', 'content.manage_media', 'content.manage_sessions',
 ];

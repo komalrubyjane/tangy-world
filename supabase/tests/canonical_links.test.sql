@@ -73,9 +73,9 @@ select tt.check(tt.link('00000000-0000-0000-0000-0000000d0001', 'application.new
 select tt.login('00000000-0000-0000-0000-0000000d0003');
 select start_partner_conversation('Loading', 'Need loading bay access', '00000000-0000-0000-0000-0000000fd001');
 select tt.logout();
-select tt.check(tt.link('00000000-0000-0000-0000-0000000d0001', 'message.new') ~ '^/admin-portal/messages\?c=[0-9a-f-]{36}$', 'partner message → /admin-portal/messages?c=…');
+select tt.check(tt.link('00000000-0000-0000-0000-0000000d0001', 'message.new') ~ '^/admin-portal/messages/[0-9a-f-]{36}$', 'partner message → /admin-portal/messages/:id');
 select tt.check((select link from email_outbox where user_id = '00000000-0000-0000-0000-0000000d0001' and notification_type = 'message.new' limit 1)
-  ~ '^/admin-portal/messages\?c=', 'queued email carries the canonical link too');
+  ~ '^/admin-portal/messages/', 'queued email carries the canonical link too');
 
 select tt.login('00000000-0000-0000-0000-0000000d0004');
 select request_checkin_access('00000000-0000-0000-0000-0000000fd001', 'Second gate');

@@ -24,6 +24,7 @@ export function mapDbEvent(row) {
     tags: row.tags || [],
     capacity: row.capacity,
     story: row.story || '',
+    background: row.page_background || null,
     featured: row.featured,
     // Booking form (0024): tickets per booking and the event's own questions.
     bookingMin: row.booking_min_quantity ?? 1,
@@ -31,6 +32,17 @@ export function mapDbEvent(row) {
     bookingQuestions: Array.isArray(row.booking_questions) ? row.booking_questions : [],
   };
 }
+
+// What the public sees as upcoming: dated today or later (the same "today" as
+// the archive in lib/archiveService.js, so every session is in exactly one of
+// the two lists) and still going ahead — a cancelled or past-status session is
+// never offered, whatever its date.
+const todayISO = () => new Date().toISOString().slice(0, 10);
+export const isUpcomingEvent = (e) => {
+  const parsed = e.date ? new Date(e.date) : null; // offline mock events carry only a display date
+  const day = e.rawDate || (parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : '');
+  return day >= todayISO() && !['past', 'cancelled', 'draft'].includes(e.dbStatus);
+};
 
 // Live events from Supabase. The editorial mock events are used ONLY when the
 // app runs fully offline (AUTH_MODE=mock or no Supabase configured). With a

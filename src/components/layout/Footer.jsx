@@ -12,7 +12,7 @@ export const Footer = () => {
       <div className="t-container">
         <p className="t-label text-[#C89D35] m-0">Hyderabad / India // Est. 2016</p>
         <h2 className="font-display uppercase text-[#EFE2C0] leading-[0.85] mt-4 mb-0" style={{ fontSize: 'clamp(3rem, 12vw, 10rem)' }}>
-          Tangy Sessions™
+          Tangy Sessions
         </h2>
         <p className="t-label text-[#EFE2C0]/70 mt-5 mb-0">People • Music • Places • Stories</p>
 

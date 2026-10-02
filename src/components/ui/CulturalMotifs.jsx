@@ -140,7 +140,7 @@ export const HalftoneTexture = ({ color = '#11100C', opacity = 0.5, dotSize = 4,
   />
 );
 
-// 9. Film grain — formalises the site's noise.png texture as a reusable, subtle
+// 9. Film grain — a reusable, subtle grain (the baked /textures set; noise.png is retired)
 // atmospheric layer (never targeted at a specific photo).
 // Film grain → the shared static grain (no blend mode). Legacy props ignored.
 export const FilmGrain = ({ className = '' }) => (

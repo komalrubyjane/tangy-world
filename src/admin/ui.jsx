@@ -5,7 +5,7 @@ import {
   ShieldCheck, Megaphone, Info, BarChart3, ScrollText, Settings, Sparkles, MessagesSquare, Mail, Hourglass,
   BellRing, DoorOpen, Tv, Search, LogOut, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, X, Menu, Plus,
   Check, TriangleAlert, Lock, RefreshCw, Download, QrCode, ArrowUpRight, MapPin, Clock, Pencil, Trash2, Ban,
-  CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
+  CircleCheck, CircleX, Eye, UserPlus, Copy, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
   Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck, ArrowUp, ArrowDown,
@@ -20,7 +20,7 @@ const ICONS = {
   ShieldCheck, Megaphone, Info, BarChart3, ScrollText, Settings, Sparkles, MessagesSquare, Mail, Hourglass,
   BellRing, DoorOpen, Tv, Search, LogOut, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, X, Menu, Plus,
   Check, TriangleAlert, Lock, RefreshCw, Download, QrCode, ArrowUpRight, MapPin, Clock, Pencil, Trash2, Ban,
-  CircleCheck, CircleX, Eye, UserPlus, Activity, Command,
+  CircleCheck, CircleX, Eye, UserPlus, Copy, Activity, Command,
   Bell, Send, FileText, ClipboardList, KeyRound, Timer, Music, Handshake, Store, Building2, HeartHandshake, CheckCheck,
   Plane, Utensils, Wallet, CalendarClock, Mic, User, Link2, ShieldAlert, Gauge,
   Upload, Image, Video, Paperclip, Columns3, List, Receipt, Filter, UserCheck, ArrowUp, ArrowDown,
@@ -245,7 +245,7 @@ const STATUS_TONE = {
   pending: 'warn', assigned: 'warn', in_progress: 'info', scheduled: 'info', 'sold-out': 'gold',
   rejected: 'bad', cancelled: 'bad', refunded: 'bad', failed: 'bad', declined: 'bad', deactivated: 'bad',
   draft: 'muted', archived: 'muted', expired: 'muted', complimentary: 'gold', manual: 'gold', qr: 'muted',
-  super_admin: 'gold', admin: 'info', staff: 'good',
+  super_admin: 'gold', admin: 'info', staff: 'good', accepted: 'good', revoked: 'muted',
 };
 
 export const Badge = ({ status, tone, children }) => {

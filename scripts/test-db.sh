@@ -30,7 +30,9 @@ fi
 demo=$("${PSQL[@]}" -At -c "select count(*) from events where id::text like 'de300000-%'")
 if [[ "$demo" != "0" ]]; then
   "${PSQL[@]}" < supabase/demo/demo_remove.sql
-  trap '"${PSQL[@]}" < supabase/demo/demo_seed.sql && echo "(demo dataset restored)"' EXIT
+  # Restore every demo seed, in the order scripts/demo-data.sh loads them
+  # (the accounts are still there, so the SQL alone brings it all back).
+  trap 'for f in demo_seed demo_seed_history demo_seed_artist_portal demo_seed_workflow; do "${PSQL[@]}" < "supabase/demo/$f.sql" || exit 1; done && echo "(demo dataset restored)"' EXIT
 fi
 
 total=0

@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient';
 import { insert, update, orIlike } from '../api';
 import { useServerTable, useDebounced, useAsync } from '../hooks';
+import { FindAvailableArtists } from '../components/ArtistAvailability';
 import {
   Page, Panel, Tabs, Toolbar, SearchInput, FilterSelect, DataTable, Pagination, Badge, Button, Drawer, KeyValue, Field,
   Input, Textarea, Skeleton, EmptyState, ErrorState, fmt, useToast,
@@ -173,6 +174,7 @@ const EntityManager = ({ kind }) => {
   const [search, setSearch] = useState(params.get('q') || '');
   const q = useDebounced(search);
   const navigate = useNavigate();
+  const [finding, setFinding] = useState(false);
 
   const table = useServerTable({
     table: config.table,
@@ -191,6 +193,7 @@ const EntityManager = ({ kind }) => {
         <Toolbar right={
           <>
             <span className="font-mono text-[11px] text-[#E7D5A4]/60">{fmt.num(table.count)} {config.label.toLowerCase()}</span>
+            {kind === 'artists' && <Button size="sm" icon="CalendarDays" onClick={() => setFinding(true)}>Find available artists</Button>}
             {config.canCreate && <Button size="sm" variant="primary" icon="Plus" to={`/admin-portal/people/${kind}/new`}>Add {config.singular}</Button>}
           </>
         }>
@@ -206,6 +209,7 @@ const EntityManager = ({ kind }) => {
           action: !config.canCreate && <Button size="sm" to={`/admin-portal/applications?type=${{ sponsors: 'sponsor', vendors: 'vendor', crew: 'crew', volunteers: 'volunteer' }[kind]}`}>View applications</Button>,
         }} />
       <Pagination {...table} />
+      {finding && <Drawer title="Find available artists" subtitle="Who can play on a date — from each artist's own calendar." width="sm:max-w-3xl" onClose={() => setFinding(false)}><FindAvailableArtists /></Drawer>}
     </Panel>
   );
 };

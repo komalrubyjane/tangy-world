@@ -1,16 +1,26 @@
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
-import { diaryStories } from '../../data/mock/diary';
+import { Link } from 'react-router-dom';
+import { content } from '../../lib/contentService';
+import { useContent, formatDate } from '../../hooks/useContent';
+import { ContentLoading, ContentError, ContentEmpty } from '../../components/ui/ContentStates';
+import { MediaImg } from '../../components/ui/Media';
 import { RetroGrain, LotusStamp } from '../../components/ui/RetroAssets';
+import { PageCrumbs, SectionNav } from '../../components/layout/SectionNav';
+import { usePageMeta } from '../../hooks/usePageMeta';
 
 export const RecentStoriesPage = () => {
+  usePageMeta({ title: 'Recent Stories', description: 'The latest field notes, session recaps and archive updates from the Tangy desk.' });
+  // The latest published diary entries (diary_posts), newest first.
+  const { data, loading, error, retry } = useContent(() => content.listDiary());
+  const stories = (data || []).slice(0, 6);
   return (
     <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
       <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
         <div className="relative z-10">
-          <a href="/diary" className="font-mono text-[10px] text-[#D19A24]/70 tracking-widest uppercase hover:text-[#D19A24] transition-colors">← BACK TO DIARY</a>
+          <PageCrumbs />
           <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
             TANGY EDITORIALS // LATEST DISPATCHES
           </span>
@@ -23,30 +33,33 @@ export const RecentStoriesPage = () => {
         </div>
       </section>
 
-      <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-        {diaryStories.map((story, idx) => (
-          <article key={story.id} className="relative bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] flex flex-col overflow-hidden">
-            <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
-            
-            <div className="relative w-full h-40 overflow-hidden border-b-4 border-[#11100C]">
-              <img src={story.image} alt={story.title} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125" />
-              <LotusStamp index={idx} bg="transparent" border="#D19A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
-            </div>
-            <div className="p-4 sm:p-5 flex flex-col flex-1">
-              <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase mb-2">ENTRY #00{idx + 1} · {story.date}</span>
-              <h2 className="font-serif italic text-lg sm:text-xl text-[#11100C] font-bold mb-2 leading-tight">{story.title}</h2>
-              <p className="font-body text-xs sm:text-sm text-[#11100C]/80 leading-relaxed flex-1">{story.excerpt}</p>
-            </div>
-          </article>
-        ))}
+      <section className="py-12 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6">
+        {loading && <ContentLoading label="Loading the latest entries…" />}
+        {!loading && error && <ContentError onRetry={retry}>We couldn’t load the diary right now.</ContentError>}
+        {!loading && !error && stories.length === 0 && <ContentEmpty>The first diary entries are on their way.</ContentEmpty>}
+        <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 list-none m-0 p-0">
+          {stories.map((story, idx) => (
+            <li key={story.id}>
+              <Link to={`/diary/${story.slug}`} data-recent-story={story.slug} className="relative h-full bg-[#EFE2C0] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] flex flex-col overflow-hidden hover:-translate-y-1 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D19A24]">
+                <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
+                <div className="relative w-full h-40 overflow-hidden border-b-4 border-[#11100C] bg-[#11100C]/10">
+                  {story.cover_url && <MediaImg src={story.cover_url} alt="" loading="lazy" className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125" />}
+                  <LotusStamp index={idx} bg="transparent" border="#D19A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
+                </div>
+                <div className="p-4 sm:p-5 flex flex-col flex-1">
+                  <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase mb-2">{formatDate(story.published_at)}{story.location ? ` · ${story.location}` : ''}</span>
+                  <h2 className="font-serif italic text-lg sm:text-xl text-[#11100C] font-bold mb-2 leading-tight">{story.title}</h2>
+                  <p className="font-body text-xs sm:text-sm text-[#11100C]/80 leading-relaxed flex-1">{story.excerpt}</p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="py-12 sm:py-16 bg-[#181614] printNoise border-t-4 border-[#D19A24]/40 px-4 sm:px-6 text-center">
         <span className="font-mono text-[10px] text-[#D19A24] tracking-[0.3em] uppercase font-bold block mb-4">MORE FROM THE DIARY</span>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/diary/journal" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">MUSEUM JOURNAL →</a>
-          <a href="/diary/behind-the-scenes" className="px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest border-2 border-[#D19A24]/60 text-[#D19A24] hover:bg-[#C89D35] hover:text-[#11100C] transition-colors">BEHIND THE SCENES →</a>
-        </div>
+        <SectionNav section="Diary" />
       </section>
 
       <Footer />

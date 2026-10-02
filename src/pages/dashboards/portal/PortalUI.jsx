@@ -55,7 +55,7 @@ export const ReadOnlyNote = ({ children }) => (
 );
 
 export const StatTile = ({ label, value, sub }) => (
-  <div className="bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-4 sm:p-5 shadow-[5px_5px_0px_#11100C]">
+  <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-4 sm:p-5 shadow-[4px_4px_0px_#11100C]">
     <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">{label}</span>
     <div className="font-condensed text-3xl font-bold mt-1">{value}</div>
     {sub && <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">{sub}</p>}
@@ -87,12 +87,12 @@ export const AdminPreviewBanner = ({ label }) => (
 
 // `tabHref` (from usePortalTab) makes each section a real link with its own URL.
 export const PortalShell = ({ icon, roleLabel, title, subtitle, statusBadge, tabs, activeTab, onTabChange, tabHref, onLogout, preview, notificationsFor, children }) => (
-  <div className="min-h-screen bg-[#11100C] text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
+  <div className="min-h-screen ui-texture text-[#E7D5A4] font-mono selection:bg-[#C99A2E] selection:text-[#11100C] overflow-x-hidden">
     <Navbar />
     {preview && <AdminPreviewBanner label={preview.label} />}
 
     <section className="pt-24 sm:pt-28 pb-4 px-4 sm:px-6 max-w-6xl mx-auto">
-      <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[8px_8px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="bg-[#191410] border-2 border-[#C99A2E] p-4 sm:p-6 shadow-[4px_4px_0px_#11100C] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 shrink-0 bg-[#E7D5A4] text-[#11100C] rounded-full border-2 border-[#B94717] flex items-center justify-center text-2xl">
             {icon}

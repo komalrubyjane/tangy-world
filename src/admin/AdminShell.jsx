@@ -4,7 +4,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAdminSession, useSetting } from './AdminSession';
 import { useDebounced } from './hooks';
 import { adminApi } from './api';
-import { buildNav, ROLE_LABELS, P } from './rbac';
+import { buildNav, ROLE_LABELS, P, NAV } from './rbac';
 import { Icon, Button, cx, CrumbContext } from './ui';
 import { SIGNOUT_REASON_KEY } from './AdminGate';
 import { NotificationBell } from '../portal/NotificationBell';
@@ -239,7 +239,7 @@ const QUICK_ACTIONS = [
   { label: 'Add complimentary booking', to: '/admin-portal/bookings?comp=1', requires: P.BOOKINGS_MANAGE, icon: 'Ticket' },
   { label: 'New announcement', to: '/admin-portal/content/announcements?new=1', requires: P.CONTENT, icon: 'Megaphone' },
   { label: 'Open check-in terminal', to: '/check-in', requires: P.CHECKIN, icon: 'ScanLine' },
-  { label: 'Invite a user', to: '/admin-portal/users?invite=1', requires: P.USERS_MANAGE, icon: 'UserPlus' },
+  { label: 'Invite a team member', to: '/admin-portal/users?invite=1', anyOf: [P.USERS_MANAGE, P.STAFF_INVITE], icon: 'UserPlus' },
 ];
 
 const RESULT_ICON = { event: 'CalendarDays', artist: 'Mic', sponsor: 'Handshake', vendor: 'Store', 'venue host': 'Building2', volunteer: 'HeartHandshake', booking: 'Ticket', attendee: 'Users', message: 'MessagesSquare' };
@@ -267,7 +267,7 @@ const CommandPalette = ({ nav, onClose }) => {
     const all = [
       ...nav.flatMap((g) => g.items.flatMap((i) => [{ label: i.label, to: i.to, icon: i.icon, hint: g.group },
         ...(i.children || []).map((c) => ({ label: `${i.label} · ${c.label}`, to: c.to, icon: c.icon, hint: g.group }))])),
-      ...QUICK_ACTIONS.filter((a) => can(a.requires)).map((a) => ({ ...a, hint: 'Action' })),
+      ...QUICK_ACTIONS.filter((a) => can(a.requires, a.anyOf)).map((a) => ({ ...a, hint: 'Action' })),
     ];
     const t = q.trim().toLowerCase();
     const found = results.q && t.startsWith(results.q.toLowerCase().slice(0, 2))
@@ -322,6 +322,20 @@ const CommandPalette = ({ nav, onClose }) => {
   );
 };
 
+// Each console section has its own material (globals.css .admin-bg-*): the
+// page's navigation group decides which, by the longest matching nav link.
+const SECTION_BG = { Operate: 'operate', People: 'people', Communicate: 'communicate', Insight: 'insight', System: 'system', 'More operations': 'more' };
+function sectionBackground(pathname) {
+  if (pathname === '/admin-portal' || pathname === '/admin-portal/') return 'dashboard';
+  let best = null;
+  for (const g of NAV) {
+    for (const item of g.items) {
+      if ((pathname === item.to || pathname.startsWith(`${item.to}/`)) && (!best || item.to.length > best.len)) best = { len: item.to.length, group: g.group };
+    }
+  }
+  return SECTION_BG[best?.group] || 'operate';
+}
+
 export const AdminShell = ({ children }) => {
   const { user, perms, can, isMock } = useAdminSession();
   const signOut = useConsoleSignOut();
@@ -359,23 +373,23 @@ export const AdminShell = ({ children }) => {
   const badges = { applications: pendingApps, messages: awaitingMessages };
 
   return (
-    <div data-lenis-prevent className="min-h-[100dvh] bg-[#11100C] text-[#E7D5A4] font-sans flex">
+    <div data-lenis-prevent className="min-h-[100dvh] ui-texture text-[#E7D5A4] font-sans flex">
       <a href="#admin-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[600] bg-[#C99A2E] text-[#11100C] px-3 py-2 rounded">Skip to content</a>
 
-      <aside className="hidden lg:block w-[236px] shrink-0 h-[100dvh] sticky top-0 bg-[#141009] border-r border-[#C99A2E]/15">
+      <aside className="hidden lg:block w-[236px] shrink-0 h-[100dvh] sticky top-0 ui-texture-deep border-r border-[#C99A2E]/15">
         <Sidebar nav={nav} badges={badges} />
       </aside>
 
       {drawerOpen && (
         <div className="fixed inset-0 z-[420] lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
           <div className="absolute inset-0 bg-black/60" onClick={() => setDrawerOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[270px] max-w-[85vw] bg-[#141009] border-r border-[#C99A2E]/25 animate-[drawerIn_0.18s_ease]">
+          <div className="absolute left-0 top-0 bottom-0 w-[270px] max-w-[85vw] ui-texture-deep border-r border-[#C99A2E]/25 animate-[drawerIn_0.18s_ease]">
             <Sidebar nav={nav} badges={badges} onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
       )}
 
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className={`flex-1 min-w-0 flex flex-col admin-bg-${sectionBackground(pathname)}`} data-admin-section={sectionBackground(pathname)}>
         <header className="sticky top-0 z-[200] h-14 shrink-0 bg-[#11100C]/95 backdrop-blur-sm border-b border-[#C99A2E]/15 flex items-center gap-2 px-3 sm:px-5">
           <Button variant="ghost" size="sm" icon="Menu" className="lg:hidden" aria-label="Open navigation" onClick={() => setDrawerOpen(true)} />
           <button

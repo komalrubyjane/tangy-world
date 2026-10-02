@@ -74,7 +74,7 @@ export const DemoArtistDashboard = () => {
       <DemoModeBanner />
 
       <main className="pt-6 pb-20 px-4 sm:px-6 max-w-5xl mx-auto flex flex-col gap-6">
-        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[8px_8px_0px_#11100C] flex items-start gap-4">
+        <div className="bg-[#191410] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[4px_4px_0px_#11100C] flex items-start gap-4">
           <div className="w-16 h-16 shrink-0 rounded-full bg-[#E7D5A4] text-[#11100C] flex items-center justify-center font-condensed text-xl font-bold border-2 border-[#B94717]">
             D
           </div>

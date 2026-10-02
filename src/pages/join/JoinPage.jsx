@@ -68,12 +68,12 @@ export const JoinPage = () => {
                 type="button"
                 onClick={() => selectRole(card)}
                 aria-label={`${card.label} — ${card.tagline}`}
-                className="text-left bg-[#E7D5A4] text-[#11100C] border-4 border-[#11100C] p-5 shadow-[6px_6px_0px_#11100C] hover:-translate-y-1 focus-visible:-translate-y-1 transition-transform flex flex-col gap-2 outline-none focus-visible:ring-4 focus-visible:ring-[#C99A2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#11100C]"
+                className="t-choice p-5 gap-2"
               >
                 <span className="text-3xl" aria-hidden="true">{card.icon}</span>
-                <h3 className="font-condensed text-xl font-bold uppercase leading-tight">{card.label}</h3>
-                <p className="font-mono text-[11px] text-[#11100C]/70 leading-relaxed">{card.tagline}</p>
-                <span className="mt-2 font-mono text-[10px] font-bold text-[#B94717] uppercase">
+                <h3 className="font-condensed text-xl font-semibold uppercase leading-tight tracking-wide">{card.label}</h3>
+                <p className="t-small text-[#181614]/75 leading-relaxed m-0">{card.tagline}</p>
+                <span className="mt-2 t-label text-[#a64a2b]">
                   {card.kind === 'signup' ? 'CREATE ACCOUNT →' : 'APPLY →'}
                 </span>
               </button>
@@ -113,7 +113,7 @@ export const JoinPage = () => {
         </section>
       ) : (
         <section className="pb-20 px-4 sm:px-6 max-w-lg mx-auto">
-          <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-4 border-[#11100C] p-6 sm:p-10 shadow-[10px_10px_0px_#11100C]">
+          <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-6 sm:p-10 shadow-[4px_4px_0px_#11100C]">
             <div className="flex justify-between items-center border-b-2 border-[#11100C] pb-3 mb-6">
               <div>
                 <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">{selected.icon} {selected.label}</span>

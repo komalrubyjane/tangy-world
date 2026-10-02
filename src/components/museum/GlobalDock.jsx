@@ -6,6 +6,7 @@ import { DigitalPassportModal } from './DigitalPassportModal';
 import { PostcardContactModal } from './PostcardContactModal';
 import { TangyTVModal } from './TangyTVModal';
 import { UserLoginModal } from './UserLoginModal';
+import { isArtistWorkspace } from '../../artist/portal/portalNav';
 
 // Staff tools keep their own chrome; the public dock stays out of them.
 const DOCK_HIDDEN_PREFIXES = ['/admin-portal', '/check-in', '/demo-admin'];
@@ -21,7 +22,7 @@ export const GlobalDock = () => {
   const [isPostcardOpen, setIsPostcardOpen] = useState(false);
   const [isTVOpen, setIsTVOpen] = useState(false);
 
-  const showDock = !DOCK_HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const showDock = !isArtistWorkspace(pathname) && !DOCK_HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
   // Flag the body so pages WITHOUT the shared Footer (which already pads for
   // the dock) get bottom padding — see `body[data-dock]` in globals.css.

@@ -9,27 +9,32 @@ import { usePageMeta } from '../../hooks/usePageMeta';
 import { ContentLoading, ContentError, ContentEmpty } from '../../components/ui/ContentStates';
 import { NotFoundPage } from './NotFoundPage';
 import { MediaImg } from '../../components/ui/Media';
+import { SectionNav } from '../../components/layout/SectionNav';
 
 // /gallery — published albums.
 export const GalleryPage = () => {
   const { data, loading, error, retry } = useContent(() => content.listAlbums());
   usePageMeta({ title: 'Gallery', description: 'Photographs from Tangy Sessions.' });
-  const albums = data || [];
+  // The latest albums; every album is in the filterable archive (/gallery/archive).
+  const all = data || [];
+  const albums = [...all].sort((a, b) => (b.taken_on || '').localeCompare(a.taken_on || '')).slice(0, 6);
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
       <Navbar />
       <header className="pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <span className="text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-3">CONTACT SHEETS</span>
         <h1 className="display text-5xl sm:text-7xl uppercase m-0">GALLERY</h1>
+        <SectionNav className="mt-6" />
       </header>
       <main className="py-10 px-4 sm:px-6 max-w-6xl mx-auto">
         {loading && <ContentLoading label="Developing…" />}
         {!loading && error && <ContentError onRetry={retry}>We couldn’t load the gallery right now.</ContentError>}
         {!loading && !error && albums.length === 0 && <ContentEmpty>No albums yet — check back soon.</ContentEmpty>}
+        {albums.length > 0 && <h2 className="text-[10px] text-[#C99A2E] uppercase tracking-[0.3em] font-bold mb-4">Latest albums</h2>}
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 list-none m-0 p-0">
           {albums.map((a) => (
             <li key={a.id}>
-              <Link to={`/gallery/${a.slug}`} className="block bg-[#EFE2C0] text-[#11100C] border-4 border-[#11100C] shadow-[6px_6px_0px_#11100C] hover:-translate-y-1 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]" data-album-card>
+              <Link to={`/gallery/${a.slug}`} className="block bg-[#EFE2C0] text-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] hover:-translate-y-1 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]" data-album-card>
                 <div className="aspect-[4/3] bg-[#11100C]/10 overflow-hidden">{a.cover_url && <MediaImg src={a.cover_url} alt="" loading="lazy" className="w-full h-full object-cover" />}</div>
                 <div className="p-3">
                   <div className="font-condensed text-lg font-bold uppercase">{a.title}</div>
@@ -39,6 +44,11 @@ export const GalleryPage = () => {
             </li>
           ))}
         </ul>
+        {all.length > 0 && (
+          <div className="text-center mt-10">
+            <Link to="/gallery/archive" className="t-btn" data-gallery-archive-link>Browse all {all.length} albums →</Link>
+          </div>
+        )}
       </main>
       <Footer />
     </div>

@@ -90,7 +90,7 @@ export const ArtistNavbar = () => {
               LOGIN
             </button>
             <button 
-              onClick={() => handleNav('/artist/register')}
+              onClick={() => handleNav('/artist/apply')}
               className="px-3 py-1 bg-[#c2272a] text-[#ecdcaf] font-bold border border-[#191410] shadow-[2px_2px_0px_#ecdcaf] active:scale-95 transition-transform uppercase"
             >
               APPLY NOW
@@ -172,7 +172,7 @@ export const ArtistNavbar = () => {
                 </button>
 
                 <button
-                  onClick={() => handleNav('/artist/register')}
+                  onClick={() => handleNav('/artist/apply')}
                   className="p-3 text-left bg-[#c2272a] text-[#ecdcaf] uppercase font-bold border border-[#191410]"
                 >
                   APPLY AS ARTIST →

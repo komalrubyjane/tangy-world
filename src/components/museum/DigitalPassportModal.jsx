@@ -29,7 +29,7 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
       <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* TANGY MEMBER PASSPORT STAMP BOOK */}
-      <div className="relative w-full max-w-2xl max-h-[90dvh] overflow-y-auto bg-[#3c0f0e] text-[#ecdcaf] border-4 border-[#d1a437] p-6 shadow-[14px_14px_0px_#191410] flex flex-col gap-5 z-10">
+      <div className="relative w-full max-w-2xl max-h-[90dvh] overflow-y-auto bg-[#3c0f0e] text-[#ecdcaf] border-2 border-[#d1a437] p-6 shadow-[4px_4px_0px_#191410] flex flex-col gap-5 z-10">
 
         {/* PASSPORT COVER HEADER */}
         <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-3">

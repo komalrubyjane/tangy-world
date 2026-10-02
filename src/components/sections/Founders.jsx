@@ -151,7 +151,7 @@ export const Founders = () => {
         {foundersData.map((founder, idx) => (
           <div 
             key={founder.id}
-            className={`founder-dossier-${idx + 1} group paper-surface text-[#15120D] p-5 md:p-8 lg:p-12 border-4 border-[#15120D] shadow-[8px_8px_0px_#15120D] md:shadow-[20px_20px_0px_#15120D] hover:shadow-[12px_12px_0px_#15120D] md:hover:shadow-[28px_28px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
+            className={`founder-dossier-${idx + 1} group paper-surface text-[#15120D] p-5 md:p-8 lg:p-12 border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] md:shadow-[4px_4px_0px_#15120D] hover:shadow-[4px_4px_0px_#15120D] md:hover:shadow-[4px_4px_0px_#15120D] transition-all duration-300 relative flex flex-col justify-between`}
             style={{ transform: window.innerWidth >= 768 ? `rotate(${founder.rotation})` : 'none' }}
           >
             
@@ -167,7 +167,7 @@ export const Founders = () => {
             <div className="absolute -top-3 right-28 w-20 h-5 bg-[rgba(234,217,166,0.85)] rotate-[-3deg] border border-black/30 z-30 pointer-events-none" />
 
             {/* CONFIDENTIAL STAMP */}
-            <div className={`${founder.stampClass} absolute -top-5 right-4 border-4 border-[#15120D] bg-[#4A171D] text-[#EAD9A6] font-mono text-[10px] font-bold px-3.5 py-1 uppercase shadow-lg z-30 pointer-events-none`}>
+            <div className={`${founder.stampClass} absolute -top-5 right-4 border-2 border-[#15120D] bg-[#4A171D] text-[#EAD9A6] font-mono text-[10px] font-bold px-3.5 py-1 uppercase shadow-lg z-30 pointer-events-none`}>
               CONFIDENTIAL // FILE 001 ✦
             </div>
 

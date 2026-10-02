@@ -1,47 +1,46 @@
-// Creates (invites) a console account — staff, admin or super_admin — for the
-// Users & Roles page. Creating an auth user needs the service role key, so it
-// can't happen in the browser.
+// Invites a console account — Super Admin, Admin / Manager or Staff — from the
+// Users & roles page (account_invitations, migration 0030).
 //
-// Security: the caller's own JWT is verified, and has_permission('users.manage')
-// is evaluated in Postgres UNDER THAT JWT (not the service role), so only an
-// active Super Admin can invite. The role is written with the service-role
-// client (the role-change guard allows server-side writes), and the invite is
-// audited via log_user_invited() — also under the caller's JWT, so the audit
-// row names the real actor.
+// The invitation decides the role; the recipient never chooses it. Nothing is
+// granted here: the role is applied only when the owner of the invited email
+// address signs in and accepts at /invitation (accept_account_invitation).
 //
-// If the email already has an account (e.g. a patron), no second account is
-// created: the existing profile's role is updated instead and `existing: true`
-// is returned.
+// Security: everything runs under the caller's own JWT — no service role key.
+// create_account_invitation() checks in Postgres who may invite which role
+// (Super Admin / Admin need roles.manage; Staff need staff.invite), stores
+// only the SHA-256 hash of the token, and audits the invite.
 //
-// Secrets: SITE_URL (optional, for the invite redirect). SUPABASE_URL /
-// SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
+// The token is 32 random bytes, sent only inside the link (in the URL
+// fragment, so it never reaches a server log). If email can't be sent, the
+// response says so honestly and returns the link once so the inviter can
+// deliver it another way; it is never reported as sent.
+//
+// Secrets: SITE_URL (the public site, for the link). SUPABASE_URL /
+// SUPABASE_ANON_KEY are injected automatically. Email: see _shared/email.ts.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { corsFor, handleOptions } from '../_shared/cors.ts';
+import { sendEmail, notificationHtml } from '../_shared/email.ts';
 
 const INVITABLE_ROLES = ['staff', 'admin', 'super_admin'];
+const ROLE_LABEL: Record<string, string> = { staff: 'Staff', admin: 'Admin / Manager', super_admin: 'Super Admin' };
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-}
+const toHex = (bytes: Uint8Array) => Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 
 Deno.serve(async (req) => {
   const preflight = handleOptions(req);
   if (preflight) return preflight;
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { ...corsFor(req), 'Content-Type': 'application/json' } });
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const siteUrl = (Deno.env.get('SITE_URL') || '').replace(/\/$/, '');
+    if (!siteUrl) return json({ error: 'SITE_URL is not configured, so an invitation link cannot be built.' }, 503);
 
-    const caller = createClient(supabaseUrl, anonKey, {
+    const caller = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
       global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
     });
     const { data: userData, error: userError } = await caller.auth.getUser();
     if (userError || !userData?.user) return json({ error: 'Sign in required.' }, 401);
-
-    const { data: allowed, error: permError } = await caller.rpc('has_permission', { p_permission: 'users.manage' });
-    if (permError || allowed !== true) return json({ error: 'Only a Super Admin can invite users.' }, 403);
 
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email ?? '').trim().toLowerCase();
@@ -51,38 +50,42 @@ Deno.serve(async (req) => {
     if (!fullName) return json({ error: 'Full name is required.' }, 400);
     if (!INVITABLE_ROLES.includes(role)) return json({ error: 'Invalid role.' }, 400);
 
-    const admin = createClient(supabaseUrl, serviceRoleKey);
+    const token = toHex(crypto.getRandomValues(new Uint8Array(32)));
+    const tokenHash = toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))));
 
-    let userId: string | null = null;
-    let existing = false;
-    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-      data: { full_name: fullName },
-      redirectTo: siteUrl ? `${siteUrl}/admin` : undefined,
+    const { data: invitation, error: inviteError } = await caller.rpc('create_account_invitation', {
+      p_email: email, p_full_name: fullName, p_role: role, p_token_hash: tokenHash,
     });
     if (inviteError) {
-      // Already registered → reuse that account rather than failing.
-      const { data: profile } = await admin.from('profiles').select('id').eq('email', email).maybeSingle();
-      if (!profile) return json({ error: 'Could not invite this email address.' }, 400);
-      userId = profile.id;
-      existing = true;
-    } else {
-      userId = invited.user?.id ?? null;
+      // 42501 = the database refused the inviter's permission.
+      return json({ error: inviteError.message || 'Could not create the invitation.' }, inviteError.code === '42501' ? 403 : 400);
     }
-    if (!userId) return json({ error: 'Could not invite this email address.' }, 500);
 
-    // handle_new_user() creates the profile row on auth.users insert.
-    const { data: target } = await admin.from('profiles').select('role').eq('id', userId).maybeSingle();
-    if (existing && target?.role === 'super_admin' && role !== 'super_admin') {
-      return json({ error: 'That account is a Super Admin — change its role from Users & Roles instead.' }, 409);
-    }
-    const { error: updateError } = await admin.from('profiles')
-      .update({ role, is_active: true, ...(existing ? {} : { full_name: fullName }) })
-      .eq('id', userId);
-    if (updateError) return json({ error: 'Account created, but the role could not be set.' }, 500);
+    const link = `${siteUrl}/invitation#token=${token}`;
+    const inviter = userData.user.email ?? 'A Tangy admin';
+    const expires = new Date(invitation.expires_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' });
+    const sent = await sendEmail({
+      to: email,
+      subject: `You're invited to Tangy Sessions as ${ROLE_LABEL[role]}`,
+      html: notificationHtml({
+        title: `Join the Tangy team as ${ROLE_LABEL[role]}`,
+        body: `${inviter} invited you to the Tangy Sessions console as ${ROLE_LABEL[role]}. Open the link, sign in with this email address (${email}) and accept. The link works once and expires ${expires} IST. If you weren't expecting this, ignore this email.`,
+        actionUrl: link,
+        actionLabel: 'Accept invitation',
+      }),
+      text: `${inviter} invited you to Tangy Sessions as ${ROLE_LABEL[role]}.\nAccept (sign in as ${email}): ${link}\nThe link works once and expires ${expires} IST.`,
+    });
+    const emailStatus = sent.ok ? 'sent' : sent.notConfigured ? 'not_configured' : 'failed';
+    await caller.rpc('set_invitation_email_status', { p_id: invitation.id, p_status: emailStatus });
 
-    await caller.rpc('log_user_invited', { p_user_id: userId, p_email: email, p_role: role, p_existing: existing });
-
-    return json({ ok: true, user_id: userId, existing });
+    return json({
+      ok: true,
+      invitation_id: invitation.id,
+      expires_at: invitation.expires_at,
+      existing_account: invitation.existing_account,
+      email_status: emailStatus,
+      ...(sent.ok ? {} : { email_error: sent.error, invite_url: link }),
+    });
   } catch {
     return json({ error: 'Something went wrong.' }, 500);
   }

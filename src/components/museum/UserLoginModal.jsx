@@ -96,77 +96,80 @@ export const UserLoginModal = () => {
         aria-modal="true"
         aria-labelledby="login-modal-title"
         tabIndex={-1}
-        className={`outline-none relative w-full ${showRoleStep ? 'max-w-2xl' : 'max-w-md'} max-h-[90dvh] overflow-y-auto bg-[#EDE0C0] p-6 border-4 border-[#11100C] shadow-[16px_16px_0px_#11100C] text-[#11100C]`}
-        style={{ backgroundImage: "url('/noise.png')", backgroundBlendMode: 'multiply', backgroundSize: '180px' }}
+        className={`surface-modal outline-none relative w-full ${showRoleStep ? 'max-w-2xl' : 'max-w-md'} max-h-[90dvh] overflow-y-auto p-5 sm:p-8`}
+        data-membership-desk
       >
-        {/* Masking tape at top */}
-        <div className="absolute -top-3 left-1/3 w-24 h-5 bg-[rgba(231,213,164,0.85)] rotate-[-2deg] border border-black/30 z-20 pointer-events-none" />
+        {/* One strip of tape — the only print detail on this sheet. */}
+        <span className="t-tape -top-2 left-1/3 rotate-[-2deg]" aria-hidden="true" />
 
-        {/* Close Button */}
         <button
           type="button"
           onClick={closeLoginModal}
           aria-label="Close"
-          className="absolute top-3 right-3 font-mono text-xs font-bold text-[#11100C] hover:text-[#C2272A] p-1"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 t-label inline-flex items-center gap-1.5 min-h-[44px] px-3 text-[#181614] hover:text-[#a64a2b] outline-none focus-visible:outline-2 focus-visible:outline-[#a64a2b]"
         >
-          ✕ CLOSE
+          <span aria-hidden="true">✕</span> Close
         </button>
 
         {/* Header */}
-        <div className="border-b-2 border-[#11100C] pb-3 mb-4 pr-16">
-          <div className="font-mono text-[9px] font-bold text-[#B94717] tracking-[0.2em] uppercase mb-1">
-            {showRoleStep ? '✦ TANGY MEMBERSHIP DESK' : '✦ TANGY PATRON PORTAL'}
-          </div>
-          <h2 id="login-modal-title" className="display text-2xl sm:text-3xl font-bold leading-tight">
+        <header className="pr-20 mb-5">
+          <p className="t-label text-[#a64a2b] m-0">
+            {showRoleStep ? 'Tangy membership desk' : 'Tangy patron portal'}
+          </p>
+          <h2 id="login-modal-title" className="display text-[2rem] sm:text-[2.6rem] leading-[0.95] mt-2 mb-0">
             {isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : loginReason ? `SIGN IN ${loginReason}` : 'CREATE YOUR ACCOUNT'}
           </h2>
-          <p className="font-serif italic text-xs text-[#2A1A0E] opacity-80 mt-1">
+          <p className="t-quote text-[1.05rem] sm:text-[1.15rem] text-[#181614]/80 mt-2 mb-0">
             {isLoggedIn
               ? 'Access your digital passport, concert stamps & member perks.'
               : showRoleStep
               ? 'Choose how you participate in the Tangy world.'
               : 'No password needed — verify with a one-time code sent to your email.'}
           </p>
-        </div>
+        </header>
+        <hr className="archivalRule mb-5" />
 
         {showRoleStep && (
           <div className="flex flex-col gap-5">
-            <div role="group" aria-label="How are you joining Tangy?" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+            <div role="group" aria-label="How are you joining Tangy?" className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {ROLE_CARDS.map((card) => (
                 <button
                   key={card.key}
                   type="button"
                   onClick={() => selectRole(card)}
                   aria-label={`${card.label} — ${card.tagline}`}
-                  className="text-left bg-[#F5E9C9] hover:bg-white border-2 border-[#11100C] p-3 shadow-[3px_3px_0px_#11100C] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 transition-transform flex flex-col gap-1 outline-none focus-visible:ring-4 focus-visible:ring-[#B94717] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDE0C0]"
+                  className="t-choice"
                 >
-                  <span className="text-xl" aria-hidden="true">{card.icon}</span>
-                  <span className="font-condensed text-xs sm:text-sm font-bold uppercase leading-tight">{card.label}</span>
-                  <span className="font-mono text-[9px] text-[#11100C]/70 leading-snug">{card.tagline}</span>
+                  <span className="text-2xl leading-none" aria-hidden="true">{card.icon}</span>
+                  <span className="font-condensed text-base sm:text-lg font-semibold uppercase leading-tight tracking-wide mt-1">{card.label}</span>
+                  <span className="t-small text-[13px] text-[#181614]/75 leading-snug">{card.tagline}</span>
                 </button>
               ))}
             </div>
 
-            <div className="pt-3 border-t border-[#11100C]/20">
-              <span className="block font-mono text-[8px] text-[#11100C]/70 uppercase tracking-[0.25em] mb-2">Other ways to join</span>
-              <div role="group" aria-label="Other ways to join Tangy" className="flex flex-col gap-1.5">
+            <div>
+              <p className="t-meta text-[#181614]/75 m-0 mb-1">Other ways to join</p>
+              <div role="group" aria-label="Other ways to join Tangy" className="flex flex-col divide-y divide-[#181614]/15 border-y border-[#181614]/15">
                 {MORE_WAYS_TO_JOIN.map((card) => (
                   <button
                     key={card.key}
                     type="button"
                     onClick={() => { playSFX('ticketClick'); closeLoginModal(); navigate(card.to); }}
                     aria-label={`${card.label} — ${card.tagline}`}
-                    className="text-left flex items-center gap-2 font-mono text-[10px] text-[#11100C]/80 hover:text-[#B94717] p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-[#B94717]"
+                    className="group text-left flex items-center gap-3 min-h-[44px] py-2 px-1 t-small text-[#181614] hover:text-[#a64a2b] outline-none focus-visible:outline-2 focus-visible:outline-[#a64a2b]"
                   >
-                    <span aria-hidden="true">{card.icon}</span>
-                    <span className="font-bold uppercase">{card.label}</span>
-                    <span className="opacity-60">— {card.tagline}</span>
+                    <span aria-hidden="true" className="text-base">{card.icon}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className="font-condensed font-semibold uppercase tracking-wide">{card.label}</span>
+                      <span className="text-[#181614]/75 group-hover:text-inherit"> — {card.tagline}</span>
+                    </span>
+                    <span aria-hidden="true" className="t-label">→</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <p className="font-mono text-[9px] text-[#11100C]/70 leading-relaxed">
+            <p className="t-small text-[12.5px] text-[#181614]/75 leading-relaxed m-0">
               Selecting a path doesn't grant that role — specialized paths go through a real application reviewed by the Tangy
               team.
             </p>
@@ -175,10 +178,10 @@ export const UserLoginModal = () => {
 
         {isLoggedIn && user && (
           <div className="flex flex-col gap-4">
-            <div className="bg-[#E3D4AC] p-4 border-2 border-[#11100C] font-mono text-xs">
+            <div className="bg-[#f8f0db] p-4 border border-[#181614]/35 rounded-[2px] font-mono text-xs">
               <div className="flex justify-between items-center mb-2 pb-2 border-b border-[#11100C]/20">
                 <span className="opacity-70">STATUS:</span>
-                <span className="text-[#B94717] font-bold">ACTIVE MEMBER 🛂</span>
+                <span className="text-[#a64a2b] font-bold">ACTIVE MEMBER 🛂</span>
               </div>
               <div className="flex justify-between items-center mb-1">
                 <span className="opacity-70">NAME:</span>
@@ -190,13 +193,14 @@ export const UserLoginModal = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="opacity-70">STAMPS COLLECTED:</span>
-                <span className="font-bold text-[#B94717]">{stampsCount} Sessions</span>
+                <span className="font-bold text-[#a64a2b]">{stampsCount} Sessions</span>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              className="w-full font-mono text-xs font-bold uppercase tracking-widest bg-[#11100C] text-[#E7D5A4] hover:bg-[#C2272A] hover:text-white py-2.5 transition-colors shadow-[3px_3px_0px_#11100C]"
+              type="button"
+              className="t-btn w-full"
             >
               LOG OUT OF PASSPORT
             </button>
@@ -208,7 +212,7 @@ export const UserLoginModal = () => {
             {!loginReason && <button
               type="button"
               onClick={() => setStep('role')}
-              className="self-start font-mono text-[10px] font-bold text-[#11100C]/60 hover:text-[#B94717] uppercase tracking-wider outline-none focus-visible:ring-2 focus-visible:ring-[#B94717]"
+              className="self-start t-label min-h-[44px] text-[#181614]/75 hover:text-[#a64a2b] outline-none focus-visible:outline-2 focus-visible:outline-[#a64a2b]"
             >
               ← CHANGE HOW YOU'RE JOINING
             </button>}
@@ -218,7 +222,7 @@ export const UserLoginModal = () => {
               onVerified={() => { playSFX('ticketClick'); closeLoginModal(); }}
             />
 
-            <div className="font-mono text-[9px] opacity-70 bg-[#E3D4AC] p-2 border border-[#11100C]/30">
+            <div className="t-small text-[12.5px] text-[#181614]/80 bg-[#f8f0db] p-3 border border-[#181614]/25 rounded-[2px]">
               ℹ️ {loginReason ? 'New here? The same code creates your free Tangy account.' : 'Guest / User account — for attending Tangy experiences.'}
             </div>
 

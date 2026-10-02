@@ -45,12 +45,12 @@ for (const path of ['/', '/about', '/about/chronology', '/about/full-story', '/a
   '/collaborate', '/collaborate/opportunities', '/contact/email', '/contact/instagram', '/contact/location', '/crew/production',
   '/crew/stage-operations', '/crew/volunteer', '/diary/journal', '/diary/stories', '/inner-circle', '/join', '/private/corporate',
   '/private/gatherings', '/private/heritage', '/private/weddings', '/sessions/calendar', '/sessions/concert-culture', '/sessions/upcoming',
-  '/volunteer', '/volunteer/apply', '/crew/apply', '/apply/crew', '/apply/vendors', '/apply/venue-host', '/apply/host', '/artist/register', '/artists']) {
+  '/volunteer', '/volunteer/apply', '/crew/apply', '/apply/crew', '/apply/vendors', '/apply/venue-host', '/apply/host', '/artist/apply', '/artists']) {
   await visit(v, 'visitor', path);
 }
 await visit(v, 'visitor', '/blogs/demo-lanterns-at-chowmahalla', { text: 'Lanterns at Chowmahalla' });
 for (const [from, to] of [['/diary/behind-the-scenes', '/diary'], ['/collaborate/sponsors', '/apply/sponsors'], ['/collaborate/vendors', '/apply/vendors'],
-  ['/collaborate/venue-host', '/apply/venue-host'], ['/artists/apply', '/artist/register'], ['/artists/login', '/artist/login'],
+  ['/collaborate/venue-host', '/apply/venue-host'], ['/artists/apply', '/artist/apply'], ['/artist/register', '/artist/apply'], ['/artists/login', '/artist/login'],
   ['/book/courtyard-live-friday', '/sessions/courtyard-live-friday'], ['/dashboard', '/join/login'], ['/profile', '/join/login'],
   ['/sponsor/dashboard/messages', '/join/login'], ['/admin-mock', /\/admin-portal/], ['/crew-mock/dashboard', /\/(crew\/dashboard|join\/login)/]]) {
   await visit(v, 'visitor', from, { expectPath: to });
@@ -68,7 +68,7 @@ const ROLES = [
   ['volunteer', 'aisha@demo.tangy.local', ['/volunteer/dashboard', '/volunteer/dashboard/events', '/volunteer/dashboard/checkin', '/volunteer/dashboard/tasks', '/volunteer/dashboard/announcements']],
   ['crew', 'sound.crew@demo.tangy.local', ['/crew/dashboard', '/crew/dashboard/assignments', '/crew/dashboard/schedule', '/crew/dashboard/profile']],
   ['private-session client', 'divya.menon@demo.tangy.local', ['/private/dashboard', '/private/dashboard/applications', '/private/dashboard/help']],
-  ['artist', 'ananya.rao@demo.tangy.local', ['/artist/dashboard', '/artist/dashboard/events', '/artist/dashboard/messages', `/artist/dashboard/messages/${D(601)}`, '/artist/dashboard/documents', '/artist/profile', '/artist/calendar', '/artist/media', '/artist/requests', '/artist/settings']],
+  ['artist', 'ananya.rao@demo.tangy.local', ['/artist/dashboard', '/artist/sessions', '/artist/messages', `/artist/messages/${D(601)}`, '/artist/documents', '/artist/notifications', '/artist/profile', '/artist/calendar', '/artist/availability', '/artist/media', '/artist/requests', '/artist/settings']],
 ];
 for (const [who, email, paths] of ROLES) {
   const s = await launch({ mobile: true });
@@ -76,6 +76,7 @@ for (const [who, email, paths] of ROLES) {
   for (const path of paths) await visit(s, who, path);
   if (who === 'artist') {
     await visit(s, who, '/artist/portal', { expectPath: '/artist/dashboard' });
+    for (const [from, to] of [['/artist/dashboard/events', '/artist/sessions'], ['/artist/dashboard/messages', '/artist/messages'], ['/artist/dashboard/payments', '/artist/documents'], [`/artist/dashboard/messages/${D(601)}`, `/artist/messages/${D(601)}`]]) await visit(s, who, from, { expectPath: to });
     // Upload limits (0029): an HTML file can't be put in the public avatars bucket; an image can.
     const before = s.errors.length;
     const up = await s.page.evaluate(async ({ anon, folder }) => {
@@ -117,6 +118,7 @@ for (const [path, text] of [[`/admin-portal/applications/${appId}`, 'Harsh Vardh
 await visit(a, 'super admin', '/admin-portal/check-in', { expectPath: '/check-in' });
 await visit(a, 'super admin', `/admin/preview/sponsor`, { expectPath: /\/admin-portal\/preview\/sponsor|\/admin\/preview\/sponsor/ });
 // admin-invite-user (Edge Function): a Super Admin can invite; staff cannot.
+// Inviting creates a pending invitation only — the role is granted on acceptance (0030).
 const invite = (page) => page.evaluate(async (anon) => {
   const key = Object.keys(localStorage).find((k) => k.endsWith('-auth-token'));
   const token = JSON.parse(localStorage.getItem(key)).access_token;
@@ -127,7 +129,8 @@ const invite = (page) => page.evaluate(async (anon) => {
 }, process.env.ANON_KEY);
 const invBefore = a.errors.length;
 const invited = await invite(a.page);
-check(invited === 200 && sql("select role from profiles where email = 'invite-probe@demo.tangy.local'") === 'staff', `super admin invites a staff member through admin-invite-user (${invited})`);
+check(invited === 200 && sql("select role from account_invitations where email = 'invite-probe@demo.tangy.local' and accepted_at is null and revoked_at is null") === 'staff'
+  && sql("select count(*) from profiles where email = 'invite-probe@demo.tangy.local'") === '0', `super admin invites a staff member through admin-invite-user — pending until accepted (${invited})`);
 a.errors.splice(invBefore);
 track('super admin', a.errors);
 await a.browser.close();
@@ -139,7 +142,7 @@ const stBefore = st.errors.length;
 const staffInvite = await invite(st.page);
 check(staffInvite === 403, `staff cannot invite users (${staffInvite})`);
 st.errors.splice(stBefore);
-sql("delete from auth.users where email = 'invite-probe@demo.tangy.local'");
+sql("delete from account_invitations where email = 'invite-probe@demo.tangy.local'");
 track('staff', st.errors);
 await st.browser.close();
 

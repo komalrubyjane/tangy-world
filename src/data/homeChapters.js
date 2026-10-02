@@ -4,6 +4,7 @@ export const HOME_CHAPTERS = [
   { id: 'hero', label: 'Cover' },
   { id: 'manifesto', label: 'Why Tangy' },
   { id: 'sessions', label: 'Sessions' },
+  { id: 'calendar', label: 'Calendar' },
   { id: 'archive', label: 'Archive' },
   { id: 'volunteer', label: 'Crew' },
   { id: 'build-together', label: 'Collaborate' },

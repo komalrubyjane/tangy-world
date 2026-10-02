@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import { useAudio } from '../audio/AudioContext';
+import { SectionNav } from '../components/layout/SectionNav';
 
 const COLLABORATION_TRACKS = [
   {
@@ -89,7 +90,7 @@ export const CollaboratePage = () => {
           <div
             key={track.id}
             id={track.id}
-            className="border-4 border-[#11100C] p-6 sm:p-10 shadow-[8px_8px_0px_#11100C] sm:shadow-[16px_16px_0px_#11100C] relative overflow-hidden"
+            className="border-2 border-[#11100C] p-6 sm:p-10 shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] relative overflow-hidden"
             style={{ backgroundColor: track.bg, color: track.text }}
           >
             {/* Header info */}
@@ -140,6 +141,8 @@ export const CollaboratePage = () => {
           </div>
         ))}
       </section>
+
+      <SectionNav section="Collaborate" className="py-10 px-4" />
 
       <Footer />
     </div>

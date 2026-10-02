@@ -77,7 +77,7 @@ When real test-mode credentials exist, run and record each of these (none has be
 | `send-ticket-email` | Ticket email with the booking QR | email vars | user JWT (own booking) or admin | E2E via Mailpit |
 | `send-approval-email` | "Application approved" email | email vars, `SITE_URL` | admin JWT | E2E via Mailpit |
 | `send-notification-emails` | Drains `email_outbox` | email vars, `CRON_SECRET`, `SITE_URL` | service key or `x-cron-secret` | E2E + `scripts/run-jobs.sh emails` |
-| `admin-invite-user` | Super Admin invites a console user | `SITE_URL` | super admin JWT (checked in Postgres under that JWT) | E2E sweep: super admin invites (200), staff refused (403) |
+| `admin-invite-user` | Creates a console invitation (hashed single-use token, 72 h) and emails the link; the role is applied only when the recipient accepts at `/invitation` | `SITE_URL`, email settings (section 2) | inviter's JWT — `create_account_invitation` checks `roles.manage` (Super Admin / Admin) or `staff.invite` (Staff) in Postgres; no service role key | E2E invitations (invite → email → accept, single use, wrong account, revoke, manager limited to Staff), sweep (staff refused 403) |
 | `_shared/*` | email provider, CORS allowlist, HMAC | — | — | `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs` |
 
 CORS: set `ALLOWED_ORIGINS` (or `SITE_URL`) to the production origin; list the canonical origin first (JSON responses use it; preflights echo any listed origin). Every browser-called function also checks the caller's JWT. Deno is not installed on this machine: functions were syntax-checked with esbuild and exercised through `supabase functions serve` in the E2E suites.
@@ -108,4 +108,8 @@ Offers are held for `waitlist.offer_hold_minutes` (default 120).
 
 ## 8. Local demo dataset
 
-`scripts/demo-data.sh seed | remove | status` — 10 sessions, 12 artists, 35 demo accounts, 40 bookings, 129 tickets, partial check-ins, 7 waitlist entries, 4 partner threads, content. Local-only (refuses non-localhost URLs); every record is identifiable (`de300000-…` ids, `@demo.tangy.local` emails, "(demo)" partner names, example.com links). Sign in as any demo account; codes arrive in Mailpit (http://127.0.0.1:54324).
+`scripts/demo-data.sh seed | remove | status` loads `supabase/demo/demo_seed.sql` (operations: bookings, check-ins, partners, threads) and `demo_seed_history.sql` (a fictional archive). Totals: 35 sessions (26 past, 2022–2026, incl. cancelled), 27 artists, 8 programmes, 22 albums / 88 photos, 15 Tangy TV records (published, draft, archived), 21 diary posts, 12 announcements, 8 sponsors, 8 vendors, 6 venue hosts, 15 volunteers, 64 accounts, 40 bookings, 129 tickets, 15 waitlist entries. Local-only (refuses non-localhost URLs); every record is identifiable (`de300000-…` ids, `@demo.tangy.local` emails, "(demo)" venue / partner names, example.com links).
+
+**Artist portal demo** (`demo_seed_artist_portal.sql`): 12 artist applications in every state, 16 booking requests, artist media and availability — see `docs/ARTIST_PORTAL.md`.
+
+**Images.** Fictional people and nights use generated artwork from `public/media/demo/` (monogram portraits, abstract covers marked "DEMO IMAGE"). The real Tangy posters and performer photos in `public/media/artists` and `public/media/gallery` are never attached to fictional artists or sessions — the only real photos in the demo data are two empty-venue shots. Sign in as any demo account; codes arrive in Mailpit (http://127.0.0.1:54324).

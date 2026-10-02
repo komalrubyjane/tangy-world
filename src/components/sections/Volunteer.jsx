@@ -18,7 +18,7 @@ const DOSSIERS = [
     tags: ['Events', 'Production', 'Creative', 'Hospitality', 'Community'],
     detailsTitle: 'Recruitment details',
     details: ['Access to all 2025-2026 Tangy Sessions behind-the-scenes.', 'Hands-on experience with analogue sound rigs & monument lighting.'],
-    cta: { href: '/apply/crew', label: 'Join the crew → Apply now' },
+    cta: { href: '/crew/apply', label: 'Join the crew → Apply now' },
   },
   {
     key: 'art',
@@ -34,7 +34,7 @@ const DOSSIERS = [
     tags: ['Musicians', 'DJs', 'Bands', 'Producers', 'Performers'],
     detailsTitle: 'Audition criteria',
     details: ['Performers of all analog, live electronic & acoustic genres welcome.', 'Submit demo recordings for season curation.'],
-    cta: { href: '/artist/register', label: 'Apply as artist →' },
+    cta: { href: '/artist/apply', label: 'Apply as artist →' },
   },
 ];
 

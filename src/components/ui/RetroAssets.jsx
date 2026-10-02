@@ -37,7 +37,7 @@ export const RetroImage = ({
 
   return (
     <div
-      className={`relative inline-block ${frameClasses[frame] || ''} ${shadow ? 'shadow-[6px_6px_0px_rgba(17,16,12,0.55)]' : ''} ${className}`}
+      className={`relative inline-block ${frameClasses[frame] || ''} ${shadow ? 'shadow-[4px_4px_0px_rgba(17,16,12,0.55)]' : ''} ${className}`}
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       {tape && (
@@ -103,7 +103,7 @@ export const PosterFragment = ({
   if (!resolvedSrc) return null;
   return (
     <div
-      className={`relative bg-[#EEE4C8] p-1.5 pb-5 border-2 border-[#11100C] shadow-[8px_8px_0px_rgba(17,16,12,0.6)] ${className}`}
+      className={`relative bg-[#EEE4C8] p-1.5 pb-5 border-2 border-[#11100C] shadow-[4px_4px_0px_rgba(17,16,12,0.6)] ${className}`}
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       {tape && (
@@ -135,7 +135,7 @@ export const FilmCutout = ({ index = 0, src, rotate = 0, className = '' }) => {
   if (!resolvedSrc) return null;
   return (
     <div
-      className={`overflow-hidden border-2 border-[#11100C] shadow-[5px_5px_0px_rgba(17,16,12,0.5)] ${className}`}
+      className={`overflow-hidden border-2 border-[#11100C] shadow-[4px_4px_0px_rgba(17,16,12,0.5)] ${className}`}
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       <img src={resolvedSrc} alt="" loading="lazy" decoding="async" className="block w-full h-full object-cover" />
