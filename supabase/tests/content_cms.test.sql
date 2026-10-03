@@ -51,11 +51,34 @@ update profiles set role = 'staff' where id = '00000000-0000-0000-0000-00000000c
 insert into events (id, slug, name, event_date, venue, capacity, price, status, description) values
   ('00000000-0000-0000-0000-00000000c601', 'cms-night', 'CMS Night', current_date + 5, 'Stepwell', 50, 1000, 'on-sale', 'Old copy');
 
+-- Test-owned CMS content, created here and rolled back with the suite. The
+-- suite must not depend on content seeded by migrations: production starts
+-- with an EMPTY CMS (supabase/production-bootstrap/ drops 0028's seed), and
+-- the visibility / edit-rights checks below need real published and draft
+-- rows to be meaningful rather than trivially true on empty tables.
+insert into tv_videos (slug, title, video_url, sort_order, status, published_at) values
+  ('test-tv-live',  'Test TV — Live',  '/media/test/live.mp4',  1, 'published', now()),
+  ('test-tv-field', 'Test TV — Field', '/media/test/field.mp4', 2, 'published', now()),
+  ('test-tv-draft', 'Test TV — Draft', '/media/test/draft.mp4', 3, 'draft', null);
+insert into gallery_albums (id, slug, title, status, published_at) values
+  ('00000000-0000-0000-0000-00000000c711', 'test-album',       'Test album',       'published', now()),
+  ('00000000-0000-0000-0000-00000000c712', 'test-draft-album', 'Test draft album', 'draft',     null);
+insert into gallery_photos (album_id, image_url, alt_text, sort_order) values
+  ('00000000-0000-0000-0000-00000000c711', '/media/test/1.jpg', 'Test photo one',   1),
+  ('00000000-0000-0000-0000-00000000c711', '/media/test/2.jpg', 'Test photo two',   2),
+  ('00000000-0000-0000-0000-00000000c711', '/media/test/3.jpg', 'Test photo three', 3),
+  ('00000000-0000-0000-0000-00000000c712', '/media/test/4.jpg', 'Test photo in a draft album', 1);
+insert into diary_posts (slug, title, body, status) values
+  ('test-draft-one', 'Test draft one', 'Draft text', 'draft'),
+  ('test-draft-two', 'Test draft two', 'Draft text', 'draft');
+
 \echo '--- 1. Visitors see published content only'
 select tt.anon();
-select tt.check((select count(*) >= 8 from tv_videos), 'the bundled TV channels are published');
+select tt.check((select count(*) from tv_videos where slug like 'test-tv-%') = 2 and not exists (select 1 from tv_videos where slug = 'test-tv-draft'),
+  'visitors see published TV videos, not drafts');
 select tt.check((select count(*) = 0 from diary_posts), 'imported diary drafts are not public');
-select tt.check((select count(*) >= 10 from gallery_photos), 'published album photos are public');
+select tt.check((select count(*) from gallery_photos where album_id = '00000000-0000-0000-0000-00000000c711') = 3
+  and not exists (select 1 from gallery_photos where album_id = '00000000-0000-0000-0000-00000000c712'), 'published album photos are public, draft album photos are not');
 select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('x', 'X', '/x.mp4')$$, '%row-level security%', 'visitors cannot add videos');
 select tt.login('00000000-0000-0000-0000-00000000c503');
 select tt.check((select count(*) = 0 from diary_posts), 'a patron cannot see drafts');
@@ -70,7 +93,7 @@ select tt.logout();
 insert into role_permissions (role, permission) values
   ('staff', 'content.view'), ('staff', 'content.create'), ('staff', 'content.edit'), ('staff', 'content.manage_diary');
 select tt.login('00000000-0000-0000-0000-00000000c502');
-select tt.check((select count(*) >= 4 from diary_posts), 'a diary editor sees drafts');
+select tt.check((select count(*) from diary_posts where slug like 'test-draft-%') = 2, 'a diary editor sees drafts');
 insert into diary_posts (slug, title, body) values ('green-room', 'The green room', 'Draft text');
 select tt.check((select created_by = auth.uid() and status = 'draft' from diary_posts where slug = 'green-room'), 'the editor drafts a post (author recorded)');
 select tt.expect_error($$insert into diary_posts (slug, title, status) values ('sneaky', 'Sneaky', 'published')$$, '%permission to publish%', 'the editor cannot publish on create');
@@ -98,7 +121,7 @@ select tt.check((select count(*) = 0 from diary_posts), 'archived posts leave th
 \echo '--- 4. Validation'
 select tt.login('00000000-0000-0000-0000-00000000c501');
 select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('Bad Slug!', 'X', '/x.mp4')$$, '%check constraint%', 'slugs must be url-safe');
-select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('damini-bhattacharya-live', 'Dup', '/x.mp4')$$, '%duplicate key%', 'slugs are unique');
+select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('test-tv-live', 'Dup', '/x.mp4')$$, '%duplicate key%', 'slugs are unique');
 select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('js', 'X', 'javascript:alert(1)')$$, '%check constraint%', 'video URLs must be site paths or https');
 select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('plain-http', 'X', 'http://example.com/v.mp4')$$, '%check constraint%', 'plain http media is refused');
 select tt.expect_error($$insert into tv_videos (slug, title, video_url) values ('blank', '   ', '/x.mp4')$$, '%check constraint%', 'titles cannot be blank');
@@ -110,10 +133,10 @@ select tt.check((select count(*) = 0 from gallery_photos where album_id = '00000
 
 \echo '--- 5. Tangy TV edits reach everyone'
 select tt.login('00000000-0000-0000-0000-00000000c501');
-update tv_videos set title = 'Damini Bhattacharya — Live at the Stepwell' where slug = 'damini-bhattacharya-live';
+update tv_videos set title = 'Test TV — Live at the Stepwell' where slug = 'test-tv-live';
 insert into tv_videos (slug, title, video_url, status) values ('new-drop', 'New drop', 'https://cdn.example.com/new.mp4', 'published');
 select tt.anon();
-select tt.check((select title = 'Damini Bhattacharya — Live at the Stepwell' from tv_videos where slug = 'damini-bhattacharya-live')
+select tt.check((select title = 'Test TV — Live at the Stepwell' from tv_videos where slug = 'test-tv-live')
   and exists (select 1 from tv_videos where slug = 'new-drop'), 'an admin''s TV change is what every visitor gets');
 select tt.logout();
 select tt.check((select count(*) >= 2 from audit_logs where resource_type = 'tv_video' and actor_id = '00000000-0000-0000-0000-00000000c501'), 'TV changes are audited with the editor');

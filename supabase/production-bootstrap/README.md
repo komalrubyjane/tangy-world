@@ -109,18 +109,25 @@ database with the Supabase shim, then:
 1. checks the package (0004 absent; 32 byte-identical copies; the two
    production files are deletions only),
 2. applies all 34 files in order,
-3. runs the read-only inventory and checks that the database holds schema,
-   CMS tables, 6 buckets, permissions and settings — and no events,
-   announcements, CMS content, users, bookings, tickets, payments, check-ins,
-   applications, conversations or notifications,
-4. runs every `supabase/tests/*.test.sql` suite twice:
-   - **pass A, unchanged:** `admin_system` and `content_cms` stop at their
-     assertions that the removed seed rows exist ("existing public
-     announcements carried over", "the bundled TV channels are published") —
-     expected on the production schema; the other 16 suites pass;
-   - **pass B:** the removed seed statements (taken from the diff above) run
-     inside each suite's own transaction, which the suite rolls back — all 18
-     suites pass (931 assertions) and the database is still empty afterwards.
+3. runs the read-only inventory and checks that the database holds the
+   schema, the CMS / RBAC / settings tables, 6 buckets, permissions and
+   settings — and no events, announcements, CMS content, users, bookings,
+   tickets, payments, check-ins, applications, conversations or
+   notifications,
+4. checks the CMS and announcements are production-ready without content:
+   RLS enabled and policies present on every CMS table, the three
+   announcement policies, the announcement columns, every `content.*`
+   permission on super_admin and none on staff, the CMS functions, the
+   publish guard on every content table with a status, the private
+   `content-media` bucket (50 MB, no HTML) and its storage policies,
+5. runs every `supabase/tests/*.test.sql` suite unchanged — 18 suites, 931
+   assertions — and checks the database is still empty afterwards.
+
+**No seed or mock content is inserted at any point.** Suites that exercise
+content rules (`content_cms`, `admin_system`) create their own clearly
+test-owned rows (`test-…` slugs, a "Public notice" announcement) inside their
+own transaction and roll them back, so they pass with or without seeded
+content and never depend on it.
 
 It does not exercise GoTrue, PostgREST, Storage, Realtime, pg_cron or the
 Edge Functions.

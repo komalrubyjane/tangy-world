@@ -8,7 +8,9 @@
 #      originals by deletions only
 #   2. applies every package file in order, each as its own transaction
 #   3. runs the read-only production inventory and the empty-database checks
-#   4. runs every supabase/tests/*.test.sql suite on the same database
+#   4. runs every supabase/tests/*.test.sql suite on the same database — no
+#      seed or mock content is ever inserted; suites create their own test
+#      rows inside their own transaction and roll them back
 set -uo pipefail
 cd "$(dirname "$0")/.."
 B=supabase/production-bootstrap
@@ -64,45 +66,33 @@ chk "select (select count(*) from conversations) + (select count(*) from message
 chk "select (select count(*) from venues) + (select count(*) from event_ticket_types) + (select count(*) from waitlist)" 0 "no derived venues, ticket types or waitlist rows"
 chk "select count(*) > 0 from role_permissions" t "role permissions configured"
 chk "select count(*) > 0 from system_settings" t "system settings configured"
+chk "select bool_and(c.relrowsecurity) from pg_class c where c.relnamespace = 'public'::regnamespace and c.relname in ('announcements','tv_videos','gallery_albums','gallery_photos','diary_posts','programmes','programme_events')" t "RLS enabled on announcements and every CMS table"
+chk "select count(distinct tablename) from pg_policies where schemaname = 'public' and tablename in ('announcements','tv_videos','gallery_albums','gallery_photos','diary_posts','programmes','programme_events')" 7 "every CMS table has RLS policies"
+chk "select count(*) from pg_policies where tablename = 'announcements' and policyname in ('announcements: public read live','announcements: staff read relevant','announcements: content managers')" 3 "announcement policies: public live read, staff relevant read, content managers"
+chk "select count(*) from information_schema.columns where table_schema = 'public' and table_name = 'announcements' and column_name in ('title','body','category','character','destination','audience','priority','publish_at','expire_at','status','author_id','event_id')" 12 "announcements columns as the CMS uses them"
+chk "select count(*) from role_permissions where role = 'super_admin' and permission in ('content.view','content.create','content.edit','content.publish','content.delete','content.manage','announcements.view')" 7 "super_admin holds every content permission"
+chk "select count(*) from role_permissions where role = 'staff' and permission like 'content.%'" 0 "staff get no content permissions by default"
+chk "select count(*) from pg_proc where pronamespace = 'public'::regnamespace and proname in ('content_can','content_guard_publish','content_slugify','content_media_is_public','update_session_content','portal_announcements')" 6 "CMS functions exist"
+chk "select string_agg(tgrelid::regclass::text, ',' order by tgrelid::regclass::text) from pg_trigger where not tgisinternal and tgfoid = 'content_guard_publish'::regproc" "diary_posts,gallery_albums,programmes,tv_videos" "publish guard on every content table with a status (photos follow their album)"
+chk "select public = false and file_size_limit = 52428800 and not ('text/html' = any (allowed_mime_types)) from storage.buckets where id = 'content-media'" t "content-media bucket: private, 50 MB, no HTML"
+chk "select count(*) > 0 from pg_policies where schemaname = 'storage' and tablename = 'objects' and (qual like '%content-media%' or with_check like '%content-media%')" t "content-media storage policies exist"
+chk "select has_function_privilege('anon', 'content_can(text,text)', 'execute') and not has_function_privilege('anon', 'update_session_content(uuid,jsonb)', 'execute')" t "visitors can run the content read helper, not the session-copy editor"
 chk "select exists (select 1 from pg_proc where proname = 'artist_day_status' and pronamespace = 'public'::regnamespace)" t "0034 detected"
 chk "select exists (select 1 from pg_proc where proname = 'guard_application_start' and pronamespace = 'public'::regnamespace)" t "0035 detected"
 
-echo "== 4. test suites"
-# Pass A — the suites exactly as they are. admin_system and content_cms
-# contain assertions that the removed seed rows exist ("existing public
-# announcements carried over", "the bundled TV channels are published"), so
-# on the production schema they are EXPECTED to stop at those assertions.
-# Pass B — the same suites with exactly the removed seed statements (taken
-# from the package diff, nothing added) executed INSIDE each suite's own
-# transaction, which the suite rolls back: proves every other assertion
-# holds on the production schema without leaving seed rows behind.
-seed="$WORK/removed_seed.sql"
-for p in 0017_admin_system 0028_content_cms; do
-  diff supabase/migrations/$p.sql $B/$p.production.sql | sed -n 's/^< //p'
-done > "$seed"
-run_suites() {  # run_suites <label> <inject seed: yes/no>
-  local total=0 failed=""
-  for f in supabase/tests/*.test.sql; do
-    if [ "$2" = yes ]; then
-      out=$(awk -v seed="$seed" '!done && /^begin;/ { print; while ((getline l < seed) > 0) print l; done = 1; next } { print }' "$f" | P 2>&1)
-    else
-      out=$(P < "$f" 2>&1)
-    fi
-    c=$(echo "$out" | grep -c "NOTICE:  ok"); total=$((total + c))
-    if echo "$out" | grep -qE "^(psql:[^ ]* )?ERROR"; then
-      failed="$failed $(basename "$f" .test.sql)"; echo "   $(basename "$f"): STOPPED after $c — $(echo "$out" | grep -m1 ERROR | cut -c1-110)"
-    else
-      echo "   $(basename "$f"): $c"
-    fi
-  done
-  echo "   $1: $total assertions; stopped:${failed:- none}"
-  RESULT="${failed# }"
-}
-echo "-- pass A: suites unchanged"
-run_suites "pass A" no
-[ "$RESULT" = "admin_system content_cms" ] && pass "pass A: only the two suites that assert the removed seed rows exist stop" || bad "pass A: unexpected failures: $RESULT"
-echo "-- pass B: removed seed statements inside each suite's rolled-back transaction"
-run_suites "pass B" yes
-[ -z "$RESULT" ] && pass "pass B: all 18 suites pass on the production schema" || bad "pass B failures: $RESULT"
-chk "select (select count(*) from events) + (select count(*) from announcements) + (select count(*) from tv_videos) + (select count(*) from gallery_photos) + (select count(*) from diary_posts) + (select count(*) from auth.users)" 0 "after both passes the database is still empty (all suites rolled back)"
+echo "== 4. test suites (no seed or mock content inserted)"
+total=0; failed=""
+for f in supabase/tests/*.test.sql; do
+  out=$(P < "$f" 2>&1)
+  c=$(echo "$out" | grep -c "NOTICE:  ok"); total=$((total + c))
+  if echo "$out" | grep -qE "^(psql:[^ ]* )?ERROR"; then
+    failed="$failed $(basename "$f" .test.sql)"; echo "   $(basename "$f"): FAILED after $c — $(echo "$out" | grep -m1 ERROR | cut -c1-110)"
+  else
+    echo "   $(basename "$f"): $c"
+  fi
+done
+suites=$(ls supabase/tests/*.test.sql | wc -l | tr -d ' ')
+echo "   $suites suites, $total assertions"
+[ -z "$failed" ] && pass "all $suites suites pass on the production schema ($total assertions)" || bad "failing suites:$failed"
+chk "select (select count(*) from events) + (select count(*) from announcements) + (select count(*) from tv_videos) + (select count(*) from gallery_albums) + (select count(*) from gallery_photos) + (select count(*) from diary_posts) + (select count(*) from auth.users) + (select count(*) from profiles) + (select count(*) from artists) + (select count(*) from bookings) + (select count(*) from tickets) + (select count(*) from checkins) + (select count(*) from payment_webhook_events) + (select count(*) from collaborations) + (select count(*) from crew_applications) + (select count(*) from artist_applications) + (select count(*) from private_enquiries) + (select count(*) from contact_enquiries) + (select count(*) from conversations) + (select count(*) from messages) + (select count(*) from notifications)" 0 "after the suites the database is still empty (every suite rolled back)"
 exit $fail

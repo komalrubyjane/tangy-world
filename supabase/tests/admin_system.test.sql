@@ -269,14 +269,18 @@ insert into announcements (title, body, audience, event_id, status) values
   ('Gate A opens 6pm', 'Staff briefing', 'staff', '00000000-0000-0000-0000-0000000e0001', 'published'),
   ('Night B load-in', 'Crew only', 'staff', '00000000-0000-0000-0000-0000000e0002', 'published'),
   ('All-staff note', 'General', 'staff', null, 'published'),
-  ('Unpublished', 'Draft', 'all', null, 'draft');
+  ('Unpublished', 'Draft', 'all', null, 'draft'),
+  ('Public notice', 'For everyone', 'all', null, 'published');
 select tt.check((select author_id from announcements where title = 'Gate A opens 6pm') = '00000000-0000-0000-0000-00000000a002', 'announcement author recorded');
 select tt.login('00000000-0000-0000-0000-00000000a003');
 select tt.check((select array_agg(title order by title) from announcements where audience = 'staff') = array['All-staff note', 'Gate A opens 6pm'], 'staff see only announcements for their events + general staff notes');
 select tt.expect_error($$insert into announcements (title, status) values ('staff post', 'published')$$, '%row-level security%', 'staff cannot publish announcements');
 select tt.anon();
 select tt.check(not exists (select 1 from announcements where audience = 'staff' or status <> 'published'), 'public never sees staff or unpublished announcements');
-select tt.check((select count(*) from announcements where title = 'VENUE PARTNERSHIP: OLD CITY HAVELI') = 1, 'existing public announcements carried over');
+-- Production starts with no announcements (the mock seed is not part of
+-- supabase/production-bootstrap/): what matters is that a live public one,
+-- created through the CMS, reaches visitors.
+select tt.check((select count(*) from announcements where title = 'Public notice' and audience = 'all') = 1, 'visitors see live public announcements');
 
 \echo '--- 9. Settings'
 select tt.login('00000000-0000-0000-0000-00000000a002');
