@@ -22,15 +22,52 @@ run these files **in order**, each as its own query:
 15. `migrations/0015_application_lifecycle.sql` — closes the anonymous-application gap on `collaborations`/`crew_applications` (insert now requires `auth.uid() = user_id`; `artists` requires a non-null `user_id` instead, see the file's own note on why), adds `application_notifications` (idempotent approval-email tracking), extends `approve_collaboration`/`approve_crew_application` to queue a notification row, and adds `approve_artist_application`/`reject_artist_application` RPCs (replacing the admin UI's previous direct `.update()` on `artists`)
 16. `migrations/0016_payments_tickets_checkin.sql` — closes the fake-confirmed-booking RLS gap (removes client INSERT on `bookings` entirely), adds `create_pending_booking()` (atomic, capacity-checked pending booking creation — the actual overselling protection), a `tickets` table (one row per admission, each with its own random `token` — never a database id or PII — used as the QR credential) plus `confirm_booking_and_issue_tickets()` (idempotent ticket issuance on payment confirmation), moves `checkins` to per-ticket (`checkins.ticket_id`, `unique(ticket_id)`, dropping the old `unique(booking_id)`) with a new `check_in_ticket()` RPC doing full server-side validation atomically, adds `bookings.tier`, the `'failed'` booking status, and `bookings.ticket_email_status/_error/_sent_at` for idempotent ticket-email delivery tracking
 
+17. `migrations/0017_security_lockdown.sql` — Phase 1 security lockdown. **Run `preflight/0017_security_lockdown_preflight.sql` first** (read-only). See [§ 1a](#1a-0017-security-lockdown) below.
+
+## 1a. 0017 security lockdown
+
+What it closes (each has a test in `tests/security_lockdown.test.sql`):
+
+- **Free tickets / arbitrary bookings** — `create_pending_booking` and `confirm_booking_and_issue_tickets` were executable by anyone through `/rest/v1/rpc` (PostgreSQL grants `EXECUTE` to `PUBLIC`, and Supabase's default privileges grant it to `anon`/`authenticated`). Every `SECURITY DEFINER` and trigger function now has least-privilege grants: those two are `service_role` only (the `razorpay-*` Edge Functions), client RPCs are `authenticated` only (each checks role/ownership inside), and only the RLS helper predicates stay callable by `anon`.
+- **Self-approved artists** — artist inserts must be by the account itself (`user_id = auth.uid()`) and start `pending`; one artist row per account (unique `artists.user_id`).
+- **Self-approved applications** — `collaborations` / `crew_applications` / `private_enquiries` inserts must be `pending` (`contact_enquiries`: `new`); `private_enquiries` can only be filed as yourself or anonymously.
+- **Profile email spoofing** — `profiles.email` / `passport_id` / `member_since` can no longer be changed through the API; `profiles.email` is kept in sync from `auth.users`, and the waitlist self-read policy now uses the email in the signed JWT.
+- **Super admin** — only a `super_admin` can grant or revoke `super_admin`, and the last one can't be demoted. The project owner (SQL editor / Table Editor, no API JWT) is no longer blocked, so the first-admin bootstrap below actually works (0003's guard used to reject it).
+- **Event delete destroying history** — `bookings`/`tickets`/`checkins` foreign keys to `events` (and to each other) are `ON DELETE RESTRICT` instead of `CASCADE`, and staff/admin can no longer `DELETE` those rows through the API. Deleting an event that has bookings now fails; events with no bookings can still be deleted.
+- **Portal authorization** — only approved artists can be requested for (or accept) a session; conversations can only be assigned to staff/admin accounts; `artist_availability` is public only for approved artists.
+
+How to apply safely:
+
+1. Take a backup (Dashboard → Database → Backups).
+2. Run `preflight/0017_security_lockdown_preflight.sql` in the SQL editor. It only reads. Result 1 must show `has_0016 = true`, `has_platform_finalization = false`. Result 2 must be empty — if any account has several artist rows, decide by hand which one it keeps (0017 stops rather than choosing for you). Results 5–9 list rows that *may* be traces of these holes having been used — 0017 doesn't touch them; review them yourself.
+3. Paste `migrations/0017_security_lockdown.sql` as one query. It runs in one transaction: if a preflight check inside it fails, nothing is changed.
+4. Re-run result 3 of the preflight: only `current_role_name`, `is_admin`, `is_staff_or_admin`, `is_participant`, `is_own_assignment` should show `anon = true`.
+
+Rollback: `rollbacks/0017_security_lockdown.down.sql` restores the 0016 policies/functions/foreign keys (re-opening those holes) but deliberately keeps the function privileges locked down.
+
+**Not for the platform-finalization branch.** `origin/feat/platform-finalization` has its own `0017_admin_system.sql … 0034`. This 0017 refuses to run on a database that already has those (it checks for `public.role_permissions`), because it would overwrite functions they redefine. If that branch is the one going to production, these fixes need porting onto its 0034 schema instead.
+
+### Running the security tests
+
+```
+supabase/tests/run_local.sh              # 0001–0017, then every tests/*.test.sql
+UP_TO=0016 supabase/tests/run_local.sh   # the pre-lockdown schema: shows what 0017 fixes
+```
+
+This starts a **throwaway local PostgreSQL 16** (needs the server binaries and `pgcrypto`), loads `tests/local/supabase_shim.sql` (the `anon`/`authenticated`/`service_role` roles, `auth.uid()`/`auth.role()`/`auth.jwt()`, Supabase's default privileges, storage stubs), applies the migrations, and runs the tests by impersonating API requests the way PostgREST does. It never connects to a Supabase project. It does not exercise GoTrue, PostgREST, Storage or the Edge Functions themselves — only the database's own enforcement. The shim must never be run against a real project.
+
 ## 2. Bootstrap your first admin account
 
 RLS deliberately blocks everyone — including admins — from ever promoting their *own*
 account's role (see 0003). That means there is no in-app way to create the first admin;
 it has to be done once, directly, by whoever owns the Supabase project:
 
-1. Sign up for a normal account on the live site (via the "LOGIN" button / patron modal, or the `/admin` sign-in form — both create the same kind of account).
-2. In the Supabase dashboard → Table Editor → `profiles`, find that row and set `role` to `admin` (or `super_admin`).
-3. Sign in at `/admin` with that account from then on.
+1. Sign up for a normal account on the live site (the "LOGIN" button / patron modal — email one-time code; the `/admin` form only signs in, it can't create accounts).
+2. `/admin` signs in with email + **password**, and OTP accounts have none: while signed in, set one under Profile → change password.
+3. In the Supabase dashboard → Table Editor → `profiles`, find that row and set `role` to `super_admin` for the owner account (`admin` for others). Before 0017 the role guard rejected this edit too; 0017 allows it for the project owner's own tools.
+4. Sign in at `/admin` with that account from then on.
+
+After 0017, admins can grant `staff`/`admin` from `/admin` → Users, but only a `super_admin` can grant or revoke `super_admin`, and the last `super_admin` can't be demoted.
 
 Every admin after the first can be promoted from inside `/admin` → Users tab, by an existing admin.
 
