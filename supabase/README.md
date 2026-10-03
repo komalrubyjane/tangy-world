@@ -173,15 +173,15 @@ original unnamed constraint, which wasn't verified against a live database.
 
 Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`, `invitations_volunteer`, `programmes`, `artist_portal`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
-### Production application order (0017 → 0033)
+### Production application order (0017 → 0035)
 
 None of these have been applied to production as part of this work. Apply in order, each file as its own query, after taking a database backup:
 
-1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql` → 13. `0029_private_media_realtime_jobs.sql` → 14. `0030_invitations_and_volunteer_access.sql` (then redeploy `admin-invite-user`) → 15. `0031_programmes_and_history.sql` → 16. `0032_booking_request_states.sql` (must be committed before 0033 runs) → 17. `0033_artist_portal.sql`
+1. `0017_admin_system.sql` → 2. `0018_operations_platform.sql` → 3. `0019_platform_enum_values.sql` (must be committed before 0020 runs) → 4. `0020_platform_finalization.sql` → 5. `0021_canonical_admin_links.sql` → 6. `0022_artist_storage_policies.sql` → 7. `0023_named_group_checkin.sql` → 8. `0024_event_booking_form.sql` → 9. `0025_enquiries_auth_first.sql` → 10. `0026_ticket_types_and_settlement.sql` → 11. `0027_waitlist.sql` → 12. `0028_content_cms.sql` → 13. `0029_private_media_realtime_jobs.sql` → 14. `0030_invitations_and_volunteer_access.sql` (then redeploy `admin-invite-user`) → 15. `0031_programmes_and_history.sql` → 16. `0032_booking_request_states.sql` (must be committed before 0033 runs) → 17. `0033_artist_portal.sql` → 18. `0034_event_artist_workflow.sql` (see `docs/EVENT_WORKFLOW.md`) → 19. `0035_phase1_security_gaps.sql` (run `preflight/0035_phase1_security_gaps_preflight.sql` first — see the 0035 notes below)
 
 Redeploy `razorpay-create-order` and `send-ticket-email` after 0023/0024 (they send and read the new fields). After 0026 redeploy **all three** Razorpay functions (`razorpay-create-order`, `razorpay-verify-payment`, `razorpay-webhook` — they call `settle_payment()` and price from ticket types; the old functions would still confirm late payments). After 0026–0028 also redeploy `send-ticket-email`, `send-approval-email` and `send-notification-emails` (shared email module, section 7).
 
-Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0033` → `0032` → `0031` → `0030` → `0029` → `0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
+Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails-and-scheduled-jobs-0020). Rollbacks run by hand in **reverse** order (`0035` → `0034` → `0033` → `0032` → `0031` → `0030` → `0029` → `0028` → `0027` → `0026` → `0025` → `0024` → `0023` → `0022` → `0021` → `0020` → `0019` → …), each only after the one above it.
 
 ### 0019–0033 in detail
 
@@ -255,10 +255,21 @@ Then deploy the Edge Functions and secrets in [section 7](#7-notification-emails
 
 **0032 / 0033 — artist portal and applications.** See `docs/ARTIST_PORTAL.md`. Security fixes: internal review notes move from applicant-readable rows (artists, collaborations, crew_applications) to `application_reviews` (a trigger keeps the existing approve functions working); artist availability is no longer publicly readable. New: `artist_applications` (multi-step drafts, review cycle via `review_artist_application`), artist profile fields, booking-request details and states (draft / confirmed / completed — enum values in 0032), `artist_schedule_check`, `set_artist_availability`, artist media metadata, `artist_documents` + private `artist-documents` bucket, applicant uploads under `artist-media/applications/<user id>/`. Tests: `tests/artist_portal.test.sql`, `e2e/artist-portal.mjs`. **Rollback**: 0033's down file (export `application_reviews` first); 0032's enum values cannot be dropped — the 0033 rollback maps those requests back to cancelled / accepted.
 
+**0035 — Phase 1 security gaps.** Closes the Phase 1 issues 0017–0034 did not cover, verified against a database built from 0001–0034. Not changed: the booking RPC lockdown (0017), the role guard / Super Admin model (0018/0030), the event-delete guard and the absence of API deletes on bookings/tickets/check-ins, the crew/volunteer insert guard, and private artist availability (0033).
+- **Applications start in review:** inserts into `artists`, `collaborations` (vendor / sponsor / venue_host) and `private_enquiries` are stored as `pending` with review fields cleared, `contact_enquiries` as `new` — for API callers (same convention as `guard_crew_application_insert`). Previously an applicant could submit themselves as `approved`.
+- **One artist profile per account:** unique `artists.user_id` (the migration stops, changing nothing, if duplicates exist — preflight result 2).
+- **Profile identity:** `profiles.email` / `passport_id` / `member_since` / `created_at` can't be changed through the API; the email is copied from `auth.users` when the sign-in email changes. The waitlist email policy (0009) now uses the email in the signed JWT instead of `profiles.email`.
+- **Approved artists only on the legacy assignment flow:** `create_assignment_request` / `respond_to_assignment_request` (0008) never checked `artists.status`; a trigger on `assignment_requests` now does (the newer booking-request flow already did).
+- **Conversation assignment:** an `admin` participant must be a staff/admin/super_admin account (`assign_conversation` accepted any user id).
+- **Function privileges:** trigger functions are no longer executable by API roles; `send_event_reminders`, `notify_overdue_tasks`, `notify_expiring_access`, `event_member_ids`, `partner_kind`, `member_link`, `notification_allowed`, `has_active_access` (no caller check of their own) are service_role only; the implicit `PUBLIC` grant is dropped from every SECURITY DEFINER function while each keeps exactly its current anon/authenticated access.
+- No rows are changed; idempotent. Tests: `tests/phase1_security_gaps.test.sql`; safety scenarios (rows unchanged, re-apply, rollback, re-apply after rollback, duplicate stop, wrong-baseline stop): `scripts/test-migration-safety-0035.sh`. **Rollback** restores every function ACL exactly from the snapshot 0035 records (`_security_0035_function_acl`), the 0009 waitlist policy, and drops the triggers and the unique index.
+
 ## Local review tools
 
 - `scripts/demo-data.sh seed|remove|status` — the local demo dataset (docs/OPERATIONS.md §8). `scripts/test-db.sh` sets it aside while the suites run and restores it.
 - `scripts/test-fresh-db.sh` — every migration on an empty database + every suite.
+- `scripts/test-db-local.sh` — the same without Docker: a throwaway local PostgreSQL 16 with `tests/local/supabase_shim.sql` standing in for Supabase's roles, `auth`/`storage`/`extensions` schemas and default privileges. Database enforcement only (no GoTrue, PostgREST, Storage, Realtime, pg_cron or Edge Functions).
+- `scripts/test-migration-safety-0035.sh` — 0035's data-safety scenarios on throwaway local databases.
 - `scripts/test-concurrency.sh`, `scripts/run-jobs.sh`, `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs`.
 - `node scripts/route-inventory.mjs` → `docs/ROUTES.md`.
 
