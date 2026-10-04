@@ -10,7 +10,7 @@ This folder holds production copies of it:
 
 | File | Relation to `supabase/migrations/` |
 |---|---|
-| `0001`–`0003`, `0005`–`0016`, `0018`–`0027`, `0029`–`0035` (32 files) | byte-identical copies |
+| `0001`–`0003`, `0005`–`0016`, `0018`–`0027`, `0029`–`0036` (33 files) | byte-identical copies |
 | `0017_admin_system.production.sql` | `0017_admin_system.sql` minus 13 lines (mock announcements) |
 | `0028_content_cms.production.sql` | `0028_content_cms.sql` minus 48 lines (TV / gallery / diary seed) |
 | `0004_seed_events.sql` | **not included** — 7 demo events, 3 of them bookable |
@@ -68,18 +68,23 @@ backup first and stop at the first error.
 0001 → 0002 → 0003 → 0005 → 0006 → 0007 → 0008 → 0009 → 0010 → 0011 → 0012 → 0013 → 0014
 → 0015 → 0016 → 0017 (.production) → 0018 → 0019 → 0020 → 0021 → 0022 → 0023 → 0024 → 0025
 → 0026 → 0027 → 0028 (.production) → 0029 → 0030 → 0031 → 0032 → 0033 → 0034
-→ [run supabase/preflight/0035_phase1_security_gaps_preflight.sql] → 0035
+→ [run supabase/preflight/0035_phase1_security_gaps_preflight.sql] → 0035 → 0036
 ```
 
 - Enum values must be committed before they are used, so never combine files
   into one query: 0005 and 0010 (role values), 0019 (before 0020), 0032
   (before 0033) each run on their own.
 - 0035 refuses to run unless the 0034 schema is present.
+- 0036 replaces the three `artist-documents` ownership policies from 0033,
+  whose unqualified `name` resolved to `artists.name`, so no artist could
+  upload, open or delete their own documents. It changes no rows. **Production
+  already has 0036** (applied by hand after 0035, with zero objects in the
+  bucket); the file records exactly the SQL that was run.
 - After 0020: check that `pg_cron` is enabled and the `tangy-platform-jobs`
   job exists; otherwise schedule `select public.run_platform_jobs()` every
   5 minutes externally.
 - Afterwards run `checks/production_inventory.readonly.sql`: expect
-  migrations 0001–0003 and 0005–0035 detected, 6 storage buckets, and zero
+  migrations 0001–0003 and 0005–0036 detected, 6 storage buckets, and zero
   rows in every data table.
 - Edge Functions and their secrets are deployed separately (see
   `supabase/README.md`).
@@ -108,7 +113,7 @@ database with the Supabase shim, then:
 
 1. checks the package (0004 absent; 32 byte-identical copies; the two
    production files are deletions only),
-2. applies all 34 files in order,
+2. applies all 35 files in order,
 3. runs the read-only inventory and checks that the database holds the
    schema, the CMS / RBAC / settings tables, 6 buckets, permissions and
    settings — and no events, announcements, CMS content, users, bookings,
@@ -120,7 +125,7 @@ database with the Supabase shim, then:
    permission on super_admin and none on staff, the CMS functions, the
    publish guard on every content table with a status, the private
    `content-media` bucket (50 MB, no HTML) and its storage policies,
-5. runs every `supabase/tests/*.test.sql` suite unchanged — 18 suites, 931
+5. runs every `supabase/tests/*.test.sql` suite unchanged — 19 suites, 949
    assertions — and checks the database is still empty afterwards.
 
 **No seed or mock content is inserted at any point.** Suites that exercise

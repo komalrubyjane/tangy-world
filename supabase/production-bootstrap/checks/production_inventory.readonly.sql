@@ -39,7 +39,8 @@ mig(n, label, applied) as (values
   ('0032', 'booking_request_states',          exists (select 1 from pg_enum e join pg_type t on t.oid = e.enumtypid where t.typname = 'assignment_status' and e.enumlabel = 'completed')),
   ('0033', 'artist_portal',                   to_regclass('public.application_reviews') is not null),
   ('0034', 'event_artist_workflow',           exists (select 1 from pg_proc where proname = 'artist_day_status' and pronamespace = 'public'::regnamespace)),
-  ('0035', 'phase1_security_gaps',            exists (select 1 from pg_proc where proname = 'guard_application_start' and pronamespace = 'public'::regnamespace))
+  ('0035', 'phase1_security_gaps',            exists (select 1 from pg_proc where proname = 'guard_application_start' and pronamespace = 'public'::regnamespace)),
+  ('0036', 'fix_artist_documents_storage',    exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'artist-documents: own upload' and with_check like '%foldername(objects.name)%'))
 ),
 user_schemas as (
   select nspname from pg_namespace

@@ -36,7 +36,7 @@ n=0; for f in $B/0*.sql; do
   esac
 done
 pass "$n unchanged copies are byte-identical to supabase/migrations/"
-[ "$(ls $B/0*.sql | wc -l)" = "34" ] && pass "34 migration files (0001-0035 without 0004)" || bad "expected 34 files"
+[ "$(ls $B/0*.sql | wc -l)" = "35" ] && pass "35 migration files (0001-0036 without 0004)" || bad "expected 35 files"
 
 echo "== 2. apply to a fresh local database"
 as_pg "$PG_BIN/initdb -D '$WORK/data' -U postgres --auth=trust" >/dev/null || exit 1
@@ -48,7 +48,7 @@ for f in $B/0*.sql; do
   out=$(P -1 -f "$f" 2>&1) || { bad "$(basename "$f") failed: $(echo "$out" | grep -m1 ERROR)"; exit 1; }
   applied=$((applied + 1))
 done
-pass "applied $applied files in order (0001-0003, 0005-0035)"
+pass "applied $applied files in order (0001-0003, 0005-0036)"
 
 echo "== 3. production inventory (read-only) and empty-database checks"
 P -A -F ' | ' -t -c "begin transaction read only" -f $B/checks/production_inventory.readonly.sql -c "rollback" | sed 's/^/   /'
@@ -79,6 +79,7 @@ chk "select count(*) > 0 from pg_policies where schemaname = 'storage' and table
 chk "select has_function_privilege('anon', 'content_can(text,text)', 'execute') and not has_function_privilege('anon', 'update_session_content(uuid,jsonb)', 'execute')" t "visitors can run the content read helper, not the session-copy editor"
 chk "select exists (select 1 from pg_proc where proname = 'artist_day_status' and pronamespace = 'public'::regnamespace)" t "0034 detected"
 chk "select exists (select 1 from pg_proc where proname = 'guard_application_start' and pronamespace = 'public'::regnamespace)" t "0035 detected"
+chk "select count(*) from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname like 'artist-documents: own %' and coalesce(qual, with_check) like '%foldername(objects.name)%'" 3 "0036 detected: artist-documents own policies read the folder from storage.objects.name"
 
 echo "== 4. test suites (no seed or mock content inserted)"
 total=0; failed=""
