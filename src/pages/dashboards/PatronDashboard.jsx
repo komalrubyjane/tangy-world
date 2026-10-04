@@ -88,6 +88,8 @@ const fmtDate = (d) => {
   }
 };
 
+const BOOKINGS_UNAVAILABLE = 'YOUR BOOKINGS COULD NOT BE LOADED — TRY AGAIN ABOVE.';
+
 const Empty = ({ children }) => (
   <div className="p-8 text-center font-mono text-[11px] font-bold text-[#E7D5A4]/60 border-2 border-dashed border-[#C99A2E]/30">
     {children}
@@ -120,6 +122,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
   const activeTab = portal.tab;
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
+  const [bookingsError, setBookingsError] = useState('');
   const [waitlist, setWaitlist] = useState([]);
   const [settingsForm, setSettingsForm] = useState({ fullName: '', phone: '' });
   const [savedMsg, setSavedMsg] = useState('');
@@ -136,8 +139,14 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       setLoading(false);
       return;
     }
-    const [myBookings] = await Promise.all([bookingService.getMyBookings(user.id)]);
-    setBookings(myBookings || []);
+    // A failed request is shown as such — never as "no bookings".
+    setBookingsError('');
+    try {
+      setBookings(await bookingService.getMyBookings(user.id));
+    } catch (err) {
+      setBookings([]);
+      setBookingsError(err.message);
+    }
     if (isSupabaseConfigured) {
       // Own dashboard: my_waitlist() (position + offer, 0027). Admin preview
       // of someone else's dashboard reads their rows directly (staff RLS).
@@ -259,16 +268,22 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
       </section>
 
       <section className="px-4 sm:px-6 max-w-6xl mx-auto pb-20">
+        {bookingsError && (
+          <div role="alert" className="mb-4 p-4 border-2 border-[#B94717] bg-[#191410] font-mono text-[11px] font-bold text-[#E7D5A4] flex flex-wrap items-center justify-between gap-3">
+            <span>{bookingsError}</span>
+            <button type="button" onClick={load} className="border-2 border-[#C99A2E] px-3 py-1 uppercase hover:bg-[#C99A2E] hover:text-[#11100C]">Try again</button>
+          </div>
+        )}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
-              <div className="font-condensed text-4xl font-bold mt-1">{stampsCount}</div>
+              <div className="font-condensed text-4xl font-bold mt-1">{bookingsError ? '—' : stampsCount}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">confirmed bookings</p>
             </div>
             <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
               <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming Bookings</span>
-              <div className="font-condensed text-4xl font-bold mt-1">{upcomingBookings.length}</div>
+              <div className="font-condensed text-4xl font-bold mt-1">{bookingsError ? '—' : upcomingBookings.length}</div>
               <p className="font-mono text-[10px] text-[#11100C]/60 mt-1">tickets on file</p>
             </div>
             <div className="bg-[#E7D5A4] text-[#11100C] border-2 border-[#11100C] p-5 shadow-[4px_4px_0px_#11100C]">
@@ -279,7 +294,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div className="sm:col-span-3 bg-[#191410] border-2 border-[#C99A2E]/40 p-5">
               <h3 className="font-condensed text-lg font-bold uppercase mb-3 text-[#C99A2E]">Next up</h3>
               {upcomingBookings.length === 0 ? (
-                <Empty>NO UPCOMING BOOKINGS YET — BROWSE SESSIONS AND BOOK YOUR NEXT NIGHT AT THE STEPWELL.</Empty>
+                <Empty>{bookingsError ? BOOKINGS_UNAVAILABLE : 'NO UPCOMING BOOKINGS YET — BROWSE SESSIONS AND BOOK YOUR NEXT NIGHT AT THE STEPWELL.'}</Empty>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {upcomingBookings.slice(0, 2).map((b) => (
@@ -300,7 +315,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <span className="font-mono text-xs font-bold text-[#C99A2E] tracking-[0.3em]">PASSPORT // MEMBER STAMP BOOK</span>
             <p className="font-mono text-[10px] text-[#E7D5A4]/70 mt-1 mb-5">Each confirmed Tangy Session booking earns a stamp in your passport.</p>
             {stampsCount === 0 ? (
-              <Empty>NO STAMPS YET — YOUR FIRST BOOKING WILL START YOUR COLLECTION.</Empty>
+              <Empty>{bookingsError ? BOOKINGS_UNAVAILABLE : 'NO STAMPS YET — YOUR FIRST BOOKING WILL START YOUR COLLECTION.'}</Empty>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {bookings.filter((b) => b.status === 'confirmed' || b.status === 'paid').map((b, i) => (
@@ -316,7 +331,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div>
               <h3 className="font-condensed text-lg font-bold uppercase mb-3">Upcoming</h3>
               {upcomingBookings.length === 0 ? (
-                <Empty>NO UPCOMING TICKETS. BOOK A SESSION TO SEE IT HERE.</Empty>
+                <Empty>{bookingsError ? BOOKINGS_UNAVAILABLE : 'NO UPCOMING TICKETS. BOOK A SESSION TO SEE IT HERE.'}</Empty>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {upcomingBookings.map((b) => (
@@ -338,7 +353,7 @@ export const PatronDashboard = ({ overrideProfile, readOnly, demoData } = {}) =>
             <div>
               <h3 className="font-condensed text-lg font-bold uppercase mb-3">Ticket History</h3>
               {pastBookings.length === 0 ? (
-                <Empty>NO PAST TICKETS ON RECORD.</Empty>
+                <Empty>{bookingsError ? BOOKINGS_UNAVAILABLE : 'NO PAST TICKETS ON RECORD.'}</Empty>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {pastBookings.map((b) => (

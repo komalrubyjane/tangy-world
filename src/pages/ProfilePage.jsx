@@ -80,6 +80,7 @@ export const ProfilePage = () => {
 
   const [bookings, setBookings] = useState([]);
   const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingsError, setBookingsError] = useState('');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState(null);
   const [savedMsg, setSavedMsg] = useState('');
@@ -89,9 +90,15 @@ export const ProfilePage = () => {
   const loadBookings = useCallback(async () => {
     if (!user) return;
     setBookingsLoading(true);
-    const data = await bookingService.getMyBookings(user.id);
-    setBookings(data || []);
-    setBookingsLoading(false);
+    setBookingsError('');
+    try {
+      setBookings(await bookingService.getMyBookings(user.id));
+    } catch (err) {
+      setBookings([]);
+      setBookingsError(err.message);
+    } finally {
+      setBookingsLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -215,20 +222,25 @@ export const ProfilePage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
-                <div className="font-condensed text-3xl font-bold mt-1">{bookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : bookings.length}</div>
               </div>
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming</span>
-                <div className="font-condensed text-3xl font-bold mt-1">{upcomingBookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : upcomingBookings.length}</div>
               </div>
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
                 <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Past Sessions</span>
-                <div className="font-condensed text-3xl font-bold mt-1">{pastBookings.length}</div>
+                <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : pastBookings.length}</div>
               </div>
             </div>
 
             {bookingsLoading ? (
               <div className="p-6 text-center font-mono text-[11px] text-[#E7D5A4]/60">LOADING BOOKINGS...</div>
+            ) : bookingsError ? (
+              <div role="alert" className="p-6 text-center font-mono text-[11px] font-bold text-[#E7D5A4] border-2 border-dashed border-[#B94717]/60 flex flex-col items-center gap-3">
+                <span>{bookingsError}</span>
+                <button type="button" onClick={loadBookings} className="border-2 border-[#C99A2E] px-3 py-1 uppercase hover:bg-[#C99A2E] hover:text-[#11100C]">Try again</button>
+              </div>
             ) : (
               <>
                 <h3 className="font-condensed text-base font-bold uppercase mb-2 text-[#E7D5A4]/90">Upcoming bookings</h3>

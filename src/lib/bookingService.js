@@ -1,31 +1,11 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient';
-import { isMockAuth } from '../config/auth';
-import { bookingService as mockBookingServiceImpl } from '../services/bookingService';
-import { eventService as mockEventServiceImpl } from '../services/eventService';
-
-function toApiBooking(mockBooking) {
-  return {
-    id: mockBooking.id,
-    registration_code: mockBooking.registrationCode,
-    user_id: mockBooking.userId,
-    event_id: mockBooking.eventId,
-    attendee_name: mockBooking.attendeeName,
-    attendee_email: mockBooking.attendeeEmail,
-    attendee_phone: mockBooking.attendeePhone || '',
-    quantity: mockBooking.quantity,
-    amount: mockBooking.amount,
-    status: mockBooking.status,
-    created_at: mockBooking.createdAt,
-  };
-}
 
 export const bookingService = {
   // Real payment path — creates a Razorpay order + a 'pending' booking
   // server-side (the database prices it from the event's ticket types via
   // booking_quote(), migration 0026; nothing about the amount is
-  // trusted from this call). Requires a real Supabase session regardless of
-  // the app's global AUTH_MODE — there is no mock equivalent, since a mock
-  // session has no JWT for the Edge Function to verify.
+  // trusted from this call). Requires a real Supabase session: the Edge
+  // Function verifies the caller's JWT.
   createPaymentOrder: async ({ eventId, quantity, tierId, attendeeName, attendeeEmail, attendeePhone, attendeeNames, details }) => {
     if (!isSupabaseConfigured) {
       return { success: false, error: 'Payment is not available right now — please try again shortly.' };
@@ -85,24 +65,21 @@ export const bookingService = {
     return { success: true, alreadySent: !!data?.already_sent };
   },
 
+  // The signed-in person's bookings (RLS returns only their own), newest
+  // first. Resolves to an array — empty means "no bookings"; rejects with a
+  // user-safe Error when the request fails or Supabase isn't configured, so
+  // callers can tell the two apart.
   getMyBookings: async (userId) => {
-    if (isMockAuth) {
-      const events = mockEventServiceImpl.getAll();
-      return mockBookingServiceImpl.getForUser(userId).map((b) => {
-        const event = events.find((e) => e.id === b.eventId);
-        return {
-          ...toApiBooking(b),
-          events: event ? { name: event.name, event_date: event.date, venue: event.venue, image_url: event.image } : null,
-        };
-      });
-    }
-    if (!isSupabaseConfigured) return [];
+    if (!isSupabaseConfigured) throw new Error('Bookings are not available right now — please try again shortly.');
     const { data, error } = await supabase
       .from('bookings')
       .select('*, events(name, event_date, event_time, venue, image_url), tickets(*)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
-    if (error) return [];
-    return data;
+    if (error) {
+      console.error('[Tangy] Failed to load bookings:', error.message);
+      throw new Error('Could not load your bookings. Please try again.', { cause: error });
+    }
+    return data || [];
   },
 };

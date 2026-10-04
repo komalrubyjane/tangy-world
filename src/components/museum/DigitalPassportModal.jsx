@@ -7,7 +7,9 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
   const { playSFX } = useAudio();
   const { user } = useUserAuth();
   const [bookings, setBookings] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready
+  const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [loadError, setLoadError] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!isOpen || !user) return;
@@ -17,9 +19,13 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
       if (cancelled) return;
       setBookings(rows);
       setStatus('ready');
+    }, (err) => {
+      if (cancelled) return;
+      setLoadError(err.message);
+      setStatus('error');
     });
     return () => { cancelled = true; };
-  }, [isOpen, user]);
+  }, [isOpen, user, attempt]);
 
   if (!isOpen || !user) return null;
 
@@ -60,6 +66,11 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
         {/* BOOKINGS / STAMPS */}
         {status === 'loading' ? (
           <div className="text-center py-8 font-mono text-xs font-bold text-[#ecdcaf]/60">LOADING YOUR STAMPS...</div>
+        ) : status === 'error' ? (
+          <div role="alert" className="text-center py-8 font-mono text-xs font-bold text-[#ecdcaf] border-2 border-dashed border-[#c2272a]/60 flex flex-col items-center gap-3">
+            <span>{loadError}</span>
+            <button type="button" onClick={() => setAttempt((n) => n + 1)} className="border border-[#ecdcaf] px-3 py-1 hover:bg-[#c2272a] transition-all">TRY AGAIN</button>
+          </div>
         ) : bookings.length === 0 ? (
           <div className="text-center py-8 font-mono text-xs font-bold text-[#ecdcaf]/60 border-2 border-dashed border-[#ecdcaf]/20">
             NO STAMPS YET — BOOK A SESSION TO START YOUR COLLECTION.
