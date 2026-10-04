@@ -5,53 +5,65 @@ import { useUserAuth } from '../../context/UserAuthContext';
 
 const PRIORITIES = ['low', 'normal', 'high'];
 
+// Shown when the conversation can't be created or the message can't be sent.
+// The server's own error text is never rendered (it can name tables / RLS).
+const SEND_FAILED = "Couldn't reach the Tangy team just now. Please try again, or email hello@tangysessions.com.";
+
 /**
  * Escalation form — "REQUEST AN AGENT" flow. Sends a real message into the
  * real support conversation (conversationService) that the Admin Inbox
  * reads from; priority is kept client-side only for now (no priority column
  * exists on conversations/messages yet).
+ *
+ * Support conversations belong to an account (conversations.created_by is
+ * the signed-in user), so a guest is sent to the existing email-code sign-in
+ * instead of calling the RPC; what they typed stays in the form, and once
+ * signed in the same button sends it.
  */
-export const AgentRequestForm = ({ conversationId, initialCategory = '', initialQuestion = '', onCancel, onSubmitted }) => {
-  const { isLoggedIn: realLoggedIn, user: realUser } = useUserAuth();
+export const AgentRequestForm = ({ initialCategory = '', initialQuestion = '', onCancel, onSubmitted }) => {
+  const { isLoggedIn, user, loading: authLoading, openLoginModal } = useUserAuth();
 
   const [category, setCategory] = useState(initialCategory);
   const [question, setQuestion] = useState(initialQuestion);
   const [priority, setPriority] = useState('normal');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const signedIn = isLoggedIn && !!user;
 
   const categories = aiSupportService.getCategories();
 
-  const resolveRequester = () => {
-    if (realLoggedIn && realUser) {
-      return {
-        id: realUser.id,
-        name: realUser.full_name || realUser.email || 'Tangy Listener',
-        email: realUser.email,
-        role: realUser.role || 'patron',
-      };
-    }
-    // Anonymous visitor — stable for this tab only (sessionId doubles as identity).
-    return { id: `guest-${conversationId}`, name: 'Guest Visitor', email: null, role: 'guest' };
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (submitting) return;
-    setSubmitting(true);
-    const requester = resolveRequester();
+    if (submitting || authLoading) return;
+    setError('');
+    if (!signedIn) {
+      openLoginModal('TO MESSAGE THE TANGY TEAM');
+      return;
+    }
+    const requester = {
+      id: user.id,
+      name: user.full_name || user.email || 'Tangy Listener',
+      email: user.email,
+      role: user.role || 'patron',
+    };
     const categoryLabel = categories.find((c) => c.id === category)?.label || category || 'General';
     const combinedQuestion = [question.trim(), description.trim()].filter(Boolean).join(' — ') || 'No details provided.';
 
-    // Creates/reuses the real conversation the Admin Inbox chats through, then
-    // keeps the legacy ticket (category/priority) for continuity.
-    const realConversationId = await conversationService.getOrCreateSupportConversation(
-      categoryLabel,
-      requester
-    );
-    await conversationService.sendMessage(realConversationId, { text: combinedQuestion, sender: requester });
-
-    setSubmitting(false);
+    setSubmitting(true);
+    let realConversationId;
+    try {
+      // Creates/reuses the real conversation the Admin Inbox chats through.
+      // A retry after a failed send reuses the same open conversation.
+      realConversationId = await conversationService.getOrCreateSupportConversation(categoryLabel);
+      await conversationService.sendMessage(realConversationId, { text: combinedQuestion });
+    } catch (err) {
+      console.error('[Tangy] Agent request failed:', err?.message || err);
+      setError(SEND_FAILED);
+      return;
+    } finally {
+      setSubmitting(false);
+    }
     onSubmitted?.({ conversationId: realConversationId }, requester);
   };
 
@@ -139,12 +151,24 @@ export const AgentRequestForm = ({ conversationId, initialCategory = '', initial
         </div>
       </div>
 
+      {!signedIn && !authLoading && (
+        <p className="font-mono text-[10px] leading-relaxed text-[#11100C]/80 border-l-2 border-[#B94717] pl-2">
+          Sign in with your email to send this, so the team can reply to you. What you've typed stays here.
+        </p>
+      )}
+
+      {error && (
+        <p role="alert" className="font-mono text-[10px] font-bold leading-relaxed text-[#F5E9C9] bg-[#B94717] border-2 border-[#11100C] px-2 py-1.5">
+          {error}
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || authLoading}
         className="w-full font-mono text-xs font-bold uppercase tracking-widest bg-[#B94717] text-[#F5E9C9] hover:bg-[#11100C] border-2 border-[#11100C] py-2.5 transition-colors shadow-[3px_3px_0px_#11100C] active:scale-95 disabled:opacity-50"
       >
-        {submitting ? 'SENDING...' : 'SEND TO TANGY TEAM →'}
+        {submitting ? 'SENDING...' : signedIn || authLoading ? 'SEND TO TANGY TEAM →' : 'SIGN IN TO SEND →'}
       </button>
     </form>
   );

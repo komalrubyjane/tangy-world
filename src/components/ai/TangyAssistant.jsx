@@ -325,7 +325,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       {/* Escalation banner */}
       {escalation && (
         <div className="px-3 py-1.5 bg-[#C99A2E] text-[#11100C] font-mono text-[9px] font-bold uppercase tracking-widest text-center border-t-2 border-[#11100C]">
-          ✓ REQUEST SENT — REFERENCE #{escalation.id}
+          ✓ REQUEST SENT — REFERENCE #{escalation.conversationId.slice(0, 8).toUpperCase()}
         </div>
       )}
 
@@ -333,7 +333,6 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       {showAgentForm ? (
         <div className="p-3 border-t-2 border-[#C99A2E]/40 bg-[#1A140F] max-h-[70%] overflow-y-auto">
           <AgentRequestForm
-            conversationId={sessionId}
             initialCategory={pickerCategory || ''}
             initialQuestion={lastUnmatchedText}
             onCancel={() => setShowAgentForm(false)}
