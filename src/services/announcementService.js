@@ -1,9 +1,12 @@
 // Public announcements for the site's character overlay. Backed by the
 // `announcements` table (0017_admin_system.sql) — RLS only ever returns
-// published, non-staff, currently-live rows to the public. Falls back to the
-// bundled editorial set only when Supabase isn't configured (local dev).
+// published, non-staff, currently-live rows to the public. Without Supabase
+// configured there are no announcements — never bundled placeholder ones.
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { mockAnnouncements, ANNOUNCEMENT_STATUSES, ANNOUNCEMENT_CATEGORIES } from '../data/mock/announcements';
+
+// The values announcements.status accepts (0017 check constraint).
+export const ANNOUNCEMENT_STATUSES = ['draft', 'scheduled', 'published', 'expired', 'archived'];
+export const ANNOUNCEMENT_CATEGORIES = ['SESSION', 'ARTIST', 'TICKET', 'ARCHIVE', 'CULTURE', 'GENERAL'];
 
 export const ANNOUNCEMENT_CHARACTERS = [
   { id: 'violinist', label: 'Violinist' },
@@ -32,7 +35,7 @@ export function toOverlayShape(row) {
 
 export const announcementService = {
   async getPublished() {
-    if (!isSupabaseConfigured) return mockAnnouncements.filter((a) => a.status === 'published');
+    if (!isSupabaseConfigured) return [];
     const { data, error } = await supabase
       .from('announcements')
       .select('id, title, body, category, character, destination, audience, priority, publish_at, expire_at, status')

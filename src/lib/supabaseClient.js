@@ -11,7 +11,7 @@ export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 if (!isSupabaseConfigured && import.meta.env.DEV) {
   console.warn(
     '[Tangy] Supabase env vars are not set (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY). ' +
-    'Auth, bookings, check-ins and admin data will fall back to local mock data until they are configured — see .env.example.'
+    'Sign-in, bookings, forms and every data page stay unavailable (empty or error states) until they are configured — see .env.example.'
   );
 }
 

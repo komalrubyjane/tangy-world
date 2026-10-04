@@ -95,12 +95,58 @@ function devMockSession(env) {
   }
 }
 
+// Every VITE_ variable is compiled into the browser bundle (and served to the
+// browser in dev). A Supabase secret / service_role key there would hand
+// anyone full database access past RLS, so it stops dev and build alike.
+function assertNoSecretInBrowserEnv(env) {
+  const roleOf = (jwt) => {
+    try { return JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString()).role } catch { return null }
+  }
+  const leaked = Object.keys(env).filter((k) => k.startsWith('VITE_') && env[k] && (
+    env[k].startsWith('sb_secret_')
+    || (env[k].split('.').length === 3 && roleOf(env[k]) === 'service_role')
+    || (env.SUPABASE_SERVICE_ROLE_KEY && env[k] === env.SUPABASE_SERVICE_ROLE_KEY)))
+  if (leaked.length) {
+    throw new Error(`[tangy] ${leaked.join(', ')} holds a Supabase secret / service_role key. VITE_ variables are public: use the publishable (or anon) key, and keep secret keys server-side only.`)
+  }
+}
+
+// A bundle without the Supabase URL and public key can't sign anyone in,
+// book, or submit a form, so a build without them fails instead of shipping
+// a site that only looks alive. TANGY_ALLOW_UNCONFIGURED_BUILD=1 allows a
+// local smoke build without a backend (never on a Vercel production deploy).
+function assertBackendConfigured(env) {
+  const url = env.VITE_SUPABASE_URL
+  const key = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY
+  const production = process.env.VERCEL_ENV === 'production'
+  let problem = null
+  if (!url || !key) {
+    problem = 'VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (or VITE_SUPABASE_ANON_KEY) must be set for a build'
+  } else {
+    let parsed = null
+    try { parsed = new URL(url) } catch { /* reported below */ }
+    const local = parsed && ['localhost', '127.0.0.1'].includes(parsed.hostname)
+    if (!parsed || !['https:', 'http:'].includes(parsed.protocol)) problem = `VITE_SUPABASE_URL is not a valid URL: ${url}`
+    else if (parsed.protocol === 'http:' && !local) problem = 'VITE_SUPABASE_URL must use https (http is allowed only for a local Supabase stack)'
+    else if (production && local) problem = 'VITE_SUPABASE_URL points at a local Supabase stack on a Vercel production deployment'
+  }
+  if (!problem) return
+  if (env.TANGY_ALLOW_UNCONFIGURED_BUILD === '1' && !production) {
+    console.warn(`\n[tangy] ${problem} — building anyway (TANGY_ALLOW_UNCONFIGURED_BUILD=1). This bundle has no working backend: never deploy it.\n`)
+    return
+  }
+  throw new Error(`[tangy] ${problem}. See .env.example.`)
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  // Build-time guards. A guard switches the feature OFF in the bundle (with a
-  // warning) instead of failing the build, so a stray hosting variable can never
-  // break a deployment and can never ship a demo login either.
+  assertNoSecretInBrowserEnv(env)
+  if (command === 'build') assertBackendConfigured(env)
+  // Feature guards below switch the feature OFF in the bundle (with a warning)
+  // instead of failing the build, so a stray hosting variable can never break
+  // a deployment and can never ship a demo login either. (A missing backend
+  // or a secret in a VITE_ variable, above, does fail.)
   const warn = (msg) => console.warn(`\n[tangy] ${msg}\n`)
   // The demo admin entry must never ship: a build compiles VITE_DEMO_ADMIN_ENABLED
   // to false unless someone deliberately builds a demo bundle (TANGY_ALLOW_DEMO_BUILD=1).

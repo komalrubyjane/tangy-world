@@ -5,6 +5,7 @@ import { Footer } from '../components/layout/Footer';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { isMockAuth } from '../config/auth';
 import { collaborationService } from '../services/collaborationService';
+import { FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
 import { useUserAuth } from '../context/UserAuthContext';
 import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
 import { ApplicationReceivedNotice } from '../components/apply/ApplicationReceivedNotice';
@@ -34,7 +35,7 @@ export const SponsorApplyPage = () => {
       return;
     }
     if (!isSupabaseConfigured) {
-      setSubmitted(true);
+      setError(FORMS_OFFLINE_MESSAGE);
       return;
     }
     setSubmitting(true);

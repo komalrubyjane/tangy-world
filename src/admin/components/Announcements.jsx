@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ANNOUNCEMENT_CATEGORIES } from '../../data/mock/announcements';
-import { ANNOUNCEMENT_CHARACTERS, toOverlayShape } from '../../services/announcementService';
+import { ANNOUNCEMENT_CATEGORIES, ANNOUNCEMENT_CHARACTERS, toOverlayShape } from '../../services/announcementService';
 import { AnnouncementCharacterOverlay } from '../../components/announcements/AnnouncementCharacterOverlay';
 import { useAdminSession } from '../AdminSession';
 import { insert, update, remove, orIlike } from '../api';

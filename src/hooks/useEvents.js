@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
-import { events as mockEvents } from '../data/mockData';
-import { isMockAuth } from '../config/auth';
 
 export function mapDbEvent(row) {
   const eventDate = new Date(`${row.event_date}T00:00:00`);
@@ -39,25 +37,24 @@ export function mapDbEvent(row) {
 // never offered, whatever its date.
 const todayISO = () => new Date().toISOString().slice(0, 10);
 export const isUpcomingEvent = (e) => {
-  const parsed = e.date ? new Date(e.date) : null; // offline mock events carry only a display date
+  const parsed = e.date ? new Date(e.date) : null; // events without rawDate carry only a display date
   const day = e.rawDate || (parsed && !Number.isNaN(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : '');
   return day >= todayISO() && !['past', 'cancelled', 'draft'].includes(e.dbStatus);
 };
 
-// Live events from Supabase. The editorial mock events are used ONLY when the
-// app runs fully offline (AUTH_MODE=mock or no Supabase configured). With a
-// real backend, an empty table shows as empty and a failed query surfaces as
-// `error` — never as fabricated sessions someone could try to book.
-const OFFLINE = isMockAuth || !isSupabaseConfigured;
+// Live events from Supabase only. An empty table shows as empty, and a failed
+// query — or a build without Supabase configured — surfaces as `error`, never
+// as fabricated sessions someone could try to book.
+const NOT_CONFIGURED = new Error('Supabase is not configured.');
 
 export function useEvents() {
-  const [events, setEvents] = useState(OFFLINE ? mockEvents : []);
-  const [source, setSource] = useState(OFFLINE ? 'mock' : 'live');
-  const [loading, setLoading] = useState(!OFFLINE);
-  const [error, setError] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [source, setSource] = useState(isSupabaseConfigured ? 'live' : 'offline');
+  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [error, setError] = useState(isSupabaseConfigured ? null : NOT_CONFIGURED);
 
   useEffect(() => {
-    if (OFFLINE) return;
+    if (!isSupabaseConfigured) return;
     let cancelled = false;
 
     supabase
