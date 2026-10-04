@@ -9,7 +9,7 @@
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / SUPABASE_ANON_KEY are injected
 // automatically by the Supabase runtime — do not set them yourself.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { handleOptions, jsonResponse } from '../_shared/cors.ts';
 
 function generateRegistrationCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -19,6 +19,8 @@ function generateRegistrationCode(): string {
 }
 
 Deno.serve(async (req) => {
+  // Answers with this request's origin when it is allowed (_shared/cors.ts).
+  const json = (body: unknown, status = 200) => jsonResponse(req, body, status);
   const preflight = handleOptions(req);
   if (preflight) return preflight;
 
@@ -211,10 +213,3 @@ Deno.serve(async (req) => {
     return json({ error: 'Unexpected server error.' }, 500);
   }
 });
-
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}

@@ -9,10 +9,10 @@ const req = (origin) => new Request('https://fn.example/x', { method: 'OPTIONS',
 
 const cors = await import('../supabase/functions/_shared/cors.ts');
 env = {};
-check(cors.corsFor(req('https://evil.example'))['Access-Control-Allow-Origin'] === '*', 'no ALLOWED_ORIGINS/SITE_URL (local dev): any origin');
+check(cors.corsFor(req('https://evil.example'))['Access-Control-Allow-Origin'] === undefined && cors.corsFor(req('http://127.0.0.1:5173'))['Access-Control-Allow-Origin'] === 'http://127.0.0.1:5173', 'no ALLOWED_ORIGINS/SITE_URL (local dev): loopback only, never "*"');
 env = { SITE_URL: 'https://tangysessions.com/' };
 check(cors.corsFor(req('https://tangysessions.com'))['Access-Control-Allow-Origin'] === 'https://tangysessions.com', 'SITE_URL origin is echoed');
-check(cors.corsFor(req('https://evil.example'))['Access-Control-Allow-Origin'] === 'https://tangysessions.com', 'another origin is not allowed');
+check(cors.corsFor(req('https://evil.example'))['Access-Control-Allow-Origin'] === undefined, 'another origin is not allowed (no Access-Control-Allow-Origin)');
 env = { ALLOWED_ORIGINS: 'https://tangysessions.com, https://www.tangysessions.com', SITE_URL: 'https://x.example' };
 check(cors.corsFor(req('https://www.tangysessions.com'))['Access-Control-Allow-Origin'] === 'https://www.tangysessions.com', 'ALLOWED_ORIGINS list is honoured (and wins over SITE_URL)');
 check(cors.corsFor(req('https://www.tangysessions.com')).Vary === 'Origin', 'Vary: Origin is set when restricted');

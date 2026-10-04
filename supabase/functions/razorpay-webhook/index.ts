@@ -10,6 +10,13 @@
 // be delivered more than once, so every event is recorded in
 // payment_webhook_events keyed by a unique id before being acted on.
 //
+// Status codes: 200 only when the event is recorded and either processed or
+// its permanent failure recorded (or it is a duplicate of a processed event).
+// 400 for a bad signature or body, 503 without the secret, and 500 whenever
+// the event could not be recorded or processing hit a transient error — so
+// Razorpay delivers it again. A redelivery of an event that was recorded but
+// not processed is processed then; every step below is idempotent.
+//
 // NOTE: verify `event_id` extraction and the exact event names below
 // (`payment.captured` / `order.paid` / `payment.failed`) against the current
 // Razorpay webhook payload reference before going live — confirm in the
@@ -22,6 +29,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { hmacSha256Hex, timingSafeEqual, requireSecret } from '../_shared/crypto.ts';
 
+
+// Not accepted: Razorpay retries non-2xx deliveries. Details go to the
+// function log only, never into the response.
+function retryLater(what: string, detail?: unknown): Response {
+  console.error(`razorpay-webhook: ${what}`, detail instanceof Error ? detail.message : detail ?? '');
+  return new Response('Webhook not processed', { status: 500 });
+}
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
@@ -42,7 +56,13 @@ Deno.serve(async (req) => {
       return new Response('Invalid signature', { status: 400 });
     }
 
-    const payload = JSON.parse(rawBody);
+    let payload;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch {
+      console.error('razorpay-webhook: signed body is not JSON');
+      return new Response('Invalid payload', { status: 400 });
+    }
     const eventType: string = payload.event;
     const paymentEntity = payload.payload?.payment?.entity;
     const orderEntity = payload.payload?.order?.entity;
@@ -66,18 +86,23 @@ Deno.serve(async (req) => {
     });
 
     if (insertError) {
-      // Unique violation on event_id means we've already seen this event.
-      if (insertError.code === '23505') {
-        return new Response('ok (duplicate)', { status: 200 });
-      }
-      console.error('razorpay-webhook: failed to record event', insertError);
-      return new Response('ok', { status: 200 }); // don't make Razorpay retry forever on our DB hiccup
+      // Anything but a unique violation means the event was NOT recorded.
+      if (insertError.code !== '23505') return retryLater('could not record event', insertError.message);
+      // Already recorded. Processed → acknowledge as a duplicate. Recorded by a
+      // delivery that did not finish (it answered 500) → process it now.
+      const { data: existing, error: readError } = await admin.from('payment_webhook_events')
+        .select('processed').eq('event_id', eventId).maybeSingle();
+      if (readError || !existing) return retryLater('could not read the recorded event', readError?.message);
+      if (existing.processed) return new Response('ok (duplicate)', { status: 200 });
     }
 
     const orderId = paymentEntity?.order_id ?? orderEntity?.id;
     const refundEntity = payload.payload?.refund?.entity;
     const now = new Date().toISOString();
-    const failures: string[] = [];
+    // retryable: a database call failed — worth another delivery.
+    // permanent: the event is understood but cannot apply — another delivery would not help.
+    const retryable: string[] = [];
+    const permanent: string[] = [];
 
     if ((eventType === 'payment.captured' || eventType === 'order.paid') && orderId) {
       // settle_payment (0026) is the only place a paid booking is confirmed:
@@ -89,13 +114,13 @@ Deno.serve(async (req) => {
       const { data: settled, error: settleError } = await admin.rpc('settle_payment', {
         p_order_id: orderId, p_payment_id: paymentEntity?.id ?? `${eventType}:${orderId}`, p_amount_paise: amountPaise, p_source: 'webhook',
       });
-      if (settleError) failures.push(`settlement failed: ${settleError.message}`);
-      else if (settled?.result === 'not_found') failures.push(`no booking for order ${orderId}`);
+      if (settleError) retryable.push(`settlement failed: ${settleError.message}`);
+      else if (settled?.result === 'not_found') permanent.push(`no booking for order ${orderId}`);
     } else if (eventType === 'payment.authorized' && orderId) {
       const { error } = await admin.from('bookings')
         .update({ payment_status: 'authorized', payment_updated_at: now })
         .eq('razorpay_order_id', orderId).eq('payment_status', 'created');
-      if (error) failures.push(`authorize update failed: ${error.message}`);
+      if (error) retryable.push(`authorize update failed: ${error.message}`);
     } else if (eventType === 'payment.failed' && orderId) {
       const { error: failError } = await admin
         .from('bookings')
@@ -103,7 +128,7 @@ Deno.serve(async (req) => {
         .eq('razorpay_order_id', orderId)
         .eq('status', 'pending'); // never overwrite an already-confirmed booking
 
-      if (failError) failures.push(`booking fail-update failed: ${failError.message}`);
+      if (failError) retryable.push(`booking fail-update failed: ${failError.message}`);
     } else if ((eventType === 'refund.processed' || eventType === 'refund.created') && (refundEntity?.payment_id || paymentEntity?.id)) {
       // Refunds are issued manually in the Razorpay dashboard. This only
       // mirrors the refunded amount onto the booking for reporting; the
@@ -118,21 +143,28 @@ Deno.serve(async (req) => {
           payment_updated_at: now,
         })
         .eq('razorpay_payment_id', paymentId);
-      if (error) failures.push(`refund mirror failed: ${error.message}`);
+      if (error) retryable.push(`refund mirror failed: ${error.message}`);
     }
 
+    const failures = [...retryable, ...permanent];
     if (failures.length) {
       console.error('razorpay-webhook: processing failed', eventId, failures);
-      // Stored on the event + alerts payments.view holders; Razorpay gets 200
-      // because the event is already recorded (a retry would be a duplicate).
-      await admin.rpc('record_webhook_failure', { p_event_id: eventId, p_error: failures.join('; ') });
-    } else {
-      await admin.from('payment_webhook_events').update({ processed: true, processed_at: now }).eq('event_id', eventId);
+      // Stored on the event + alerts payments.view holders. A permanent failure
+      // is acknowledged; a retryable one (or one we could not even record) is
+      // not, so Razorpay delivers it again.
+      const { error: recordError } = await admin.rpc('record_webhook_failure', { p_event_id: eventId, p_error: failures.join('; ') });
+      if (recordError) return retryLater('could not record the processing failure', recordError.message);
+      if (retryable.length) return retryLater('processing failed, retry requested', eventId);
+      return new Response('ok', { status: 200 });
     }
+
+    const { error: markError } = await admin.from('payment_webhook_events')
+      .update({ processed: true, processed_at: now }).eq('event_id', eventId);
+    // Processed but not marked: a redelivery re-runs the idempotent steps and marks it.
+    if (markError) return retryLater('could not mark the event processed', markError.message);
 
     return new Response('ok', { status: 200 });
   } catch (err) {
-    console.error('razorpay-webhook error', err);
-    return new Response('ok', { status: 200 });
+    return retryLater('unexpected error', err);
   }
 });

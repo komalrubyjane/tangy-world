@@ -219,8 +219,8 @@ secret reaches the browser bundle.
 | `EMAIL_FROM` | `_shared/email.ts` | e.g. `Tangy Sessions <hello@your-verified-domain>`; must use the Resend-verified domain. Old name `RESEND_FROM_EMAIL` is still read. Default `Tangy Sessions <hello@tangysessions.com>`. |
 | `EMAIL_PROVIDER` | `_shared/email.ts` | `resend` (default — can be left unset). `log` / `disabled` / `mailpit` are for development. |
 | `EMAIL_REPLY_TO` | `_shared/email.ts` | Optional. |
-| `SITE_URL` | `_shared/cors.ts` (browser functions), `send-approval-email`, `send-notification-emails`, `admin-invite-user` | The exact origin of the production site, e.g. `https://www.example.com` (no trailing slash). Used as the CORS allow-list **and** for links in emails. `admin-invite-user` refuses (503) without it; if it is unset, CORS allows any origin. |
-| `ALLOWED_ORIGINS` | `_shared/cors.ts` | Optional, overrides `SITE_URL` for CORS only. **Leave unset** — see "CORS" below. |
+| `SITE_URL` | `_shared/cors.ts` (browser functions), `send-approval-email`, `send-notification-emails`, `admin-invite-user` | The exact origin of the production site, e.g. `https://www.example.com` (no trailing slash). Used as the CORS allow-list **and** for links in emails. `admin-invite-user` refuses (503) without it. If neither it nor `ALLOWED_ORIGINS` is set, CORS allows only `http://localhost` / `http://127.0.0.1` (local development), so the production site's calls fail. |
+| `ALLOWED_ORIGINS` | `_shared/cors.ts` | Optional, comma-separated; replaces `SITE_URL` as the CORS allow-list only (emails keep using `SITE_URL`). Set it only when the site is served from more than one origin — see "CORS" below. |
 | `CRON_SECRET` | `send-notification-emails` | Secret shared with the scheduler (§2a). |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | all functions | **Injected by Supabase — do not set.** |
 | `MAILPIT_URL` | `_shared/email.ts` | Local stack only. |
@@ -229,14 +229,15 @@ Vercel (browser build) needs only `VITE_SUPABASE_URL` and
 `VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`).
 `VITE_RAZORPAY_KEY_ID` is not read by the app and can stay unset.
 
-**CORS.** The four browser-called functions that answer with the shared
-default headers (`razorpay-create-order`, `razorpay-verify-payment`,
-`send-ticket-email`, `send-approval-email`) always answer with the **first**
-allowed origin. So the site must be served from exactly one origin, equal to
-`SITE_URL`: redirect the other host (apex ↔ `www`) to it at the hosting/DNS
-level, and do not list a second origin in `ALLOWED_ORIGINS` (its preflight
-would pass but the browser would reject the response). Vercel preview URLs
-therefore cannot take payments.
+**CORS.** Every browser-called function answers a request (preflight and
+response alike) with **that request's own origin when it is on the allow-list**,
+and with no `Access-Control-Allow-Origin` at all otherwise — never `*`. The
+allow-list is `ALLOWED_ORIGINS` if set, else `SITE_URL`, each reduced to its
+origin (scheme + host + port). One origin: set only `SITE_URL`. Both apex and
+`www` serving the site: either redirect one to the other (simplest), or set
+`ALLOWED_ORIGINS=https://example.com,https://www.example.com` with `SITE_URL`
+the one used in email links. Never add Vercel preview URLs to the production
+list.
 
 ### Before deploying (operator checks in the dashboards)
 
@@ -289,6 +290,10 @@ this does not open them up.
   - `payment.failed` — releases a pending hold (a later successful retry on the same order is still accepted while seats are free)
   - `payment.authorized` — status mirror only
   - `refund.processed`, `refund.created` — refund mirror for reporting only
+- Responses: `200` = recorded and processed (or a duplicate of a processed
+  event, or a permanent failure already recorded and alerted); `400` = bad
+  signature or body; `503` = secret missing; `500` = not recorded, or a
+  database step failed — Razorpay retries, and the retry finishes the event.
 - Locate the webhook settings in the Razorpay dashboard yourself; the
   repository cannot confirm its current labels. Configure it separately for
   test mode and live mode, with the matching keys.
@@ -323,7 +328,7 @@ The detailed scenario list in §3 (abandoned checkout, wrong amount, late paymen
 
 - **Stop taking payments at once:** `supabase secrets unset RAZORPAY_KEY_SECRET` (or `RAZORPAY_KEY_ID`). New checkouts answer 503 and release their seats; payments already made still confirm through the webhook, which needs only `RAZORPAY_WEBHOOK_SECRET`. Set the secret again to resume.
 - **Bad function release:** check out the previous commit's `supabase/functions/<name>` (and `_shared/`) and deploy that function again with the same flags.
-- **Webhook failing:** Razorpay's delivery log shows the HTTP status. `400` = secret mismatch (re-copy it into both places); `503` = secret missing; `401` = redeploy with `--no-verify-jwt`. Payments made meanwhile are still confirmed by the browser's verify call when the customer completes checkout; the rest appear as pending/expired bookings — see "Payment stuck".
+- **Webhook failing:** Razorpay's delivery log shows the HTTP status. `400` = secret mismatch (re-copy it into both places); `503` = secret missing; `401` = redeploy with `--no-verify-jwt`; `500` = the event was not recorded or a database step failed — Razorpay delivers it again by itself, and a redelivery finishes an event that was recorded but not processed (function logs say which step; row 8/10 of the payments check). Payments made meanwhile are still confirmed by the browser's verify call when the customer completes checkout; the rest appear as pending/expired bookings — see "Payment stuck".
 - **Payment stuck** (customer charged, booking not confirmed, or `needs_review`): rows 3, 4 and 10 of the payments check. A `needs_review` booking is resolved in Admin → Bookings (reseat, or refund in Razorpay and record it). For a payment the webhook never recorded, compare with Razorpay's payment list; resolving it in the database is a production write and a deliberate operator decision — the same `settle_payment(order_id, payment_id, amount_paise, 'webhook')` the webhook would have run, executed by the project owner.
 - **Email:** unset `RESEND_API_KEY` to stop all sending (queued email waits); deactivate the `tangy-email-drain` cron job to pause notifications only.
 - **Rotating a secret:** set the new value in both places (Razorpay webhook form ↔ `RAZORPAY_WEBHOOK_SECRET`; scheduler ↔ `CRON_SECRET`), then re-run V1/V2 or §2a step 4.
@@ -339,9 +344,9 @@ The detailed scenario list in §3 (abandoned checkout, wrong amount, late paymen
 | `send-approval-email` | "Application approved" email | email vars, `SITE_URL` | admin JWT | E2E via Mailpit |
 | `send-notification-emails` | Drains `email_outbox` | email vars, `CRON_SECRET`, `SITE_URL` | service key or `x-cron-secret` | E2E + `scripts/run-jobs.sh emails` |
 | `admin-invite-user` | Creates a console invitation (hashed single-use token, 72 h) and emails the link; the role is applied only when the recipient accepts at `/invitation` | `SITE_URL`, email settings (section 2) | inviter's JWT — `create_account_invitation` checks `roles.manage` (Super Admin / Admin) or `staff.invite` (Staff) in Postgres; no service role key | E2E invitations (invite → email → accept, single use, wrong account, revoke, manager limited to Staff), sweep (staff refused 403) |
-| `_shared/*` | email provider, CORS allowlist, HMAC | — | — | `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs` |
+| `_shared/*` | email provider, CORS allowlist, HMAC | — | — | `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs`; every browser function's CORS answer and every `razorpay-webhook` status path: `scripts/test-edge-functions.mjs` |
 
-CORS: set `SITE_URL` to the single canonical production origin and leave `ALLOWED_ORIGINS` unset — four functions answer with the first allowed origin only, so a second origin passes the preflight but its responses are rejected by the browser (§3a). Every browser-called function also checks the caller's JWT. Deno is not installed on this machine: functions were syntax-checked with esbuild and exercised through `supabase functions serve` in the E2E suites.
+CORS: `SITE_URL` (or `ALLOWED_ORIGINS` for several origins) — the request's origin is echoed only when listed, never `*` (§3a). Every browser-called function also checks the caller's JWT. Deno is not installed on this machine: functions were syntax-checked with esbuild and exercised through `supabase functions serve` in the E2E suites.
 
 Deployment (not done yet): step by step in §3a — all seven, `razorpay-webhook` and `send-notification-emails` with `--no-verify-jwt`.
 

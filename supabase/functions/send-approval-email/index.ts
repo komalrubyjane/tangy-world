@@ -18,7 +18,7 @@
 // re-invoking this function for the same application, cannot double-send.
 // Pass `force: true` to explicitly resend (the admin "RESEND EMAIL" action).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { handleOptions, jsonResponse } from '../_shared/cors.ts';
 import { sendEmail } from '../_shared/email.ts';
 
 const ROLE_META: Record<string, { label: string; loginPath: string }> = {
@@ -84,14 +84,9 @@ function emailHtml({ name, roleLabel, portalUrl }: { name: string; roleLabel: st
 </html>`;
 }
 
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
-
 Deno.serve(async (req) => {
+  // Answers with this request's origin when it is allowed (_shared/cors.ts).
+  const json = (body: unknown, status = 200) => jsonResponse(req, body, status);
   const preflight = handleOptions(req);
   if (preflight) return preflight;
 

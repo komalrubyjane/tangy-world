@@ -14,7 +14,7 @@
 // admin "RESEND EMAIL" action).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import QRCode from 'https://esm.sh/qrcode@1.5.4';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
+import { handleOptions, jsonResponse } from '../_shared/cors.ts';
 import { sendEmail } from '../_shared/email.ts';
 
 const TIER_LABELS: Record<string, string> = { gen: 'General Admission', vip: 'VIP Heritage Pass', premium: 'Backstage Collective Pass' };
@@ -91,14 +91,9 @@ function emailHtml({ attendeeName, event, booking, tickets }: { attendeeName: st
 </html>`;
 }
 
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
-
 Deno.serve(async (req) => {
+  // Answers with this request's origin when it is allowed (_shared/cors.ts).
+  const json = (body: unknown, status = 200) => jsonResponse(req, body, status);
   const preflight = handleOptions(req);
   if (preflight) return preflight;
 
