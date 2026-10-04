@@ -87,8 +87,8 @@ explicit deployment checklist item, not something already confirmed working.
 
 Copy `.env.example` to `.env.local` and fill in:
 
-- `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` — Project Settings → API in the Supabase dashboard.
-- `VITE_RAZORPAY_KEY_ID` — not yet used by the app; ticketing currently confirms bookings directly without capturing payment (see `src/lib/bookingService.js`) until a Supabase Edge Function is written to create/verify Razorpay orders server-side with the secret key.
+- `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`) — the only variables the browser build needs (`vite build` fails without them).
+- `VITE_RAZORPAY_KEY_ID` — not read by the app: `razorpay-create-order` returns the public key id with each order. Every Razorpay, email and cron secret is an Edge Function secret — exact names and the production deployment runbook: `docs/OPERATIONS.md` §3a.
 
 ## 4. Deploy the Razorpay Edge Functions
 
@@ -111,7 +111,7 @@ supabase secrets set RAZORPAY_KEY_ID=rzp_test_xxx RAZORPAY_KEY_SECRET=xxx RAZORP
 
 In the Razorpay dashboard (Settings → Webhooks), add the `razorpay-webhook` function's URL, subscribe to at least `payment.captured` and `order.paid`, and set a webhook secret matching `RAZORPAY_WEBHOOK_SECRET` above. **Before going live**, confirm the webhook payload's event-id field and event names against Razorpay's current webhook reference in the dashboard's "recent deliveries" panel — noted as a TODO in `razorpay-webhook/index.ts` since it couldn't be verified against live docs while writing this.
 
-This payment flow requires a **real** Supabase session (`AUTH_MODE = 'real'` in `src/config/auth.js`, or at minimum a real signed-in user at checkout) — there's no mock equivalent, since the Edge Functions verify a real JWT. While `AUTH_MODE` stays `'mock'`, `BookingPage.jsx` keeps using the old direct-confirm test path automatically.
+This payment flow requires a real signed-in Supabase session — the Edge Functions verify the caller's JWT, and there is no other checkout path.
 
 ## 5. Deploy the approval-email Edge Function
 

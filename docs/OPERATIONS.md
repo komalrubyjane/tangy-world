@@ -179,6 +179,155 @@ When real test-mode credentials exist, run and record each of these (none has be
 11. [ ] Subscribe the webhook to `payment.captured`, `order.paid`, `payment.failed`, `payment.authorized`, `refund.processed`, `refund.created`; compare payload fields with Razorpay's "recent deliveries".
 12. [ ] A refund made in the Razorpay dashboard is recorded in Tangy (`admin_record_refund`) and mirrored by the webhook.
 
+## 3a. Production runbook — Edge Functions and Razorpay
+
+Project `ohyjqxbsgdkzytfnlitf`. Nothing here has been deployed yet: the
+repository has no `supabase/config.toml`, no linked project ref, no CI and no
+deploy script, so every step below is an **operator action** (Supabase CLI,
+Supabase dashboard, Razorpay dashboard, Resend). Nothing here changes a
+migration, RLS, a policy, a function, a trigger or the schema.
+
+### Which functions, and how they are called
+
+| Function | Called by | Gateway JWT check | Service-role key | External service | Must exist for |
+| --- | --- | --- | --- | --- | --- |
+| `razorpay-create-order` | browser (`src/lib/bookingService.js`) | keep (default) | yes — after `auth.getUser()`, to read the event and call `create_pending_booking` (service-role only) | Razorpay Orders API | checkout |
+| `razorpay-verify-payment` | browser (`bookingService.js`) | keep | yes — after `auth.getUser()` + own-booking check, to call `settle_payment` (service-role only) | none (HMAC with `RAZORPAY_KEY_SECRET`) | checkout |
+| `razorpay-webhook` | Razorpay | **off** (`--no-verify-jwt`): Razorpay sends no Supabase JWT; the function verifies `X-Razorpay-Signature` itself | yes — after the signature check | none | payment source of truth |
+| `send-ticket-email` | browser after a verified payment; admin "resend" (`Bookings.jsx`) | keep | yes — after `auth.getUser()` + owner/team check | Resend; `qrcode` from esm.sh | ticket email |
+| `send-approval-email` | admin (`src/services/notificationService.js`) | keep | yes — after `auth.getUser()` + admin role check | Resend | application decisions |
+| `admin-invite-user` | admin (`src/admin/api.js`) | keep | **no** — runs entirely under the inviter's JWT | Resend | console invitations |
+| `send-notification-emails` | scheduler (§2a) | **off** (`--no-verify-jwt`): checks `x-cron-secret` (or the service key) itself | yes — after that check | Resend | notification email |
+
+Every function with the gateway check kept also verifies the caller in code
+(`auth.getUser()`); the two without it verify a signature / shared secret
+before doing anything.
+
+### Secrets — exact names read by the code
+
+Edge Function secrets (`supabase secrets set NAME=value`). **None of them may
+be a `VITE_` variable or appear in Vercel**: `vite build` refuses a Supabase
+secret key in a `VITE_` variable, and a canary build confirms no function
+secret reaches the browser bundle.
+
+| Name | Read by | Notes |
+| --- | --- | --- |
+| `RAZORPAY_KEY_ID` | `razorpay-create-order` | Public key id (`rzp_test_…` / `rzp_live_…`). Returned to the browser in the order response — that is the only way the browser gets it; it is not a secret. |
+| `RAZORPAY_KEY_SECRET` | `razorpay-create-order` (Orders API auth), `razorpay-verify-payment` (signature) | Secret. Without it (or the key id) checkout answers 503 and releases the seats; verify answers 503. |
+| `RAZORPAY_WEBHOOK_SECRET` | `razorpay-webhook` | Secret. The value you type into the Razorpay webhook form — **not** the key secret. Without it every delivery gets 503. |
+| `RESEND_API_KEY` | `_shared/email.ts` (all email functions) | Secret. Without it email is "not configured": nothing is sent, nothing crashes. |
+| `EMAIL_FROM` | `_shared/email.ts` | e.g. `Tangy Sessions <hello@your-verified-domain>`; must use the Resend-verified domain. Old name `RESEND_FROM_EMAIL` is still read. Default `Tangy Sessions <hello@tangysessions.com>`. |
+| `EMAIL_PROVIDER` | `_shared/email.ts` | `resend` (default — can be left unset). `log` / `disabled` / `mailpit` are for development. |
+| `EMAIL_REPLY_TO` | `_shared/email.ts` | Optional. |
+| `SITE_URL` | `_shared/cors.ts` (browser functions), `send-approval-email`, `send-notification-emails`, `admin-invite-user` | The exact origin of the production site, e.g. `https://www.example.com` (no trailing slash). Used as the CORS allow-list **and** for links in emails. `admin-invite-user` refuses (503) without it; if it is unset, CORS allows any origin. |
+| `ALLOWED_ORIGINS` | `_shared/cors.ts` | Optional, overrides `SITE_URL` for CORS only. **Leave unset** — see "CORS" below. |
+| `CRON_SECRET` | `send-notification-emails` | Secret shared with the scheduler (§2a). |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | all functions | **Injected by Supabase — do not set.** |
+| `MAILPIT_URL` | `_shared/email.ts` | Local stack only. |
+
+Vercel (browser build) needs only `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`).
+`VITE_RAZORPAY_KEY_ID` is not read by the app and can stay unset.
+
+**CORS.** The four browser-called functions that answer with the shared
+default headers (`razorpay-create-order`, `razorpay-verify-payment`,
+`send-ticket-email`, `send-approval-email`) always answer with the **first**
+allowed origin. So the site must be served from exactly one origin, equal to
+`SITE_URL`: redirect the other host (apex ↔ `www`) to it at the hosting/DNS
+level, and do not list a second origin in `ALLOWED_ORIGINS` (its preflight
+would pass but the browser would reject the response). Vercel preview URLs
+therefore cannot take payments.
+
+### Before deploying (operator checks in the dashboards)
+
+1. **Supabase API keys:** the functions read the injected `SUPABASE_ANON_KEY`
+   and `SUPABASE_SERVICE_ROLE_KEY`. Confirm in the project's API-key settings
+   that these keys are available to Edge Functions (i.e. the legacy anon /
+   service_role keys have not been disabled).
+2. **Razorpay payment capture:** confirm the account captures payments
+   automatically. The code never calls Razorpay's capture API; with manual
+   capture an authorised-but-uncaptured payment would still pass the checkout
+   signature check and be confirmed, then be auto-refunded by Razorpay.
+3. **Resend:** sending domain verified (SPF, DKIM, DMARC — §2); API key created.
+4. **Site origin:** decide the single canonical origin → `SITE_URL`.
+5. Start with **Razorpay test-mode keys** (`rzp_test_…`); switch to live keys
+   only after the verification below passes.
+
+### Deploy (CLI, from the repository root)
+
+```
+supabase link --project-ref ohyjqxbsgdkzytfnlitf
+
+supabase secrets set RAZORPAY_KEY_ID=rzp_test_… RAZORPAY_KEY_SECRET=… RAZORPAY_WEBHOOK_SECRET=<long random string>
+supabase secrets set RESEND_API_KEY=re_… EMAIL_FROM="Tangy Sessions <hello@your-verified-domain>" \
+  SITE_URL=https://<canonical origin> CRON_SECRET=<long random string>
+supabase secrets list            # names only; confirm all of the above are present
+
+# browser-called: keep the gateway JWT check
+supabase functions deploy razorpay-create-order
+supabase functions deploy razorpay-verify-payment
+supabase functions deploy send-ticket-email
+supabase functions deploy send-approval-email
+supabase functions deploy admin-invite-user
+# server-to-server: they verify a signature / shared secret themselves
+supabase functions deploy razorpay-webhook --no-verify-jwt
+supabase functions deploy send-notification-emails --no-verify-jwt
+```
+
+Generate random values with `openssl rand -hex 32`. If, after deploying, a
+**signed-in** call (step V3) is rejected by the gateway with 401 before the
+function runs, redeploy the five browser-called functions with
+`--no-verify-jwt`: each verifies the caller itself with `auth.getUser()`, so
+this does not open them up.
+
+### Razorpay webhook
+
+- URL: `https://ohyjqxbsgdkzytfnlitf.supabase.co/functions/v1/razorpay-webhook`
+- Secret: the same value as `RAZORPAY_WEBHOOK_SECRET`.
+- Events the code handles — enable these:
+  - `payment.captured` and `order.paid` — confirm the booking (`settle_payment`; either one is enough, both are safe together)
+  - `payment.failed` — releases a pending hold (a later successful retry on the same order is still accepted while seats are free)
+  - `payment.authorized` — status mirror only
+  - `refund.processed`, `refund.created` — refund mirror for reporting only
+- Locate the webhook settings in the Razorpay dashboard yourself; the
+  repository cannot confirm its current labels. Configure it separately for
+  test mode and live mode, with the matching keys.
+- After the first deliveries, compare the payload fields the code reads
+  (`payload.payment.entity.id / order_id / amount / amount_refunded`,
+  `payload.order.entity.id`, `payload.refund.entity.payment_id / amount`)
+  with what Razorpay shows for a delivery.
+
+### Notification email scheduler
+
+Follow §2a (secrets above already include `CRON_SECRET` and `SITE_URL`).
+
+### Verify (test mode)
+
+Run `supabase/ops/payments_and_webhooks.readonly.sql` before starting and after
+each step; it shows booking / payment states, items needing action and webhook
+health without personal data.
+
+- V1 `curl -s -o /dev/null -w '%{http_code}\n' -X POST https://ohyjqxbsgdkzytfnlitf.supabase.co/functions/v1/razorpay-webhook -d '{}'` → `400` (no signature). `503` means `RAZORPAY_WEBHOOK_SECRET` is missing; `401` means it was deployed without `--no-verify-jwt`.
+- V2 `curl -s -X OPTIONS -H "Origin: https://<canonical origin>" -D - -o /dev/null https://ohyjqxbsgdkzytfnlitf.supabase.co/functions/v1/razorpay-create-order | grep -i access-control-allow-origin` → your origin.
+- V3 On the site, signed in: book a test session → pay with a Razorpay test method → the booking page shows the tickets and QR; the ticket email arrives.
+  Check rows 1–2 (`confirmed`, `captured`), 6 (`0`), 8 (events processed, no errors).
+- V4 Close the browser tab right after paying (before the confirmation shows) on a second test booking → within a minute the webhook confirms it (rows 1, 8). **Known gap:** no ticket email is sent on this path — row 6 lists the booking; resend it from Admin → Bookings.
+- V5 A failed test payment, then a successful retry in the same checkout → one confirmed booking.
+- V6 Redeliver a webhook from the Razorpay dashboard, if it offers that → row 8 total unchanged (duplicate ignored).
+- V7 Send yourself a notification email (§2a step 6) and an application decision email.
+- V8 Only then switch to live keys (`supabase secrets set RAZORPAY_KEY_ID=rzp_live_… RAZORPAY_KEY_SECRET=…`, live-mode webhook with its own secret), make one small real payment, refund it in Razorpay, and record the refund in Admin → Bookings.
+
+The detailed scenario list in §3 (abandoned checkout, wrong amount, late payment, races) can be run in test mode as well.
+
+### Rollback and recovery
+
+- **Stop taking payments at once:** `supabase secrets unset RAZORPAY_KEY_SECRET` (or `RAZORPAY_KEY_ID`). New checkouts answer 503 and release their seats; payments already made still confirm through the webhook, which needs only `RAZORPAY_WEBHOOK_SECRET`. Set the secret again to resume.
+- **Bad function release:** check out the previous commit's `supabase/functions/<name>` (and `_shared/`) and deploy that function again with the same flags.
+- **Webhook failing:** Razorpay's delivery log shows the HTTP status. `400` = secret mismatch (re-copy it into both places); `503` = secret missing; `401` = redeploy with `--no-verify-jwt`. Payments made meanwhile are still confirmed by the browser's verify call when the customer completes checkout; the rest appear as pending/expired bookings — see "Payment stuck".
+- **Payment stuck** (customer charged, booking not confirmed, or `needs_review`): rows 3, 4 and 10 of the payments check. A `needs_review` booking is resolved in Admin → Bookings (reseat, or refund in Razorpay and record it). For a payment the webhook never recorded, compare with Razorpay's payment list; resolving it in the database is a production write and a deliberate operator decision — the same `settle_payment(order_id, payment_id, amount_paise, 'webhook')` the webhook would have run, executed by the project owner.
+- **Email:** unset `RESEND_API_KEY` to stop all sending (queued email waits); deactivate the `tangy-email-drain` cron job to pause notifications only.
+- **Rotating a secret:** set the new value in both places (Razorpay webhook form ↔ `RAZORPAY_WEBHOOK_SECRET`; scheduler ↔ `CRON_SECRET`), then re-run V1/V2 or §2a step 4.
+
 ## 4. Edge Functions
 
 | Function | Purpose | Env vars | Auth | Local result |
@@ -192,9 +341,9 @@ When real test-mode credentials exist, run and record each of these (none has be
 | `admin-invite-user` | Creates a console invitation (hashed single-use token, 72 h) and emails the link; the role is applied only when the recipient accepts at `/invitation` | `SITE_URL`, email settings (section 2) | inviter's JWT — `create_account_invitation` checks `roles.manage` (Super Admin / Admin) or `staff.invite` (Staff) in Postgres; no service role key | E2E invitations (invite → email → accept, single use, wrong account, revoke, manager limited to Staff), sweep (staff refused 403) |
 | `_shared/*` | email provider, CORS allowlist, HMAC | — | — | `scripts/test-email-config.mjs`, `scripts/test-edge-shared.mjs` |
 
-CORS: set `ALLOWED_ORIGINS` (or `SITE_URL`) to the production origin; list the canonical origin first (JSON responses use it; preflights echo any listed origin). Every browser-called function also checks the caller's JWT. Deno is not installed on this machine: functions were syntax-checked with esbuild and exercised through `supabase functions serve` in the E2E suites.
+CORS: set `SITE_URL` to the single canonical production origin and leave `ALLOWED_ORIGINS` unset — four functions answer with the first allowed origin only, so a second origin passes the preflight but its responses are rejected by the browser (§3a). Every browser-called function also checks the caller's JWT. Deno is not installed on this machine: functions were syntax-checked with esbuild and exercised through `supabase functions serve` in the E2E suites.
 
-Deployment (later, not done): `supabase functions deploy <name>` for all seven, `razorpay-webhook` and `send-notification-emails` with `--no-verify-jwt`.
+Deployment (not done yet): step by step in §3a — all seven, `razorpay-webhook` and `send-notification-emails` with `--no-verify-jwt`.
 
 ## 5. Media storage
 
