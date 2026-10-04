@@ -299,7 +299,7 @@ supabase secrets set CRON_SECRET=<long random string> SITE_URL=https://tangysess
 # RESEND_API_KEY, EMAIL_FROM (or the older RESEND_FROM_EMAIL), optional EMAIL_REPLY_TO — shared by every email function
 ```
 
-Schedule a `POST` to the function every minute or two (Supabase dashboard → Integrations → Cron → HTTP request, or any external scheduler) with the `x-cron-secret` header. Links in emails are `SITE_URL` + the notification's path.
+Schedule a `POST` to the function every minute or two (Supabase dashboard → Integrations → Cron → HTTP request, or any external scheduler) with the `x-cron-secret` header. Links in emails are `SITE_URL` + the notification's path. Step-by-step production runbook, with a read-only check (`ops/scheduled_jobs_and_email.readonly.sql`) to run before and after: `docs/OPERATIONS.md` §2a.
 
 All email goes through `functions/_shared/email.ts`. `EMAIL_PROVIDER` is `resend` (default), `log` (development: logs recipient and subject only), `disabled`, or `mailpit` (local stack only, with `MAILPIT_URL`). **Without `RESEND_API_KEY` email is "not configured"**: nothing is sent and nothing crashes — `send-notification-emails` leaves the queue untouched (rows are not marked failed) and ticket/approval emails record "Email is not configured yet." so an admin can resend once it is. The sending domain must be verified in Resend. `node scripts/test-email-config.mjs` checks the provider logic without Deno or network.
 

@@ -40,11 +40,123 @@ CRON_SECRET=
 - [ ] Create the Resend account and verify the sending domain (SPF, DKIM, DMARC records).
 - [ ] Set the secrets above; `EMAIL_FROM` must use the verified domain.
 - [ ] Deploy `send-notification-emails` (`--no-verify-jwt`; it checks the service key / `CRON_SECRET` itself), `send-ticket-email`, `send-approval-email`.
-- [ ] Schedule a POST to `send-notification-emails` every 1–2 minutes with header `x-cron-secret`.
+- [ ] Schedule a POST to `send-notification-emails` every 1–2 minutes with header `x-cron-secret` (step-by-step: §2a).
 - [ ] Send one real ticket email and one approval email to a team inbox; check links (`SITE_URL`), QR attachment and reply-to.
 - [ ] Watch Admin → Email delivery for failures for the first days.
 
 Until then: nothing is sent and nothing crashes; queued emails wait (`scripts/test-email-config.mjs` checks this). Email bodies never contain message text, payment details or booking answers.
+
+## 2a. Production runbook — scheduled jobs and the email queue
+
+Project `ohyjqxbsgdkzytfnlitf`. Every step is done by a person in the Supabase
+dashboard or with the Supabase CLI; nothing here re-runs a migration or changes
+RLS, policies, functions, triggers or the schema. Two schedules matter:
+
+- **`tangy-platform-jobs`** (pg_cron, every 5 min) → `run_platform_jobs()`:
+  expires unpaid checkout holds (releasing seats), waitlist offers and artist
+  requests, sends reminders and notices. Without it, seats held by abandoned
+  checkouts are only released when someone else starts a checkout.
+- **The email drain** (every 1–2 min) → Edge Function `send-notification-emails`,
+  which sends what `notify()` queued in `email_outbox`. Without it, in-app
+  notifications work but **no notification email is ever sent**.
+
+### Step 0 — look before changing anything
+
+Run `supabase/ops/scheduled_jobs_and_email.readonly.sql` in the SQL editor
+(one SELECT; it can be wrapped in `begin transaction read only; … rollback;`).
+It reports pg_cron / pg_net, both schedules and their recent runs, the job-run
+log and the outbox by status. It never shows addresses, email content or a
+cron job's command (which holds the cron secret). Note rows 1, 3 and 8.
+
+### Step 1 — platform jobs (`tangy-platform-jobs`)
+
+- Row 3 shows `*/5 * * * * (active)` → nothing to do; after 10 minutes row 5
+  shows successes and row 7 a recent `last finished`.
+- Row 3 shows **pg_cron not installed** or **MISSING**: enable `pg_cron` under
+  Database → Extensions, then create the same job 0020 creates — either
+  Integrations → Cron → *Create job* → name `tangy-platform-jobs`, schedule
+  `*/5 * * * *`, type *SQL snippet* `select public.run_platform_jobs()`; or in
+  the SQL editor:
+  `select cron.schedule('tangy-platform-jobs', '*/5 * * * *', 'select public.run_platform_jobs()');`
+  (re-running it with the same name updates the job instead of adding one).
+- Row 4 (`tangy-log-expired-access`, 0018) may or may not exist; it is
+  redundant with `run_platform_jobs()` and harmless either way.
+
+### Step 2 — email secrets
+
+Prerequisite: a Resend account with the sending domain verified (SPF, DKIM,
+DMARC). Then, with the CLI linked to the project (`supabase link --project-ref
+ohyjqxbsgdkzytfnlitf`), set the Edge Function secrets — never as `VITE_`
+variables, never in Git:
+
+```
+openssl rand -hex 32          # → the CRON_SECRET value; keep it in your password manager
+supabase secrets set EMAIL_PROVIDER=resend RESEND_API_KEY=re_… \
+  EMAIL_FROM="Tangy Sessions <hello@your-verified-domain>" SITE_URL=https://<production site> \
+  CRON_SECRET=<the value above>
+# optional: EMAIL_REPLY_TO=…
+```
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are injected by Supabase; do
+not set them. Without `RESEND_API_KEY` the function answers
+`{"configured": false}` and leaves the queue untouched.
+
+### Step 3 — deploy the function
+
+```
+supabase functions deploy send-notification-emails --no-verify-jwt
+```
+
+`--no-verify-jwt` is required: the scheduler authenticates with the
+`x-cron-secret` header, which the function checks itself (end-user sessions are
+always refused). Deployed *with* JWT verification, the platform gateway rejects
+every scheduled call with 401 before the function runs.
+
+### Step 4 — smoke-test by hand
+
+Read the secret without leaving it in shell history, then call the function:
+
+```
+read -rs CRON_SECRET
+URL=https://ohyjqxbsgdkzytfnlitf.supabase.co/functions/v1/send-notification-emails
+curl -s -X POST "$URL" -H "x-cron-secret: $CRON_SECRET" -H 'Content-Type: application/json' -d '{}'
+#   → {"claimed":0,"sent":0,"failed":0}  (configured; {"configured":false} means RESEND_API_KEY is missing)
+curl -s -o /dev/null -w '%{http_code}\n' -X POST "$URL" -d '{}'          # → 403 (no secret)
+curl -s -o /dev/null -w '%{http_code}\n' "$URL"                          # → 405 (GET)
+unset CRON_SECRET
+```
+
+### Step 5 — schedule the drain
+
+Integrations → Cron → *Create job* (enable `pg_net` when the dashboard asks):
+
+| Field | Value |
+| --- | --- |
+| Name | `tangy-email-drain` |
+| Schedule | `* * * * *` (or `*/2 * * * *`) |
+| Type | *Supabase Edge Function* (or *HTTP request* to the URL above) |
+| Method / function | `POST` / `send-notification-emails` |
+| Headers | `x-cron-secret: <CRON_SECRET>` (plus `Content-Type: application/json`) |
+| Body | `{}` |
+
+Each run sends at most 25 emails; overlapping runs never send one twice. The
+secret is stored in the job's command (`cron.job`, readable only by
+database-owner roles): after rotating `CRON_SECRET`, edit the job too.
+An external scheduler that POSTs the same request every 1–2 minutes works as
+well.
+
+### Step 6 — verify
+
+1. Re-run the Step 0 check: row 8 lists `tangy-email-drain (active)`, row 9
+   shows successes, row 13 shows 2xx responses and no 4xx (a 401 means the
+   function was deployed with JWT verification; a 403 means the header or
+   secret is wrong).
+2. End to end: as Super Admin, open another active team member's account in
+   Admin → Users and send them a custom notification (the form is not shown on
+   your own account). Within two minutes it reaches their inbox, row 10 shows
+   it as `sent`, and the link opens `SITE_URL`.
+3. For the first days, check Admin → More operations → Email delivery for
+   `failed` rows (row 12 shows the latest error, addresses masked).
 
 ## 3. Razorpay — production checklist (not done yet)
 
