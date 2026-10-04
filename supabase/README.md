@@ -171,7 +171,7 @@ original unnamed constraint, which wasn't verified against a live database.
 28. `migrations/0028_content_cms.sql` — Tangy TV, diary, gallery, artist slugs, session copy editing and granular content permissions. Reverse: `rollbacks/0028_content_cms.down.sql`.
 29. `migrations/0029_private_media_realtime_jobs.sql` — private content media with signed URLs, live seat-availability signal, waitlist allocation policy, upload limits on every bucket, single-flight scheduled jobs with a run log. Reverse: `rollbacks/0029_private_media_realtime_jobs.down.sql`.
 
-Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`, `invitations_volunteer`, `programmes`, `artist_portal`, `artist_documents_storage`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
+Database tests live in `tests/` (`admin_system`, `operations_platform`, `platform_finalization`, `canonical_links`, `artist_storage`, `named_group_checkin`, `booking_form`, `enquiries_auth`, `pricing_settlement`, `waitlist`, `content_cms`, `messaging_security`, `media_realtime_jobs`, `invitations_volunteer`, `programmes`, `artist_portal`, `artist_documents_storage`, `ticket_email_outbox`) and run against a **local** stack with `scripts/test-db.sh` — each file is one transaction that rolls back. Never run them against production.
 
 ### Production application order (0017 → 0036)
 

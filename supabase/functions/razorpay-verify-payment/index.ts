@@ -6,6 +6,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleOptions, jsonResponse } from '../_shared/cors.ts';
 import { hmacSha256Hex, timingSafeEqual, requireSecret } from '../_shared/crypto.ts';
+import { enqueueTicketEmail } from '../_shared/ticketEmail.ts';
 
 Deno.serve(async (req) => {
   // Answers with this request's origin when it is allowed (_shared/cors.ts).
@@ -43,10 +44,18 @@ Deno.serve(async (req) => {
     if (fetchError || !booking) return json({ error: 'Booking not found.' }, 404);
     if (booking.user_id !== user.id) return json({ error: 'Not your booking.' }, 403);
     if (booking.razorpay_order_id !== razorpay_order_id) return json({ error: 'Order mismatch.' }, 400);
+    // Queues the ticket email for the confirmed booking (once per booking);
+    // never fails the payment response — the webhook queues it too.
+    const queueTicketEmail = async () => {
+      const queued = await enqueueTicketEmail(admin, booking_id).catch(() => ({ ok: false, reason: 'exception' }));
+      if (!queued.ok) console.error('razorpay-verify-payment: ticket email not queued for booking', booking_id, queued.reason);
+    };
+
     if (booking.status === 'confirmed' && booking.razorpay_signature_verified) {
       // Already verified — idempotent. Tickets were already issued the
       // first time (confirm_booking_and_issue_tickets is itself idempotent
       // too), so just re-fetch and return them rather than re-deriving.
+      await queueTicketEmail();
       const { data: tickets } = await admin.from('tickets').select('*').eq('booking_id', booking_id).order('ticket_number');
       return json({ success: true, booking, tickets: tickets || [] });
     }
@@ -75,6 +84,7 @@ Deno.serve(async (req) => {
     if (settled?.result === 'needs_review') {
       return json({ error: 'We received your payment, but these seats are no longer available. Our team will contact you about a refund or a new seat.', review: true }, 409);
     }
+    await queueTicketEmail();
     const { data: confirmed } = await admin.from('bookings').select('*').eq('id', booking_id).single();
     const { data: tickets } = await admin.from('tickets').select('*').eq('booking_id', booking_id).order('ticket_number');
     return json({ success: true, booking: confirmed, tickets: tickets || [] });

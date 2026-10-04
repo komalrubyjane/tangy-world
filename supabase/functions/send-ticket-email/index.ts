@@ -1,95 +1,20 @@
-// Sends the ticket confirmation email after a booking is confirmed and its
-// tickets have been issued (confirm_booking_and_issue_tickets in
-// 0016_payments_tickets_checkin.sql), via _shared/email.ts (email secrets
-// never leave the server). Mirrors send-approval-email's auth-client/admin-client split —
-// see that function for the established pattern this follows.
+// Sends the ticket confirmation email for a confirmed booking (tickets are
+// issued by settle_payment → confirm_booking_and_issue_tickets), via
+// _shared/ticketEmail.ts + _shared/email.ts (email secrets never leave the
+// server).
 //
-// Called by the client (src/lib/bookingService.js) right after
-// razorpay-verify-payment succeeds. Re-verifies everything server-side
-// rather than trusting the request: re-fetches the booking, its tickets,
-// and the event from the database, and never sends unless the booking is
-// actually status='confirmed'. Idempotent via bookings.ticket_email_status
-// (0016_payments_tickets_checkin.sql) — calling this twice for the same
-// booking cannot double-send. Pass `force: true` to explicitly resend (the
-// admin "RESEND EMAIL" action).
+// The automatic ticket email is queued in email_outbox by razorpay-webhook /
+// razorpay-verify-payment and sent by send-notification-emails, so it does not
+// depend on the browser. This function is:
+//   * the browser's call after a verified payment — a no-op when the email is
+//     already queued or sent, a direct send only as a fallback;
+//   * the admin "RESEND EMAIL" action (`force: true`) — always sends.
+// Re-verifies everything server-side: the caller's session, that the caller
+// owns the booking or is on the team, and that the booking is confirmed.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import QRCode from 'https://esm.sh/qrcode@1.5.4';
 import { handleOptions, jsonResponse } from '../_shared/cors.ts';
 import { sendEmail } from '../_shared/email.ts';
-
-const TIER_LABELS: Record<string, string> = { gen: 'General Admission', vip: 'VIP Heritage Pass', premium: 'Backstage Collective Pass' };
-
-function fmtDate(d: string | null): string {
-  if (!d) return '—';
-  try {
-    return new Date(`${d}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return d;
-  }
-}
-
-function emailHtml({ attendeeName, event, booking, tickets }: { attendeeName: string; event: any; booking: any; tickets: any[] }) {
-  const safeName = String(attendeeName).replace(/</g, '&lt;');
-  const tierLabel = TIER_LABELS[booking.tier] || booking.tier || 'General Admission';
-  // The booking's ONE QR (0023) is attached as booking-pass.png, not embedded
-  // inline — CID inline-image embedding support varies by email
-  // provider/client and wasn't something that could be verified live, so
-  // this degrades safely to "open the attachment" everywhere rather than
-  // risking a broken inline image in some clients. Attendee names are
-  // user-entered, so they are escaped.
-  const esc = (v: string) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const ticketRows = tickets.map((t: any, i: number) => `
-    <tr>
-      <td style="padding:8px 0;border-top:1px dashed rgba(17,16,12,0.3);font-family:Courier,monospace;font-size:12px;color:#11100C;">
-        ${i + 1}. <strong>${esc(t.attendee_name || `Guest ${i + 1}`)}</strong> <span style="opacity:0.6;">· ${t.ticket_number}</span>
-      </td>
-    </tr>`).join('');
-
-  return `<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background-color:#11100C;font-family:Georgia,'Times New Roman',serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#11100C;padding:32px 16px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" style="max-width:520px;background-color:#EDE0C0;border:4px solid #11100C;">
-            <tr>
-              <td style="padding:28px 32px 16px 32px;border-bottom:2px solid #11100C;">
-                <p style="margin:0;font-family:Courier,monospace;font-size:11px;font-weight:bold;letter-spacing:3px;color:#8B2E00;text-transform:uppercase;">✦ TANGY SESSIONS</p>
-                <h1 style="margin:6px 0 0 0;font-size:26px;color:#11100C;text-transform:uppercase;">Your Tickets Are Confirmed</h1>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:24px 32px;color:#11100C;">
-                <p style="margin:0 0 14px 0;font-size:15px;">Hi ${safeName},</p>
-                <p style="margin:0 0 18px 0;font-size:14px;line-height:1.6;">Your booking for <strong>${event?.name || 'the session'}</strong> is confirmed.</p>
-
-                <table role="presentation" width="100%" style="background-color:#F5E9C9;border:2px solid #11100C;margin-bottom:18px;">
-                  <tr><td style="padding:16px;font-family:Courier,monospace;font-size:12px;color:#11100C;">
-                    <div><strong>Event:</strong> ${event?.name || '—'}</div>
-                    <div><strong>Date:</strong> ${fmtDate(event?.event_date)} ${event?.event_time || ''}</div>
-                    <div><strong>Venue:</strong> ${event?.venue || '—'}</div>
-                    <div><strong>Tier:</strong> ${tierLabel}</div>
-                    <div><strong>Quantity:</strong> ${booking.quantity}</div>
-                    <div><strong>Booking reference:</strong> ${booking.registration_code}</div>
-                    <div><strong>Amount paid:</strong> ₹${booking.amount}</div>
-                  </td></tr>
-                </table>
-
-                <table role="presentation" width="100%">${ticketRows}</table>
-
-                <p style="margin:20px 0 0 0;font-size:12px;line-height:1.6;color:#4A2E1A;">
-                  Show the attached QR (booking-pass.png) at the entrance — one QR for everyone on this booking; staff check each person in by name, even if you arrive separately. It's always available in your Tangy Dashboard too.
-                </p>
-                <p style="margin:20px 0 0 0;font-size:13px;line-height:1.6;color:#4A2E1A;">See you inside,<br />Tangy Sessions</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
-}
+import { buildTicketEmail, markTicketEmail, ticketDedupeKey } from '../_shared/ticketEmail.ts';
 
 Deno.serve(async (req) => {
   // Answers with this request's origin when it is allowed (_shared/cors.ts).
@@ -129,51 +54,28 @@ Deno.serve(async (req) => {
       return json({ success: true, already_sent: true });
     }
 
-    const { data: tickets } = await admin.from('tickets').select('*').eq('booking_id', booking_id).order('ticket_number');
-    if (!tickets || tickets.length === 0) {
-      return json({ error: 'No tickets issued for this booking yet.' }, 409);
+    // Already queued by the payment functions: the queue sends it (no second copy).
+    if (!force) {
+      const { data: queued } = await admin.from('email_outbox').select('status').eq('dedupe_key', ticketDedupeKey(booking.id)).maybeSingle();
+      if (queued && ['queued', 'sending', 'sent'].includes(queued.status)) return json({ success: true, queued: true });
     }
 
-    const { data: event } = await admin.from('events').select('name, event_date, event_time, venue').eq('id', booking.event_id).maybeSingle();
-
-    // Trusted recipient: the AUTHENTICATED account's email, never the
-    // (user-typed, unverified) attendee_email column on the booking itself.
-    const { data: profile } = await admin.from('profiles').select('email, full_name').eq('id', booking.user_id).maybeSingle();
-    const recipientEmail = profile?.email;
-    const recipientName = profile?.full_name || booking.attendee_name || 'there';
-
-    if (!recipientEmail) {
-      await admin.from('bookings').update({ ticket_email_status: 'failed', ticket_email_error: 'No linked account email on file.' }).eq('id', booking_id);
-      return json({ success: false, error: 'No linked account email on file.' });
+    const { email, problem } = await buildTicketEmail(admin, booking);
+    if (!email) {
+      if (problem === 'No linked account email on file.') {
+        await markTicketEmail(admin, booking.id, false, problem);
+        return json({ success: false, error: problem });
+      }
+      return json({ error: problem }, 409);
     }
 
-    // One opaque booking QR (0023) — no ids, names or contact details inside.
-    const dataUrl: string = await QRCode.toDataURL(`TANGY:BOOKING:${booking.group_token}`, { width: 320, margin: 2, color: { dark: '#11100C', light: '#E7D5A4' } });
-    const attachments = [{ filename: 'booking-pass.png', content: dataUrl.split(',')[1] }];
-
-    const html = emailHtml({ attendeeName: recipientName, event, booking, tickets });
-
-    const result = await sendEmail({
-      to: recipientEmail,
-      subject: `Your Tangy Sessions tickets — ${event?.name || booking.registration_code}`,
-      html,
-      attachments,
-    });
-    const sendOk = result.ok;
-    const sendError = result.error ?? '';
-
-    if (sendOk) {
-      await admin.from('bookings').update({ ticket_email_status: 'sent', ticket_email_sent_at: new Date().toISOString(), ticket_email_error: null }).eq('id', booking_id);
-      return json({ success: true });
-    }
-
-    // The booking's payment/ticket confirmation is NOT touched here — only
-    // the email delivery state reflects the failure, so an admin can see it
-    // and retry without re-running payment verification.
-    await admin.from('bookings').update({ ticket_email_status: 'failed', ticket_email_error: sendError || 'Unknown delivery failure.' }).eq('id', booking_id);
-    return json({ success: false, error: sendError || 'Email delivery failed.' });
+    // The booking's payment/ticket confirmation is NOT touched here — only the
+    // email delivery state reflects the outcome, so an admin can retry.
+    const result = await sendEmail(email);
+    await markTicketEmail(admin, booking.id, result.ok, result.error);
+    return json(result.ok ? { success: true } : { success: false, error: result.error || 'Email delivery failed.' });
   } catch (err) {
-    console.error('send-ticket-email error', err);
+    console.error('send-ticket-email error', err instanceof Error ? err.message : err);
     return json({ error: 'Unexpected server error.' }, 500);
   }
 });

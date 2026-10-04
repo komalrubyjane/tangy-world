@@ -28,6 +28,7 @@
 // paise; `payment.entity.amount_refunded` is used when present).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { hmacSha256Hex, timingSafeEqual, requireSecret } from '../_shared/crypto.ts';
+import { enqueueTicketEmail } from '../_shared/ticketEmail.ts';
 
 
 // Not accepted: Razorpay retries non-2xx deliveries. Details go to the
@@ -116,6 +117,13 @@ Deno.serve(async (req) => {
       });
       if (settleError) retryable.push(`settlement failed: ${settleError.message}`);
       else if (settled?.result === 'not_found') permanent.push(`no booking for order ${orderId}`);
+      else if ((settled?.result === 'confirmed' || settled?.result === 'already_confirmed') && settled.booking_id) {
+        // Queue the ticket email (once per booking — unique dedupe key), so it
+        // goes out even if the customer closed the browser. The booking is
+        // already confirmed; a queueing failure only asks for a redelivery.
+        const queued = await enqueueTicketEmail(admin, settled.booking_id);
+        if (!queued.ok) retryable.push(`ticket email not queued: ${queued.reason}`);
+      }
     } else if (eventType === 'payment.authorized' && orderId) {
       const { error } = await admin.from('bookings')
         .update({ payment_status: 'authorized', payment_updated_at: now })

@@ -57,8 +57,10 @@ RLS, policies, functions, triggers or the schema. Two schedules matter:
   requests, sends reminders and notices. Without it, seats held by abandoned
   checkouts are only released when someone else starts a checkout.
 - **The email drain** (every 1–2 min) → Edge Function `send-notification-emails`,
-  which sends what `notify()` queued in `email_outbox`. Without it, in-app
-  notifications work but **no notification email is ever sent**.
+  which sends what `notify()` queued in `email_outbox` **and every ticket
+  confirmation email** (queued by `razorpay-webhook` / `razorpay-verify-payment`
+  once a payment is settled — see "Ticket email" below). Without it, in-app
+  notifications work but **no notification or ticket email is ever sent**.
 
 ### Step 0 — look before changing anything
 
@@ -194,7 +196,7 @@ migration, RLS, a policy, a function, a trigger or the schema.
 | `razorpay-create-order` | browser (`src/lib/bookingService.js`) | keep (default) | yes — after `auth.getUser()`, to read the event and call `create_pending_booking` (service-role only) | Razorpay Orders API | checkout |
 | `razorpay-verify-payment` | browser (`bookingService.js`) | keep | yes — after `auth.getUser()` + own-booking check, to call `settle_payment` (service-role only) | none (HMAC with `RAZORPAY_KEY_SECRET`) | checkout |
 | `razorpay-webhook` | Razorpay | **off** (`--no-verify-jwt`): Razorpay sends no Supabase JWT; the function verifies `X-Razorpay-Signature` itself | yes — after the signature check | none | payment source of truth |
-| `send-ticket-email` | browser after a verified payment; admin "resend" (`Bookings.jsx`) | keep | yes — after `auth.getUser()` + owner/team check | Resend; `qrcode` from esm.sh | ticket email |
+| `send-ticket-email` | browser after a verified payment (no-op when the email is already queued); admin "resend" (`Bookings.jsx`, always sends) | keep | yes — after `auth.getUser()` + owner/team check | Resend; `qrcode` from esm.sh | ticket email resend / fallback |
 | `send-approval-email` | admin (`src/services/notificationService.js`) | keep | yes — after `auth.getUser()` + admin role check | Resend | application decisions |
 | `admin-invite-user` | admin (`src/admin/api.js`) | keep | **no** — runs entirely under the inviter's JWT | Resend | console invitations |
 | `send-notification-emails` | scheduler (§2a) | **off** (`--no-verify-jwt`): checks `x-cron-secret` (or the service key) itself | yes — after that check | Resend | notification email |
@@ -316,13 +318,36 @@ health without personal data.
 - V2 `curl -s -X OPTIONS -H "Origin: https://<canonical origin>" -D - -o /dev/null https://ohyjqxbsgdkzytfnlitf.supabase.co/functions/v1/razorpay-create-order | grep -i access-control-allow-origin` → your origin.
 - V3 On the site, signed in: book a test session → pay with a Razorpay test method → the booking page shows the tickets and QR; the ticket email arrives.
   Check rows 1–2 (`confirmed`, `captured`), 6 (`0`), 8 (events processed, no errors).
-- V4 Close the browser tab right after paying (before the confirmation shows) on a second test booking → within a minute the webhook confirms it (rows 1, 8). **Known gap:** no ticket email is sent on this path — row 6 lists the booking; resend it from Admin → Bookings.
+- V4 Close the browser tab right after paying (before the confirmation shows) on a second test booking → within a minute the webhook confirms it (rows 1, 8) and queues the ticket email; the next drain run (§2a) sends it (row 6 back to `0`).
 - V5 A failed test payment, then a successful retry in the same checkout → one confirmed booking.
 - V6 Redeliver a webhook from the Razorpay dashboard, if it offers that → row 8 total unchanged (duplicate ignored).
 - V7 Send yourself a notification email (§2a step 6) and an application decision email.
 - V8 Only then switch to live keys (`supabase secrets set RAZORPAY_KEY_ID=rzp_live_… RAZORPAY_KEY_SECRET=…`, live-mode webhook with its own secret), make one small real payment, refund it in Razorpay, and record the refund in Admin → Bookings.
 
 The detailed scenario list in §3 (abandoned checkout, wrong amount, late payment, races) can be run in test mode as well.
+
+### Ticket email
+
+Owned by the email queue, not the browser:
+
+1. `settle_payment` confirms the booking and issues the tickets (unchanged).
+2. Whichever of `razorpay-webhook` / `razorpay-verify-payment` sees the
+   confirmation queues one `email_outbox` row of type `ticket.confirmed` with
+   `dedupe_key = ticket.confirmed:<booking id>` (`_shared/ticketEmail.ts`).
+   The key is unique, so duplicate webhooks, `order.paid` + `payment.captured`
+   and the browser path all end in **one** row. If the webhook cannot queue
+   it, it answers 500 and Razorpay's redelivery queues it.
+3. `send-notification-emails` (§2a schedule) renders the ticket email with the
+   booking QR, sends it to the account email and sets
+   `bookings.ticket_email_status`. A provider failure leaves the booking
+   confirmed, marks the email `failed` for the admin and retries the row (up to
+   5 attempts). A row whose booking was already emailed (admin resend) or is no
+   longer confirmed is marked `skipped`.
+4. The browser's call to `send-ticket-email` after checkout is then a no-op;
+   Admin → Bookings → Resend email (`force`) always sends.
+
+So ticket emails need the §2a drain schedule; until it runs they wait in the
+queue (payments check row 6 lists confirmed bookings whose email is not sent).
 
 ### Rollback and recovery
 
@@ -340,7 +365,7 @@ The detailed scenario list in §3 (abandoned checkout, wrong amount, late paymen
 | `razorpay-create-order` | Validates the booking, creates the pending booking at the server price, creates the Razorpay order | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `SITE_URL`/`ALLOWED_ORIGINS` | user JWT | E2E: validation, pricing, 503 without keys (checkout, groupcheckin suites) |
 | `razorpay-verify-payment` | Verifies the checkout signature, calls `settle_payment` | `RAZORPAY_KEY_SECRET` | user JWT, own booking only | syntax + shared crypto unit tests; refuses (503) without the secret; not exercised end to end (no Razorpay checkout locally) |
 | `razorpay-webhook` | Source of truth for payments; HMAC-verified, idempotent | `RAZORPAY_WEBHOOK_SECRET` | signature (deploy with `--no-verify-jwt`) | E2E: success / duplicate / failure / forged signature (checkout suite) |
-| `send-ticket-email` | Ticket email with the booking QR | email vars | user JWT (own booking) or admin | E2E via Mailpit |
+| `send-ticket-email` | Ticket email with the booking QR — admin resend, browser fallback | email vars | user JWT (own booking) or admin | E2E via Mailpit; `scripts/test-ticket-email.mjs` |
 | `send-approval-email` | "Application approved" email | email vars, `SITE_URL` | admin JWT | E2E via Mailpit |
 | `send-notification-emails` | Drains `email_outbox` | email vars, `CRON_SECRET`, `SITE_URL` | service key or `x-cron-secret` | E2E + `scripts/run-jobs.sh emails` |
 | `admin-invite-user` | Creates a console invitation (hashed single-use token, 72 h) and emails the link; the role is applied only when the recipient accepts at `/invitation` | `SITE_URL`, email settings (section 2) | inviter's JWT — `create_account_invitation` checks `roles.manage` (Super Admin / Admin) or `staff.invite` (Staff) in Postgres; no service role key | E2E invitations (invite → email → accept, single use, wrong account, revoke, manager limited to Staff), sweep (staff refused 403) |

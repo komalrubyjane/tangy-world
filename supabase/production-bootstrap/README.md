@@ -125,7 +125,7 @@ database with the Supabase shim, then:
    permission on super_admin and none on staff, the CMS functions, the
    publish guard on every content table with a status, the private
    `content-media` bucket (50 MB, no HTML) and its storage policies,
-5. runs every `supabase/tests/*.test.sql` suite unchanged — 19 suites, 949
+5. runs every `supabase/tests/*.test.sql` suite unchanged — 20 suites, 966
    assertions — and checks the database is still empty afterwards.
 
 **No seed or mock content is inserted at any point.** Suites that exercise
