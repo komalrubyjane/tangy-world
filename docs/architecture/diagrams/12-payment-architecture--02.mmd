@@ -1,0 +1,27 @@
+---
+title: settle_payment(order, payment, amount, source)
+---
+flowchart TD
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  S(["settle_payment"]) --> V{"valid source verify/webhook,<br/>order + payment ids?"}:::dec
+  V -- no --> X["raise Invalid settlement<br/>request"]:::err
+  V -- yes --> F{"booking with this order?"}:::dec
+  F -- no --> NF["result not_found<br/>(webhook: permanent failure<br/>recorded)"]:::err
+  F -- yes --> L["lock events row · lock<br/>booking row"]:::db
+  L --> C{"already confirmed?"}:::dec
+  C -- yes --> AC["already_confirmed<br/>(idempotent)"]:::res
+  C -- no --> AM{"webhook amount ≠ booking<br/>total?"}:::dec
+  AM -- yes --> RV["needs_review: wrong amount"]:::err
+  AM -- no --> CA{"booking cancelled /<br/>refunded?"}:::dec
+  CA -- yes --> RV2["needs_review: paid for a<br/>cancelled booking"]:::err
+  CA -- no --> EXP{"booking expired / failed<br/>(late payment)?"}:::dec
+  EXP -- yes --> SEAT{"seats still free incl.<br/>waitlist holds?"}:::dec
+  SEAT -- no --> RV3["needs_review: hold expired,<br/>seats gone"]:::err
+  SEAT -- yes --> OK
+  EXP -- no --> PEN{"status pending?"}:::dec
+  PEN -- no --> RV4["needs_review: unexpected<br/>state"]:::err
+  PEN -- yes --> OK["status confirmed · payment<br/>captured · signature<br/>verified<br/>confirm_booking_and_issue_tickets<br/>late → audit<br/>payment.late_accepted"]:::res
+  RV & RV2 & RV3 & RV4 --> NR["payment_status needs_review<br/>· audit payment.needs_review<br/>notify payments.view holders<br/>(payment.review, urgent,<br/>emailed)<br/>refund or reseat manually"]:::db

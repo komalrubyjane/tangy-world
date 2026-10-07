@@ -1,0 +1,22 @@
+---
+title: Generic admin request path
+---
+flowchart TB
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  A(["Admin opens page"]):::start --> G{"Guard requires / anyOf<br/>from my_permissions()"}:::dec
+  G -- no --> F["Forbidden"]:::err
+  G -- yes --> C["Page / component<br/>src/admin/pages · components · sections"]:::proc
+  C --> S["admin/api.js<br/>rpc() · list() · update() · adminApi.*"]:::proc
+  S --> R{"RPC or table?"}:::dec
+  R -- RPC --> P["SECURITY DEFINER function<br/>has_permission() check inside"]:::db
+  R -- table --> T["PostgREST + RLS policy"]:::db
+  P & T --> M["Mutation"]:::db
+  M --> AU["audit_write() / audit_row_change trigger → audit_logs (append-only)"]:::db
+  M --> NO["notify() / notify_permission_holders() triggers"]:::db
+  M --> UI["friendlyError() or toast → UI refresh"]:::res
+  P -- "raise 42501 / P0001" --> UI

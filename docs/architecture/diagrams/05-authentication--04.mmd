@@ -1,0 +1,16 @@
+---
+title: Session lifecycle
+---
+stateDiagram-v2
+  [*] --> SignedOut
+  SignedOut --> Verifying: verifyOtp / signInWithPassword
+  Verifying --> SignedIn: session stored
+  Verifying --> SignedOut: invalid code
+  SignedIn --> SignedIn: autoRefreshToken renews JWT
+  SignedIn --> RoleChanged: 60 s poll / focus sees new role or is_active
+  RoleChanged --> SignedIn: menus + guards follow the server role
+  SignedIn --> Deactivated: is_active false — current_role_name() returns null
+  Deactivated --> SignedOut: logout
+  SignedIn --> IdleSignedOut: console idle timeout (default 60 min)
+  IdleSignedOut --> SignedOut
+  SignedIn --> SignedOut: logout()

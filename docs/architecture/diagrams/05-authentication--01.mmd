@@ -1,0 +1,34 @@
+---
+title: Authentication → role → permission → enforcement
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  U(["User opens a sign-in surface"]):::start --> E["Enter email<br/>signInWithOtp(email, shouldCreateUser)"]:::proc
+  E --> SA["Supabase Auth emails a 6-digit code"]:::db
+  SA --> C["Enter code · verifyOtp(email, token, type email)"]:::proc
+  C --> V{"Code valid?"}:::dec
+  V -- no --> ER["friendlyOtpError message"]:::err
+  V -- yes --> JWT["Session + JWT stored by supabase-js<br/>auto-refresh"]:::db
+  JWT --> NEW{"First sign-in?"}:::dec
+  NEW -- yes --> TR["auth.users insert → handle_new_user()<br/>profiles: role user · passport_id"]:::db
+  NEW -- no --> PL
+  TR --> PL["UserAuthContext.loadProfile<br/>select * from profiles where id = auth user"]:::proc
+  PL --> PE{"Profile row loaded?"}:::dec
+  PE -- no --> PF["profileError · fallback role user"]:::err
+  PE -- yes --> ROLE["user.role = profiles.role"]:::res
+  ROLE --> SURF{"Which surface?"}:::dec
+  SURF -- "account dashboards" --> PR["ProtectedRoute: signed in only<br/>DashboardRedirect by role"]:::proc
+  SURF -- "artist portal" --> AP["artist AuthContext:<br/>artists row for this user,<br/>status approved"]:::proc
+  SURF -- "console / check-in" --> PERM["AdminSessionProvider<br/>my_permissions() + get_runtime_settings()"]:::db
+  PERM --> G{"can(requires)?"}:::dec
+  G -- no --> NA["No access / Deactivated card"]:::err
+  G -- yes --> CON["Console renders · nav from buildNav(perms)"]:::res
+  PR & AP & CON --> CALL["Data call with user JWT"]:::proc
+  CALL --> RLS{"RLS policy / RPC has_permission() / auth.uid() check"}:::dec
+  RLS -- denied --> D["0 rows / 42501 → 'You don't have permission'"]:::err
+  RLS -- allowed --> OK["Data returned / mutation done · audit_write"]:::res

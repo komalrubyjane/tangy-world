@@ -1,0 +1,21 @@
+---
+title: run_platform_jobs — single-flight job runner (every 5 minutes)
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  C(["pg_cron tangy-platform-jobs */5"]):::start --> L{"pg_try_advisory_xact_lock<br/>'tangy.run_platform_jobs'"}:::dec
+  L -- "busy" --> SK["platform_job_runs row skipped=true<br/>(another run in progress)"]:::err
+  L -- acquired --> R["platform_job_runs row started"]:::db
+  R --> J1["expire_stale_bookings<br/>pending unpaid > 30 min → expired · notify customer · audit · seats → waitlist"]:::db
+  J1 --> J2["expire_waitlist_offers<br/>lapsed offers → expired · notify · offer onwards"]:::db
+  J2 --> J3["expire_booking_requests<br/>pending artist requests past expires_at → expired"]:::db
+  J3 --> J4["send_event_reminders<br/>members of events starting within 24 h · event_reminders_sent dedupe"]:::db
+  J4 --> J5["notify_overdue_tasks<br/>assignee + team.manage · overdue_notified_at marker"]:::db
+  J5 --> J6["notify_expiring_access<br/>volunteer grants about to end · expiring_notified_at"]:::db
+  J6 --> J7["log_expired_access<br/>audit access.expired · expiry_logged_at"]:::db
+  J7 --> J8["send_availability_reminders<br/>artists with calendars older than 30 days"]:::db
+  J8 --> F["platform_job_runs finished_at + result jsonb (counts)"]:::res

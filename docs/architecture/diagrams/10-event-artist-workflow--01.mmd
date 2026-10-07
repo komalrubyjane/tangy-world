@@ -1,0 +1,23 @@
+---
+title: artist_day_status decision
+---
+flowchart TD
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef warn fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  IN["inputs: artist_availability · event_artists + event_artist_details · pending assignment_requests"]:::db --> A{"marked unavailable<br/>and window overlaps?"}:::dec
+  A -- yes --> UN["unavailable"]:::err
+  A -- no --> B{"confirmed slot overlaps window?"}:::dec
+  B -- yes --> BU["busy"]:::err
+  B -- no --> C{"booked elsewhere that day?"}:::dec
+  C -- yes --> T1["tentative"]:::warn
+  C -- no --> D{"marked tentative?"}:::dec
+  D -- yes --> T2["tentative"]:::warn
+  D -- no --> E{"pending request that day?"}:::dec
+  E -- yes --> T3["tentative"]:::warn
+  E -- no --> F{"marked available?"}:::dec
+  F -- "yes, window covered" --> AV["available"]:::res
+  F -- "yes, partial window" --> T4["tentative"]:::warn
+  F -- no --> UK["unknown · No availability set"]:::db

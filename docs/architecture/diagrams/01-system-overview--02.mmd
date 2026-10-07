@@ -1,0 +1,13 @@
+---
+title: Three layers — experience, operations, partners
+---
+flowchart LR
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  L1["1 · Public experience<br/>Hero · Sessions · Archive · Diary · TV · Gallery<br/>Session page = checkout"]:::proc
+  L2["2 · Operations<br/>Admin console: events, line-ups, bookings, payments,<br/>content, people, messages, reports, audit · Check-in"]:::proc
+  L3["3 · Partner & account portals<br/>Artist portal · Sponsor · Vendor · Venue · Volunteer · Crew · Customer"]:::proc
+  DB[("Supabase Postgres<br/>single source of truth<br/>RLS + RPC + triggers")]:::db
+  L1 <--> DB
+  L2 <--> DB
+  L3 <--> DB

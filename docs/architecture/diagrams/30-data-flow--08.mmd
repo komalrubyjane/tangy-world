@@ -1,0 +1,12 @@
+---
+title: Waitlist data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  J(["join_waitlist(event, qty)"]):::src --> W[("waitlist: waiting · queue_no")]:::db
+  REL(["seat released / capacity raised"]):::src --> OF["offer_waitlist_seats"] --> W2[("waitlist: offered · offer_expires_at")]:::db
+  W2 --> HOLD["held seats counted in capacity everywhere"]:::out
+  W2 --> CO["create_pending_booking → converted · booking_id"]:::out
+  W2 --> EX["expire → expired → next party"]:::out

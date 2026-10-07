@@ -1,0 +1,14 @@
+---
+title: Authentication data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  E(["Email typed by user"]):::src --> AU[("auth.users")]:::db
+  AU -- "handle_new_user" --> PR[("profiles: role user · passport_id · email")]:::db
+  AU -- "sync_profile_email (0035)" --> PR
+  PR --> JWT["Session JWT in browser storage (supabase-js)"]:::out
+  PR --> CTX["UserAuthContext user · role"]:::out
+  PR --> PERM["my_permissions() via role_permissions"]:::out
+  PR --> RLS["every RLS / RPC check"]:::out

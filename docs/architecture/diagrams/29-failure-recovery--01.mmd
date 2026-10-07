@@ -1,0 +1,16 @@
+---
+title: Payment failures — failed, browser closed, duplicate, bad signature
+---
+flowchart LR
+  classDef ok fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef rec fill:#fff3c4,stroke:#b38600,color:#222
+  N1["NORMAL: pay → verify → settle → tickets → email queued"]:::ok
+  E1["ERROR: payment fails in checkout"]:::err --> R1["RECOVERY: UI 'payment did not go through'; retry with same details reuses the order<br/>webhook payment.failed marks the pending booking failed → seats released → waitlist offered<br/>untouched holds expire after 30 min"]:::rec
+  E2["ERROR: paid, but browser closed before verify"]:::err --> R2["RECOVERY: razorpay-webhook settles independently · ticket email queued<br/>booking appears in /dashboard"]:::rec
+  E3["ERROR: webhook delivered twice"]:::err --> R3["RECOVERY: unique payment_webhook_events.event_id → 200 duplicate<br/>settle_payment already_confirmed · email dedupe key"]:::rec
+  E4["ERROR: webhook signature invalid"]:::err --> R4["400, nothing recorded or changed · Razorpay keeps its delivery log"]:::rec
+  E5["ERROR: DB error during webhook processing"]:::err --> R5["500 → Razorpay redelivers · recorded-but-unprocessed event is processed on retry"]:::rec
+  E6["ERROR: paid after hold expired and seats gone / wrong amount / cancelled booking"]:::err --> R6["needs_review · customer told (409) · payments.view alerted (urgent, emailed)<br/>admin refunds in Razorpay dashboard + admin_record_refund, or reseats"]:::rec
+  E7["ERROR: Razorpay secrets missing"]:::err --> R7["create-order 503 and hold released · verify 503 · webhook 503 (Razorpay retries after config)"]:::rec
+  E8["ERROR: settlement RPC fails in verify"]:::err --> R8["500 'contact support with your payment ID' · webhook still settles"]:::rec

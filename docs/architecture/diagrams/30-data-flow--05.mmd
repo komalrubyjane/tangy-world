@@ -1,0 +1,14 @@
+---
+title: Booking data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  CF(["Checkout form: booker · attendees · answers"]):::src --> EF["razorpay-create-order"] --> BK[("bookings (pending)")]:::db
+  BK --> ST["settle_payment → confirmed"]
+  ST --> BK
+  BK --> DASH["Customer /dashboard"]:::out
+  BK --> ADM["Admin bookings · attendees CSV (attendee_tickets)"]:::out
+  BK --> REP["Reports · revenue"]:::out
+  BK --> AUD[("audit_logs")]:::db

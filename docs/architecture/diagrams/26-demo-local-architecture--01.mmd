@@ -1,0 +1,20 @@
+---
+title: Local development stack
+---
+flowchart TD
+  classDef loc fill:#eeeeee,stroke:#888,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  D["Docker"]:::loc --> SS["npx supabase init && npx supabase start<br/>(any scratch folder; no config.toml in this repo)"]:::loc
+  SS --> PG[("Local Postgres + API :54321")]:::db
+  SS --> MP["Mailpit :54324<br/>receives OTP codes and (EMAIL_PROVIDER=mailpit) app email"]:::loc
+  PG --> MIG["scripts/test-db.sh --apply<br/>applies supabase/migrations 0001…0036 in order"]:::proc
+  MIG --> SEED["scripts/demo-data.sh seed"]:::proc
+  SEED --> ACC["1. Auth admin API: create 76 demo users<br/>fixed ids de300000-…, emails @demo.tangy.local, email_confirm true"]:::proc
+  ACC --> SQL["2. psql: demo_seed.sql · demo_seed_history.sql · demo_seed_artist_portal.sql · demo_seed_workflow.sql"]:::proc
+  SQL --> FILES["3. Storage uploads: demo performance videos → artist-media · demo covers → content-media"]:::proc
+  FILES --> V["npm run dev (Vite)<br/>.env.development.local: VITE_SUPABASE_URL=http://127.0.0.1:54321 · local anon key · SUPABASE_SERVICE_ROLE_KEY (dev server only)"]:::proc
+  V --> RS["/admin-portal → DevRoleSelector<br/>Super Admin · Admin · Staff · Artist · Sponsor · Vendor · Venue · Volunteer"]:::proc
+  RS --> MS["POST /__dev/mock-session {role}<br/>creates/ensures local account · sets profiles.role · provisions approved partner rows · returns a magic-link token hash"]:::proc
+  MS --> SESS["Real local session → real RLS"]:::db
+  V --> FN["Edge Functions locally: supabase functions serve<br/>EMAIL_PROVIDER=mailpit or log"]:::loc

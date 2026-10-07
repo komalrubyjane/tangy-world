@@ -1,0 +1,40 @@
+---
+title: Razorpay architecture — order, checkout, verify, webhook, settle
+---
+sequenceDiagram
+  autonumber
+  actor C as Customer browser
+  participant BS as bookingService
+  participant CO as razorpay-create-order
+  participant DB as Postgres
+  participant RZ as Razorpay API
+  participant CK as Razorpay Checkout.js
+  participant VP as razorpay-verify-payment
+  participant WH as razorpay-webhook
+  C->>BS: Pay (eventId, tierId, qty, names, details)
+  BS->>CO: functions.invoke + user JWT
+  CO->>CO: auth.getUser() · validate qty 1–50, name, email, Indian mobile, names = qty, tier code
+  CO->>DB: read event (service role) · status on-sale, or sold-out with live waitlist offer
+  CO->>DB: rpc create_pending_booking(..., p_amount null)
+  DB->>DB: expire_stale_bookings() · lock event · validate type, answers · capacity check
+  DB->>DB: amount = booking_quote(total) · insert bookings pending
+  DB-->>CO: booking (amount in rupees)
+  CO->>RZ: POST /v1/orders amount × 100 paise, receipt registration_code
+  RZ-->>CO: order id
+  CO->>DB: bookings.razorpay_order_id = order id
+  CO-->>C: order_id, amount, currency INR, key_id, booking_id
+  C->>CK: open checkout(order_id, key_id, prefill)
+  CK->>RZ: customer pays
+  RZ-->>CK: razorpay_payment_id, razorpay_signature
+  CK->>VP: handler → verifyPayment
+  VP->>VP: auth.getUser() · booking owner · order match · HMAC(order|payment) constant-time
+  VP->>DB: settle_payment(order, payment, null, 'verify')
+  DB-->>VP: confirmed / already_confirmed / needs_review
+  VP->>DB: enqueueTicketEmail (email_outbox)
+  VP-->>C: booking + tickets → confirmation + booking QR
+  RZ-)WH: webhook payment.captured / order.paid (signed)
+  WH->>WH: HMAC(raw body, webhook secret) constant-time
+  WH->>DB: insert payment_webhook_events(event_id unique)
+  WH->>DB: settle_payment(order, payment, amount_paise, 'webhook')
+  WH->>DB: enqueueTicketEmail · mark event processed
+  WH-->>RZ: 200 (or 500 to request redelivery)

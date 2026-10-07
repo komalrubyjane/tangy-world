@@ -1,0 +1,52 @@
+---
+title: ER — identity, events, bookings, tickets, waitlist
+---
+erDiagram
+  AUTH_USERS ||--|| PROFILES : "handle_new_user"
+  PROFILES ||--o{ BOOKINGS : "user_id"
+  EVENTS ||--o{ BOOKINGS : "event_id"
+  EVENTS ||--o{ EVENT_TICKET_TYPES : "event_id"
+  BOOKINGS ||--o{ TICKETS : "booking_id"
+  EVENTS ||--o{ TICKETS : "event_id"
+  TICKETS ||--o| CHECKINS : "ticket_id unique"
+  BOOKINGS ||--o{ CHECKINS : "booking_id"
+  EVENTS ||--o{ WAITLIST : "event_id"
+  PROFILES ||--o{ WAITLIST : "user_id"
+  WAITLIST |o--o| BOOKINGS : "booking_id / waitlist_entry_id"
+  VENUES ||--o{ EVENTS : "venue_id"
+  PROFILES ||--o{ EVENTS : "venue_partner_id"
+  EVENTS ||--|| EVENT_AVAILABILITY_SIGNAL : "event_id"
+  PROFILES {
+    uuid id PK
+    user_role role
+    bool is_active
+    text email
+    text passport_id
+  }
+  EVENTS {
+    uuid id PK
+    text slug
+    date event_date
+    text status
+    int capacity
+    int price
+    jsonb booking_questions
+  }
+  BOOKINGS {
+    uuid id PK
+    text registration_code
+    booking_status status
+    text payment_status
+    int quantity
+    int amount
+    text razorpay_order_id
+    text group_token
+    text ticket_email_status
+  }
+  TICKETS {
+    uuid id PK
+    text ticket_number
+    text token
+    text status
+    text attendee_name
+  }

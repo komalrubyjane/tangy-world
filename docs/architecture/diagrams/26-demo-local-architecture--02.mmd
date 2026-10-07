@@ -1,0 +1,10 @@
+---
+title: Team review deployment (disposable, never production)
+---
+flowchart TB
+  classDef demo fill:#eeeeee,stroke:#888,color:#222,stroke-dasharray: 4 3
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  RB["Review branch → Vercel Preview<br/>VITE_TEAM_REVIEW_MODE=true · VITE_TEAM_REVIEW_PASSWORD"]:::demo --> TD["/team-demo · TeamReviewStrip"]:::demo
+  TD --> PW["signInWithPassword(demo email, review password)"]:::demo
+  PW --> RP[("Disposable REVIEW Supabase project<br/>migrated + seeded by DEMO_TARGET=review")]:::db
+  RP --> RLS["Real RLS — every role restriction is the real one"]:::db

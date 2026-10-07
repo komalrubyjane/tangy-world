@@ -1,0 +1,41 @@
+---
+title: Frontend dependency diagram — who talks to Supabase
+---
+flowchart LR
+  classDef page fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef svc fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef sb fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef mock fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  subgraph PAGES["Pages / components"]
+    BP["BookingPage"]:::page
+    PD["Patron / Partner dashboards"]:::page
+    ART["Artist portal pages"]:::page
+    ADM["Admin pages + components"]:::page
+    CHK["Check-in page"]:::page
+    CNT["Content + archive pages"]:::page
+    FRM["Apply / enquiry forms"]:::page
+    AI["Tangy assistant"]:::page
+  end
+  subgraph SVC["Services"]
+    BS["lib/bookingService.js"]:::svc
+    CS["lib/checkinService.js"]:::svc
+    CT["lib/contentService.js · archiveService.js"]:::svc
+    STG["lib/storage.js<br/>uploadWithProgress · signedUrl"]:::svc
+    AAPI["admin/api.js<br/>rpc · list · one · insert · update · remove · adminApi"]:::svc
+    PAPI["portal/portalApi.js"]:::svc
+    WAPI["artist/portal/api.js · artist/services/workspaceApi.js"]:::svc
+    CHAT["services/chatService.js via conversationService facade"]:::svc
+    NS["services/notificationService.js"]:::svc
+    MOCK["services/aiSupportService · messageService<br/>MOCK, browser-local"]:::mock
+  end
+  SB["lib/supabaseClient.js<br/>createClient(URL, publishable key)<br/>persistSession · autoRefreshToken"]:::sb
+  BP --> BS
+  PD --> BS & PAPI
+  ART --> WAPI & STG & PAPI
+  ADM --> AAPI & STG & CS & CT & NS & CHAT
+  CHK --> CS
+  CNT --> CT
+  FRM --> SB
+  AI --> MOCK
+  AI --> CHAT
+  BS & CS & CT & STG & AAPI & PAPI & WAPI & CHAT & NS --> SB

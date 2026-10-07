@@ -1,0 +1,13 @@
+---
+title: waitlist.status
+---
+stateDiagram-v2
+  [*] --> waiting: join_waitlist
+  waiting --> offered: offer_waitlist_seats
+  offered --> converted: holder starts checkout (create_pending_booking)
+  offered --> expired: hold lapsed
+  waiting --> cancelled: leave_waitlist / admin_remove_waitlist_entry
+  offered --> cancelled: leave / admin remove
+  converted --> [*]
+  expired --> [*]
+  cancelled --> [*]

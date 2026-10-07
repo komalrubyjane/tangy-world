@@ -1,0 +1,20 @@
+---
+title: Artist sets availability → admin sees it in the event editor
+---
+sequenceDiagram
+  autonumber
+  actor AR as Artist
+  participant AV as /artist/availability
+  participant DB as Postgres
+  actor AD as Admin (events.manage)
+  participant ED as Event editor · ArtistAvailability drawer
+  AR->>AV: select a day or a range · status · note · optional time window
+  AV->>DB: set_artist_availability(from, to, status, note, start, end)
+  DB->>DB: approved artist only · range ≤ 366 days
+  DB->>DB: upsert artist_availability per day<br/>skip days with a confirmed performance
+  DB-->>AV: rows changed
+  AD->>ED: pick date / slot for a session
+  ED->>DB: find_available_artists(event, date, start, end)
+  DB->>DB: artist_day_status for every approved artist
+  DB-->>ED: available / tentative / unavailable / busy / unknown + conflicts
+  AD->>ED: decide line-up (assign or request)

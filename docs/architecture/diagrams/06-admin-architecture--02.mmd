@@ -1,0 +1,25 @@
+---
+title: Applications — approve and email
+---
+sequenceDiagram
+  autonumber
+  actor AD as Admin (applications.review)
+  participant AP as ApplicationsPage
+  participant DB as Postgres
+  participant EF as send-approval-email
+  participant RS as Resend
+  actor AN as Applicant
+  AD->>AP: Approve (notes)
+  AP->>DB: rpc approve_collaboration / approve_crew_application / approve_artist_application
+  DB->>DB: has_permission · status must be pending · lock row
+  DB->>DB: status approved · reviewed_by / at
+  DB->>DB: create *_profiles row · profiles.role user → vendor/sponsor/venue/crew/volunteer/artist
+  DB->>DB: application_notifications (approval) · audit_write · notify triggers
+  DB-->>AP: ok
+  alt setting notifications.send_approval_emails on and applicant has an account
+    AP->>EF: invoke(source_table, source_id)
+    EF->>DB: re-check caller is admin/super_admin · read application + profiles.email
+    EF->>RS: "Application Approved" email (portal link)
+    EF->>DB: application_notifications.status = sent / failed
+  end
+  AN-->>AN: next sign-in · DashboardRedirect → own portal

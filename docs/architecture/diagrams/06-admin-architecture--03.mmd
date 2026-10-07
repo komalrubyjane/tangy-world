@@ -1,0 +1,16 @@
+---
+title: Bookings drawer actions
+---
+flowchart TD
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  B["Booking drawer · Bookings.jsx"]:::proc --> X{"Action"}:::dec
+  X -- Cancel --> C["admin_cancel_booking(reason)"]:::db --> C1{"pending/confirmed and nobody<br/>checked in?"}:::dec
+  C1 -- no --> CE["raise: cannot cancel"]:::err
+  C1 -- yes --> C2["status cancelled · tickets<br/>cancelled · audit<br/>trigger<br/>waitlist_on_booking_release →<br/>offer seats"]:::db
+  X -- "Record refund" --> R["admin_record_refund(reason,<br/>Razorpay ref)<br/>bookings.manage +<br/>payments.view"]:::db --> R1["status refunded · tickets<br/>cancelled · audit<br/>money moves in Razorpay<br/>dashboard (manual)"]:::db
+  X -- "Cancel one ticket" --> T["admin_cancel_ticket"]:::db
+  X -- "Complimentary booking" --> CB["admin_create_comp_booking<br/>capacity under lock →<br/>confirm_booking_and_issue_tickets"]:::db
+  X -- "Resend ticket email" --> E["send-ticket-email force=true<br/>caller role<br/>staff/admin/super_admin"]:::proc

@@ -1,0 +1,14 @@
+---
+title: Event data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  A(["Admin EventForm / TicketTypesEditor / BookingFormEditor / Content → Sessions"]):::src --> EV[("events")]:::db
+  A --> TT[("event_ticket_types")]:::db
+  EV --> SIG[("event_availability_signal")]:::db
+  EV & TT --> PUB["/sessions · /sessions/:slug · calendar · homepage"]:::out
+  EV --> ARC["/sessions/archive · programmes"]:::out
+  EV --> REM["event reminders · change notices → members"]:::out
+  SIG -- Realtime --> PUB

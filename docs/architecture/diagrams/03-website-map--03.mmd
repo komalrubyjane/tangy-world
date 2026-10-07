@@ -1,0 +1,19 @@
+---
+title: Artist routes
+---
+flowchart LR
+  classDef pub fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef acc fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  A["/artist  ArtistLayout"]:::pub --> A1["index  ArtistsDirectoryPage<br/>public_artists"]:::pub
+  A --> A2["/artist/login"]:::pub
+  A --> A3["/artist/profile/:id  ArtistDetailsPage"]:::pub
+  AP["/artist/apply  ApplyPage · 8 steps · ?step=1..8"]:::acc
+  AS["/artist/application  ApplicationStatusPage"]:::acc
+  SH["ArtistPortalShell"]:::acc --> S1["/artist/dashboard"]:::acc
+  SH --> S2["/artist/sessions[/:sessionId]"]:::acc
+  SH --> S3["/artist/calendar"]:::acc
+  SH --> S4["/artist/requests[/:requestId]"]:::acc
+  SH --> S5["/artist/availability"]:::acc
+  SH --> S6["/artist/media[/:mediaId]"]:::acc
+  SH --> S7["/artist/messages[/:conversationId]"]:::acc
+  SH --> S8["/artist/notifications · /artist/profile · /artist/documents · /artist/settings"]:::acc

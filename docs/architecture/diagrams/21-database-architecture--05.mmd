@@ -1,0 +1,14 @@
+---
+title: ER — event operations
+---
+erDiagram
+  direction LR
+  EVENTS ||--o{ EVENT_ASSIGNMENTS : "event_id"
+  PROFILES ||--o{ EVENT_ASSIGNMENTS : "assignee_id"
+  EVENT_ASSIGNMENTS ||--o{ EVENT_TASKS : "assignment_id"
+  EVENTS ||--o{ EVENT_REQUIREMENTS : "event_id"
+  PROFILES ||--o{ EVENT_REQUIREMENTS : "user_id"
+  EVENTS ||--o{ EVENT_DOCUMENTS : "event_id"
+  EVENTS ||--o{ TEMPORARY_ACCESS : "event_id"
+  PROFILES ||--o{ TEMPORARY_ACCESS : "user_id"
+  ACCESS_REQUESTS |o--o| TEMPORARY_ACCESS : "grant_id"

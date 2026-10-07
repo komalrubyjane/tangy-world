@@ -1,0 +1,22 @@
+---
+title: Check-in part 2 — group admission by name
+---
+flowchart TD
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  GB{"booking for this event?<br/>status confirmed?"}:::dec
+  GB -- "other event" --> WE["wrong_event"]:::err
+  GB -- "cancelled / refunded" --> CX["cancelled"]:::err
+  GB -- "unpaid" --> PN["payment_not_confirmed"]:::err
+  GB -- ok --> RD{"anyone left to admit?"}:::dec
+  RD -- no --> AC["already_checked_in<br/>+ attendee list"]:::res
+  RD -- yes --> LIST["ready: attendee list<br/>booking_attendees_state"]:::res
+  LIST --> SEL["Staff tick names present<br/>check_in_ticket(…, attendee_ids)"]:::proc
+  SEL --> V{"selection valid ·<br/>all in THIS booking ·<br/>all still valid?"}:::dec
+  V -- "bad selection" --> IS["invalid_selection /<br/>invalid_attendee"]:::err
+  V -- "some already in" --> AAI["attendee_already_<br/>checked_in (names)"]:::err
+  V -- yes --> W["insert checkins (shared batch_id)<br/>tickets checked_in<br/>audit checkin.scan / manual"]:::db
+  W --> OK["valid: admitted names<br/>checked_in / remaining"]:::res

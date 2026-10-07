@@ -1,0 +1,22 @@
+---
+title: Private upload + signed read (artist media example)
+---
+sequenceDiagram
+  autonumber
+  actor A as Artist
+  participant MP as MediaPage
+  participant LS as lib/storage.js
+  participant ST as Supabase Storage
+  participant DB as Postgres
+  actor C as Curator (entities.manage)
+  A->>MP: choose file (≤ 50 MB)
+  MP->>LS: uploadWithProgress('artist-media', '<artist id>/<ts>-<name>', file)
+  LS->>ST: POST /storage/v1/object/... Bearer user JWT
+  ST->>DB: policy "artist-media: self upload" (first folder = own artists.id)
+  DB-->>ST: allowed
+  ST-->>LS: 200 (progress events)
+  MP->>DB: insert artist_media (status uploaded / under_review) · guard_artist_media
+  DB-->>C: notify media.submitted
+  C->>DB: ReviewsPage update status approved / rejected + note
+  C->>ST: signedUrl('artist-media', path) to preview (curators read policy)
+  DB-->>A: notify media.reviewed

@@ -1,0 +1,22 @@
+---
+title: Tangy World sitemap — route groups
+---
+flowchart LR
+  classDef pub fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef auth fill:#fff3c4,stroke:#b38600,color:#222
+  classDef acc fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef adm fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef demo fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  ROOT(["tangy world SPA"])
+  ROOT --> PUB["PUBLIC WEBSITE<br/>/ · /about/* · /sessions/* · /archive/* · /diary/* · /tv · /gallery · /artists · /faq · /contact/* · /private/* · /crew/* · /collaborate/* · legal"]:::pub
+  ROOT --> AUTH["AUTHENTICATION<br/>/join · /join/login · /artist/login · /invitation · login modal"]:::auth
+  ROOT --> CUST["CUSTOMER AREA<br/>/dashboard · /dashboard/:tab · /profile · /sessions/:id checkout"]:::acc
+  ROOT --> ART["ARTIST PORTAL<br/>/artist · /artist/apply · /artist/application · /artist/dashboard … /artist/settings"]:::acc
+  ROOT --> PART["PARTNER PORTALS<br/>/sponsor/dashboard · /vendor/dashboard · /venue/dashboard"]:::acc
+  ROOT --> CREW["CREW / VOLUNTEER<br/>/crew/dashboard · /volunteer/dashboard"]:::acc
+  ROOT --> PRIV["PRIVATE ENQUIRIES<br/>/private/dashboard"]:::acc
+  ROOT --> ADM["ADMIN PORTAL<br/>/admin-portal/* (54 routes)"]:::adm
+  ROOT --> CHK["CHECK-IN<br/>/check-in"]:::adm
+  ROOT --> PREV["PORTAL INSPECTORS<br/>/admin/preview/:role[/:id]"]:::adm
+  ROOT --> DEMO["DEMO / REVIEW<br/>/demo-admin · /demo/:role · /team-demo"]:::demo
+  ROOT --> LEG["LEGACY REDIRECTS<br/>/admin/* · /book/:id · /blogs/* · /artist/portal · /*-mock"]:::demo

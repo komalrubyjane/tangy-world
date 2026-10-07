@@ -1,0 +1,18 @@
+---
+title: Post-login landing — DashboardRedirect
+---
+flowchart LR
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  L["Any login flow<br/>navigate to /dashboard"]:::proc --> PR["ProtectedRoute<br/>signed in?"]:::dec
+  PR -- no --> J["/join/login?next=…"]:::res
+  PR -- yes --> D{"profiles.role<br/>from UserAuthContext"}:::dec
+  D -- vendor --> V["/vendor/dashboard"]:::res
+  D -- sponsor --> S["/sponsor/dashboard"]:::res
+  D -- venue --> VE["/venue/dashboard"]:::res
+  D -- volunteer --> VO["/volunteer/dashboard"]:::res
+  D -- crew --> CR["/crew/dashboard"]:::res
+  D -- artist --> AR["/artist/dashboard"]:::res
+  D -- "staff · admin · super_admin" --> AD["/admin-portal"]:::res
+  D -- "user or unknown" --> PA["PatronDashboard rendered in place"]:::res

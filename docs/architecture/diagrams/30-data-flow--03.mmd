@@ -1,0 +1,14 @@
+---
+title: Artist data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  AP(["Application answers"]):::src --> AR[("artists (pending → approved)")]:::db
+  PF(["Artist profile edits"]):::src --> AR
+  PF --> PP[("artist_private_profiles")]:::db
+  AV(["Availability calendar"]):::src --> AA[("artist_availability")]:::db
+  AR --> VIEW[("public_artists view")]:::db --> PUB["/artists · /artist directory · session line-ups"]:::out
+  AR & AA --> DS["artist_day_status → admin pickers / calendars"]:::out
+  PP --> TEAM["team only (entities.manage)"]:::out

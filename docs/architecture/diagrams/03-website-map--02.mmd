@@ -1,0 +1,20 @@
+---
+title: Public website
+---
+flowchart LR
+  classDef pub fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef key fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  H["/  MainWorld<br/>Hero · Manifesto · Upcoming<br/>Calendar · Archive · Crew · Private<br/>Diary · Inner Circle · Closing"]:::key
+  H --> AB["/about<br/>why-tangy · chronology<br/>team · full-story"]:::pub
+  H --> SE["/sessions  SessionsPage"]:::key
+  SE --> SE1["/sessions/:sessionId<br/>BookingPage = checkout"]:::key
+  SE --> SE2["/sessions/calendar<br/>/sessions/waitlist<br/>/sessions/concert-culture"]:::pub
+  SE --> SE3["/sessions/archive[/:slug]<br/>past sessions"]:::pub
+  H --> AR["/archive<br/>programmes[/:slug] · museum-timeline<br/>past-memories · contact-sheets"]:::pub
+  H --> CO["/diary[/:slug] · journal · stories<br/>/tv[/:slug] · /gallery[/:album]<br/>/gallery/archive · /artists[/:slug] · /faq"]:::pub
+  H --> JN["/crew · volunteer · production<br/>stage-operations · /crew/apply<br/>/volunteer/apply"]:::pub
+  H --> CL["/collaborate[/opportunities]<br/>/apply/vendors · /apply/sponsors<br/>/apply/venue-host · /apply/host"]:::pub
+  H --> PR["/private-sessions · /private/gatherings<br/>/private/corporate · weddings · heritage"]:::pub
+  H --> CT["/contact · location · email<br/>instagram · /inner-circle"]:::pub
+  H --> LG["/terms · /privacy · /refund-policy · /404 · * NotFound"]:::pub
+  H --> AI["/ai  AIAssistantPage<br/>knowledge-base assistant"]:::pub

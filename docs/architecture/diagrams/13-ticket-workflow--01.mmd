@@ -1,0 +1,18 @@
+---
+title: Booking → settlement → tickets → QR → email → check-in
+---
+flowchart TD
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  B["bookings row (pending)<br/>attendee_names[] · group_token (DB default)"]:::db
+  B --> S["settle_payment → status confirmed"]:::db
+  S --> G["confirm_booking_and_issue_tickets(booking)<br/>lock booking · only if no tickets yet"]:::db
+  G --> T["tickets × quantity<br/>ticket_number REG-01… · token gen_random_bytes(20) · attendee_name[i] · status valid"]:::db
+  T --> Q1["Browser QR (client-side, qrcode lib)<br/>TANGY:BOOKING:group_token<br/>BookingPage · PatronDashboard · admin Bookings"]:::res
+  T --> Q2["Email QR (server-side, Deno qrcode via esm.sh)<br/>same payload → booking-pass.png attachment"]:::proc
+  Q2 --> E["email_outbox → send-notification-emails → Resend"]:::ext
+  Q1 & E --> CU["Customer shows ONE QR for the whole party"]:::res
+  CU --> CK["/check-in scan → check_in_ticket(token, event, attendee ids)"]:::db
+  CK --> AT["checkins rows (one per admitted attendee) · tickets.status checked_in · audit checkin.scan / checkin.manual"]:::db

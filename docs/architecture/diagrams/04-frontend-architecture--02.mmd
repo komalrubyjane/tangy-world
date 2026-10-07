@@ -1,0 +1,13 @@
+---
+title: Route groups and their shells
+---
+flowchart LR
+  classDef shell fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef gate fill:#fff3c4,stroke:#b38600,color:#222
+  RT["Routes"] --> PUBS["PUBLIC SHELL<br/>MainWorld: CurtainOverlay · Navbar · Menu · MicNavRail · sections · Footer<br/>standalone pages: own Navbar / layout"]:::shell
+  RT --> PR["ProtectedRoute<br/>signed in? else /join/login?next="]:::gate --> ACC["Account dashboards<br/>PortalUI · PartnerPortal · RoleApplicationDashboard"]:::shell
+  RT --> AL["ArtistLayout<br/>artist AuthProvider · public artist pages"]:::shell
+  RT --> APS["ArtistPortalShell<br/>artist AuthProvider → PortalFrame<br/>needs artists row with status approved,<br/>else → /artist/application"]:::gate
+  RT --> ADM["AdminApp<br/>AdminSessionProvider → AdminGate → ToastProvider → AdminShell → Guard per route"]:::gate
+  RT --> CHK["TangyWorldCheckInPage<br/>StaffAuthGate(checkin.perform)"]:::gate

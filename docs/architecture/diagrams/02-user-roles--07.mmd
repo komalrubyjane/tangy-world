@@ -1,0 +1,7 @@
+---
+title: Volunteer — time-boxed check-in access
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  V["Volunteer"]:::proc --> RQ["request_checkin_access(event)"]:::db --> AD["Admin grant_temporary_access<br/>access.grant · 30–720 min"]:::proc --> TA["temporary_access row<br/>my_permissions adds checkin.perform"]:::db --> CK["/check-in · StaffAuthGate(checkin.perform)<br/>check_in_ticket → has_active_access"]:::proc

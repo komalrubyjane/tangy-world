@@ -1,0 +1,16 @@
+---
+title: Payment data
+---
+flowchart TB
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  Q(["booking_quote: price × qty + 18% tax"]):::src --> BK[("bookings.amount")]:::db
+  BK --> RO["Razorpay order (paise)"]:::ext
+  RO --> RP["Razorpay payment"]:::ext
+  RP -- "checkout signature" --> VP["razorpay-verify-payment"]
+  RP -- "webhook" --> WH["razorpay-webhook"] --> PWE[("payment_webhook_events")]:::db
+  VP & WH --> BK2[("bookings: razorpay_payment_id · payment_status · signature_verified · refunded_amount")]:::db
+  BK2 --> ADM["Admin Payments page"]:::out
+  BK2 --> REP["report_revenue_by_month"]:::out

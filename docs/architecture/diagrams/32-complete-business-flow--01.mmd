@@ -1,0 +1,57 @@
+---
+title: Tangy World — end-to-end business lifecycle
+---
+flowchart TD
+  classDef a fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef gap fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  subgraph S1["1 · ARTISTS AND CONTENT"]
+    A1["Artist applies /artist/apply →<br/>review → approved<br/>artist_applications · artists<br/>· profiles.role"]:::a
+    A2["Partners / crew / volunteers<br/>apply → approved<br/>collaborations ·<br/>crew_applications · *_profiles"]:::a
+    A3["Team publishes content: TV ·<br/>Diary · Gallery · Programmes ·<br/>Announcements"]:::a
+  end
+  subgraph S2["2 · EVENT CREATION"]
+    E1["Admin creates event (draft) ·<br/>venue · capacity · ticket<br/>types · booking form"]:::db
+  end
+  subgraph S3["3 · ARTIST LINE-UP"]
+    L1["find_available_artists →<br/>save_event_lineup /<br/>create_artist_request<br/>advisory locks · artist<br/>accepts → admin confirms"]:::db
+    L2["Team, tasks, requirements,<br/>documents, sponsor<br/>deliverables"]:::db
+  end
+  subgraph S4["4 · PUBLISHING"]
+    P1["status on-sale → public pages<br/>· line-up artists notified"]:::res
+  end
+  subgraph S5["5 · DISCOVERY"]
+    D1["Visitor: homepage · /sessions<br/>· calendar · session page<br/>live availability via Realtime"]:::a
+  end
+  subgraph S6["6 · BOOKING AND PAYMENT"]
+    B1["Sign in (OTP) · form ·<br/>razorpay-create-order →<br/>create_pending_booking (hold)"]:::db
+    B2["Razorpay Checkout"]:::ext
+    B3["verify + webhook →<br/>settle_payment"]:::db
+    B4["Sold out → waitlist → offer →<br/>book"]:::db
+  end
+  subgraph S7["7 · TICKET AND EMAIL"]
+    T1["tickets per attendee · one<br/>booking QR"]:::res
+    T2["email_outbox →<br/>send-notification-emails →<br/>Resend<br/>(drain scheduler = PRODUCTION<br/>CONFIGURATION)"]:::ext
+    T3["Customer reminder emails — NOT<br/>IMPLEMENTED"]:::gap
+  end
+  subgraph S8["8 · EVENT DAY"]
+    C1["/check-in · staff or volunteer<br/>with temporary access<br/>check_in_ticket · group<br/>admission by name"]:::db
+  end
+  subgraph S9["9 · COMPLETION AND ARCHIVE"]
+    X1["Requests completed · status<br/>past (manual) · archive pages<br/>link gallery / diary / TV by<br/>event_id"]:::res
+  end
+  subgraph S10["10 · REPORTING AND OPERATIONS"]
+    R1["Reports · audit log · payments<br/>log · email delivery ·<br/>platform job runs · invoices"]:::res
+  end
+  A1 --> L1
+  A2 --> L2
+  A3 --> D1
+  E1 --> L1 --> P1
+  E1 --> L2 --> P1
+  P1 --> D1 --> B1 --> B2 --> B3 --> T1 --> T2
+  D1 --> B4 --> B1
+  T1 --> C1 --> X1 --> R1
+  B3 --> R1
+  T1 -.-> T3

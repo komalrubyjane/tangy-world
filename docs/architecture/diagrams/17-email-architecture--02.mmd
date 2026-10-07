@@ -1,0 +1,21 @@
+---
+title: send-approval-email
+---
+sequenceDiagram
+  autonumber
+  participant AP as ApplicationsPage
+  participant EF as send-approval-email
+  participant DB as Postgres (service role)
+  participant RS as Resend
+  AP->>EF: invoke(source_table, source_id[, force]) with admin JWT
+  EF->>EF: auth.getUser()
+  EF->>DB: profiles.role in (admin, super_admin)? else 403
+  EF->>DB: application_notifications (approval) row? else 404
+  alt status sent and not force
+    EF-->>AP: already_sent
+  else
+    EF->>DB: read application + applicant profiles.email (never the typed email)
+    EF->>RS: "You're officially part of Tangy — <Role> Application Approved" + portal link
+    EF->>DB: application_notifications.status sent / failed (+ error)
+    EF-->>AP: success / error → toast
+  end

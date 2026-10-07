@@ -1,0 +1,21 @@
+---
+title: artist_applications.status
+---
+stateDiagram-v2
+  [*] --> draft: insert (applicant)
+  draft --> submitted: submit_artist_application
+  submitted --> under_review: review start_review
+  submitted --> needs_information: review request_info
+  under_review --> needs_information: review request_info
+  needs_information --> submitted: applicant edits and resubmits
+  submitted --> approved: review approve
+  under_review --> approved: review approve
+  submitted --> rejected: review reject (internal reason required)
+  under_review --> rejected: review reject
+  draft --> withdrawn: withdraw_artist_application
+  submitted --> withdrawn
+  under_review --> withdrawn
+  needs_information --> withdrawn
+  approved --> [*]
+  rejected --> [*]
+  withdrawn --> [*]

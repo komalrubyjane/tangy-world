@@ -1,0 +1,18 @@
+---
+title: Security layers — where each boundary sits
+---
+flowchart TD
+  classDef ui fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef hard fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef gap fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  B["1 · Browser<br/>public key only · build refuses secrets in VITE_ · demo/review/dev tools compiled out"]:::ui
+  B --> FG["2 · Frontend guards (cosmetic)<br/>ProtectedRoute · AdminGate · Guard(requires) · StaffAuthGate · ArtistPortalShell<br/>nav from my_permissions()"]:::ui
+  FG --> J["3 · JWT (Supabase Auth)<br/>email OTP / password · auto refresh · role re-read every 60 s"]:::hard
+  J --> EF["4 · Edge Function validation<br/>auth.getUser() · ownership · input validation · CORS allow-list<br/>HMAC signatures (Razorpay) · x-cron-secret"]:::hard
+  J --> RPC["5 · RPC (SECURITY DEFINER, search_path pinned)<br/>has_permission() · auth.uid() checks · row locks · EXECUTE revoked from anon where not needed"]:::hard
+  J --> RLS["6 · Row-level security<br/>~240 policies: own rows · permission · event scope · published-only"]:::hard
+  J --> SP["7 · Storage policies<br/>folder = owner id · audience · published-only reads · signed URLs · size/type limits"]:::hard
+  RPC & RLS --> TR["8 · Constraints and guard triggers<br/>role self-escalation · identity fields · application status · media review · event delete · CHECK constraints"]:::hard
+  TR --> AU["9 · Audit<br/>audit_logs append-only (trigger blocks update/delete)"]:::hard
+  B -.-> HD["Security headers / CSP<br/>NOT IMPLEMENTED (vercel.json has only an SPA rewrite; no CSP meta in index.html)"]:::gap

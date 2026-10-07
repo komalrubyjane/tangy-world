@@ -1,0 +1,17 @@
+---
+title: How each role is obtained
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  S(["New sign-in · email OTP"]):::start --> H["handle_new_user trigger<br/>profiles.role = user<br/>passport_id TS-xxxxxxxx"]:::db
+  H --> U["Customer / Patron · role user"]:::proc
+  U --> Q{"Applies?"}:::dec
+  Q -- "/artist/apply" --> AA["artist_applications → review_artist_application"]:::proc --> R1["approve_artist_application<br/>role user → artist"]:::db
+  Q -- "/apply/vendors · sponsors · venue-host" --> CO["collaborations"]:::proc --> R2["approve_collaboration<br/>user → vendor / sponsor / venue<br/>+ vendor_ / sponsor_ / venue_profiles"]:::db
+  Q -- "/crew/apply · /volunteer/apply" --> CR["crew_applications"]:::proc --> R3["approve_crew_application<br/>user → crew / volunteer<br/>+ crew_ / volunteer_profiles"]:::db
+  I(["Invitation link /invitation#token"]):::start --> IA["accept_account_invitation<br/>role fixed by invitation:<br/>staff / admin / super_admin"]:::db
+  SA["Super Admin · Users & Roles"]:::proc --> AR["admin_set_user_role<br/>roles.manage · audited · notifies"]:::db
+  B(["SQL editor / service role<br/>bootstrap first super_admin"]):::start --> BR["direct update profiles.role<br/>allowed: no end-user JWT"]:::db

@@ -1,0 +1,11 @@
+---
+title: ER — line-ups and booking requests
+---
+erDiagram
+  direction LR
+  EVENTS ||--o{ EVENT_ARTISTS : "event_id"
+  ARTISTS ||--o{ EVENT_ARTISTS : "artist_id"
+  EVENT_ARTISTS ||--o| EVENT_ARTIST_DETAILS : "event_id + artist_id"
+  EVENTS ||--o{ ASSIGNMENT_REQUESTS : "session_id"
+  ARTISTS ||--o{ ASSIGNMENT_REQUESTS : "artist_id"
+  ASSIGNMENT_REQUESTS }o--o| CONVERSATIONS : "conversation_id"

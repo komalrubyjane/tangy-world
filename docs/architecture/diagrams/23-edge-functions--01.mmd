@@ -1,0 +1,25 @@
+---
+title: Edge Functions — callers, auth, data, external services
+---
+flowchart LR
+  classDef fe fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef ef fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  BR["Browser · bookingService"]:::fe --> CO["razorpay-create-order<br/>JWT → auth.getUser"]:::ef
+  BR --> VP["razorpay-verify-payment<br/>JWT + booking owner + HMAC"]:::ef
+  BR --> TE["send-ticket-email<br/>JWT + owner or team role"]:::ef
+  ADM["Admin console"]:::fe --> TE
+  ADM --> AE["send-approval-email<br/>JWT + admin/super_admin role"]:::ef
+  ADM --> IV["admin-invite-user<br/>JWT, runs AS the inviter"]:::ef
+  RZP["Razorpay"]:::ext --> WH["razorpay-webhook<br/>X-Razorpay-Signature HMAC"]:::ef
+  SCH["Scheduler"]:::ext --> NE["send-notification-emails<br/>service key or x-cron-secret"]:::ef
+  CO --> DB[("Postgres<br/>service-role client")]:::db
+  VP --> DB
+  WH --> DB
+  TE --> DB
+  AE --> DB
+  NE --> DB
+  IV --> DBU[("Postgres<br/>caller-JWT client — no service role")]:::db
+  CO --> RO["Razorpay Orders API"]:::ext
+  TE & AE & NE & IV --> RS["Resend (or mailpit / log)"]:::ext

@@ -1,0 +1,13 @@
+---
+title: Environments and what each points at
+---
+flowchart LR
+  classDef loc fill:#eeeeee,stroke:#888,color:#222
+  classDef dev fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef rev fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef prod fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  L["LOCAL<br/>vite dev · localhost:5173<br/>Docker Supabase 127.0.0.1:54321<br/>Mailpit · demo data · dev role switcher"]:::loc
+  D["DEVELOPMENT (no backend)<br/>vite dev without Supabase env<br/>empty / error states · console warning"]:::dev
+  R["REVIEW<br/>Vercel Preview · disposable review Supabase project<br/>Team Demo Login · demo data"]:::rev
+  P["PRODUCTION<br/>Vercel production · Supabase ohyjqxbsgdkzytfnlitf<br/>Razorpay live · Resend<br/>NOT YET CONFIGURED"]:::prod
+  L --> R --> P

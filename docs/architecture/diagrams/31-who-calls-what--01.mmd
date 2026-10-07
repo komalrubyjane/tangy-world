@@ -1,0 +1,19 @@
+---
+title: Major call chains (page → service → backend → external)
+---
+flowchart LR
+  classDef pg fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef sv fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef ef fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  BP["BookingPage"]:::pg --> BS["bookingService"]:::sv --> CO["razorpay-create-order"]:::ef --> CPB["create_pending_booking → bookings"]:::db
+  CO --> RZ["Razorpay Orders API"]:::ef
+  BP --> BS2["bookingService.verifyPayment"]:::sv --> VP["razorpay-verify-payment"]:::ef --> SP["settle_payment → bookings, tickets, email_outbox"]:::db
+  CK["TangyWorldCheckInPage"]:::pg --> CS["checkinService"]:::sv --> CIT["check_in_ticket → checkins, tickets, audit_logs"]:::db
+  AP["ApplyPage"]:::pg --> AAPI["artistApi"]:::sv --> SAA["submit_artist_application → artist_applications, artists"]:::db
+  AA["ArtistApplicationsPage"]:::pg --> RAA["review_artist_application → artists, profiles"]:::db
+  APP["ApplicationsPage"]:::pg --> ADA["adminApi.approveApplication"]:::sv --> APR["approve_* → profiles.role, *_profiles"]:::db
+  APP --> NS["notificationService"]:::sv --> SAE["send-approval-email → Resend"]:::ef
+  ED["EventDetailPage"]:::pg --> CAR["create_artist_request / save_event_lineup → assignment_requests, event_artists"]:::db
+  RQ["artist RequestsPage"]:::pg --> WAPI["artistApi → workspaceApi"]:::sv --> RBR["respond_to_booking_request"]:::db
+  UP["UsersPage"]:::pg --> INV["adminApi.inviteUser"]:::sv --> AIU["admin-invite-user → create_account_invitation → Resend"]:::ef

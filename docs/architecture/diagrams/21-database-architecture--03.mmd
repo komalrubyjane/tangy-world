@@ -1,0 +1,14 @@
+---
+title: ER — artists and applications
+---
+erDiagram
+  direction LR
+  PROFILES ||--o| ARTISTS : "user_id"
+  PROFILES ||--o| ARTIST_APPLICATIONS : "user_id unique"
+  ARTIST_APPLICATIONS |o--o| ARTISTS : "artist_id"
+  ARTIST_APPLICATIONS ||--o| APPLICATION_REVIEWS : "source_id"
+  ARTISTS ||--o| ARTIST_PRIVATE_PROFILES : "artist_id"
+  ARTISTS ||--o{ ARTIST_ADMIN_NOTES : "artist_id"
+  ARTISTS ||--o{ ARTIST_AVAILABILITY : "artist_id + date"
+  ARTISTS ||--o{ ARTIST_MEDIA : "artist_id"
+  ARTISTS ||--o{ ARTIST_DOCUMENTS : "artist_id"

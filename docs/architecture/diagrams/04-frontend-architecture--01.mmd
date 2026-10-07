@@ -1,0 +1,18 @@
+---
+title: main.jsx → providers → router (src/App.jsx)
+---
+flowchart TD
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef ctx fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef demo fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  M["main.jsx<br/>createRoot · StrictMode · styles/globals.css"]:::proc --> APP["App"]:::proc
+  APP --> AU["AudioProvider<br/>src/audio/AudioContext.jsx · SFX"]:::ctx
+  AU --> UA["UserAuthProvider<br/>Supabase session + profiles row · role refresh 60 s / focus"]:::ctx
+  UA --> DA["DemoAdminProvider<br/>in-memory flag · DEMO ONLY"]:::demo
+  DA --> LE["LenisProvider<br/>smooth scroll"]:::ctx
+  LE --> CU["CursorProvider + CustomCursor"]:::ctx
+  CU --> BR["BrowserRouter"]:::proc
+  BR --> STT["ScrollToTop"]:::proc
+  BR --> GO["GlobalOverlays<br/>GlobalDock · TangyAssistantLauncher · AnnouncementCharacterOverlay<br/>suppressed on /admin-portal, /check-in, portals, checkout"]:::proc
+  BR --> RS["ReviewStripMount · review builds only"]:::demo
+  BR --> SUS["Suspense · RouteFallback"]:::proc --> RT["Routes (134)"]:::proc

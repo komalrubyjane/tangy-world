@@ -1,0 +1,41 @@
+---
+title: Tangy World — system context
+---
+flowchart TB
+  classDef actor fill:#1f6f43,color:#fff,stroke:#123
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef demo fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  U1["Visitors · Customers<br/>role user"]:::actor
+  U2["Artists · Sponsors · Vendors<br/>Venue hosts · Crew · Volunteers"]:::actor
+  U3["Team<br/>Super Admin · Admin · Staff"]:::actor
+  FE["React 19 SPA on Vercel<br/>React Router: public site · dashboards<br/>artist portal · /admin-portal · /check-in"]:::proc
+  SVC["Services and API wrappers<br/>src/lib · src/services · admin/api.js<br/>portal/portalApi.js"]:::proc
+  SB["supabase-js client<br/>publishable key + user JWT"]:::proc
+  U1 & U2 & U3 --> FE --> SVC --> SB
+  subgraph SUPA["SUPABASE"]
+    direction TB
+    AUTH["Auth<br/>email OTP · password"]:::db
+    PG[("Postgres<br/>61 tables · RLS<br/>RPCs · triggers")]:::db
+    ST[("Storage<br/>6 buckets")]:::db
+    RT["Realtime"]:::db
+    CRON["pg_cron<br/>every 5 min"]:::db
+    EF["7 Edge Functions<br/>payments · email · invites"]:::proc
+  end
+  SB --> AUTH & PG & ST & RT
+  SB -- "functions.invoke" --> EF
+  EF -- "service role" --> PG
+  CRON --> PG
+  subgraph EXT["EXTERNAL SERVICES"]
+    direction TB
+    RZP["Razorpay<br/>Orders · Checkout · Webhooks"]:::ext
+    RS["Resend<br/>email API"]:::ext
+    SCHED["Email drain scheduler<br/>PRODUCTION CONFIG"]:::ext
+    MP["Mailpit<br/>LOCAL ONLY"]:::demo
+  end
+  EF --> RZP & RS
+  EF -.-> MP
+  RZP -- "signed webhook" --> EF
+  SCHED -- "x-cron-secret" --> EF
+  FE -- "Checkout.js" --> RZP

@@ -1,0 +1,30 @@
+---
+title: Waitlist — join, offer, convert, expire
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  S(["Session sold out<br/>event_availability: sold_out"]):::start --> J["WaitlistPanel → join_waitlist(event, qty)"]:::proc
+  J --> JV{"signed in · session open · qty in range ·<br/>not already waiting · truly full?"}:::dec
+  JV -- no --> JE["WAITLIST_CLOSED / INVALID_QUANTITY / ALREADY_WAITLISTED / SEATS_AVAILABLE"]:::err
+  JV -- yes --> W["waitlist row status waiting · queue_no<br/>notify waitlist.joined (position) — receipt to self"]:::db
+  W --> R{"Seats released?"}:::dec
+  R -- "booking cancelled / expired / failed / refunded<br/>(waitlist_on_booking_release)" --> O
+  R -- "capacity raised (waitlist_on_capacity_change)" --> O
+  R -- "offer expired / declined" --> O
+  R -- "admin_offer_waitlist (manual)" --> O
+  O["offer_waitlist_seats(event)<br/>lock event · expire lapsed offers · free = capacity − pending − confirmed − held"]:::db
+  O --> F{"head of queue fits?"}:::dec
+  F -- "no, strict_order" --> STOP["stop · seats stay bookable by anyone"]:::proc
+  F -- "no, first_fit" --> NEXT["try next party"]:::proc --> F
+  F -- yes --> OF["status offered · offer_expires_at = now + waitlist.offer_hold_minutes (120)<br/>notify waitlist.offer (urgent, emailed) · audit waitlist.offered"]:::db
+  OF --> B{"Holder books before expiry?"}:::dec
+  B -- yes --> CK["razorpay-create-order accepts a sold-out event for an offer holder<br/>create_pending_booking uses the held seats"]:::proc
+  CK --> CV["waitlist converted · booking_id · audit waitlist.converted<br/>→ normal payment flow (12)"]:::res
+  B -- no --> EX["expire_waitlist_offers (platform job, every 5 min)<br/>status expired · notify waitlist.offer_expired · offer onwards"]:::err
+  EX --> O
+  W --> LV["leave_waitlist → cancelled"]:::proc

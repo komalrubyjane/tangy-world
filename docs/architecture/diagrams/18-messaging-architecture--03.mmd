@@ -1,0 +1,12 @@
+---
+title: Tangy Assistant escalation → support conversation
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef mock fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  V["Visitor on /ai or launcher"]:::proc --> KB["aiSupportService knowledge-base answer<br/>messageService (browser-local transcript)"]:::mock
+  KB --> ESC["'Request an agent' → AgentRequestForm<br/>sign-in required"]:::proc
+  ESC --> SC["conversationService.get_or_create_support_conversation<br/>conversations (general / support) + participant"]:::db
+  SC --> MSG["messages insert (RLS) · Realtime"]:::db
+  MSG --> INB["Admin Website support inbox<br/>assign_conversation · reopen_conversation"]:::proc

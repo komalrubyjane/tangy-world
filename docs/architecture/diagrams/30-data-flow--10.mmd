@@ -1,0 +1,12 @@
+---
+title: Messaging data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  U(["user / partner / team message text"]):::src --> RPC["send_message / start_* / chatService"] --> M[("messages")]:::db
+  RPC --> C[("conversations · participants")]:::db
+  M -- Realtime --> UI["thread views"]:::out
+  M --> RS[("message_read_states")]:::db
+  M -- "on_message_created" --> NT["notify message.new (no text in email)"]:::out

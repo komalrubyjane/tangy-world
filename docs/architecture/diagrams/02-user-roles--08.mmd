@@ -1,0 +1,10 @@
+---
+title: Console roles — Staff · Admin · Super Admin
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  I["Invitation email<br/>admin-invite-user"]:::proc --> AC["/invitation → accept_account_invitation"]:::db --> LG["/admin-portal · AdminGate · email OTP"]:::proc --> MP["my_permissions() + get_runtime_settings()"]:::db --> G{"Guard per route<br/>can(requires / anyOf)"}:::dec
+  G -- allowed --> PG["Page"]:::proc --> RPC["adminApi RPC / list / update"]:::proc --> CHK["has_permission() inside RPC · RLS on tables · audit_write()"]:::db
+  G -- denied --> F["Forbidden view"]:::proc

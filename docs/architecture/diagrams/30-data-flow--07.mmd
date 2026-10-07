@@ -1,0 +1,13 @@
+---
+title: Ticket data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  N(["attendee_names[] on booking"]):::src --> T[("tickets × qty · token")]:::db
+  G(["bookings.group_token (DB default)"]):::src --> QR["QR TANGY:BOOKING:token<br/>browser + email"]:::out
+  QR --> SC["/check-in scan"]
+  SC --> CK[("checkins")]:::db
+  T --> CK
+  CK --> HIST["check-in history · stats · audit"]:::out

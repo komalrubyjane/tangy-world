@@ -1,0 +1,8 @@
+---
+title: Presentation order (25 min)
+---
+flowchart TB
+  classDef s fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef t fill:#dce8f7,stroke:#2a5b9a,color:#122
+  P1["1 What it is<br/>2 min"]:::s --> P2["2 Architecture<br/>3 min"]:::t --> P3["3 Users & roles<br/>2 min"]:::s --> P4["4 Website<br/>2 min"]:::s --> P5["5 Admin<br/>2 min"]:::s --> P6["6 Artist portal<br/>2 min"]:::s --> P7["7 Event + line-up<br/>2 min"]:::t
+  P7 --> P8["8 Booking<br/>2 min"]:::s --> P9["9 Payments<br/>3 min"]:::t --> P10["10 Tickets & check-in<br/>2 min"]:::s --> P11["11 Notifications & email<br/>1 min"]:::t --> P12["12 Database & security<br/>2 min"]:::t --> P13["13 Deployment & status<br/>1 min"]:::s --> P14["14 Failure handling ★<br/>1 min"]:::t

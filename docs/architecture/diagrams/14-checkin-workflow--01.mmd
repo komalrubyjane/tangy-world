@@ -1,0 +1,29 @@
+---
+title: Check-in part 1 — sign-in, scan and authorization
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  O(["/check-in"]):::start --> G["StaffAuthGate<br/>(checkin.perform)<br/>email OTP · my_permissions"]:::proc
+  G --> EV["my_checkin_events()<br/>pick event · event_checkin_stats()"]:::db
+  EV --> SC["Camera (html5-qrcode)<br/>or typed code"]:::proc
+  SC --> OFF{"offline?"}:::dec
+  OFF -- yes --> OE["'Reconnect and<br/>scan again'"]:::err
+  OFF -- no --> P["parseCheckinCode<br/>BOOKING / TICKET / bare"]:::proc
+  P --> PRE["check_in_ticket<br/>(token, event, preview)"]:::db
+  PRE --> A{"checkin.perform or<br/>active temporary access?"}:::dec
+  A -- "grant ended" --> AE["access_expired"]:::err
+  A -- no --> NP["no permission"]:::err
+  A -- yes --> B{"can_checkin_event?"}:::dec
+  B -- no --> NA["not_assigned"]:::err
+  B -- yes --> M{"manual and manual<br/>check-in disabled?"}:::dec
+  M -- yes --> MD["manual_disabled"]:::err
+  M -- no --> K{"token resolves to?"}:::dec
+  K -- neither --> NF["not_found"]:::err
+  K -- "booking" --> PART2["→ part 2: group admission"]:::proc
+  K -- "ticket" --> TK{"right event · not cancelled ·<br/>paid · not already in?"}:::dec
+  TK -- fail --> TF["wrong_event / cancelled /<br/>payment_not_confirmed /<br/>already_checked_in"]:::err
+  TK -- ok --> TW["insert checkins · ticket<br/>checked_in · audit → valid"]:::db

@@ -1,0 +1,21 @@
+---
+title: assignment_requests.status (assignment_status enum)
+---
+stateDiagram-v2
+  [*] --> draft: create_artist_request(send=false)
+  [*] --> pending: create_artist_request(send=true)
+  draft --> pending: manage_artist_request send
+  pending --> accepted: artist accepts
+  pending --> declined: artist declines
+  pending --> expired: expires_at passed (platform job / on respond)
+  accepted --> confirmed: manage_artist_request confirm
+  accepted --> completed: complete (after event date)
+  confirmed --> completed: complete (after event date)
+  draft --> cancelled: manage cancel
+  pending --> cancelled: manage cancel / event cancelled
+  accepted --> cancelled: manage cancel → removed from line-up
+  confirmed --> cancelled: manage cancel → removed from line-up
+  declined --> [*]
+  expired --> [*]
+  completed --> [*]
+  cancelled --> [*]

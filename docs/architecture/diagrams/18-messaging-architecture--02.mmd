@@ -1,0 +1,26 @@
+---
+title: Partner or artist ↔ team conversation
+---
+sequenceDiagram
+  autonumber
+  actor P as Partner / Artist
+  participant PP as Portal MessagesPanel
+  participant DB as Postgres
+  participant RT as Supabase Realtime
+  actor T as Team member (messages.manage)
+  participant AM as /admin-portal/messages
+  P->>PP: New message (optional event)
+  PP->>DB: start_partner_conversation(event, subject, body)
+  DB->>DB: partner_kind() must be artist / sponsor / vendor / venue · must be on the event
+  DB->>DB: reuse open thread of the same type + event, or insert conversation + owner participant
+  DB->>DB: insert message · on_message_created → notify messages.manage holders (message.new)
+  DB-)RT: INSERT messages / conversations
+  RT-)AM: inbox refresh (Realtime INSERT subscription)
+  T->>AM: open thread → conversation_messages · mark_conversation_read
+  T->>AM: reply
+  AM->>DB: send_message(conversation, body)
+  DB->>DB: can see thread? closed? · add team member as admin participant · status pending
+  DB->>DB: on_message_created → notify partner (message.new, email body generic)
+  DB-)RT: INSERT messages (filter conversation_id)
+  RT-)PP: new message appears
+  T->>AM: set_conversation_status / set_conversation_meta (priority, assign to me)

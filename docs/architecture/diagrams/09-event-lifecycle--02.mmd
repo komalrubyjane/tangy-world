@@ -1,0 +1,21 @@
+---
+title: events.status (manual transitions, enforced side effects)
+---
+stateDiagram-v2
+  state "draft" as draft
+  state "on-sale" as onsale
+  state "sold-out" as soldout
+  state "past" as past
+  state "cancelled" as cancelled
+  [*] --> draft: insert (admin)
+  draft --> onsale: publish → line-up notified
+  draft --> soldout: publish
+  onsale --> soldout: admin sets flag
+  soldout --> onsale: admin reopens / capacity raised
+  onsale --> past: admin marks completed
+  soldout --> past
+  draft --> cancelled
+  onsale --> cancelled: requests cancelled · members notified
+  soldout --> cancelled
+  past --> [*]
+  cancelled --> [*]

@@ -1,0 +1,15 @@
+---
+title: Artist portal — shell and pages
+---
+flowchart TB
+  classDef gate fill:#fff3c4,stroke:#b38600,color:#222
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  R["/artist/* portal routes"] --> SH["ArtistPortalShell<br/>artist AuthProvider → PortalFrame"]:::gate
+  SH --> Q1{"session?"}:::gate
+  Q1 -- no --> L["/artist/login?next="]:::proc
+  Q1 -- yes --> Q2{"artists.status<br/>approved?"}:::gate
+  Q2 -- no --> S["/artist/application"]:::proc
+  Q2 -- yes --> NAV["Sidebar portalNav.js<br/>+ pending-request badge"]:::proc
+  NAV --> PAGES["Dashboard · Sessions · Calendar (.ics)<br/>Requests · Availability · Media<br/>Messages · Notifications · Profile<br/>Documents · Settings"]:::proc
+  PAGES --> API["artist/portal/api.js · workspaceApi.js<br/>portalApi.js · storage.js"]:::db

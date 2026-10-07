@@ -1,0 +1,33 @@
+---
+title: Event lifecycle — as implemented
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef gap fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  C(["Admin · Events → New<br/>events.manage"]):::start --> F["EventForm / EventEditor<br/>name · slug · date · time · timezone · venue / venue_id · capacity · price · image · background · category · description · story"]:::proc
+  F --> I["insert events (status draft)<br/>triggers: audit · validate timezone · seed ticket type 'gen' from price"]:::db
+  I --> TT["TicketTypesEditor<br/>event_ticket_types (code, name, price, capacity, active)<br/>events.price = min active price (sync trigger)"]:::db
+  TT --> BF["BookingFormEditor<br/>booking_min/max_quantity · booking_questions"]:::db
+  BF --> LU["Line-up · EventEditor<br/>find_available_artists · artist_schedule_check<br/>save_event_lineup (assign or request)"]:::db
+  LU --> RQ{"Mode"}:::dec
+  RQ -- assign --> EA["event_artists + event_artist_details<br/>(busy refused · unavailable needs override)"]:::db
+  RQ -- request --> AR["assignment_requests pending → artist answers<br/>see 10-event-artist-workflow"]:::db
+  EA & AR --> OPS["Operations tabs · EventOps<br/>team assignments · tasks · requirements · documents · sponsor deliverables"]:::db
+  OPS --> PUB{"Publish?<br/>update status draft → on-sale"}:::dec
+  PUB --> PN["notify_on_event_publish → line-up artists notified<br/>public pages show the event (RLS status ≠ draft)<br/>booking_quote / event_availability work"]:::res
+  PN --> SALE["Public session page /sessions/:slug<br/>bookings → payments → tickets (11–13)"]:::proc
+  SALE --> SO{"Capacity reached?"}:::dec
+  SO -- "yes" --> SOLD["checkout refuses SOLD_OUT · waitlist opens<br/>status sold-out is set by an admin (manual)"]:::proc
+  SALE --> CH["Changes: date / time / venue<br/>notify_on_event_change → members notified"]:::db
+  SALE --> DAY["Event day · /check-in · check_in_ticket"]:::proc
+  DAY --> DONE["Requests completed (manage_artist_request complete)<br/>status past set by an admin · phase 'completed' derived from date"]:::proc
+  DONE --> ARC["Archive: /sessions/archive/:slug · programmes · gallery · diary · TV link by event_id"]:::res
+  SALE --> CX{"Cancel event?"}:::dec
+  CX -- yes --> CAN["status cancelled<br/>open artist requests cancelled · members notified (event.cancelled)"]:::err
+  CAN --> GAP["Customer bookings are NOT auto-cancelled / refunded<br/>and ticket holders are NOT notified — admin acts per booking"]:::gap
+  I -. "delete with bookings" .-> DEL["events_prevent_delete_with_bookings → refused"]:::err

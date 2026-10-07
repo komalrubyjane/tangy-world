@@ -1,0 +1,27 @@
+---
+title: Storage buckets — who can upload / read / delete
+---
+flowchart LR
+  classDef pub fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef priv fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef who fill:#f4ead2,stroke:#7a5c2e,color:#222
+  AV["artist-avatars<br/>PUBLIC"]:::pub
+  AM["artist-media<br/>private"]:::priv
+  AD["artist-documents<br/>private"]:::priv
+  ED["event-documents<br/>private"]:::priv
+  SA["sponsor-assets<br/>private"]:::priv
+  CM["content-media<br/>private"]:::priv
+  ART["Artist (owns artists row)"]:::who -- "upload · update · delete own folder" --> AV
+  ART -- "upload · read · delete own folder" --> AM
+  APP["Applicant (any signed-in user)"]:::who -- "applications/uid/ upload · read · delete" --> AM
+  ART -- "upload · read · delete own folder" --> AD
+  ADM["is_admin()"]:::who -- "all" --> AV & AM
+  CUR["entities.manage"]:::who -- read --> AM & AD & SA
+  REV["applications.view"]:::who -- "read applications/" --> AM
+  EVM["events.manage"]:::who -- "upload events/ · read · delete" --> ED
+  PAR["Partner with an open requirement"]:::who -- "upload requirements/id/" --> ED
+  MEM["Event member per document audience"]:::who -- read --> ED
+  SP["Active sponsor"]:::who -- "upload · read · delete own folder" --> SA
+  CE["content_can(create/edit/delete, area)<br/>or content.manage_sessions+content.edit or events.manage"]:::who -- "upload · update · delete" --> CM
+  ANY["Anyone (anon)"]:::who -- "read only files used by published content" --> CM
+  ANY -- read --> AV

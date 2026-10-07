@@ -1,0 +1,18 @@
+---
+title: Build-time guards in vite.config.js
+---
+flowchart TD
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  S(["vite / vite build"]) --> A{"A VITE_ variable holds sb_secret_… or a service_role JWT?"}:::dec
+  A -- yes --> E1["throw — refuse to start"]:::err
+  A -- no --> B{"command = build?"}:::dec
+  B -- yes --> C{"VITE_SUPABASE_URL + public key set,<br/>https (http only for localhost),<br/>not localhost on Vercel production?"}:::dec
+  C -- no --> E2["throw (unless TANGY_ALLOW_UNCONFIGURED_BUILD=1 and not production)"]:::err
+  C -- yes --> D
+  B -- no --> D["define flags"]
+  D --> F1["__TANGY_DEV_TOOLS__ = serve and TANGY_DEV_TOOLS ≠ off"]:::res
+  D --> F2["VITE_DEMO_ADMIN_ENABLED = true only in serve or TANGY_ALLOW_DEMO_BUILD=1"]:::res
+  D --> F3["__TANGY_REVIEW_MODE__ = VITE_TEAM_REVIEW_MODE and password set,<br/>off on Vercel production unless TANGY_ALLOW_REVIEW_BUILD=1"]:::res
+  D --> F4["dev server plugin /__dev/mock-session<br/>loopback + local Supabase only"]:::res

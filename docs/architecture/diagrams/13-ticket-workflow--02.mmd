@@ -1,0 +1,9 @@
+---
+title: tickets.status
+---
+stateDiagram-v2
+  [*] --> valid: issued at settlement / comp booking
+  valid --> checked_in: check_in_ticket
+  valid --> cancelled: admin_cancel_ticket / admin_cancel_booking / admin_record_refund
+  checked_in --> [*]
+  cancelled --> [*]

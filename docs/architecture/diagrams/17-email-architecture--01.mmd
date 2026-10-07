@@ -1,0 +1,39 @@
+---
+title: Ticket email — queue, dedupe, drain, fallbacks
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  P(["settle_payment → confirmed<br/>(verify path and/or<br/>webhook path)"]):::start --> EQ["enqueueTicketEmail(booking)"]:::proc
+  EQ --> C1{"booking confirmed?"}:::dec
+  C1 -- no --> NQ["not queued (ok)"]:::res
+  C1 -- yes --> C2{"ticket_email_status =<br/>sent?"}:::dec
+  C2 -- yes --> AS["already sent (ok)"]:::res
+  C2 -- no --> C3{"account email<br/>(profiles.email)?"}:::dec
+  C3 -- no --> NE["mark failed 'No linked<br/>account email on file.'"]:::err
+  C3 -- yes --> IN["insert email_outbox<br/>type ticket.confirmed ·<br/>dedupe_key<br/>ticket.confirmed:booking"]:::db
+  IN -- "23505 duplicate" --> DUP["already queued (ok) —<br/>second path or redelivery"]:::res
+  IN --> Q[("email_outbox status queued")]:::db
+  SCH(["Scheduler every 1–2 min<br/>POST<br/>send-notification-emails<br/>x-cron-secret or service<br/>key"]):::start --> CFG{"provider configured?"}:::dec
+  CFG -- no --> WAIT["return configured:false ·<br/>queue untouched"]:::err
+  CFG -- yes --> CL["claim_email_batch(25)<br/>FOR UPDATE SKIP LOCKED ·<br/>status sending ·<br/>attempts+1"]:::db
+  Q --> CL
+  CL --> TR{"ticket.confirmed row?"}:::dec
+  TR -- yes --> CH{"booking found, confirmed,<br/>not already sent?"}:::dec
+  CH -- no --> SKP["status skipped (reason)"]:::res
+  CH -- yes --> BT["buildTicketEmail: tickets<br/>· event · account email<br/>QR<br/>TANGY:BOOKING:group_token<br/>→ booking-pass.png"]:::proc
+  BT --> SEND["sendEmail → Resend"]:::ext
+  TR -- no --> NH["notificationHtml(title,<br/>body, SITE_URL + link)"]:::proc --> SEND
+  SEND --> RES{"ok?"}:::dec
+  RES -- yes --> DONE["complete_email ok → sent<br/>bookings.ticket_email_status<br/>sent"]:::res
+  RES -- no --> RET["complete_email fail →<br/>queued again<br/>(attempts < 5) else failed<br/>· last_error"]:::err
+  RET --> CL
+  BR["Browser after verify:<br/>send-ticket-email(booking)"]:::proc --> BQ{"already sent or queued /<br/>sending?"}:::dec
+  BQ -- yes --> NOOP["no-op (queued:true /<br/>already_sent)"]:::res
+  BQ -- no --> DIRECT["direct send fallback ·<br/>mark sent / failed"]:::proc
+  AD["Admin 'Resend email' ·<br/>send-ticket-email<br/>force=true<br/>caller role<br/>staff/admin/super_admin"]:::proc --> DIRECT

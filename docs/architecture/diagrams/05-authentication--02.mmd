@@ -1,0 +1,17 @@
+---
+title: Who signs in where
+---
+flowchart LR
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef demo fill:#eeeeee,stroke:#888,color:#444,stroke-dasharray: 4 3
+  CUS["Customer"]:::proc --> M1["Login modal · /join/login · /join"]:::proc
+  ART["Artist"]:::proc --> M2["/artist/login · /artist/apply"]:::proc
+  PAR["Sponsor · Vendor · Venue · Crew · Volunteer"]:::proc --> M3["/join/login (approval email links here)"]:::proc
+  TEAM["Staff · Admin · Super Admin"]:::proc --> M4["/admin-portal AdminLoginPanel<br/>OTP (no sign-up) or password"]:::proc
+  VOL["Volunteer with grant"]:::proc --> M5["/check-in StaffAuthGate"]:::proc
+  INV["Invited person"]:::proc --> M6["/invitation#token=…"]:::proc
+  M1 & M2 & M3 & M6 --> OTP["EmailOtpAuth → Supabase Auth"]:::db
+  M4 & M5 --> OTP
+  M4 --> PW["signInWithPassword"]:::db
+  REV["Reviewer"]:::demo --> M7["/team-demo · review builds"]:::demo --> PW

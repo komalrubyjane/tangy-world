@@ -1,0 +1,19 @@
+---
+title: Public content read
+---
+sequenceDiagram
+  autonumber
+  actor V as Visitor (anon)
+  participant PG as Content page
+  participant CS as contentService
+  participant DB as Postgres
+  participant ST as Storage content-media
+  V->>PG: open /diary/:slug
+  PG->>CS: getDiary(slug)
+  CS->>DB: select diary_posts where slug (RLS: published and published_at ≤ now)
+  DB-->>CS: row with cover_url /storage/content-media/…
+  CS->>ST: createSignedUrls(paths, 3600)
+  ST->>DB: storage policy "content-media: read" → content_media_is_public(name)
+  DB-->>ST: true only if a published item references this file
+  ST-->>CS: signed URL
+  CS-->>PG: post with resolved media

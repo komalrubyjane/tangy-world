@@ -1,0 +1,7 @@
+---
+title: Artist
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  A["Artist"]:::proc --> L["/artist/login · email OTP"]:::proc --> P["profiles.role = artist<br/>artists.status = approved"]:::db --> R["/artist/dashboard · sessions · requests · availability · media · documents · messages"]:::proc --> X["respond_to_booking_request · set_artist_availability · uploads"]:::proc --> S["RPCs check artists.user_id = auth.uid · storage first folder = own artist id"]:::db

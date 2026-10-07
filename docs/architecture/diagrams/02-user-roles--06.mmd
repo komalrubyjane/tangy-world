@@ -1,0 +1,7 @@
+---
+title: Partners — sponsor · vendor · venue
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  P["Partner"]:::proc --> AP["/apply/... → collaborations (pending)"]:::db --> AD["Admin approve_collaboration"]:::proc --> RL["role → sponsor / vendor / venue + *_profiles row"]:::db --> PO["/sponsor · /vendor · /venue dashboard<br/>PartnerPortal"]:::proc --> RLS["event_member_kind · own folder · own rows"]:::db

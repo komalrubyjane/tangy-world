@@ -1,0 +1,21 @@
+---
+title: RPC call graph — main callers
+---
+flowchart LR
+  classDef fe fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef ef fill:#fde3c8,stroke:#b8560a,color:#3a1a00
+  classDef rpc fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef job fill:#eeeeee,stroke:#888,color:#444
+  BP["BookingPage / session hooks"]:::fe --> Q["booking_quote · event_availability · my_waitlist · join_waitlist · leave_waitlist"]:::rpc
+  CO["razorpay-create-order"]:::ef --> CPB["create_pending_booking"]:::rpc --> BQ["booking_quote · waitlist_held_seats · expire_stale_bookings"]:::rpc
+  VP["razorpay-verify-payment"]:::ef --> SP["settle_payment"]:::rpc
+  WH["razorpay-webhook"]:::ef --> SP
+  WH --> RWF["record_webhook_failure"]:::rpc
+  SP --> CBT["confirm_booking_and_issue_tickets"]:::rpc
+  DR["send-notification-emails"]:::ef --> CEB["claim_email_batch · complete_email"]:::rpc
+  IU["admin-invite-user (caller JWT)"]:::ef --> CAI["create_account_invitation · set_invitation_email_status"]:::rpc
+  CK["Check-in page"]:::fe --> CIT["check_in_ticket · my_checkin_events · event_checkin_stats · get_checkin_history"]:::rpc
+  AD["Admin console"]:::fe --> ADR["admin_* · approve_* / reject_* · review_artist_application · save_event_lineup · create_artist_request · manage_artist_request · report_* · set_role_permission · update_system_setting · grant_temporary_access …"]:::rpc
+  AR["Artist portal"]:::fe --> ARR["submit_artist_application · set_artist_availability · respond_to_booking_request · my_booking_requests · artist_calendar"]:::rpc
+  PP["Partner portals"]:::fe --> PPR["my_portal_events · start_partner_conversation · send_message · submit_requirement · request_checkin_access · my_notifications"]:::rpc
+  CRON["pg_cron */5"]:::job --> RPJ["run_platform_jobs"]:::rpc

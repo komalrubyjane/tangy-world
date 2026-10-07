@@ -1,0 +1,11 @@
+---
+title: Content data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  E(["Editors in Admin → Content"]):::src --> CT[("tv_videos · diary_posts · gallery_albums · gallery_photos · programmes · announcements")]:::db
+  E --> FS[("content-media files")]:::db
+  CT -- "published and published_at ≤ now" --> PUB["/tv · /diary · /gallery · archive · homepage · character pop-up"]:::out
+  FS -- "signed URL if referenced by published content" --> PUB

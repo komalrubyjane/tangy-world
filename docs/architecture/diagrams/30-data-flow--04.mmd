@@ -1,0 +1,16 @@
+---
+title: Application data
+---
+flowchart TB
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  F1(["/artist/apply"]):::src --> AA[("artist_applications.data")]:::db --> AR[("artists")]:::db
+  F2(["/apply/vendors · sponsors · venue-host"]):::src --> CO[("collaborations")]:::db
+  F3(["/crew/apply · /volunteer/apply"]):::src --> CR[("crew_applications")]:::db
+  F4(["/private-sessions · /contact"]):::src --> EN[("private_enquiries · contact_enquiries")]:::db
+  AA & CO & CR --> OV[("applications_overview view")]:::db --> ADM["Admin Applications"]:::out
+  ADM --> REV[("application_reviews (internal notes)")]:::db
+  ADM --> ROLE[("profiles.role + *_profiles")]:::db --> PORT["Portals"]:::out
+  ADM --> AN[("application_notifications")]:::db --> EM["Approval email"]:::out
+  EN --> OPS["Admin ops: enquiries / contact"]:::out

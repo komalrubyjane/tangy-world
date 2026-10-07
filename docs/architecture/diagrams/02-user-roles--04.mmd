@@ -1,0 +1,7 @@
+---
+title: Customer — role user
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  C["Customer"]:::proc --> L["Email OTP<br/>supabase.auth.signInWithOtp / verifyOtp"]:::proc --> P["profiles row · role user"]:::db --> D["/dashboard · /profile · /sessions/:id checkout"]:::proc --> A["book · pay · waitlist · apply · enquire"]:::proc --> R["RLS self-rows · Edge Functions verify JWT · RPCs check auth.uid"]:::db

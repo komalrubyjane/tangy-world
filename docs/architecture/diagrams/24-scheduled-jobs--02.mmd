@@ -1,0 +1,17 @@
+---
+title: Email drain — operator-scheduled HTTP job
+---
+sequenceDiagram
+  autonumber
+  participant S as Scheduler (PRODUCTION CONFIGURATION)
+  participant F as send-notification-emails
+  participant DB as Postgres
+  participant R as Resend
+  loop every 1–2 minutes
+    S->>F: POST · x-cron-secret
+    F->>F: secret matches? provider configured?
+    F->>DB: claim_email_batch(25) · FOR UPDATE SKIP LOCKED
+    DB-->>F: rows (status sending, attempts+1)
+    F->>R: send each
+    F->>DB: complete_email(id, ok, error) → sent / queued again / failed (5 attempts)
+  end

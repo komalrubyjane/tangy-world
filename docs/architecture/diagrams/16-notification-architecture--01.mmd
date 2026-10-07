@@ -1,0 +1,20 @@
+---
+title: notify() — from event to inbox and email
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  E(["Domain event<br/>trigger / RPC / platform job"]):::start --> N["notify(user, type, …)<br/>or notify_permission_holders(perm, …)"]:::db
+  N --> SELF{"own action and not a receipt?<br/>inactive account?"}:::dec
+  SELF -- yes --> SK["skip"]:::err
+  SELF -- no --> META["notification_meta(type)<br/>category · pref · priority · email · critical"]:::db
+  META --> IA{"critical or prefs allow in_app?"}:::dec
+  IA -- yes --> NT["insert notifications"]:::db --> RT["Realtime INSERT → NotificationBell / portal inbox<br/>my_notifications · notification_unread_count · mark_notifications_read"]:::res
+  META --> EM{"type emails and prefs allow email?"}:::dec
+  EM -- yes --> OB["insert email_outbox (status queued, dedupe_key)<br/>on conflict do nothing"]:::db
+  OB --> DR["send-notification-emails drain<br/>(scheduler, x-cron-secret)"]:::db --> RS["Resend"]:::ext --> IN["Recipient inbox"]:::res
+  EM -- no --> NE["no email"]:::err

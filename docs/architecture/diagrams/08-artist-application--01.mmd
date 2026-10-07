@@ -1,0 +1,38 @@
+---
+title: /artist/apply — draft, autosave, upload, submit
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  S(["Open /artist/apply"]):::start --> AU{"Signed in?"}:::dec
+  AU -- no --> OTP["EmailOtpAuth inline"]:::proc --> AU
+  AU -- yes --> LD["Load own artist_applications<br/>row"]:::db
+  LD --> EX{"Row exists?"}:::dec
+  EX -- no --> NEW["insert {} · status draft<br/>(guard_artist_application<br/>forces draft)"]:::db
+  EX -- yes --> ST{"status"}:::dec
+  ST -- "submitted / under_review / approved / rejected / withdrawn" --> STAT["/artist/application status<br/>page"]:::res
+  ST -- "draft / needs_information" --> STEP
+  NEW --> STEP["Step N from ?step= or<br/>current_step"]:::proc
+  STEP --> ED["Edit fields"]:::proc
+  ED --> T["1.5 s debounce →<br/>saveApplication()<br/>update data, current_step,<br/>video, consents"]:::db
+  T --> RLS{"RLS: own row and status draft<br/>or needs_information"}:::dec
+  RLS -- no --> NS["'Not saved: …'"]:::err
+  RLS -- yes --> ED
+  ED --> UP{"Step 5 upload?"}:::dec
+  UP -- yes --> STO["uploadWithProgress →<br/>artist-media/applications/uid/…<br/>bucket: 50 MB,<br/>audio/video/images/pdf"]:::db
+  STO --> ED
+  ED --> NX["Continue → validate(step)"]:::dec
+  NX -- errors --> ED
+  NX -- ok --> STEP
+  STEP -- "step 8" --> SB["Submit: validate all steps ·<br/>accuracy confirmed"]:::dec
+  SB -- missing --> ED
+  SB -- ok --> RPC["save() then<br/>submit_artist_application()"]:::db
+  RPC --> CHK{"server: required fields,<br/>video, consents"}:::dec
+  CHK -- missing --> ERR["'Please complete: …'"]:::err
+  CHK -- ok --> ART["insert artists (status<br/>pending) or update pending row<br/>application status submitted ·<br/>artist_id · submitted_at"]:::db
+  ART --> N1["notify self<br/>application.submitted<br/>resubmission → notify<br/>reviewers<br/>application.resubmitted<br/>audit application.submitted /<br/>resubmitted"]:::db
+  N1 --> GO["navigate /artist/application"]:::res

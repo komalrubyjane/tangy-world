@@ -1,0 +1,12 @@
+---
+title: Users & Roles — role change
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  U["UsersPage"]:::proc --> R["admin_set_user_role(user, role, reason)"]:::db
+  R --> A{"roles.manage?<br/>not self?<br/>Super Admin change by Super Admin?<br/>not last active Super Admin?"}:::dec
+  A -- fail --> E["exception → toast"]:::err
+  A -- ok --> W["update profiles.role<br/>(trigger prevent_role_self_escalation re-checks)"]:::db --> AU["audit user.role_changed"]:::db --> N["notify role.changed → in-app + email queue"]:::db

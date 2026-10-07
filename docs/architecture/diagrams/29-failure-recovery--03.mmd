@@ -1,0 +1,15 @@
+---
+title: Artist request failures
+---
+flowchart LR
+  classDef ok fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef rec fill:#fff3c4,stroke:#b38600,color:#222
+  N["NORMAL: request → accept → confirm → session"]:::ok
+  A["ERROR: artist declines"]:::err --> AR["status declined + reason · requester notified booking.declined<br/>RECOVERY: request another artist (find_available_artists)"]:::rec
+  B["ERROR: artist busy (confirmed slot overlaps)"]:::err --> BR["save_event_lineup / create_artist_request refuse with a human message (hint tangy:user)"]:::rec
+  C["ERROR: artist marked unavailable"]:::err --> CR["direct assign refused unless explicit override (audited) · a request is allowed — the artist decides"]:::rec
+  D["ERROR: artist becomes unavailable after the request"]:::err --> DR["pending request stays · artist_day_status shows unavailable/tentative to the team<br/>artist may still accept (own mark doesn't block) · a clashing confirmed booking does block"]:::rec
+  E["ERROR: request expires unanswered"]:::err --> ER["expire_booking_requests (job or on respond) → expired · requester notified<br/>artist sees 'This request has expired. Message Tangy…'"]:::rec
+  F["ERROR: two admins book the same artist/day"]:::err --> FR["per-artist-per-day advisory lock serializes · second one re-checked → busy"]:::rec
+  G["ERROR: event cancelled"]:::err --> GR["open requests cancelled · line-up kept as history · artists notified"]:::rec

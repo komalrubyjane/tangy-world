@@ -1,0 +1,15 @@
+---
+title: ER — partners and sponsors
+---
+erDiagram
+  direction LR
+  PROFILES ||--o| VENDOR_PROFILES : "id"
+  PROFILES ||--o| SPONSOR_PROFILES : "id"
+  PROFILES ||--o| VENUE_PROFILES : "id"
+  PROFILES ||--o| CREW_PROFILES : "id"
+  PROFILES ||--o| VOLUNTEER_PROFILES : "id"
+  PROFILES ||--o{ VENUES : "partner_profile_id"
+  SPONSOR_PROFILES ||--o{ SPONSOR_DELIVERABLES : "sponsor_profile_id"
+  EVENTS ||--o{ SPONSOR_DELIVERABLES : "event_id"
+  PROFILES ||--o{ SPONSOR_ASSETS : "sponsor_id"
+  PROFILES ||--o{ PARTNER_INVOICES : "partner_id"

@@ -1,0 +1,20 @@
+---
+title: Volunteers — grant temporary access
+---
+sequenceDiagram
+  autonumber
+  actor VO as Volunteer
+  participant PP as Volunteer portal
+  participant DB as Postgres
+  actor AD as Admin (access.grant)
+  participant VP as VolunteersPage
+  VO->>PP: Request check-in access
+  PP->>DB: request_checkin_access(event, message)
+  DB->>DB: role volunteer · on event team · no active grant · no pending request
+  DB->>DB: access_requests row · audit · notify volunteers.manage holders
+  AD->>VP: open request
+  VP->>DB: grant_temporary_access(user, event, minutes 30–720, request)
+  DB->>DB: advisory lock(user, event) · no overlapping grant · add event_assignments (volunteer)
+  DB->>DB: temporary_access row · audit · notify access.granted
+  VO->>PP: /check-in now works (my_permissions adds checkin.perform)
+  Note over DB: pg_cron log_expired_access / run_platform_jobs audit expiry · access.expiring notice

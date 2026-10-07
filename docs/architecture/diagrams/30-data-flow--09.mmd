@@ -1,0 +1,13 @@
+---
+title: Notification data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef ext fill:#efe0f5,stroke:#6b3d87,color:#222
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  T(["triggers · RPCs · jobs"]):::src --> N["notify()"]
+  P[("notification_preferences")]:::db --> N
+  N --> NT[("notifications")]:::db -- Realtime --> BELL["bells / inboxes"]:::out
+  N --> OB[("email_outbox")]:::db --> DR["send-notification-emails"] --> RS["Resend"]:::ext --> IN["inbox"]:::out
+  OB --> LOG["Admin email delivery log"]:::out

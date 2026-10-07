@@ -1,0 +1,24 @@
+---
+title: Content — draft → publish → public → archive
+---
+flowchart TD
+  classDef start fill:#1f6f43,color:#fff
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef dec fill:#fff3c4,stroke:#b38600,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef res fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  A(["Editor · /admin-portal/content/:section"]):::start --> E["ContentCollections manager<br/>content.save(table,row) · content.remove · slugify"]:::proc
+  E --> UP["Upload cover / video / photo<br/>content.upload → content-media bucket (private)<br/>stored as /storage/content-media/path"]:::db
+  E --> W["insert / update row (status draft)<br/>RLS: content_can(create|edit, area)"]:::db
+  W --> PUB{"set status published?"}:::dec
+  PUB --> G{"content_guard_publish trigger:<br/>has content.publish?"}:::dec
+  G -- no --> X["exception: no permission to publish"]:::err
+  G -- yes --> P["status published · published_at = now or a future time<br/>audit trigger *_audit"]:::db
+  P --> V{"published_at ≤ now?"}:::dec
+  V -- "no (scheduled)" --> WAIT["invisible until then — evaluated at read time"]:::proc
+  V -- yes --> PUBRLS["public RLS: status published and published_at ≤ now"]:::db
+  PUBRLS --> SIGN["contentService.withResolvedMedia → signed URLs (1 h)<br/>storage policy content_media_is_public(name)"]:::db
+  SIGN --> SITE["/tv · /diary · /gallery · homepage sections · archive"]:::res
+  P --> ARC["status archived → hidden from public, kept in console"]:::proc
+  ARC --> HIST["Archive pages link content to past sessions by event_id"]:::res

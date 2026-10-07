@@ -1,0 +1,10 @@
+---
+title: Visitor — no account
+---
+flowchart TB
+  classDef proc fill:#f4ead2,stroke:#7a5c2e,color:#222
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  V["Visitor"]:::proc --> R["Public routes<br/>/ · /sessions · /sessions/:id · /archive · /diary · /tv · /gallery · /artists · /faq · /ai"]:::proc
+  R --> A["Read published content · see live availability · quote prices"]:::proc
+  A --> DB["RLS: events status ≠ draft · content status = published and published_at ≤ now · public_artists view<br/>RPCs granted to anon: event_availability · booking_quote · invitation_preview"]:::db
+  A --> X["Book · apply · enquire · waitlist → sign-in required"]:::proc

@@ -1,0 +1,21 @@
+---
+title: Database domains (61 tables, 3 views)
+---
+flowchart LR
+  classDef d fill:#dce8f7,stroke:#2a5b9a,color:#122
+  ID["AUTH / IDENTITY / ROLES<br/>auth.users · profiles · role_permissions<br/>· account_invitations<br/>vendor_ / sponsor_ / venue_ / crew_ /<br/>volunteer_profiles"]:::d
+  EV["EVENTS<br/>events · venues · event_ticket_types ·<br/>event_availability_signal<br/>programmes · programme_events ·<br/>event_reminders_sent"]:::d
+  AR["ARTISTS<br/>artists · artist_private_profiles ·<br/>artist_admin_notes · artist_availability<br/>artist_media · artist_documents ·<br/>event_artists · event_artist_details ·<br/>assignment_requests"]:::d
+  AP["APPLICATIONS / ENQUIRIES<br/>artist_applications ·<br/>application_reviews ·<br/>application_notifications<br/>collaborations · crew_applications ·<br/>private_enquiries · contact_enquiries"]:::d
+  BK["BOOKINGS / PAYMENTS / TICKETS<br/>bookings · tickets · checkins ·<br/>payment_webhook_events · waitlist ·<br/>partner_invoices"]:::d
+  OP["OPERATIONS<br/>event_assignments · event_tasks ·<br/>event_requirements · event_documents<br/>sponsor_deliverables · sponsor_assets ·<br/>temporary_access · access_requests"]:::d
+  MS["MESSAGING<br/>conversations ·<br/>conversation_participants · messages ·<br/>message_read_states"]:::d
+  NT["NOTIFICATIONS / EMAIL<br/>notifications · notification_preferences<br/>· email_outbox"]:::d
+  CT["CONTENT<br/>tv_videos · diary_posts · gallery_albums<br/>· gallery_photos · announcements"]:::d
+  SY["SYSTEM / AUDIT<br/>audit_logs · system_settings ·<br/>platform_job_runs ·<br/>_security_0035_function_acl"]:::d
+  VW["VIEWS<br/>public_artists · applications_overview ·<br/>attendee_tickets"]:::d
+  ID --- AR & AP & BK & OP & MS & NT
+  EV --- AR & BK & OP & CT
+  AR --- AP
+  BK --- NT
+  OP --- NT

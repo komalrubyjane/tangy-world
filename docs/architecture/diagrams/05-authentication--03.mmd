@@ -1,0 +1,26 @@
+---
+title: Console invitation — admin-invite-user + accept_account_invitation
+---
+sequenceDiagram
+  autonumber
+  actor SA as Inviter (Admin or Super Admin)
+  participant UI as Users & Roles page
+  participant EF as admin-invite-user (Edge Function)
+  participant DB as Postgres
+  participant RS as Resend
+  actor NEW as Invitee
+  participant IP as /invitation page
+  SA->>UI: email, full name, role (staff / admin / super_admin)
+  UI->>EF: functions.invoke with inviter JWT
+  EF->>EF: auth.getUser() · validate · 32 random bytes token · SHA-256 hash
+  EF->>DB: rpc create_account_invitation(email, name, role, token_hash) as INVITER
+  DB->>DB: can_invite_role(role): roles.manage for admin or super_admin, staff.invite for staff
+  DB-->>EF: invitation id, expires_at
+  EF->>RS: email with SITE_URL/invitation#token=… (token only in URL fragment)
+  EF->>DB: set_invitation_email_status(sent / failed / not_configured)
+  EF-->>UI: ok · if email failed, the link is returned once to deliver by hand
+  NEW->>IP: open link · sign in with the invited email (OTP)
+  IP->>DB: invitation_preview(token) then accept_account_invitation(token)
+  DB->>DB: hash match · pending · not expired · email equals auth email · account active · rank higher
+  DB->>DB: update profiles.role (trigger allows: accepted_by = self, accepted_at = now())
+  DB-->>IP: role granted → console

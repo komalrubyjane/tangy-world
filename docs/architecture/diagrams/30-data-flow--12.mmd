@@ -1,0 +1,13 @@
+---
+title: Storage data
+---
+flowchart LR
+  classDef src fill:#1f6f43,color:#fff
+  classDef db fill:#dce8f7,stroke:#2a5b9a,color:#122
+  classDef out fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  AF(["Artist files"]):::src --> AM[("artist-media · artist-documents · artist-avatars")]:::db
+  PF(["Partner files"]):::src --> ED[("event-documents/requirements · sponsor-assets")]:::db
+  TF(["Team files"]):::src --> ED2[("event-documents/events · content-media")]:::db
+  AM & ED & ED2 --> META[("artist_media · artist_documents · event_documents · sponsor_assets · CMS rows: storage_path")]:::db
+  META --> SURL["signed URLs (10 min – 1 h) → reviewers, members, visitors"]:::out
+  AM --> PUBAV["public avatar URLs"]:::out

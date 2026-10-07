@@ -1,0 +1,40 @@
+---
+title: Line-up and booking requests — with race protection
+---
+sequenceDiagram
+  autonumber
+  actor AD as Admin (events.manage)
+  participant EP as EventDetailPage / EventEditor
+  participant DB as Postgres
+  actor AR as Artist
+  participant RP as /artist/requests
+  AD->>EP: select artist(s) + set times · mode assign or request
+  EP->>DB: save_event_lineup(event, items) or create_artist_request(event, artist, details, send)
+  DB->>DB: lock events row (save_event_lineup)
+  DB->>DB: approved artist (request: must also have an account)
+  DB->>DB: lock_artist_day → pg_advisory_xact_lock(artist, date)
+  DB->>DB: assert_artist_bookable: busy → refuse · unavailable → refuse unless override or request
+  DB->>DB: assert_no_slot_overlap within this event
+  alt assign
+    DB->>DB: event_artists + event_artist_details · notify_lineup_artist (only if event published)
+  else request
+    DB->>DB: assignment_requests status pending (or draft) · expires_at default now + artists.request_default_days (7)
+    DB-->>AR: notify booking.requested (in-app + email)
+  end
+  AR->>RP: open request → mark_artist_request_viewed
+  AR->>RP: Accept or Decline (+ reason)
+  RP->>DB: respond_to_booking_request(id, accept, reason)
+  DB->>DB: expire_booking_requests() first · lock request row
+  DB->>DB: must be own request · status pending (expired → error)
+  alt accept
+    DB->>DB: event not cancelled · lock_artist_day + assert_artist_bookable (own unavailable mark allowed, clash refused)
+    DB->>DB: status accepted · insert event_artists · event_artist_details times
+  else decline
+    DB->>DB: status declined · decline_reason
+  end
+  DB-->>AD: notify booking.accepted / booking.declined
+  AD->>EP: Confirm
+  EP->>DB: manage_artist_request(id, 'confirm')
+  DB->>DB: status confirmed · copy call time, soundcheck, set times, fee into event_artist_details
+  DB-->>AR: notify booking.confirmed → /artist/sessions/:id
+  Note over DB: after the event's local date: manage_artist_request(id,'complete') → completed

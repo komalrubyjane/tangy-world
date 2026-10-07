@@ -1,0 +1,35 @@
+---
+title: Messaging tables
+---
+erDiagram
+  conversations ||--o{ conversation_participants : has
+  conversations ||--o{ messages : contains
+  conversations ||--o{ message_read_states : tracks
+  conversations }o--o| events : related_session_id
+  conversations }o--o| artists : related_artist_id
+  conversations {
+    uuid id
+    text conversation_type "general | artist_support | sponsor_support | vendor_support | venue_support | artist_private"
+    text category "support | assignment | general"
+    conversation_status status "open | pending | resolved | closed"
+    text priority "normal | high | urgent"
+    uuid created_by
+    uuid external_user_id
+    uuid assigned_admin_id
+  }
+  conversation_participants {
+    uuid conversation_id
+    uuid user_id
+    text role "owner | admin | member"
+  }
+  messages {
+    uuid id
+    uuid conversation_id
+    uuid sender_id
+    text content "1-4000 chars"
+    text message_type
+  }
+  message_read_states {
+    uuid conversation_id
+    uuid user_id
+  }

@@ -1,0 +1,35 @@
+---
+title: Admin review — request info, resubmit, decide, provision
+---
+sequenceDiagram
+  autonumber
+  actor AR as Artist applicant
+  participant AP as ApplyPage / ApplicationStatusPage
+  participant DB as Postgres
+  actor RV as Reviewer (applications.review)
+  participant AA as ArtistApplicationsPage
+  AR->>AP: Submit
+  AP->>DB: submit_artist_application()
+  DB-->>RV: (list shows "New")
+  RV->>AA: Open application · preview video (YouTube/Vimeo embed or signed URL)
+  AA->>DB: review_artist_application(id, 'start_review')
+  DB-->>AR: notify application.under_review (in-app)
+  RV->>AA: Request information (items + message)
+  AA->>DB: review_artist_application(id, 'request_info', items, message)
+  DB->>DB: status needs_information · info_request jsonb
+  DB-->>AR: notify application.info_requested (in-app + email queue)
+  AR->>AP: Update answers · resubmit
+  AP->>DB: submit_artist_application()  (update pending artists row)
+  DB-->>RV: notify application.resubmitted
+  alt approve
+    RV->>AA: Approve (public message, internal note)
+    AA->>DB: review_artist_application(id, 'approve', …)
+    DB->>DB: approve_artist_application(artist_id)<br/>artists approved · profiles.role user → artist<br/>application_notifications(approval) · notify application.approved · audit
+    DB-->>AR: in-app notification · next visit to /artist/dashboard opens the portal
+  else reject
+    RV->>AA: Reject (internal reason required, optional public message)
+    AA->>DB: review_artist_application(id, 'reject', …)
+    DB->>DB: reject_artist_application · status rejected · decided_at · audit
+    DB-->>AR: notify application.rejected (in-app)
+  end
+  Note over DB: internal notes → application_reviews (reviewers only)<br/>public_message → shown to the applicant

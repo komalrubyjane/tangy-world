@@ -1,0 +1,14 @@
+---
+title: Email failures
+---
+flowchart LR
+  classDef ok fill:#d9f2e3,stroke:#1f7a4a,color:#0f3d24
+  classDef err fill:#fbdada,stroke:#b42318,color:#5a0d0d
+  classDef rec fill:#fff3c4,stroke:#b38600,color:#222
+  N["NORMAL: email_outbox queued → drain → Resend → sent"]:::ok
+  A["ERROR: provider not configured"]:::err --> AR["drain leaves the queue untouched · ticket/approval show 'Email is not configured yet.'<br/>RECOVERY: set RESEND_API_KEY → queue drains"]:::rec
+  B["ERROR: Resend rejects / network"]:::err --> BR["complete_email → queued again, up to 5 attempts → failed with last_error<br/>RECOVERY: Admin → Email delivery shows it · admin 'Resend email' (force)"]:::rec
+  C["ERROR: worker dies mid-send"]:::err --> CR["row stuck in sending → reclaimed after 10 min by claim_email_batch"]:::rec
+  D["ERROR: no account email"]:::err --> DR["ticket_email_status failed 'No linked account email on file.' — visible to admin"]:::rec
+  E["ERROR: approval email fails"]:::err --> ER["toast 'Approved, but the email failed' · application_notifications failed<br/>RECOVERY: Resend from the application drawer"]:::rec
+  F["ERROR: invitation email fails"]:::err --> FR["response returns the invite link once · email_status failed / not_configured<br/>RECOVERY: deliver the link by hand"]:::rec
