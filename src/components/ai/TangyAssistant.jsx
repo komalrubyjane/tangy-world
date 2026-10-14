@@ -26,7 +26,7 @@ function getOrCreateSessionId() {
 }
 
 const chipClass =
-  'px-2.5 py-1 font-mono text-[9.5px] font-bold uppercase tracking-wide border-2 border-[#C99A2E]/70 text-[#E7D5A4] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors text-left';
+  'min-h-[32px] px-2.5 py-1 font-mono text-[9.5px] font-bold uppercase tracking-wide border-2 border-[#C99A2E]/70 text-[#E7D5A4] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors text-left';
 
 const smallChipClass =
   'px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-wide border-2 border-[#11100C]/50 text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] transition-colors text-left';
@@ -216,12 +216,12 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
         >
           {!isUser && (
             <div
-              className={`font-mono text-[9px] font-bold tracking-[0.2em] uppercase mb-1 flex items-center gap-1.5 ${
+              className={`font-mono text-[9px] font-bold tracking-[0.2em] uppercase mb-1 flex flex-wrap items-baseline gap-x-1.5 ${
                 isTeam ? 'text-[#E7D5A4]' : 'text-[#B94717]'
               }`}
             >
-              <span>{isTeam ? '● TANGY TEAM' : '◆ TANGY AI'}</span>
-              {isAi && <span className="opacity-60 font-normal normal-case">(automated, not human)</span>}
+              <span className="whitespace-nowrap">{isTeam ? '● TANGY TEAM' : '◆ TANGY AI'}</span>
+              {isAi && <span className="opacity-60 font-normal normal-case tracking-[0.1em] whitespace-nowrap">(automated, not human)</span>}
             </div>
           )}
           <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -263,22 +263,22 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
   return (
     <div
       className={`flex flex-col bg-[#11100C] border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] w-full ${
-        isFloating ? 'h-[75dvh] max-h-[600px]' : 'h-[72vh] min-h-[520px] max-h-[760px]'
+        isFloating ? 'h-full' : 'h-[72dvh] min-h-[480px] max-h-[760px]'
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-4 border-[#C99A2E] bg-[#1A140F]">
+      <div className="flex items-center justify-between gap-2 px-4 py-1.5 min-h-[60px] border-b-4 border-[#C99A2E] bg-[#1A140F]">
         <div className="min-w-0">
-          <div className="font-mono text-[9px] font-bold tracking-[0.25em] uppercase text-[#C99A2E]">✦ TANGY ASSISTANT</div>
+          <div className="font-mono text-[9px] font-bold tracking-[0.25em] uppercase text-[#C99A2E] truncate">✦ TANGY ASSISTANT</div>
           <div className="font-condensed text-sm text-[#E7D5A4] uppercase tracking-wide truncate">
             {conversationId ? 'Connected with Tangy Team' : 'Mock Knowledge-Base Guide'}
           </div>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={() => openAgentForm()}
-            className="hidden sm:inline font-mono text-[9px] font-bold uppercase tracking-widest text-[#E7D5A4]/70 hover:text-[#C99A2E] underline"
+            className="min-h-[44px] px-1 whitespace-nowrap font-mono text-[9px] font-bold uppercase tracking-widest text-[#E7D5A4]/70 hover:text-[#C99A2E] underline"
           >
             Talk to a human
           </button>
@@ -287,7 +287,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
               type="button"
               onClick={onClose}
               aria-label="Close Tangy Assistant"
-              className="font-mono text-sm font-bold text-[#E7D5A4] hover:text-[#C2272A] px-1"
+              className="min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center font-mono text-base font-bold text-[#E7D5A4] hover:text-[#C2272A]"
             >
               ✕
             </button>
@@ -298,7 +298,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       {/* Message log */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-3 bg-[#191410] t-quiet"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3 bg-[#191410] t-quiet [overflow-wrap:anywhere]"
       >
         {messages.map((m) => renderBubble(m))}
         {typing && <TypingIndicator reducedMotion={reducedMotion} />}
@@ -348,12 +348,13 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
             <button
               type="button"
               onClick={() => setPickerOpen((o) => !o)}
-              className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#C99A2E]"
+              aria-expanded={pickerOpen}
+              className="min-h-[32px] font-mono text-[9px] font-bold uppercase tracking-widest text-[#C99A2E]"
             >
               {pickerOpen ? 'HIDE TOPICS ▲' : 'BROWSE TOPICS ▼'}
             </button>
             {pickerOpen && (
-              <div className="mt-2 flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+              <div className="mt-1 flex flex-wrap gap-1.5 max-h-[min(7.5rem,22dvh)] overflow-y-auto overscroll-contain">
                 {!pickerCategory
                   ? categories.map((c) => (
                       <button key={c.id} type="button" onClick={() => setPickerCategory(c.id)} className={chipClass}>
@@ -384,12 +385,12 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask Tangy Assistant..."
               aria-label="Ask Tangy Assistant"
-              className="flex-1 min-w-0 bg-[#F5E9C9] border-2 border-[#11100C] px-3 py-2 font-serif text-sm text-[#11100C] focus:outline-none focus:border-[#B94717]"
+              className="flex-1 min-w-0 min-h-[44px] bg-[#F5E9C9] border-2 border-[#11100C] px-3 py-2 font-serif text-base sm:text-sm text-[#11100C] focus:outline-none focus:border-[#B94717]"
             />
             <button
               type="submit"
               disabled={!inputText.trim()}
-              className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest bg-[#B94717] text-[#F5E9C9] hover:bg-[#C99A2E] hover:text-[#11100C] border-2 border-[#11100C] px-3 py-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest bg-[#B94717] text-[#F5E9C9] hover:bg-[#C99A2E] hover:text-[#11100C] border-2 border-[#11100C] px-3 min-h-[44px] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               SEND
             </button>

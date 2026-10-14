@@ -132,7 +132,7 @@ export const Hero = () => {
     <section
       ref={sectionRef}
       id="hero"
-      className="hero theme-hero relative w-full overflow-hidden isolate min-h-[100svh] lg:h-[100svh] lg:min-h-[640px] flex flex-col lg:block pt-[58px] lg:pt-0 pb-[calc(var(--dock-space)+60px)] lg:pb-0"
+      className="hero theme-hero relative w-full overflow-hidden isolate min-h-[100svh] lg:h-[100svh] lg:min-h-[640px] flex flex-col lg:block pt-[58px] lg:pt-0 pb-[calc(var(--dock-space)+28px)] lg:pb-0"
     >
       {/* Printed-sheet chrome: an inset trim rule and four registration
           marks, as on a press proof of the cover. */}
@@ -166,19 +166,22 @@ export const Hero = () => {
 
       {/* THE SPLIT — performer left, archive/brand right. Below lg the right
           column becomes `contents` so its pieces and the performer stack in
-          one intentional order: title → standfirst → performer → CTA. */}
+          one intentional order: title → standfirst → performer → CTA. On
+          phones and tablets the performer takes whatever height is left
+          (flex-1, with a viewport-relative floor) so the cast, not the
+          type, is the focal point of the cover. */}
       <div className="relative lg:absolute lg:inset-x-0 lg:top-[150px] lg:bottom-0 z-10 flex-1 flex flex-col">
         <div className="t-container flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:gap-x-6 lg:h-full">
 
           <HeroPerformerStage
-            className="hero-in hero-in-late order-3 lg:order-none lg:col-span-6 lg:h-full lg:pt-[9svh] lg:pb-[calc(var(--dock-space)-8px)] mt-4 lg:mt-0 h-[clamp(200px,31svh,440px)] max-lg:[@media(max-height:720px)]:h-[clamp(165px,26svh,240px)]"
+            className="hero-in hero-in-late order-3 lg:order-none lg:col-span-6 lg:h-full lg:pt-[9svh] lg:pb-[calc(var(--dock-space)-8px)] mt-3 lg:mt-0 max-lg:flex-1 max-lg:min-h-[clamp(250px,41svh,640px)] max-lg:[@media(max-height:720px)]:min-h-[clamp(200px,36svh,280px)]"
           />
 
           <div className="contents lg:flex lg:flex-col lg:justify-center lg:col-span-6 lg:col-start-7 lg:pb-[var(--dock-space)]">
             {/* MASTHEAD — the one typographic statement, with a single
                 static vermilion misregistration layer. */}
             <h1
-              className="hero-in order-1 lg:order-none m-0 mt-3 lg:mt-0 text-center lg:text-left font-display font-normal uppercase text-[#EFE2C0] leading-[0.82] select-none text-[clamp(3.5rem,22vw,8.5rem)] max-lg:[@media(max-height:720px)]:text-[min(22vw,11.5svh)] lg:text-[clamp(5rem,11.6vw,11.5rem)]"
+              className="hero-in order-1 lg:order-none m-0 mt-3 lg:mt-0 text-center lg:text-left font-display font-normal uppercase text-[#EFE2C0] leading-[0.82] select-none text-[clamp(3.25rem,20vw,8rem)] max-lg:[@media(max-height:720px)]:text-[min(19vw,10.5svh)] lg:text-[clamp(5rem,11.6vw,11.5rem)]"
             >
               <span className="relative block">
                 <span className="absolute inset-0 text-[#C0392B]/50 translate-x-[0.02em] -translate-y-[0.016em] -z-10" aria-hidden="true">Tangy</span>

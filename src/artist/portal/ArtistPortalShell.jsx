@@ -5,7 +5,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useNotifications } from '../../portal/useNotifications';
 import { workspaceApi } from '../services/workspaceApi';
 import { ARTIST_NAV } from './portalNav';
-import { PIcon } from './kit';
+import { BackToSite, PIcon } from './kit';
 import { cx } from './util';
 
 // The Artist Portal: one dedicated shell — a sidebar on desktop, a drawer on
@@ -55,7 +55,7 @@ const NavList = ({ badges, onNavigate }) => (
 const Brand = () => (
   <div className="flex items-baseline gap-2">
     <span className="font-display text-lg uppercase tracking-wide text-[#F3E7C9]">Tangy</span>
-    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#C99A2E]">Artist portal</span>
+    <span className="font-mono text-[10px] uppercase tracking-[0.2em] min-[360px]:tracking-[0.3em] whitespace-nowrap text-[#C99A2E]">Artist portal</span>
   </div>
 );
 
@@ -94,14 +94,18 @@ function PortalFrame() {
       <a href="#artist-main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-[#C99A2E] text-[#14110D] px-3 py-2 rounded">Skip to content</a>
 
       <aside className="hidden lg:flex flex-col sticky top-0 h-[100dvh] border-r border-[#E7D5A4]/10 ui-texture-deep px-3 py-5" aria-label="Artist portal">
-        <div className="px-3 mb-6"><Brand /></div>
+        <div className="px-3 mb-2"><Brand /></div>
+        <BackToSite className="mb-4 self-start" />
         <nav aria-label="Artist portal" className="flex-1 overflow-y-auto"><NavList badges={badges} /></nav>
         {footer}
       </aside>
 
       <div className="min-w-0">
         <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between gap-3 px-4 h-14 bg-[#17140F]/95 border-b border-[#E7D5A4]/10">
-          <Brand />
+          <div className="flex items-center gap-1 min-w-0 -ml-2">
+            <BackToSite compact />
+            <Brand />
+          </div>
           <button ref={toggle} type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="artist-drawer"
             className="flex items-center gap-2 min-h-[44px] px-3 rounded-md border border-[#E7D5A4]/20 text-sm">
             <PIcon name="Menu" />Menu{badges.notifications + badges.requests > 0 && <span className="w-2 h-2 rounded-full bg-[#C99A2E]" aria-label="New items" />}
@@ -122,6 +126,7 @@ function PortalFrame() {
               <Brand />
               <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md"><PIcon name="X" /></button>
             </div>
+            <BackToSite className="mb-3 self-start" />
             <nav aria-label="Artist portal" className="flex-1"><NavList badges={badges} onNavigate={() => setOpen(false)} /></nav>
             {footer}
           </div>

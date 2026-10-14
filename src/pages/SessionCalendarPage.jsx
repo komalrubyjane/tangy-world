@@ -131,10 +131,10 @@ export const SessionCalendarPage = () => {
         <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
           <button
             onClick={goPrevMonth}
-            className="px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#C99A2E] text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors shrink-0"
+            className="min-h-[44px] px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#C99A2E] text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors shrink-0"
             aria-label="Previous month"
           >
-            ← PREV
+            ←<span className="hidden min-[400px]:inline"> PREV</span>
           </button>
 
           <div className="text-center flex-1 min-w-0">
@@ -146,16 +146,16 @@ export const SessionCalendarPage = () => {
           <div className="flex gap-2 shrink-0">
             <button
               onClick={goToday}
-              className="px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#B94717] bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] hover:border-[#11100C] transition-colors"
+              className="min-h-[44px] px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#B94717] bg-[#B94717] text-[#E7D5A4] hover:bg-[#11100C] hover:border-[#11100C] transition-colors"
             >
               TODAY
             </button>
             <button
               onClick={goNextMonth}
-              className="px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#C99A2E] text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
+              className="min-h-[44px] px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest border-2 border-[#C99A2E] text-[#C99A2E] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors"
               aria-label="Next month"
             >
-              NEXT →
+              <span className="hidden min-[400px]:inline">NEXT </span>→
             </button>
           </div>
         </div>
@@ -204,7 +204,7 @@ export const SessionCalendarPage = () => {
             const week = grid.slice(weekIdx * 7, weekIdx * 7 + 7);
             if (week.every((d) => d == null)) return null;
             return (
-              <div key={weekIdx} className="flex gap-1.5 overflow-x-auto pb-2 mb-2 last:mb-0 scrollbar-none">
+              <div key={weekIdx} className="grid grid-cols-7 gap-1 mb-1.5 last:mb-0">
                 {week.map((day, dIdx) => {
                   const hasEvents = day != null && eventsByDay[day];
                   const selected = day != null && day === selectedDay;
@@ -213,7 +213,7 @@ export const SessionCalendarPage = () => {
                       key={dIdx}
                       disabled={day == null}
                       onClick={() => handleDayClick(day)}
-                      className={`shrink-0 w-12 h-14 flex flex-col items-center justify-center border font-mono text-[10px] relative ${
+                      className={`min-w-0 h-14 flex flex-col items-center justify-center border font-mono text-[10px] relative ${
                         day == null
                           ? 'border-transparent'
                           : isToday(day)

@@ -89,14 +89,15 @@ export const Navbar = () => {
     <header className="fixed top-0 left-0 right-0 z-[9999] bg-[#181614] border-b border-[#EFE2C0]/12 px-4 md:px-8 py-3 flex items-center justify-between text-[#EFE2C0] font-mono text-[10px] md:text-[11px] tracking-widest">
       
       {/* LEFT: BRAND LOGO */}
-      <div 
-        onClick={() => handleNav('/')}
-        className="flex items-center gap-2 cursor-pointer group"
+      <Link
+        to="/"
+        onClick={onLinkClick}
+        className="flex items-center gap-2 group"
       >
         <span className="font-display text-base md:text-lg leading-none tracking-[0.04em] text-[#EFE2C0] group-hover:text-[#C89D35] transition-colors uppercase">
           TANGY SESSIONS
         </span>
-      </div>
+      </Link>
 
       {/* CENTER: DESKTOP EDITORIAL DROPDOWN MENU */}
       <nav className="hidden xl:flex items-center text-[#E7D5A4]">
@@ -212,10 +213,10 @@ export const Navbar = () => {
         aria-modal="true"
         aria-label="Archive index"
         inert={!isMobileMenuOpen}
-        className={`index-panel ${isMobileMenuOpen ? 'is-open' : ''} fixed inset-x-0 top-[49px] h-[calc(100dvh-49px)] theme-hero z-[10000] overflow-y-auto overscroll-contain xl:hidden`}
+        className={`index-panel ${isMobileMenuOpen ? 'is-open' : ''} fixed inset-x-0 top-[61px] h-[calc(100dvh-61px)] theme-hero z-[10000] overflow-y-auto overscroll-contain xl:hidden`}
       >
-        <div className="t-container py-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
-          <div className="index-item flex justify-between items-center archiveMetadata text-[#EFE2C0]/60 pb-3 border-b-[3px] border-double border-[#EFE2C0]/25" style={{ '--i': 0 }}>
+        <div className="t-container md:max-w-[44rem] py-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+          <div className="index-item flex flex-wrap justify-between items-center gap-x-4 gap-y-1 archiveMetadata text-[#EFE2C0]/60 pb-3 border-b-[3px] border-double border-[#EFE2C0]/25" style={{ '--i': 0 }}>
             <span>Archive index</span>
             <span>Hyderabad · Est. 2016</span>
           </div>
@@ -232,7 +233,7 @@ export const Navbar = () => {
                       onClick={onLinkClick}
                       data-active={activeSection === cat.title ? 'true' : 'false'}
                       aria-current={pathname === cat.path ? 'page' : undefined}
-                      className={`flex-1 text-left font-display uppercase text-[clamp(1.9rem,9vw,2.75rem)] leading-none py-3 hover:text-[#C89D35] focus-visible:text-[#C89D35] ${activeSection === cat.title ? 'text-[#C89D35]' : 'text-[#EFE2C0]'}`}
+                      className={`flex-1 min-w-0 text-left font-display uppercase text-[clamp(1.75rem,8.5vw,2.5rem)] leading-none py-3 md:py-2.5 break-words hover:text-[#C89D35] focus-visible:text-[#C89D35] ${activeSection === cat.title ? 'text-[#C89D35]' : 'text-[#EFE2C0]'}`}
                     >
                       {cat.title}
                     </Link>
@@ -247,7 +248,7 @@ export const Navbar = () => {
                   </div>
 
                   {isCatOpen && (
-                    <ul className="list-none m-0 mb-4 ml-10 p-0 border-l border-[#C89D35]/40">
+                    <ul className="list-none m-0 mb-4 ml-10 p-0 border-l border-[#C89D35]/40 md:max-w-[26rem]">
                       {cat.items.map((item) => (
                         <li key={item.label}>
                           <Link

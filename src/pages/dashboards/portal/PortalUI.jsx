@@ -67,7 +67,7 @@ export const StatTile = ({ label, value, sub }) => (
 // this based on anything other than a real is_admin()-backed session; the
 // banner is a UI affordance, not the security boundary (RLS is).
 export const AdminPreviewBanner = ({ label }) => (
-  <div className="sticky top-[49px] z-[90] bg-[#B94717] text-[#E7D5A4] border-b-2 border-[#11100C]">
+  <div className="sticky top-[61px] xl:top-[50px] z-[90] bg-[#B94717] text-[#E7D5A4] border-b-2 border-[#11100C]">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-[#E7D5A4] animate-pulse shrink-0" />

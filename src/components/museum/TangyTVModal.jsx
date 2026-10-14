@@ -10,8 +10,8 @@ export const TangyTVModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
-      <div onClick={onClose} className="absolute inset-0 bg-black/85" />
+    <div className="museum-modal" data-lenis-prevent>
+      <div onClick={onClose} className="fixed inset-0 bg-black/85" />
 
       <div className="relative w-full max-w-md z-10">
         <button

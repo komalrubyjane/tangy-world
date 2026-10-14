@@ -93,9 +93,9 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+    <div className="museum-modal" data-lenis-prevent>
       {/* Fade Backdrop */}
-      <div onClick={handleClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
+      <div onClick={handleClose} className="fixed inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* 1970s CASSETTE TAPE DECK PLAYER */}
       <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-2 border-[#d1a437] p-6 shadow-[4px_4px_0px_#4c1210] flex flex-col gap-6 z-10 overflow-hidden">

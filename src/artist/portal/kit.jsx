@@ -1,19 +1,38 @@
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard, Music, CalendarDays, Inbox, CalendarCheck, Image, MessagesSquare, Bell, UserRound, FileText, Settings,
-  Menu, X, LogOut, ExternalLink, ChevronRight, MapPin, Clock, AlertTriangle, CheckCircle2, Upload, Plus, Trash2, Play,
+  Menu, X, LogOut, ExternalLink, ChevronRight, MapPin, Clock, AlertTriangle, CheckCircle2, Upload, Plus, Trash2, Play, ArrowLeft,
 } from 'lucide-react';
 import { cx } from './util';
 
 // Artist Portal UI kit — a calm workspace: clear cards, subtle borders,
 // restrained shadows, strong type, status pills. Tangy palette.
 const ICONS = { LayoutDashboard, Music, CalendarDays, Inbox, CalendarCheck, Image, MessagesSquare, Bell, UserRound, FileText, Settings,
-  Menu, X, LogOut, ExternalLink, ChevronRight, MapPin, Clock, AlertTriangle, CheckCircle2, Upload, Plus, Trash2, Play };
+  Menu, X, LogOut, ExternalLink, ChevronRight, MapPin, Clock, AlertTriangle, CheckCircle2, Upload, Plus, Trash2, Play, ArrowLeft };
 export const PIcon = ({ name, size = 18, className = '' }) => {
   const C = ICONS[name];
   return C ? <C size={size} strokeWidth={1.75} className={className} aria-hidden="true" /> : null;
 };
 
+// The way out of the portal to the public site (same-origin SPA route, so it
+// follows whichever domain the site is served from). `compact` is the
+// icon-only form for the narrow mobile header; it keeps the full name for
+// screen readers and a 44px target.
+export const BackToSite = ({ compact = false, className = '', onClick }) => (
+  <Link
+    to="/"
+    onClick={onClick}
+    aria-label={compact ? 'Back to Tangy World' : undefined}
+    className={cx(
+      'inline-flex items-center gap-2 min-h-[44px] rounded-md text-[#E7D5A4]/85 hover:text-[#F3E7C9] hover:bg-[#E7D5A4]/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C99A2E]',
+      compact ? 'min-w-[44px] justify-center' : 'px-3 font-mono text-[11px] uppercase tracking-[0.18em]',
+      className,
+    )}
+  >
+    <PIcon name="ArrowLeft" size={compact ? 20 : 16} />
+    {!compact && <span>Back to Tangy World</span>}
+  </Link>
+);
 
 export const PageHeader = ({ title, kicker, description, actions }) => (
   <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">

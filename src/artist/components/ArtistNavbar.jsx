@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../../audio/AudioContext';
 import { NotificationBell } from '../../portal/NotificationBell';
@@ -48,21 +48,22 @@ export const ArtistNavbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[120] bg-[#181614] printNoise border-b-2 border-[#d1a437] px-3 sm:px-6 py-2.5 flex items-center justify-between text-[#ecdcaf] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[120] h-14 bg-[#181614] printNoise border-b-2 border-[#d1a437] px-3 sm:px-6 flex items-center justify-between gap-2 text-[#ecdcaf] font-mono text-[10px] md:text-[11px] tracking-widest shadow-xl">
       
       {/* BRAND & ROUTE HEADER */}
-      <div 
-        onClick={() => handleNav('/artist')} 
-        className="flex items-center gap-2 cursor-pointer group truncate max-w-[200px] sm:max-w-none"
+      <button
+        type="button"
+        onClick={() => handleNav('/artist')}
+        className="flex items-center gap-2 min-h-[44px] min-w-0 group text-left"
       >
         <span className="w-2 h-2 rounded-full bg-[#B5532A] group-hover:scale-125 transition-transform flex-shrink-0" />
         <span className="font-poster text-sm sm:text-base md:text-lg tracking-wider text-[#ecdcaf] group-hover:text-[#d1a437] truncate">
-          TANGY ARTIST PORTAL
+          <span className="hidden min-[400px]:inline">TANGY </span>ARTIST PORTAL
         </span>
         <span className="text-[#d1a437] hidden xl:inline opacity-80">
           // BANSILAL STEPWELL
         </span>
-      </div>
+      </button>
 
       {/* DESKTOP ROUTE LINKS (>=1024px) */}
       <nav className="hidden lg:flex items-center gap-4 xl:gap-5">
@@ -101,15 +102,19 @@ export const ArtistNavbar = () => {
       </nav>
 
       {/* RIGHT ACTIONS & MOBILE TOGGLE */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         
-        {/* PUBLIC SITE LINK (DESKTOP) */}
-        <button
-          onClick={() => handleNav('/')}
-          className="hidden sm:inline text-[#ecdcaf]/70 hover:text-[#ecdcaf] font-mono text-[9px] underline uppercase"
+        {/* BACK TO THE PUBLIC SITE — every width. A router link to "/", so
+            it follows whichever origin the site is served from. */}
+        <Link
+          to="/"
+          onClick={() => playSFX('ticketClick')}
+          aria-label="Back to Tangy World"
+          className="inline-flex items-center gap-1.5 min-h-[40px] px-2.5 sm:px-3 border border-[#ecdcaf]/35 text-[#ecdcaf] hover:text-[#d1a437] hover:border-[#d1a437] uppercase font-bold text-[9.5px] sm:text-[10px] whitespace-nowrap transition-colors"
         >
-          PUBLIC SITE ↗
-        </button>
+          <span aria-hidden="true">←</span>
+          <span aria-hidden="true"><span className="hidden sm:inline">Back to </span>Tangy World</span>
+        </Link>
 
         {user && (
           <>
@@ -131,8 +136,9 @@ export const ArtistNavbar = () => {
         {/* HAMBURGER TOGGLE BUTTON (<1024px) */}
         <button
           onClick={() => { playSFX('ticketClick'); setMobileDrawerOpen(!mobileDrawerOpen); }}
-          className="lg:hidden w-8 h-8 bg-[#0d0a07] border border-[#d1a437] text-[#d1a437] font-bold flex items-center justify-center text-base focus:outline-none"
-          aria-label="Toggle mobile menu"
+          className="lg:hidden w-10 h-10 bg-[#0d0a07] border border-[#d1a437] text-[#d1a437] font-bold flex items-center justify-center text-base"
+          aria-label={mobileDrawerOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileDrawerOpen}
         >
           {mobileDrawerOpen ? '✕' : '☰'}
         </button>
@@ -140,7 +146,7 @@ export const ArtistNavbar = () => {
 
       {/* MOBILE SLIDE-OUT DRAWER OVERLAY (<1024px) */}
       {mobileDrawerOpen && (
-        <div className="lg:hidden fixed top-[45px] left-0 right-0 bottom-0 bg-[#181614]/95 backdrop-blur-md z-[150] border-t-2 border-[#d1a437] p-6 flex flex-col justify-between overflow-y-auto animate-fadeIn">
+        <div className="lg:hidden fixed top-14 left-0 right-0 bottom-0 bg-[#181614]/95 backdrop-blur-md z-[150] border-t-2 border-[#d1a437] p-6 flex flex-col justify-between overflow-y-auto animate-fadeIn">
           
           <div className="flex flex-col gap-4 font-mono text-xs font-bold text-left">
             <span className="text-[9px] text-[#d1a437] tracking-[0.3em] uppercase border-b border-[#d1a437]/30 pb-2">
@@ -184,12 +190,13 @@ export const ArtistNavbar = () => {
 
           {/* BOTTOM DRAWER FOOTER */}
           <div className="flex flex-col gap-3 border-t border-[#ecdcaf]/20 pt-4 mt-6">
-            <button
-              onClick={() => handleNav('/')}
-              className="w-full p-3 bg-[#0d0a07] text-[#ecdcaf]/80 hover:text-[#ecdcaf] border border-[#ecdcaf]/30 font-mono text-xs font-bold uppercase text-center"
+            <Link
+              to="/"
+              onClick={() => playSFX('ticketClick')}
+              className="w-full p-3 bg-[#0d0a07] text-[#ecdcaf] hover:text-[#d1a437] border border-[#ecdcaf]/30 font-mono text-xs font-bold uppercase text-center"
             >
-              RETURN TO PUBLIC SITE ↗
-            </button>
+              ← BACK TO TANGY WORLD
+            </Link>
 
             {user && (
               <button

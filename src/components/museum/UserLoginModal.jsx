@@ -94,7 +94,7 @@ export const UserLoginModal = () => {
   const showAuthStep = !comingSoon && !isLoggedIn && step === 'auth';
 
   return (
-    <div className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
+    <div data-lenis-prevent className="museum-modal z-[10050] bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
       <div
         ref={dialogRef}
         role="dialog"

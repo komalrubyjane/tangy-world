@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TangyAssistant } from './TangyAssistant';
 
 /**
@@ -11,6 +11,31 @@ import { TangyAssistant } from './TangyAssistant';
  */
 export const TangyAssistantLauncher = () => {
   const [open, setOpen] = useState(false);
+  const panelRef = useRef(null);
+
+  // Keep the composer above the on-screen keyboard: where the browser
+  // overlays the keyboard instead of resizing the page (iOS Safari), lift the
+  // panel by the part of the layout viewport the keyboard covers.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!open || !vv) return undefined;
+    const sync = () => {
+      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      panelRef.current?.style.setProperty('--kb-inset', `${Math.round(covered)}px`);
+    };
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => { vv.removeEventListener('resize', sync); vv.removeEventListener('scroll', sync); };
+  }, [open]);
+
+  // Escape closes the floating panel.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
     <>
@@ -26,7 +51,7 @@ export const TangyAssistantLauncher = () => {
       </button>
 
       {open && (
-        <div className="fixed z-[131] bottom-[calc(10rem+env(safe-area-inset-bottom))] lg:bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:w-[380px] md:right-8">
+        <div ref={panelRef} className="assistant-panel" data-lenis-prevent>
           <TangyAssistant variant="floating" onClose={() => setOpen(false)} />
         </div>
       )}

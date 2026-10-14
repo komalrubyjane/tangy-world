@@ -14,8 +14,8 @@ export const ProgrammeBoardModal = ({ isOpen, onClose }) => {
   const upcoming = events.filter((e) => !['past', 'cancelled', 'draft'].includes(e.dbStatus) && (!e.rawDate || e.rawDate >= today)).slice(0, 8);
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="programme-title">
-      <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
+    <div className="museum-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="programme-title">
+      <div onClick={onClose} className="fixed inset-0 bg-black/85 backdrop-blur-md" />
 
       <div className="relative w-full max-w-2xl bg-[#191410] text-[#ecdcaf] border-2 border-[#d1a437] p-6 shadow-[4px_4px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-hidden">
         <div className="flex justify-between items-center border-b-2 border-[#d1a437]/40 pb-3">

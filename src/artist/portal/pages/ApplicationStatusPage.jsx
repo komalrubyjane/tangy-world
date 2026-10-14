@@ -79,7 +79,7 @@ export const ApplicationStatusPage = () => {
 
 const Shell = ({ children }) => (
   <div className="min-h-[100dvh] ui-texture text-[#E7D5A4] font-body">
-    <header className="border-b border-[#E7D5A4]/10 px-4 h-14 flex items-center max-w-3xl mx-auto"><Link to="/" className="font-display text-lg uppercase text-[#F3E7C9]">Tangy</Link></header>
+    <header className="border-b border-[#E7D5A4]/10 px-4 h-14 flex items-center max-w-3xl mx-auto"><Link to="/" className="inline-flex items-center min-h-[44px] gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#E7D5A4]/85 hover:text-[#F3E7C9]"><span aria-hidden="true">←</span> Back to Tangy World</Link></header>
     <main className="max-w-3xl mx-auto px-4 py-8">{children}</main>
   </div>
 );

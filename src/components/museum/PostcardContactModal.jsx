@@ -24,9 +24,9 @@ export const PostcardContactModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+    <div className="museum-modal" data-lenis-prevent>
       {/* Fade Backdrop */}
-      <div onClick={onClose} className="absolute inset-0 bg-black/85 backdrop-blur-md" />
+      <div onClick={onClose} className="fixed inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* VINTAGE POSTCARD CONTACT FORM */}
       <div className="relative w-full max-w-2xl max-h-[90dvh] bg-[#e9decb] text-[#241a12] border-2 border-[#191410] p-6 shadow-[4px_4px_0px_#4c1210] flex flex-col gap-5 z-10 overflow-y-auto overflow-x-hidden">

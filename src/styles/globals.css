@@ -555,6 +555,56 @@
   .regMark::after { top: 50%; left: 0; right: 0; height: 1px; }
   .regMark > i { position: absolute; inset: 3px; border: 1px solid currentColor; border-radius: 50%; }
 
+  /* ── Museum / dock modal overlay ─────────────────────────────────── */
+  /* Above the fixed site header (z 9999), and "safe" centred: a dialog
+     shorter than the screen sits in the middle; a taller one starts at the
+     top and the overlay scrolls, so its title and Close are never pushed off
+     the top edge. The backdrop child is position: fixed. */
+  .museum-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10010;
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.5rem max(0.75rem, env(safe-area-inset-bottom));
+  }
+  @media (min-width: 640px) { .museum-modal { padding: 1rem; } }
+  .museum-modal > * { margin: auto; }
+
+  /* ── Floating Tangy Assistant panel ──────────────────────────────── */
+  /* Desktop/tablet: a 380px card above the launcher, never taller than the
+     space between the header and the launcher. Phones and short landscape
+     screens: a sheet between the site header (61px) and the bottom edge, so
+     the header and its close button can never leave the screen. --kb-inset
+     (set from visualViewport by the launcher) lifts it above the on-screen
+     keyboard on browsers that don't resize the layout viewport (iOS). */
+  .assistant-panel {
+    position: fixed;
+    z-index: 9990; /* above the dock (140) and launcher, below the header */
+    right: 1.5rem;
+    width: 380px;
+    bottom: calc(10rem + env(safe-area-inset-bottom));
+    height: min(600px, calc(100dvh - 10rem - env(safe-area-inset-bottom) - 77px));
+  }
+  @media (min-width: 768px) { .assistant-panel { right: 2rem; } }
+  @media (min-width: 1024px) {
+    .assistant-panel { bottom: 5rem; height: min(600px, calc(100dvh - 5rem - 66px)); }
+  }
+  @media (max-width: 639px), (max-height: 600px) {
+    .assistant-panel {
+      top: calc(61px + 0.5rem);
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: calc(0.5rem + env(safe-area-inset-bottom) + var(--kb-inset, 0px));
+      width: auto;
+      height: auto;
+    }
+  }
+  @media (min-width: 640px) and (max-height: 600px) {
+    .assistant-panel { left: auto; width: min(480px, calc(100vw - 1rem)); }
+  }
+
   /* ── Archive index panel (mobile menu) ───────────────────────────── */
   .index-panel {
     clip-path: inset(0 0 100% 0);

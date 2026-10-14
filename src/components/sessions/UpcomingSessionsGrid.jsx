@@ -28,7 +28,7 @@ export const UpcomingSessionsGrid = () => {
         </div>
       </div>
 
-      <div className="flex gap-2 justify-center mb-8 overflow-x-auto px-4 pb-1 scrollbar-none">
+      <div className="flex gap-2 justify-center-safe mb-8 overflow-x-auto px-4 pb-1 scrollbar-none">
         {VENUE_FILTERS.map((f) => (
           <button
             key={f}
