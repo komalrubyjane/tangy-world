@@ -5,6 +5,8 @@
 // later this file is what gets replaced by real retrieval (see architecture
 // note in aiSupportService.js).
 
+import { LAUNCH_MODE, COMING_SOON_EMAIL } from '../../config/launch';
+
 export const AI_CATEGORIES = [
   { id: 'tickets', label: 'TICKETS' },
   { id: 'sessions', label: 'SESSIONS' },
@@ -19,7 +21,7 @@ export const AI_CATEGORIES = [
 
 // Each entry: predefined question, the answer, optional CTA, optional
 // related question ids, and keywords used for free-text matching.
-export const aiKnowledge = [
+const KNOWLEDGE = [
   // ---------------- TICKETS ----------------
   {
     id: 'tickets-book',
@@ -250,6 +252,43 @@ export const aiKnowledge = [
     keywords: ['where based', 'location', 'city', 'address'],
   },
 ];
+
+// Temporary launch (src/config/launch.js): answers that would send people to
+// ticketing, accounts, the waitlist or an old session say what's true now.
+const LAUNCH_ANSWERS = {
+  'tickets-book': {
+    answer: "Online ticketing isn't open yet. Our next session is on the Sessions page — register there through the team's registration form.",
+    cta: { label: 'VIEW SESSIONS', to: '/sessions' },
+  },
+  'tickets-find': {
+    answer: "Tangy accounts and the Passport are coming soon. If you registered for a session, the team will contact you with the details.",
+    cta: { label: 'CONTACT US', to: '/contact' },
+  },
+  'tickets-waitlist': {
+    answer: 'Waitlists are coming soon. Keep an eye on the Sessions page for new sessions.',
+    cta: { label: 'VIEW SESSIONS', to: '/sessions' },
+  },
+  'sessions-next': {
+    answer: 'New sessions are being scheduled. The Sessions page shows the session that is currently open for registration.',
+  },
+  'artists-apply': {
+    answer: `Online artist applications open soon. Until then, write to ${COMING_SOON_EMAIL} with your profile and work.`,
+    cta: { label: 'ARTISTS DIRECTORY', to: '/artist' },
+  },
+  'crew-join': {
+    answer: `Crew roles cover production, stage operations, and hospitality. Online applications open soon — until then, write to ${COMING_SOON_EMAIL}.`,
+  },
+  'crew-volunteer': {
+    answer: `Volunteers help with everything from registration to social coverage on session nights. Online applications open soon — until then, write to ${COMING_SOON_EMAIL}.`,
+  },
+  'contact-general': {
+    answer: `Email ${COMING_SOON_EMAIL} — we reply within 48 hours.`,
+  },
+};
+
+export const aiKnowledge = LAUNCH_MODE
+  ? KNOWLEDGE.map((k) => (LAUNCH_ANSWERS[k.id] ? { ...k, ...LAUNCH_ANSWERS[k.id] } : k))
+  : KNOWLEDGE;
 
 export function findAnswerById(id) {
   return aiKnowledge.find((k) => k.id === id) || null;

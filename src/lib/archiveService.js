@@ -3,6 +3,7 @@
 // RLS decides what visitors see (non-draft events, published content).
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { ALBUM_FIELDS, DIARY_FIELDS, TV_FIELDS } from './contentService';
+import { LAUNCH_MODE } from '../config/launch';
 
 const offline = { data: null, error: new Error('Supabase is not configured.') };
 const SESSION_FIELDS = 'id, slug, name, description, story, event_date, event_time, end_time, venue, image_url, page_background, capacity, status, tags, attendance_recorded';
@@ -98,7 +99,8 @@ export async function artistTimeline(artistIds) {
   for (const r of data || []) {
     if (r.events.status === 'draft') continue;
     const t = (out[r.artist_id] ||= { past: 0, upcoming: 0 });
-    if (r.events.event_date < today()) t.past += 1; else if (r.events.status !== 'cancelled') t.upcoming += 1;
+    // Temporary launch: no session is offered publicly, so none counts as upcoming.
+    if (r.events.event_date < today()) t.past += 1; else if (r.events.status !== 'cancelled' && !LAUNCH_MODE) t.upcoming += 1;
   }
   return out;
 }

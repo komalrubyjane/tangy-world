@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { LAUNCH_MODE } from '../config/launch';
 
 export function mapDbEvent(row) {
   const eventDate = new Date(`${row.event_date}T00:00:00`);
@@ -47,14 +48,19 @@ export const isUpcomingEvent = (e) => {
 // as fabricated sessions someone could try to book.
 const NOT_CONFIGURED = new Error('Supabase is not configured.');
 
+// Temporary launch (src/config/launch.js): the public site lists no session
+// from the database — every consumer of this hook is a public listing, so
+// they all show their empty state. Admin screens query events themselves.
+const fetchesEvents = isSupabaseConfigured && !LAUNCH_MODE;
+
 export function useEvents() {
   const [events, setEvents] = useState([]);
-  const [source, setSource] = useState(isSupabaseConfigured ? 'live' : 'offline');
-  const [loading, setLoading] = useState(isSupabaseConfigured);
-  const [error, setError] = useState(isSupabaseConfigured ? null : NOT_CONFIGURED);
+  const [source, setSource] = useState(LAUNCH_MODE ? 'launch' : isSupabaseConfigured ? 'live' : 'offline');
+  const [loading, setLoading] = useState(fetchesEvents);
+  const [error, setError] = useState(isSupabaseConfigured || LAUNCH_MODE ? null : NOT_CONFIGURED);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!fetchesEvents) return;
     let cancelled = false;
 
     supabase

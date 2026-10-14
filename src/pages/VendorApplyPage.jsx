@@ -9,6 +9,7 @@ import { FORMS_OFFLINE_MESSAGE } from '../lib/enquiries';
 import { useUserAuth } from '../context/UserAuthContext';
 import { RequireAuthToApply } from '../components/apply/RequireAuthToApply';
 import { ApplicationReceivedNotice } from '../components/apply/ApplicationReceivedNotice';
+import { LAUNCH_MODE } from '../config/launch';
 
 export const VendorApplyPage = () => {
   const navigate = useNavigate();
@@ -62,13 +63,14 @@ export const VendorApplyPage = () => {
       <Navbar />
 
       <section className="relative pt-32 pb-16 px-6 max-w-5xl mx-auto text-center border-b-2 border-[#E7D5A4]/40">
-        <button
+        {/* Temporary launch: /join is "Coming soon". */}
+        {!LAUNCH_MODE && <button
           type="button"
           onClick={() => navigate('/join')}
           className="mb-3 font-mono text-[10px] font-bold text-[#E7D5A4]/60 hover:text-[#C69A32] uppercase tracking-wider"
         >
           ← CHANGE HOW YOU'RE JOINING
-        </button>
+        </button>}
         <span className="font-mono text-xs text-[#C69A32] tracking-[0.35em] uppercase font-bold mb-3 block">
           TANGY PARTNERSHIPS // VENDOR DESK
         </span>

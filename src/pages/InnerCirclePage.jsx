@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { LAUNCH_MODE } from '../config/launch';
+import { ComingSoonPanel } from '../components/launch/ComingSoon';
 
 const MEMBERSHIP_TIERS = [
   {
@@ -185,7 +187,10 @@ export const InnerCirclePage = () => {
             </p>
           </div>
 
-          {submitted ? (
+          {/* Temporary launch: this form saves nothing yet, so it isn't offered. */}
+          {LAUNCH_MODE ? (
+            <ComingSoonPanel title="Membership opens soon" text="The Inner Circle mailing list isn’t open yet." />
+          ) : submitted ? (
             <div className="text-center py-8 border-2 border-[#C99A2E]/40">
               <div className="display text-5xl text-[#C99A2E] mb-3">✦</div>
               <h3 className="display text-3xl text-[#E3D4AC] mb-2">WELCOME TO THE CIRCLE</h3>

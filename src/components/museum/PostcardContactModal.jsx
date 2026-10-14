@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useAudio } from '../../audio/AudioContext';
+import { LAUNCH_MODE } from '../../config/launch';
+import { ComingSoonPanel } from '../launch/ComingSoon';
 
 export const PostcardContactModal = ({ isOpen, onClose }) => {
   const { playSFX } = useAudio();
@@ -42,7 +44,10 @@ export const PostcardContactModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {isMailed ? (
+        {/* Temporary launch: this form sends nothing yet, so it isn't offered. */}
+        {LAUNCH_MODE ? (
+          <ComingSoonPanel title="Postcards open soon" text="The correspondence desk isn’t sending messages yet." />
+        ) : isMailed ? (
           <div className="py-12 flex flex-col items-center gap-4 text-center animate-bounce">
             <div className="w-16 h-16 rounded-full bg-[#c2272a] text-[#ecdcaf] flex items-center justify-center font-poster text-2xl">
               ✓

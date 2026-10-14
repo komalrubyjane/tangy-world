@@ -6,7 +6,11 @@
 // `match` lists extra path prefixes that belong to a section, so the parent
 // stays highlighted on nested pages (e.g. /sessions/:slug, /blogs → Diary).
 // `heading` is text the destination page's <h1> contains (used by the tests).
-export const NAV_SECTIONS = [
+// `launchHidden` items are left out during the temporary launch
+// (src/config/launch.js) — their routes show "Coming soon".
+import { LAUNCH_MODE } from './launch.js';
+
+const ALL_SECTIONS = [
   {
     title: 'About',
     path: '/about',
@@ -26,7 +30,7 @@ export const NAV_SECTIONS = [
       { label: 'Upcoming Sessions', path: '/sessions', heading: 'UPCOMING' },
       { label: 'Concert Culture', path: '/sessions/concert-culture', heading: 'CONCERT' },
       { label: 'Session Calendar', path: '/sessions/calendar', heading: 'CALENDAR' },
-      { label: 'Join Waitlist', path: '/sessions/waitlist', heading: 'WAITLIST' },
+      { label: 'Join Waitlist', path: '/sessions/waitlist', heading: 'WAITLIST', launchHidden: true },
       { label: 'Previous Sessions', path: '/sessions/archive', heading: 'PREVIOUS' },
     ],
   },
@@ -51,10 +55,10 @@ export const NAV_SECTIONS = [
     match: ['/artist', '/artists'],
     items: [
       { label: 'Artists Directory', path: '/artist', heading: 'ARTIST' },
-      { label: 'Apply as an Artist', path: '/artist/apply', heading: 'APPLY' },
-      { label: 'Artist Login', path: '/artist/login', heading: 'STAGE' },
+      { label: 'Apply as an Artist', path: '/artist/apply', heading: 'APPLY', launchHidden: true },
+      { label: 'Artist Login', path: '/artist/login', heading: 'STAGE', launchHidden: true },
       // Signed-in area: signed-out visitors are sent to /artist/login.
-      { label: 'Artist Portal', path: '/artist/dashboard', heading: 'ARTIST', protected: true },
+      { label: 'Artist Portal', path: '/artist/dashboard', heading: 'ARTIST', protected: true, launchHidden: true },
     ],
   },
   {
@@ -110,6 +114,10 @@ export const NAV_SECTIONS = [
     ],
   },
 ];
+
+export const NAV_SECTIONS = LAUNCH_MODE
+  ? ALL_SECTIONS.map((s) => ({ ...s, items: s.items.filter((i) => !i.launchHidden) }))
+  : ALL_SECTIONS;
 
 const under = (pathname, prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`);
 

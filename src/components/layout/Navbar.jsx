@@ -5,6 +5,7 @@ import { useUserAuth } from '../../context/UserAuthContext';
 import { useLenis } from './LenisProvider';
 import { HOME_CHAPTERS } from '../../data/homeChapters';
 import { NAV_SECTIONS, sectionFor } from '../../config/siteNav';
+import { LAUNCH_MODE } from '../../config/launch';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -166,7 +167,8 @@ export const Navbar = () => {
           </span>
         )}
 
-        {isLoggedIn && (
+        {/* Temporary launch: the Passport isn't open (src/config/launch.js). */}
+        {isLoggedIn && !LAUNCH_MODE && (
           <div className="hidden xl:flex items-center gap-2">
             <button
               onClick={() => handleNav('/profile')}
@@ -268,7 +270,7 @@ export const Navbar = () => {
 
           {/* Utilities that live in the desktop header */}
           <div className="index-item flex flex-wrap gap-3 mt-8" style={{ '--i': navCategories.length + 1 }}>
-            {isLoggedIn && (
+            {isLoggedIn && !LAUNCH_MODE && (
               <button onClick={() => handleNav('/profile')} className="t-btn t-btn-ghost text-[#EFE2C0]">Profile / Passport</button>
             )}
             {isAdminUser && (

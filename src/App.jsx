@@ -23,6 +23,14 @@ import { ProgrammeBoardModal } from './components/museum/ProgrammeBoardModal';
 import { ArchiveSpreadModal } from './components/museum/ArchiveSpreadModal';
 import { GlobalDock } from './components/museum/GlobalDock';
 
+// Temporary public launch (src/config/launch.js, docs/LAUNCH.md): routes for
+// features that aren't open yet render "Coming soon" instead.
+import { LAUNCH_MODE } from './config/launch';
+import { ComingSoonPage } from './components/launch/ComingSoon';
+const ACCOUNTS_SOON = { title: 'Accounts coming soon', text: 'Tangy accounts, the Passport and sign-in aren’t open yet. You can still explore the site and register for our next session.' };
+const ARTIST_SOON = { title: 'Artist portal coming soon', text: 'Artist sign-in and online artist applications open soon.', back: { to: '/artist', label: 'Artists directory' } };
+const held = (element, soon) => (LAUNCH_MODE ? <ComingSoonPage {...soon} /> : element);
+
 // Dedicated Standalone Pages
 const CollaboratePage = lazy(() => import('./pages/CollaboratePage').then((m) => ({ default: m.CollaboratePage })));
 const BookingPage = lazy(() => import('./pages/BookingPage').then((m) => ({ default: m.BookingPage })));
@@ -378,7 +386,7 @@ export default function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/sessions" element={<SessionsPage />} />
                 {/* One page per session; /book/:id is the older alias. */}
-                <Route path="/sessions/:sessionId" element={<BookingPage />} />
+                <Route path="/sessions/:sessionId" element={held(<BookingPage />, { title: 'Booking opens soon', text: 'Online booking isn’t open yet. Register for our next session from the Sessions page.', back: { to: '/sessions', label: 'See our next session' } })} />
                 <Route path="/archive" element={<ArchivePage />} />
                 <Route path="/crew" element={<CrewPage />} />
                 <Route path="/apply/crew" element={<Navigate to="/crew/apply" replace />} />
@@ -441,15 +449,15 @@ export default function App() {
                 {/* Public artist pages (artist navbar). */}
                 <Route path="/artist" element={<ArtistLayout />}>
                   <Route index element={<ArtistsDirectoryPage />} />
-                  <Route path="login" element={<LoginPage />} />
+                  <Route path="login" element={held(<LoginPage />, { ...ARTIST_SOON, bare: true })} />
                   <Route path="profile/:id" element={<ArtistDetailsPage />} />
                 </Route>
                 {/* The application (any signed-in person) and its status. */}
-                <Route path="/artist/apply" element={<ArtistApplyPage />} />
+                <Route path="/artist/apply" element={held(<ArtistApplyPage />, ARTIST_SOON)} />
                 <Route path="/artist/register" element={<Navigate to="/artist/apply" replace />} />
-                <Route path="/artist/application" element={<ArtistApplicationStatusPage />} />
+                <Route path="/artist/application" element={held(<ArtistApplicationStatusPage />, ARTIST_SOON)} />
                 {/* The Artist Portal: one shell, every section its own route. */}
-                <Route element={<ArtistPortalShell />}>
+                <Route element={held(<ArtistPortalShell />, ARTIST_SOON)}>
                   <Route path="/artist/dashboard" element={<PortalDashboardPage />} />
                   <Route path="/artist/dashboard/:tab" element={<LegacyArtistTab />} />
                   <Route path="/artist/dashboard/:tab/:sub" element={<LegacyArtistTab />} />
@@ -472,16 +480,16 @@ export default function App() {
 
                 {/* ===================== REAL ROLE-BASED ACCOUNT DASHBOARDS ===================== */}
                 {/* Supabase Auth (UserAuthContext) + RLS — see src/config/auth.js (AUTH_MODE). */}
-                <Route path="/join" element={<JoinPage />} />
-                <Route path="/join/login" element={<JoinLoginPage />} />
+                <Route path="/join" element={held(<JoinPage />, ACCOUNTS_SOON)} />
+                <Route path="/join/login" element={held(<JoinLoginPage />, ACCOUNTS_SOON)} />
 
                 {/* "/dashboard" is the universal post-login landing point — every
                     login/signup flow sends every role here, and DashboardRedirect
                     reads the authoritative profiles.role to send each role on to
                     its own dashboard (or render Patron's directly for role='user'). */}
-                <Route path="/profile" element={<ProtectedRoute><PassportProfilePage /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
-                <Route path="/dashboard/:tab" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
+                <Route path="/profile" element={held(<ProtectedRoute><PassportProfilePage /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/dashboard" element={held(<ProtectedRoute><DashboardRedirect /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/dashboard/:tab" element={held(<ProtectedRoute><DashboardRedirect /></ProtectedRoute>, ACCOUNTS_SOON)} />
                 {/* No `allowedRoles` here, deliberately — these must stay reachable by a
                     still-role='user' PENDING applicant so they can see their own
                     application status (each dashboard's own isApproved gate handles
@@ -489,21 +497,21 @@ export default function App() {
                     at the route level would bounce a pending applicant back to
                     /dashboard before ever showing their status. RLS (self-row only)
                     is the real security boundary — see ProtectedRoute.jsx's own note. */}
-                <Route path="/vendor/dashboard" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
-                <Route path="/vendor/dashboard/:tab" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
-                <Route path="/vendor/dashboard/:tab/:sub" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
-                <Route path="/crew/dashboard" element={<ProtectedRoute><CrewDashboard /></ProtectedRoute>} />
-                <Route path="/crew/dashboard/:tab" element={<ProtectedRoute><CrewDashboard /></ProtectedRoute>} />
-                <Route path="/volunteer/dashboard" element={<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>} />
-                <Route path="/volunteer/dashboard/:tab" element={<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>} />
-                <Route path="/sponsor/dashboard" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
-                <Route path="/sponsor/dashboard/:tab" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
-                <Route path="/sponsor/dashboard/:tab/:sub" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
-                <Route path="/venue/dashboard" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
-                <Route path="/venue/dashboard/:tab" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
-                <Route path="/venue/dashboard/:tab/:sub" element={<ProtectedRoute><VenueDashboard /></ProtectedRoute>} />
-                <Route path="/private/dashboard" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
-                <Route path="/private/dashboard/:tab" element={<ProtectedRoute><PrivateDashboard /></ProtectedRoute>} />
+                <Route path="/vendor/dashboard" element={held(<ProtectedRoute><VendorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/vendor/dashboard/:tab" element={held(<ProtectedRoute><VendorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/vendor/dashboard/:tab/:sub" element={held(<ProtectedRoute><VendorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/crew/dashboard" element={held(<ProtectedRoute><CrewDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/crew/dashboard/:tab" element={held(<ProtectedRoute><CrewDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/volunteer/dashboard" element={held(<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/volunteer/dashboard/:tab" element={held(<ProtectedRoute><VolunteerDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/sponsor/dashboard" element={held(<ProtectedRoute><SponsorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/sponsor/dashboard/:tab" element={held(<ProtectedRoute><SponsorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/sponsor/dashboard/:tab/:sub" element={held(<ProtectedRoute><SponsorDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/venue/dashboard" element={held(<ProtectedRoute><VenueDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/venue/dashboard/:tab" element={held(<ProtectedRoute><VenueDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/venue/dashboard/:tab/:sub" element={held(<ProtectedRoute><VenueDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/private/dashboard" element={held(<ProtectedRoute><PrivateDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
+                <Route path="/private/dashboard/:tab" element={held(<ProtectedRoute><PrivateDashboard /></ProtectedRoute>, ACCOUNTS_SOON)} />
 
                 {/* Legacy/documented aliases from the removed mock account system. */}
                 <Route path="/admin-mock" element={<Navigate to="/admin-portal" replace />} />
@@ -526,7 +534,7 @@ export default function App() {
                 <Route path="/sessions/upcoming" element={<Navigate to="/sessions" replace />} />
                 <Route path="/sessions/concert-culture" element={<ConcertCulturePage />} />
                 <Route path="/sessions/calendar" element={<SessionCalendarPage />} />
-                <Route path="/sessions/waitlist" element={<WaitlistPage />} />
+                <Route path="/sessions/waitlist" element={held(<WaitlistPage />, { title: 'Waitlist coming soon', back: { to: '/sessions', label: 'See our next session' } })} />
 
                 {/* Archive */}
                 {/* Previous sessions live under Sessions; the old archive URL redirects. */}

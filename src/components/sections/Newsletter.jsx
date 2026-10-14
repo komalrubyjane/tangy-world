@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAudio } from '../../audio/AudioContext';
 import { useReveal } from '../../hooks/useReveal';
+import { LAUNCH_MODE } from '../../config/launch';
 
 // 09 — INNER CIRCLE. Deliberately the simplest section on the page:
 // burgundy, one line, one field, one button.
@@ -30,7 +31,10 @@ export const Newsletter = () => {
           &ldquo;The best stories are shared with those who stay close.&rdquo;
         </p>
 
-        {status === 'SUCCESS' ? (
+        {/* Temporary launch: this form saves nothing yet, so it isn't offered. */}
+        {LAUNCH_MODE ? (
+          <p className="reveal d3 t-label text-[#EFE2C0]/80 mt-10 mb-0">The Inner Circle mailing list opens soon.</p>
+        ) : status === 'SUCCESS' ? (
           <div className="mt-10 inline-block text-left border-[3px] border-double border-[#EFE2C0]/40 p-6">
             <h3 className="t-h3 text-[#EFE2C0] m-0">You&rsquo;re in the circle ✦</h3>
             <p className="t-small text-[#EFE2C0]/80 mt-2 mb-5">Check your inbox for session confirmation.</p>

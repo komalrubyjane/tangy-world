@@ -3,12 +3,16 @@ import { Footer } from '../components/layout/Footer';
 import { SectionNav } from '../components/layout/SectionNav';
 import { UpcomingSessionsGrid } from '../components/sessions/UpcomingSessionsGrid';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { LAUNCH_MODE } from '../config/launch';
+import { TemporarySession } from '../components/launch/TemporarySession';
 
 // /sessions — Upcoming Sessions. Concert Culture, the Session Calendar and the
 // Waitlist are their own pages (/sessions/concert-culture, /sessions/calendar,
 // /sessions/waitlist), linked from the section navigation.
 export const SessionsPage = () => {
-  usePageMeta({ title: 'Upcoming Sessions', description: 'Upcoming Tangy sessions — live music in Hyderabad’s heritage spaces. Book tickets or join the waitlist.' });
+  usePageMeta({ title: 'Upcoming Sessions', description: LAUNCH_MODE
+    ? 'Tangy Sessions — live music in Hyderabad’s heritage spaces. Register for our next session.'
+    : 'Upcoming Tangy sessions — live music in Hyderabad’s heritage spaces. Book tickets or join the waitlist.' });
 
   return (
     <div className="theme-sessions min-h-screen text-[#E7D5A4] font-mono selection:bg-[#181614] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
@@ -30,14 +34,17 @@ export const SessionsPage = () => {
             UPCOMING<br/>SESSIONS
           </h1>
           <p className="font-mono text-xs sm:text-sm text-[#E7D5A4]/80 tracking-widest max-w-3xl mx-auto leading-relaxed border-y border-[#11100C] py-3 sm:py-4 uppercase">
-            EVERY CONFIRMED SESSION ON THE 2026 CALENDAR, BOOKABLE DIRECTLY FROM THIS PAGE.
+            {LAUNCH_MODE
+              ? 'NEW SESSIONS ARE COMING SOON. REGISTER FOR OUR NEXT SESSION BELOW.'
+              : 'EVERY CONFIRMED SESSION ON THE 2026 CALENDAR, BOOKABLE DIRECTLY FROM THIS PAGE.'}
           </p>
 
           <SectionNav className="mt-6" />
         </div>
       </section>
 
-      <UpcomingSessionsGrid />
+      {/* Temporary launch: one designated session instead of the live listing. */}
+      {LAUNCH_MODE ? <TemporarySession /> : <UpcomingSessionsGrid />}
 
       <Footer />
     </div>

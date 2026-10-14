@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEvents, isUpcomingEvent } from '../../hooks/useEvents';
+import { LAUNCH_MODE } from '../../config/launch';
 
 const MONTH = (d) => new Date(`${d}T00:00:00`).toLocaleDateString('en-IN', { month: 'short' }).toUpperCase();
 const DAY = (d) => new Date(`${d}T00:00:00`).getDate();
@@ -22,7 +23,7 @@ export const TangyCalendar = () => {
           <Link to="/sessions/calendar" className="t-btn t-btn-light self-start md:self-auto" data-calendar-all>View full calendar →</Link>
         </header>
         {loading && <p className="t-label text-[#EFE2C0]/70 mt-8" role="status">Loading dates…</p>}
-        {!loading && (error || upcoming.length === 0) && <p className="t-label text-[#EFE2C0]/70 mt-8">New dates are being scheduled — <Link className="underline" to="/sessions/waitlist">join the waitlist</Link>.</p>}
+        {!loading && (error || upcoming.length === 0) && <p className="t-label text-[#EFE2C0]/70 mt-8">New dates are being scheduled — {LAUNCH_MODE ? <Link className="underline" to="/sessions">see our next session</Link> : <Link className="underline" to="/sessions/waitlist">join the waitlist</Link>}.</p>}
         <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px mt-8 list-none m-0 p-0 bg-[#EFE2C0]/15 border border-[#EFE2C0]/15" data-home-calendar>
           {upcoming.map((e) => (
             <li key={e.id} className="bg-[#1d1813]">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { useAudio } from '../../audio/AudioContext';
+import { LAUNCH_MODE } from '../../config/launch';
 
 export const ArtistDetailsPage = () => {
   const { id } = useParams();
@@ -30,6 +31,8 @@ export const ArtistDetailsPage = () => {
         if (!data) { setStatus('notfound'); return; }
         setArtist(data);
         setStatus('ready');
+        // Temporary launch: no session is offered publicly.
+        if (LAUNCH_MODE) return;
 
         supabase
           .from('event_artists')

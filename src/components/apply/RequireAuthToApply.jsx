@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/UserAuthContext';
 import { EmailOtpAuth } from '../auth/EmailOtpAuth';
+import { LAUNCH_MODE } from '../../config/launch';
+import { ComingSoonPanel } from '../launch/ComingSoon';
 
 // Gates a role application form behind a real, authenticated Supabase
 // session — "Do NOT allow anonymous applications." The RLS insert policies
@@ -22,6 +24,15 @@ export const RequireAuthToApply = ({ roleLabel, children, title, intro, showJoin
 
   if (loading) return null;
   if (isLoggedIn) return children;
+  // Temporary launch: public sign-in isn't open, so the form can't be sent.
+  if (LAUNCH_MODE) {
+    return (
+      <ComingSoonPanel
+        title={roleLabel ? `${roleLabel} applications open soon` : 'Online messages open soon'}
+        text={roleLabel ? 'Online applications need a Tangy account, and accounts aren’t open yet.' : 'Sending this form needs a Tangy account, and accounts aren’t open yet.'}
+      />
+    );
+  }
 
   return (
     <div className="bg-black/10 border-2 border-current p-6 sm:p-8 flex flex-col gap-5">

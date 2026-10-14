@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../../audio/AudioContext';
 import { NotificationBell } from '../../portal/NotificationBell';
+import { LAUNCH_MODE } from '../../config/launch';
 
 // Artist workspace navigation. Sections that live as tabs inside the
 // dashboard have their own URLs (/artist/dashboard/<section>).
@@ -81,7 +82,7 @@ export const ArtistNavbar = () => {
               </button>
             ))}
           </>
-        ) : (
+        ) : !LAUNCH_MODE && (
           <>
             <button 
               onClick={() => handleNav('/artist/login')}
@@ -162,7 +163,7 @@ export const ArtistNavbar = () => {
                   </button>
                 ))}
               </>
-            ) : (
+            ) : !LAUNCH_MODE && (
               <>
                 <button
                   onClick={() => handleNav('/artist/login')}

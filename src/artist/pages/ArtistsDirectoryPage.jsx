@@ -6,6 +6,7 @@ import { PhotoTreatment } from '../../components/ui/PhotoTreatment';
 import { TextileBorderStrip } from '../../components/ui/CulturalMotifs';
 import { ArchiveStamp } from '../../components/ui/ArchiveStamp';
 import { RangoliDecoration, LotusStamp, PatternBackground, RetroGrain } from '../../components/ui/RetroAssets';
+import { LAUNCH_MODE } from '../../config/launch';
 
 // Each poster card cycles through one of these spot-colour fields — real colour
 // blocking per card rather than one uniform card background repeated N times.
@@ -90,12 +91,13 @@ export const ArtistsDirectoryPage = () => {
             </p>
           </div>
 
-          <button
+          {/* Temporary launch: artist applications aren't open yet. */}
+          {!LAUNCH_MODE && <button
             onClick={() => { playSFX('ticketClick'); navigate('/artist/apply'); }}
             className="w-full md:w-auto shrink-0 px-6 py-3.5 bg-[#c2272a] text-[#ecdcaf] font-mono text-xs font-bold uppercase border-2 border-[#191410] shadow-[4px_4px_0px_#191410] hover:bg-[#191410] active:scale-95 transition-all text-center min-h-[44px] rotate-1"
           >
             APPLY AS ARTIST →
-          </button>
+          </button>}
         </div>
       </div>
       <TextileBorderStrip height={11} colorA="#c2272a" colorB="#191410" />

@@ -2,6 +2,7 @@ import { useEvents, isUpcomingEvent } from '../../hooks/useEvents';
 import { useAudio } from '../../audio/AudioContext';
 import { useReveal } from '../../hooks/useReveal';
 import { PosterEventCard } from '../ui/PosterEventCard';
+import { LAUNCH_MODE } from '../../config/launch';
 
 // Posters lie on the archive table at slightly different angles — the same
 // three values every render, not random.
@@ -45,7 +46,11 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
           ))}
         </div>
         {!loading && events.length === 0 && (
-          <p className="t-label text-[#EFE2C0]/70 mt-12 text-center">New sessions are being scheduled — join the waitlist on the sessions page.</p>
+          <p className="t-label text-[#EFE2C0]/70 mt-12 text-center">
+            {LAUNCH_MODE
+              ? <>New sessions coming soon — <a className="underline" href="/sessions">register for our next session</a>.</>
+              : 'New sessions are being scheduled — join the waitlist on the sessions page.'}
+          </p>
         )}
       </div>
     </section>

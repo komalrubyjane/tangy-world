@@ -41,12 +41,12 @@ export const TeamPage = () => {
 
         <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-8 px-2">
           {[
-            { name: 'Jhanavi', file: '002-A' },
-            { name: 'Gopika', file: '002-B' },
-            { name: 'Komal', file: '002-C' },
+            { name: 'xxx', file: '002-A' },
+            { name: 'xxx', file: '002-B' },
+            { name: 'xxx', file: '002-C' },
           ].map((member) => (
             <div
-              key={member.name}
+              key={member.file}
               className="relative bg-[#EFE2C0] paperTexture text-[#15120D] border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] p-6 pt-8 flex flex-col items-center text-center"
             >
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#181614] text-[#EAD9A6] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24] whitespace-nowrap">

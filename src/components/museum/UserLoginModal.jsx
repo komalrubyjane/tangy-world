@@ -9,6 +9,7 @@ import { EmailOtpAuth } from '../auth/EmailOtpAuth';
 // DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note.
 import { DEMO_ADMIN_ENABLED } from '../../config/demoAdmin';
 import { TEAM_REVIEW_MODE } from '../../config/teamReview';
+import { LAUNCH_MODE, COMING_SOON_EMAIL } from '../../config/launch';
 
 // The quick-login modal is the site's main "Login" entry point (opened from
 // MuseumQuickDock's LOGIN button and BookingPage's "log in to book" prompts
@@ -86,8 +87,11 @@ export const UserLoginModal = () => {
     closeLoginModal();
   };
 
-  const showRoleStep = !isLoggedIn && step === 'role';
-  const showAuthStep = !isLoggedIn && step === 'auth';
+  // Temporary launch: every "Login" / "sign in to …" entry point lands here,
+  // and says accounts are coming soon instead of offering sign-up.
+  const comingSoon = LAUNCH_MODE && !isLoggedIn;
+  const showRoleStep = !comingSoon && !isLoggedIn && step === 'role';
+  const showAuthStep = !comingSoon && !isLoggedIn && step === 'auth';
 
   return (
     <div className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-[#11100C]/80 backdrop-blur-sm animate-fadeIn">
@@ -118,10 +122,12 @@ export const UserLoginModal = () => {
             {showRoleStep ? 'Tangy membership desk' : 'Tangy patron portal'}
           </p>
           <h2 id="login-modal-title" className="display text-[2rem] sm:text-[2.6rem] leading-[0.95] mt-2 mb-0">
-            {isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : loginReason ? `SIGN IN ${loginReason}` : 'CREATE YOUR ACCOUNT'}
+            {comingSoon ? 'ACCOUNTS COMING SOON' : isLoggedIn ? 'PATRON PROFILE' : showRoleStep ? 'HOW ARE YOU JOINING TANGY?' : loginReason ? `SIGN IN ${loginReason}` : 'CREATE YOUR ACCOUNT'}
           </h2>
           <p className="t-quote text-[1.05rem] sm:text-[1.15rem] text-[#181614]/80 mt-2 mb-0">
-            {isLoggedIn
+            {comingSoon
+              ? 'Sign-in, the Tangy Passport and online booking open soon.'
+              : isLoggedIn
               ? 'Access your digital passport, concert stamps & member perks.'
               : showRoleStep
               ? 'Choose how you participate in the Tangy world.'
@@ -129,6 +135,22 @@ export const UserLoginModal = () => {
           </p>
         </header>
         <hr className="archivalRule mb-5" />
+
+        {comingSoon && (
+          <div className="flex flex-col gap-4" data-coming-soon>
+            <p className="t-small m-0">
+              You can explore the site and register for our next session from the Sessions page.
+              For anything else, write to <a href={`mailto:${COMING_SOON_EMAIL}`} className="underline font-bold">{COMING_SOON_EMAIL}</a>.
+            </p>
+            <button
+              type="button"
+              onClick={() => { closeLoginModal(); navigate('/sessions'); }}
+              className="t-btn self-start min-h-[44px]"
+            >
+              See our next session →
+            </button>
+          </div>
+        )}
 
         {showRoleStep && (
           <div className="flex flex-col gap-5">

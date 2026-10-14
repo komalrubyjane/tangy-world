@@ -6,6 +6,7 @@ import { useContent, formatDate } from '../../hooks/useContent';
 import { usePageMeta } from '../../hooks/usePageMeta';
 import { ContentLoading, ContentError } from '../../components/ui/ContentStates';
 import { NotFoundPage } from './NotFoundPage';
+import { LAUNCH_MODE } from '../../config/launch';
 
 const LINKS = [['instagram', 'Instagram'], ['spotify', 'Spotify'], ['soundcloud', 'SoundCloud'], ['youtube', 'YouTube']];
 const href = (v) => (/^https:\/\//.test(v || '') ? v : null);
@@ -21,7 +22,8 @@ export const ArtistPage = () => {
 
   if (!loading && !error && !artist) return <NotFoundPage what="artist" back={{ to: '/artist', label: 'All artists' }} />;
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = (sessions || []).filter((s) => s.event_date >= today && s.status !== 'draft');
+  // Temporary launch: no session is offered publicly, so none is listed as upcoming.
+  const upcoming = LAUNCH_MODE ? [] : (sessions || []).filter((s) => s.event_date >= today && s.status !== 'draft');
   const past = (sessions || []).filter((s) => s.event_date < today);
 
   return (
