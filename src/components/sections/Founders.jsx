@@ -120,15 +120,15 @@ export const Founders = () => {
       <LotusStamp index={3} bg="transparent" border="#D19A24" className="lg:hidden absolute top-[8%] left-4 w-9 h-9 opacity-90 z-10" />
 
       {/* ARCHIVAL METADATA */}
-      <div className="absolute top-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#D19A24] font-bold pointer-events-none uppercase hidden md:block">
+      <div className="absolute top-8 left-8 z-20 font-mono text-[10px] md:text-[10px] tracking-[0.25em] text-[#D19A24] font-bold pointer-events-none uppercase hidden md:block">
         TANGY SESSIONS // FOUNDERS ARCHIVE
       </div>
 
-      <div className="absolute top-8 right-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#EAD9A6]/60 pointer-events-none uppercase hidden md:block">
+      <div className="absolute top-8 right-8 z-20 font-mono text-[10px] md:text-[10px] tracking-[0.25em] text-[#EAD9A6]/60 pointer-events-none uppercase hidden md:block">
         PROPERTY OF TANGY SESSIONS
       </div>
 
-      <div className="absolute bottom-8 left-8 z-20 font-mono text-[9px] md:text-[10px] tracking-[0.25em] text-[#EAD9A6]/60 pointer-events-none uppercase hidden md:block">
+      <div className="absolute bottom-8 left-8 z-20 font-mono text-[10px] md:text-[10px] tracking-[0.25em] text-[#EAD9A6]/60 pointer-events-none uppercase hidden md:block">
         STRICTLY CONFIDENTIAL // HYD 17°23'N
       </div>
 
@@ -156,7 +156,7 @@ export const Founders = () => {
           >
             
             {/* MANILA TAB */}
-            <div className="absolute -top-6 left-6 bg-[#181614] text-[#EAD9A6] px-4 py-1 font-mono text-[9px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24]">
+            <div className="absolute -top-6 left-6 bg-[#181614] text-[#EAD9A6] px-4 py-1 font-mono text-[10px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24]">
               FILE {founder.id} // {founder.tag}
             </div>
 
@@ -172,7 +172,7 @@ export const Founders = () => {
             </div>
 
             <div>
-              <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B9471B] border-b-2 border-[#15120D] pb-3 mb-6 uppercase">
+              <div className="flex justify-between items-center font-mono text-[10px] font-bold text-[#B9471B] border-b-2 border-[#15120D] pb-3 mb-6 uppercase">
                 <span>FOUNDER FILE // {founder.year}</span>
                 <span>HYDERABAD</span>
               </div>
@@ -188,7 +188,7 @@ export const Founders = () => {
               {/* POLAROID PHOTO */}
               <div className="relative w-[140px] sm:w-[180px] md:w-[230px] paper-surface p-2.5 pb-8 border-2 border-[#15120D] shadow-md rotate-[-3deg] my-4 transition-transform group-hover:scale-105">
                 <img src={founder.image} alt={founder.name} className="w-full aspect-[3/4] object-cover filter grayscale contrast-130 border border-[#15120D]" />
-                <p className="font-mono text-[8px] text-[#15120D] font-bold tracking-wider mt-2">✎ FOUNDER ARCHIVE // {founder.year}</p>
+                <p className="font-mono text-[10px] text-[#15120D] font-bold tracking-wider mt-2">✎ FOUNDER ARCHIVE // {founder.year}</p>
                 {idx === 0 && <HandDrawnCircle color="#5A120D" className="hidden md:block absolute -inset-3 opacity-40 pointer-events-none" />}
               </div>
 
@@ -199,7 +199,7 @@ export const Founders = () => {
             </div>
 
             {/* SIGNATURE STAMP FOOTER */}
-            <div className="pt-4 border-t-2 border-dashed border-[#15120D] flex justify-between items-center font-mono text-[9px] opacity-80">
+            <div className="pt-4 border-t-2 border-dashed border-[#15120D] flex justify-between items-center font-mono text-[10px] opacity-80">
               <span className="font-bold uppercase">SIGNATURE: {founder.name}</span>
               <span className="text-[#5A120D] font-bold">VERIFIED ✦</span>
             </div>

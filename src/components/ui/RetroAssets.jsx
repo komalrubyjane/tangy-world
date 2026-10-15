@@ -120,7 +120,7 @@ export const PosterFragment = ({
         <img src={resolvedSrc} alt={alt} loading="lazy" decoding="async" className="block w-full h-full object-cover" />
       </div>
       {caption && (
-        <p className="absolute bottom-1 left-0 right-0 text-center font-mono text-[7.5px] font-bold uppercase tracking-widest text-[#11100C]/70">
+        <p className="absolute bottom-1 left-0 right-0 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-[#11100C]/70">
           {caption}
         </p>
       )}

@@ -17,13 +17,13 @@ export const BotanicalRoseInk = () => null;
 // 7. Vintage Cassette Tape & Reel Label Graphic
 export const CassetteTapeGraphic = ({ className = "" }) => (
   <div className={`pointer-events-none z-10 bg-[#11100C] text-[#E7D5A4] p-3 border-2 border-[#E7D5A4] shadow-xl rotate-[-4deg] ${className}`}>
-    <div className="flex justify-between font-mono text-[8px] border-b border-[#E7D5A4]/40 pb-1 mb-2 font-bold uppercase">
+    <div className="flex justify-between font-mono text-[10px] border-b border-[#E7D5A4]/40 pb-1 mb-2 font-bold uppercase">
       <span>TANGY AUDIO REEL</span>
       <span>60 MIN</span>
     </div>
     <div className="flex items-center justify-around bg-[#E7D5A4] text-[#11100C] p-2 border border-[#11100C]">
       <div className="w-6 h-6 rounded-full border-2 border-[#11100C] border-dashed animate-spin" />
-      <span className="font-mono text-[7px] font-bold tracking-widest uppercase">SIDE A</span>
+      <span className="font-mono text-[10px] font-bold tracking-widest uppercase">SIDE A</span>
       <div className="w-6 h-6 rounded-full border-2 border-[#11100C] border-dashed animate-spin" />
     </div>
   </div>
@@ -37,10 +37,10 @@ export const FloralCutoutAccent = ({ className = "" }) => (
 // 8. Torn Newspaper Fragment Graphic
 export const TornNewspaperScrap = ({ className = "" }) => (
   <div className={`pointer-events-none z-10 bg-[#E7D5A4] p-3 border border-[#11100C]/40 shadow-md rotate-[-3deg] ${className}`}>
-    <div className="font-mono text-[7px] text-[#11100C]/70 leading-tight uppercase tracking-tighter">
+    <div className="font-mono text-[10px] text-[#11100C]/70 leading-tight uppercase tracking-tighter">
       <div>HYDERABAD DAILY PRESS // ISSUE 1974</div>
       <div className="border-b border-[#11100C]/30 my-1" />
-      <p className="font-serif italic normal-case text-[9px] text-[#11100C] leading-snug">
+      <p className="font-serif italic normal-case text-[10px] text-[#11100C] leading-snug">
         "Secret concerts held under full moon arches..."
       </p>
     </div>
@@ -105,14 +105,14 @@ export const PressedFlower = ({ className = "" }) => (
 
 // 15. Tangy Sessions Performer Pass Ticket Stub
 export const PerformerPassStub = ({ date = "21/09/75", className = "" }) => (
-  <div className={`pointer-events-none z-20 bg-[#D3B480] text-[#3D2517] p-2.5 border border-[#3D2517] shadow-md font-mono text-[8px] font-bold flex flex-col gap-1 uppercase rotate-[-2deg] ${className}`}>
+  <div className={`pointer-events-none z-20 bg-[#D3B480] text-[#3D2517] p-2.5 border border-[#3D2517] shadow-md font-mono text-[10px] font-bold flex flex-col gap-1 uppercase rotate-[-2deg] ${className}`}>
     <div className="border-b border-[#3D2517]/40 pb-1 flex justify-between tracking-widest">
       <span>TANGY SESSIONS</span>
       <span>1974</span>
     </div>
-    <div className="text-[9px] font-black tracking-wider text-[#7C2D18]">PERFORMER PASS</div>
-    <div className="text-[7.5px] opacity-80">BACKSTAGE ACCESS</div>
-    <div className="border-t border-[#3D2517]/40 pt-1 text-[7px] flex justify-between">
+    <div className="text-[10px] font-black tracking-wider text-[#7C2D18]">PERFORMER PASS</div>
+    <div className="text-[10px] opacity-80">BACKSTAGE ACCESS</div>
+    <div className="border-t border-[#3D2517]/40 pt-1 text-[10px] flex justify-between">
       <span>DATE: {date}</span>
       <span>VALID ✦</span>
     </div>

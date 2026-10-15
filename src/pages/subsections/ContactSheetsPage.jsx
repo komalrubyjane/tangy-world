@@ -10,7 +10,7 @@ export const ContactSheetsPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -36,7 +36,7 @@ export const ContactSheetsPage = () => {
               {sheet.frames.map((frame, i) => (
                 <div key={i} className="relative aspect-[3/2] overflow-hidden border border-[#E7D5A4]/15">
                   <img src={frame} alt={`${sheet.roll} frame ${i + 1}`} className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125" />
-                  <span className="absolute bottom-0.5 right-1 font-mono text-[6px] sm:text-[7px] text-[#E7D5A4]/70 bg-black/60 px-1">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="absolute bottom-0.5 right-1 font-mono text-[10px] sm:text-[10px] text-[#E7D5A4]/70 bg-black/60 px-1">{String(i + 1).padStart(2, '0')}</span>
                 </div>
               ))}
             </div>

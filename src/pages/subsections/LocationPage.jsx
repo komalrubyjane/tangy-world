@@ -9,7 +9,7 @@ export const LocationPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -26,7 +26,7 @@ export const LocationPage = () => {
 
       <section className="py-12 sm:py-20 max-w-4xl mx-auto px-4 sm:px-6">
         <div className="bg-[#211915] border-2 border-[#C99A2E] p-6 sm:p-10 mb-8 text-center">
-          <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
+          <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
             PRIMARY HERITAGE SANCTUARY
           </span>
           <h3 className="display text-2xl sm:text-4xl text-[#E7D5A4] mb-2">BANSILALPET STEPWELL</h3>
@@ -39,7 +39,7 @@ export const LocationPage = () => {
             { name: 'OLD CITY HAVELI COURTYARD', address: 'Charminar Lane, Hyderabad, Telangana 500002' }
           ].map((v) => (
             <div key={v.name} className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-5 sm:p-6 shadow-[4px_4px_0px_#11100C]">
-              <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1 block">ROTATING VENUE</span>
+              <span className="font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-wider mb-1 block">ROTATING VENUE</span>
               <h4 className="display text-xl sm:text-2xl text-[#11100C] mb-1">{v.name}</h4>
               <p className="font-mono text-xs text-[#11100C]/70">{v.address}</p>
             </div>

@@ -31,7 +31,7 @@ export const TangyCalendar = () => {
                 <span className="w-14 shrink-0 text-center border-r border-[#EFE2C0]/20 pr-3" aria-hidden="true">
                   <span className="block font-mono text-[10px] tracking-widest text-[#C99A2E]">{MONTH(e.rawDate)}</span>
                   <span className="block font-condensed text-3xl leading-none text-[#EFE2C0]">{DAY(e.rawDate)}</span>
-                  <span className="block font-mono text-[9px] tracking-widest text-[#EFE2C0]/60">{WEEKDAY(e.rawDate)}</span>
+                  <span className="block font-mono text-[10px] tracking-widest text-[#EFE2C0]/60">{WEEKDAY(e.rawDate)}</span>
                 </span>
                 <span className="min-w-0">
                   <span className="sr-only">{new Date(`${e.rawDate}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}: </span>

@@ -80,7 +80,7 @@ export const ArtistsDirectoryPage = () => {
 
         <div className="relative flex flex-col md:flex-row justify-between items-start md:items-end gap-5">
           <div className="flex flex-col gap-1 max-w-full">
-            <span className="font-mono text-[8.5px] sm:text-[9px] font-bold text-[#c2272a] tracking-[0.25em] sm:tracking-[0.3em] uppercase">
+            <span className="font-mono text-[10px] sm:text-[10px] font-bold text-[#c2272a] tracking-[0.25em] sm:tracking-[0.3em] uppercase">
               THE ROSTER // BANSILAL STEPWELL SESSIONS
             </span>
             <h1 className="font-poster text-[clamp(2.6rem,10vw,6.5rem)] text-[#191410] leading-[0.82] mt-1 -rotate-1 origin-left">
@@ -184,7 +184,7 @@ export const ArtistsDirectoryPage = () => {
                   >
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <ArchiveStamp text={artist.genre || 'ARTIST'} rotation="4deg" color="dark" className="absolute top-2 right-2 z-10 !text-[8px]" />
+                  <ArchiveStamp text={artist.genre || 'ARTIST'} rotation="4deg" color="dark" className="absolute top-2 right-2 z-10 !text-[10px]" />
                   <LotusStamp
                     index={idx}
                     bg="transparent"
@@ -199,7 +199,7 @@ export const ArtistsDirectoryPage = () => {
                 <div className="absolute inset-x-0 bottom-0 h-[36%] flex flex-col justify-center px-3.5 sm:px-5 py-2 overflow-hidden" style={{ color: palette.text }}>
                   <PatternBackground category="textile" index={idx} opacity={0.12} size="180px" repeat />
                   <div className="flex items-center justify-between relative">
-                    <span className="font-mono text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest opacity-70">PLATE {String(idx + 1).padStart(2, '0')} · LIVE ARCHIVE</span>
+                    <span className="font-mono text-[10px] sm:text-[10px] font-bold uppercase tracking-widest opacity-70">PLATE {String(idx + 1).padStart(2, '0')} · LIVE ARCHIVE</span>
                   </div>
                   <h3
                     className="relative font-poster leading-[0.82] -rotate-1 origin-left -mt-[10%] drop-shadow-[2px_2px_0_rgba(0,0,0,0.35)]"
@@ -209,7 +209,7 @@ export const ArtistsDirectoryPage = () => {
                   </h3>
                   <p className="relative font-sans text-[11px] sm:text-xs opacity-80 line-clamp-1 leading-relaxed mt-1.5">{artist.bio}</p>
                   {artist.city && (
-                    <span className="relative font-mono text-[8px] sm:text-[8.5px] uppercase mt-1.5 tracking-widest" style={{ color: palette.accent }}>
+                    <span className="relative font-mono text-[10px] sm:text-[10px] uppercase mt-1.5 tracking-widest" style={{ color: palette.accent }}>
                       ★ {artist.city}
                     </span>
                   )}

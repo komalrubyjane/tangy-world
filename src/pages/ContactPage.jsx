@@ -11,7 +11,7 @@ export const ContactPage = () => {
       <Navbar />
 
       {/* PAGE HERO */}
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
           <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">CONTACT</span>
@@ -63,16 +63,16 @@ export const ContactPage = () => {
               onClick={() => card.href && window.open(card.href, '_blank', 'noopener,noreferrer')}
             >
               <div className="text-2xl mb-2">{card.icon}</div>
-              <div className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{card.label}</div>
+              <div className="font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{card.label}</div>
               <div className="font-mono text-xs sm:text-sm font-bold text-[#11100C] mb-1">{card.value}</div>
-              <div className="font-mono text-[8px] sm:text-[9px] text-[#11100C]/70 uppercase">{card.sub}</div>
+              <div className="font-mono text-[10px] sm:text-[10px] text-[#11100C]/70 uppercase">{card.sub}</div>
             </div>
           ))}
         </div>
 
         {/* MAP LOCATION DISPLAY */}
         <div className="bg-[#211915] border-2 border-[#C99A2E] p-4 sm:p-8 mb-10 text-center">
-          <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
+          <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2 font-bold">
             PRIMARY HERITAGE SANCTUARY
           </span>
           <h3 className="display text-2xl sm:text-4xl text-[#E7D5A4] mb-2">BANSILALPET STEPWELL</h3>
@@ -81,7 +81,7 @@ export const ContactPage = () => {
 
         {/* CONTACT FORM / EMAIL DISPATCH */}
         <div id="dispatch" className="bg-[#EFE2C0] paperTexture text-[#11100C] p-5 sm:p-10 md:p-14 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] relative">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center font-mono text-[9px] sm:text-xs font-bold text-[#B94717] border-b-2 border-[#11100C] pb-3 mb-5 sm:mb-6 uppercase gap-1">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center font-mono text-[10px] sm:text-xs font-bold text-[#B94717] border-b-2 border-[#11100C] pb-3 mb-5 sm:mb-6 uppercase gap-1">
             <span>TANGY SESSIONS // CORRESPONDENCE FORM</span>
             <span className="hidden sm:block">DISPATCH DESK · HYDERABAD</span>
           </div>
@@ -121,7 +121,7 @@ export const ContactPage = () => {
               >
                 <span className="opacity-60">{s.icon}</span>
                 <span>{s.label}</span>
-                <span className="text-[8px] font-normal normal-case opacity-70">(soon)</span>
+                <span className="text-[10px] font-normal normal-case opacity-70">(soon)</span>
               </span>
             )
           ))}

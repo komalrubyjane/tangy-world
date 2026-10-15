@@ -95,7 +95,7 @@ export function ArtistCalendar({ artistId, linkFor = () => null, view: viewProp,
                 <div key={k} data-day={k} data-day-state={st || ''} className={cx('min-h-[92px] rounded-md border border-[#E7D5A4]/10 p-1 flex flex-col gap-1', st && DAY_TINT[st], d.getMonth() !== anchor.getMonth() && 'opacity-40', k === today && 'border-[#C99A2E]')}>
                   <span className="flex items-center justify-between gap-1">
                     <span className={cx('text-xs', k === today ? 'text-[#C99A2E] font-bold' : 'text-[#E7D5A4]/70')}>{d.getDate()}</span>
-                    {st && st !== 'pending' && <span className="text-[9px] uppercase tracking-wide text-[#E7D5A4]/75">{DAY_LABEL[st]}</span>}
+                    {st && st !== 'pending' && <span className="text-[10px] uppercase tracking-wide text-[#E7D5A4]/75">{DAY_LABEL[st]}</span>}
                   </span>
                   {items.slice(0, 3).map((e, i) => <Entry key={i} e={e} to={linkFor(e)} compact />)}
                   {items.length > 3 && <button type="button" className="text-[10px] text-left text-[#E7D5A4]/70 underline" onClick={() => { setView('week'); setDate(k); }}>+{items.length - 3} more</button>}

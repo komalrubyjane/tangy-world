@@ -66,7 +66,7 @@ export const ContactEnquiryForm = () => {
                 key={type}
                 type="button"
                 onClick={() => setInquiry(type)}
-                className={`px-2.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-wider border transition-colors ${
+                className={`px-2.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider border transition-colors ${
                   inquiry === type
                     ? 'bg-[#11100C] text-[#E7D5A4] border-[#11100C]'
                     : 'bg-[#F5E9C9] text-[#11100C] border-[#11100C]/40 hover:border-[#11100C]'

@@ -10,7 +10,7 @@ export const NotFoundPage = ({ what = 'page', back = { to: '/', label: 'Go to th
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body flex flex-col t-quiet">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center text-center gap-5 px-4 pt-28 pb-16" data-not-found>
+      <main className="flex-1 flex flex-col items-center justify-center text-center gap-5 px-4 pt-20 md:pt-28 pb-10 md:pb-16" data-not-found>
         <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold">404</span>
         <h1 className="display text-4xl sm:text-6xl uppercase m-0">This {what} isn’t here</h1>
         <p className="max-w-md text-xs sm:text-sm text-[#E7D5A4]/75 m-0">It may have moved, been unpublished, or the link may be mistyped.</p>

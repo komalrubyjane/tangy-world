@@ -35,7 +35,7 @@ export const LoginPage = () => {
         {/* LEFT PANEL: PORTAL OVERVIEW & CHECKLIST */}
         <div className="bg-[#181614] text-[#ecdcaf] p-8 border-b-4 md:border-b-0 md:border-r-4 border-[#191410] flex flex-col justify-between">
           <div className="flex flex-col gap-4">
-            <span className="font-mono text-[9px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">
+            <span className="font-mono text-[10px] font-bold text-[#d1a437] tracking-[0.3em] uppercase">
               ARTIST PORTAL // ACCESS CONTROL
             </span>
             <h1 className="font-poster text-4xl text-[#ecdcaf] leading-none">
@@ -65,7 +65,7 @@ export const LoginPage = () => {
             </div>
           </div>
 
-          <div className="font-mono text-[8.5px] text-[#ecdcaf]/60 uppercase border-t border-[#ecdcaf]/15 pt-3">
+          <div className="font-mono text-[10px] text-[#ecdcaf]/60 uppercase border-t border-[#ecdcaf]/15 pt-3">
             TANGY SESSIONS // EST. 2016 // BANSILAL STEPWELL
           </div>
         </div>
@@ -76,11 +76,11 @@ export const LoginPage = () => {
             <button
               type="button"
               onClick={() => navigate('/join')}
-              className="mb-3 font-mono text-[9px] font-bold text-[#241a12]/70 hover:text-[#c2272a] uppercase tracking-wider"
+              className="mb-3 font-mono text-[10px] font-bold text-[#241a12]/70 hover:text-[#c2272a] uppercase tracking-wider"
             >
               ← CHANGE HOW YOU'RE JOINING
             </button>
-            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-widest uppercase">PORTAL CREDENTIALS</span>
+            <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-widest uppercase">PORTAL CREDENTIALS</span>
             <h2 className="font-poster text-3xl text-[#241a12] my-1">SIGN IN TO PORTAL</h2>
             <p className="font-mono text-xs text-[#241a12]/70">No password needed — verify with a one-time code sent to your email.</p>
           </div>
@@ -116,7 +116,7 @@ export const LoginPage = () => {
             <button
               type="button"
               onClick={() => navigate('/demo/artist')}
-              className="w-full text-left font-mono text-[9px] bg-transparent hover:bg-[#191410]/5 p-2.5 border border-dashed border-[#191410]/30 transition-colors"
+              className="w-full text-left font-mono text-[10px] bg-transparent hover:bg-[#191410]/5 p-2.5 border border-dashed border-[#191410]/30 transition-colors"
             >
               <span className="font-bold uppercase tracking-wider text-[#241a12]/70">TEAM DEMO</span>
               <span className="text-[#241a12]/70"> — internal preview access, not a real account →</span>

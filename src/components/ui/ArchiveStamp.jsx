@@ -10,7 +10,7 @@ export const ArchiveStamp = ({ text = "ARCHIVE", rotation = "-6deg", color = "re
   return (
     <div 
       style={{ transform: `rotate(${rotation})` }}
-      className={`inline-block font-mono text-[9px] font-bold px-2.5 py-1 uppercase tracking-widest border-2 shadow-md pointer-events-none select-none ${colorMap[color] || colorMap.red} ${className}`}
+      className={`inline-block font-mono text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest border-2 shadow-md pointer-events-none select-none ${colorMap[color] || colorMap.red} ${className}`}
     >
       {text} ✦
     </div>

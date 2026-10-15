@@ -26,7 +26,7 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center gap-3 border-b-2 border-[#d1a437]/40 pb-3 shrink-0">
           <div className="min-w-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <h2 id="kirana-title" className="m-0 font-mono text-[11px] sm:text-xs font-bold text-[#d1a437] tracking-[0.2em] sm:tracking-[0.3em]"><span aria-hidden="true">🛒 </span>VINTAGE TANGY KIRANA <span className="hidden sm:inline">// MERCHANDISE</span></h2>
-            <span className="font-mono text-[9px] text-[#ecdcaf]/70">LIMITED PRESSINGS</span>
+            <span className="font-mono text-[10px] text-[#ecdcaf]/70">LIMITED PRESSINGS</span>
           </div>
           <button 
             type="button"
@@ -55,7 +55,7 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
                     alt={item.name} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                   />
-                  <span className="absolute top-2 left-2 font-mono text-[8px] font-bold bg-[#191410]/90 text-[#d1a437] px-2 py-0.5 border border-[#d1a437]/30">
+                  <span className="absolute top-2 left-2 font-mono text-[10px] font-bold bg-[#191410]/90 text-[#d1a437] px-2 py-0.5 border border-[#d1a437]/30">
                     {item.category}
                   </span>
                 </div>
@@ -75,7 +75,7 @@ export const MerchShopModal = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        <div className="shrink-0 font-mono text-[9.5px] text-[#ecdcaf]/60 text-center pt-2 border-t border-[#ecdcaf]/20">
+        <div className="shrink-0 font-mono text-[10px] text-[#ecdcaf]/60 text-center pt-2 border-t border-[#ecdcaf]/20">
           ✦ WORLDWIDE SHIPPING FROM HYDERABAD · INCLUDES RECYCLED POSTER TUBE & STICKERS
         </div>
 

@@ -36,7 +36,7 @@ export const SectionNav = ({ section: sectionTitle, tone = 'dark', className = '
             key={item.path}
             to={item.path}
             aria-current={current ? 'page' : undefined}
-            className={`inline-flex items-center min-h-[36px] px-3 py-1.5 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest border transition-colors ${current ? t.current : t.link}`}
+            className={`inline-flex items-center min-h-[36px] px-3 py-1.5 font-mono text-[10px] sm:text-[10px] font-bold uppercase tracking-widest border transition-colors ${current ? t.current : t.link}`}
           >
             {item.label}
           </Link>

@@ -65,13 +65,13 @@ export const CrewPage = () => {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-2xl">{role.icon}</span>
-                    <span className="font-mono text-[9px] font-bold text-[#c2272a]">ROLE #{idx+1}</span>
+                    <span className="font-mono text-[10px] font-bold text-[#c2272a]">ROLE #{idx+1}</span>
                   </div>
                   <h3 className="font-poster text-xl text-[#191410] my-1">{role.title}</h3>
                   <p className="font-mono text-xs text-[#191410]/80 leading-relaxed">{role.desc}</p>
                 </div>
 
-                <div className="mt-4 pt-2 border-t border-[#191410]/20 font-mono text-[9px] font-bold text-[#c2272a]">
+                <div className="mt-4 pt-2 border-t border-[#191410]/20 font-mono text-[10px] font-bold text-[#c2272a]">
                   ✦ RECRUITING NOW
                 </div>
               </div>

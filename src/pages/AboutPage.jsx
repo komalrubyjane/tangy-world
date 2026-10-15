@@ -12,7 +12,7 @@ export const AboutPage = () => {
       <Navbar />
 
       {/* ABOUT HERO — Responsive */}
-      <section className="relative pt-24 sm:pt-32 pb-14 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
 
         {/* Giant faded watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
@@ -45,7 +45,7 @@ export const AboutPage = () => {
           ].map((stat, i) => (
             <div key={i} className="text-center px-5 sm:border-r last:border-0 border-[#11100C]/20">
               <div className="display text-3xl sm:text-5xl text-[#11100C] leading-none">{stat.num}</div>
-              <div className="font-mono text-[9px] sm:text-[10px] text-[#11100C]/60 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
+              <div className="font-mono text-[10px] sm:text-[10px] text-[#11100C]/60 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
             </div>
           ))}
         </div>

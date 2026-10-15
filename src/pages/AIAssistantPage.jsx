@@ -7,7 +7,7 @@ export const AIAssistantPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 max-w-4xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 max-w-4xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
         <div className="relative z-10">
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 block">
             ✦ MOCK KNOWLEDGE-BASE GUIDE // NOT A TRAINED AI

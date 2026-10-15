@@ -9,7 +9,7 @@ export const MessageBubble = ({ text, isMine, label, sublabel, timestamp, isSyst
   if (isSystem) {
     return (
       <div className="flex justify-center my-2">
-        <span className="px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-wider text-[#C99A2E] bg-[#11100C] border border-[#C99A2E]/40">
+        <span className="px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-[#C99A2E] bg-[#11100C] border border-[#C99A2E]/40">
           {text}
         </span>
       </div>
@@ -24,7 +24,7 @@ export const MessageBubble = ({ text, isMine, label, sublabel, timestamp, isSyst
         }`}
       >
         {!isMine && label && (
-          <div className="font-mono text-[9px] font-bold tracking-[0.2em] uppercase mb-1 flex items-center gap-1.5 text-[#E7D5A4]">
+          <div className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase mb-1 flex items-center gap-1.5 text-[#E7D5A4]">
             <span>{label}</span>
             {sublabel && <span className="opacity-60 font-normal normal-case">{sublabel}</span>}
           </div>
@@ -39,7 +39,7 @@ export const MessageBubble = ({ text, isMine, label, sublabel, timestamp, isSyst
           </Link>
         )}
         {timestamp && (
-          <div className={`mt-1 font-mono text-[8.5px] uppercase tracking-wide ${isMine ? 'text-[#11100C]/70' : 'text-[#E7D5A4]/60'}`}>
+          <div className={`mt-1 font-mono text-[10px] uppercase tracking-wide ${isMine ? 'text-[#11100C]/70' : 'text-[#E7D5A4]/60'}`}>
             {timeAgo(timestamp)}
           </div>
         )}

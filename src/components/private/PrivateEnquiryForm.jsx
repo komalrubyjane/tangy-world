@@ -90,7 +90,7 @@ export const PrivateEnquiryForm = ({
                 type="button"
                 onClick={() => setEnquiryType(t.id)}
                 aria-pressed={enquiryType === t.id}
-                className={`px-2.5 py-1.5 text-[9px] font-bold uppercase border transition-colors ${enquiryType === t.id ? 'bg-[#ecdcaf] text-[#191410] border-[#ecdcaf]' : 'bg-[#241a12] text-[#ecdcaf]/70 border-[#ecdcaf]/30'}`}
+                className={`px-2.5 py-1.5 text-[10px] font-bold uppercase border transition-colors ${enquiryType === t.id ? 'bg-[#ecdcaf] text-[#191410] border-[#ecdcaf]' : 'bg-[#241a12] text-[#ecdcaf]/70 border-[#ecdcaf]/30'}`}
               >
                 {t.label}
               </button>

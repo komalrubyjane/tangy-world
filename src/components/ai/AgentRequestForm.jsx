@@ -90,7 +90,7 @@ export const AgentRequestForm = ({ initialCategory = '', initialQuestion = '', o
       </p>
 
       <div>
-        <label className="block font-mono text-[9px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
+        <label className="block font-mono text-[10px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
           Topic (optional)
         </label>
         <select
@@ -106,7 +106,7 @@ export const AgentRequestForm = ({ initialCategory = '', initialQuestion = '', o
       </div>
 
       <div>
-        <label className="block font-mono text-[9px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
+        <label className="block font-mono text-[10px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
           Your Question
         </label>
         <textarea
@@ -119,7 +119,7 @@ export const AgentRequestForm = ({ initialCategory = '', initialQuestion = '', o
       </div>
 
       <div>
-        <label className="block font-mono text-[9px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
+        <label className="block font-mono text-[10px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
           Short Description (optional)
         </label>
         <textarea
@@ -132,7 +132,7 @@ export const AgentRequestForm = ({ initialCategory = '', initialQuestion = '', o
       </div>
 
       <div>
-        <label className="block font-mono text-[9px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
+        <label className="block font-mono text-[10px] font-bold tracking-wider uppercase mb-1 text-[#11100C]/70">
           Priority
         </label>
         <div className="flex gap-2">

@@ -20,7 +20,7 @@ export const TemporarySession = ({ session = TEMPORARY_SESSION, formUrl = TEMP_S
         <div className="relative bg-[#EDE0C0] paperTexture text-[#181614] overflow-hidden flex">
           <div className="relative w-6 shrink-0 bg-[#B5532A]" aria-hidden="true">
             <span
-              className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-medium text-[#EFE2C0] uppercase tracking-[0.22em] whitespace-nowrap"
+              className="absolute inset-0 flex items-center justify-center font-mono text-[10px] font-medium text-[#EFE2C0] uppercase tracking-[0.22em] whitespace-nowrap"
               style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
             >
               LIVE · MUSIC · CULTURE

@@ -68,7 +68,7 @@ export const InnerCirclePage = () => {
       <Navbar />
 
       {/* PAGE HERO */}
-      <section className="relative pt-28 pb-10 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 md:pt-28 pb-10 px-4 sm:px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
 
         {/* Big watermark text */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-[0.04] select-none">
@@ -99,7 +99,7 @@ export const InnerCirclePage = () => {
           ].map((stat, i) => (
             <div key={i} className="text-center px-4 sm:border-r last:border-0 border-[#11100C]/40">
               <div className="display text-3xl sm:text-5xl text-[#E3D4AC] leading-none">{stat.num}</div>
-              <div className="font-mono text-[9px] sm:text-[10px] text-[#E3D4AC]/80 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
+              <div className="font-mono text-[10px] sm:text-[10px] text-[#E3D4AC]/80 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export const InnerCirclePage = () => {
             >
               {/* FOLDER TAB */}
               {idx === 1 && (
-                <div className="absolute -top-6 left-4 bg-[#C89D35] text-[#11100C] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t border-x border-[#11100C] z-10">
+                <div className="absolute -top-6 left-4 bg-[#C89D35] text-[#11100C] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest border-t border-x border-[#11100C] z-10">
                   MOST POPULAR
                 </div>
               )}
@@ -139,7 +139,7 @@ export const InnerCirclePage = () => {
                   boxShadow: selectedTier === tier.id ? '8px 8px 0px #11100C' : '4px 4px 0px #11100C'
                 }}
               >
-                <div className="font-mono text-[9px] font-bold tracking-[0.3em] uppercase border-b-2 pb-2 mb-4"
+                <div className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase border-b-2 pb-2 mb-4"
                   style={{ borderColor: tier.accent + '40', opacity: 0.7 }}>
                   {tier.tag}
                 </div>
@@ -160,7 +160,7 @@ export const InnerCirclePage = () => {
 
                 {/* Selection indicator */}
                 {selectedTier === tier.id && (
-                  <div className="mt-4 pt-3 border-t-2 font-mono text-[9px] font-bold uppercase tracking-widest text-center"
+                  <div className="mt-4 pt-3 border-t-2 font-mono text-[10px] font-bold uppercase tracking-widest text-center"
                     style={{ borderColor: tier.accent + '50', color: tier.accent }}>
                     ✦ SELECTED
                   </div>
@@ -176,7 +176,7 @@ export const InnerCirclePage = () => {
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-[rgba(201,154,46,0.6)] rotate-[-1deg] border border-[#C99A2E]/40 pointer-events-none hidden sm:block" />
 
           <div className="text-center mb-6 sm:mb-8">
-            <span className="font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2">
+            <span className="font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase block mb-2">
               MEMBERSHIP APPLICATION
             </span>
             <h2 className="display text-3xl sm:text-5xl text-[#E3D4AC]">JOIN THE CIRCLE</h2>
@@ -224,7 +224,7 @@ export const InnerCirclePage = () => {
                     key={tier.id}
                     type="button"
                     onClick={() => setSelectedTier(tier.id)}
-                    className={`px-3 py-2 font-mono text-[9px] font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                    className={`px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-wider border transition-colors flex-1 ${
                       selectedTier === tier.id
                         ? 'bg-[#C99A2E] text-[#11100C] border-[#C99A2E]'
                         : 'bg-transparent text-[#E3D4AC] border-[#C99A2E]/40 hover:border-[#C99A2E]'
@@ -241,7 +241,7 @@ export const InnerCirclePage = () => {
               >
                 JOIN INNER CIRCLE →
               </button>
-              <p className="font-mono text-[9px] text-[#E3D4AC]/40 text-center uppercase tracking-wider">
+              <p className="font-mono text-[10px] text-[#E3D4AC]/40 text-center uppercase tracking-wider">
                 NO SPAM. ONLY GENUINE TANGY DISPATCHES. UNSUBSCRIBE ANYTIME.
               </p>
             </form>
@@ -263,7 +263,7 @@ export const InnerCirclePage = () => {
                 <p className="font-body text-sm italic leading-relaxed mb-4 border-l-4 border-[#C99A2E] pl-3">
                   "{t.quote}"
                 </p>
-                <div className="font-mono text-[9px] font-bold uppercase">
+                <div className="font-mono text-[10px] font-bold uppercase">
                   <div className="text-[#B94717]">{t.name}</div>
                   <div className="text-[#11100C]/60">{t.member}</div>
                 </div>

@@ -90,7 +90,7 @@ export const ArtistDetailsPage = () => {
         {/* HERO DETAILS */}
         <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-between gap-6">
           <div className="flex flex-col gap-2">
-            <span className="font-mono text-[9px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">
+            <span className="font-mono text-[10px] font-bold text-[#c2272a] tracking-[0.3em] uppercase">
               ARTIST SPOTLIGHT {artist.city ? `// ${artist.city}` : ''}
             </span>
             <h1 className="font-poster text-5xl sm:text-7xl text-[#191410] leading-none">
@@ -101,7 +101,7 @@ export const ArtistDetailsPage = () => {
 
           {artist.experience_level && (
             <div className="font-mono text-xs border-y-2 border-[#191410] py-4">
-              <span className="text-[#241a12]/70 block text-[9px] uppercase">EXPERIENCE</span>
+              <span className="text-[#241a12]/70 block text-[10px] uppercase">EXPERIENCE</span>
               <span className="font-poster text-2xl text-[#191410]">{artist.experience_level}</span>
             </div>
           )}

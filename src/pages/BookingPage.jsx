@@ -311,7 +311,7 @@ export const BookingPage = () => {
               <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 mb-0 border-t border-[#EFE2C0]/15 pt-4">
                 {[['Date', session.date], ['Time', session.time || 'TBA'], ['From', fromPrice != null ? `₹${fromPrice.toLocaleString('en-IN')}` : '—'], ['Capacity', `${session.capacity} seats`]].map(([k, v]) => (
                   <div key={k} className="min-w-0">
-                    <dt className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#EFE2C0]/55">{k}</dt>
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#EFE2C0]/55">{k}</dt>
                     <dd className="m-0 mt-1 font-condensed uppercase text-xl text-[#EFE2C0] leading-tight">{v}</dd>
                   </div>
                 ))}
@@ -391,7 +391,7 @@ export const BookingPage = () => {
             <div className="w-full bg-[#EFE2C0] paperTexture text-[#241a12] border-2 border-[#11100C] shadow-[6px_6px_0px_#11100C] p-6 sm:p-7 text-left relative flex flex-col gap-5">
               <div className="flex justify-between items-center border-b-2 border-dashed border-[#191410]/40 pb-4">
                 <div>
-                  <span className="font-mono text-[9.5px] font-bold text-[#B5532A] uppercase tracking-[0.25em]">Box office admit</span>
+                  <span className="font-mono text-[10px] font-bold text-[#B5532A] uppercase tracking-[0.25em]">Box office admit</span>
                   <h2 className="display uppercase text-3xl text-[#191410] leading-none mt-1 mb-0">
                     {isSubmitted ? 'YOUR BOOKING' : 'BOOK YOUR PLACE'}
                   </h2>

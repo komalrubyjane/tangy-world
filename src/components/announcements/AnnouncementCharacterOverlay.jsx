@@ -237,7 +237,7 @@ export const AnnouncementCharacterOverlay = ({
         >
           ✕
         </button>
-        <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#B94717] mb-1 border-b border-dashed border-[#191410]/30 pb-1">
+        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#B94717] mb-1 border-b border-dashed border-[#191410]/30 pb-1">
           Tangy Sessions · {announcement.category || 'Announcement'}
         </div>
         <h4 ref={titleRef} className="font-condensed text-lg md:text-xl font-bold leading-tight mb-1">

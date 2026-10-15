@@ -33,7 +33,7 @@ export const ArtistsIndexPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
       <Navbar />
-      <header className="pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <header className="pt-20 md:pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <span className="text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-3">THE ROSTER</span>
         <h1 className="display text-5xl sm:text-7xl uppercase m-0">ARTISTS</h1>
       </header>

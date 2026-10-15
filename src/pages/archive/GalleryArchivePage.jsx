@@ -32,7 +32,7 @@ export const GalleryArchivePage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono overflow-x-hidden printNoise">
       <Navbar />
-      <header className="pt-24 sm:pt-32 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <header className="pt-20 sm:pt-32 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <PageCrumbs parent={{ label: 'Gallery', to: '/gallery' }} label="Archive" />
         <span className="text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mt-3 mb-3">EVERY ALBUM</span>
         <h1 className="display text-4xl sm:text-7xl uppercase leading-none m-0">GALLERY<br />ARCHIVE</h1>

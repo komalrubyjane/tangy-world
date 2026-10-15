@@ -43,7 +43,7 @@ export const JoinPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-14 sm:pb-20 px-4 sm:px-6 max-w-5xl mx-auto text-center">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-20 px-4 sm:px-6 max-w-5xl mx-auto text-center">
         <div className="relative z-10">
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 block">
             TANGY SESSIONS // MEMBERSHIP DESK
@@ -85,7 +85,7 @@ export const JoinPage = () => {
           </p>
 
           <div className="mt-14 pt-8 border-t border-[#C99A2E]/20">
-            <span className="block text-center font-mono text-[9px] sm:text-[10px] text-[#E7D5A4]/60 uppercase tracking-[0.3em] mb-4">
+            <span className="block text-center font-mono text-[10px] sm:text-[10px] text-[#E7D5A4]/60 uppercase tracking-[0.3em] mb-4">
               Other ways to join
             </span>
             <div role="group" aria-label="Other ways to join Tangy" className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto">
@@ -116,7 +116,7 @@ export const JoinPage = () => {
           <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-6 sm:p-10 shadow-[4px_4px_0px_#11100C]">
             <div className="flex justify-between items-center border-b-2 border-[#11100C] pb-3 mb-6">
               <div>
-                <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">{selected.icon} {selected.label}</span>
+                <span className="font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-widest">{selected.icon} {selected.label}</span>
                 <h2 className="font-condensed text-2xl font-bold uppercase">CREATE YOUR ACCOUNT</h2>
               </div>
               <button onClick={() => setSelectedRole(null)} className="font-mono text-[10px] font-bold underline">CHANGE</button>

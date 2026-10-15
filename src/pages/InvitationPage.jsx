@@ -109,7 +109,7 @@ export const InvitationPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body flex flex-col t-quiet">
       <Navbar />
-      <main className="flex-1 flex items-start justify-center px-4 pt-28 pb-16" data-invitation-page>
+      <main className="flex-1 flex items-start justify-center px-4 pt-20 md:pt-28 pb-10 md:pb-16" data-invitation-page>
         <section className="surface-modal w-full max-w-lg p-5 sm:p-8" aria-labelledby="invitation-title">
           <p className="t-label text-[#a64a2b] m-0">Tangy team invitation</p>
           <h1 id="invitation-title" className="display text-[2rem] sm:text-[2.6rem] leading-[0.95] mt-2 mb-4">Join the Tangy team</h1>

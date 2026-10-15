@@ -259,7 +259,7 @@ export const UserLoginModal = () => {
               <button
                 type="button"
                 onClick={goToDemo}
-                className="w-full text-left font-mono text-[9px] bg-transparent hover:bg-[#11100C]/5 p-2 border border-dashed border-[#11100C]/30 transition-colors"
+                className="w-full text-left font-mono text-[10px] bg-transparent hover:bg-[#11100C]/5 p-2 border border-dashed border-[#11100C]/30 transition-colors"
               >
                 <span className="font-bold uppercase tracking-wider text-[#11100C]/70">TEAM DEMO</span>
                 <span className="text-[#11100C]/60"> — internal preview access, not a real account →</span>

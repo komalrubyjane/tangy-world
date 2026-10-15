@@ -12,7 +12,7 @@ export const PastMemoriesPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -38,7 +38,7 @@ export const PastMemoriesPage = () => {
               <div className="relative w-full aspect-square bg-black overflow-hidden mb-1.5">
                 <img src={mem.image} alt={mem.caption} className="w-full h-full object-cover filter grayscale sepia-[0.25] contrast-125" />
               </div>
-              <figcaption className="relative font-mono text-[8px] sm:text-[9px] text-[#E7D5A4]/70 leading-tight">{mem.caption}</figcaption>
+              <figcaption className="relative font-mono text-[10px] sm:text-[10px] text-[#E7D5A4]/70 leading-tight">{mem.caption}</figcaption>
             </figure>
           ))}
         </div>
@@ -56,10 +56,10 @@ export const PastMemoriesPage = () => {
                 <LotusStamp index={ii} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-mono text-[8px] sm:text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{item.category} // {item.year}</div>
+                <div className="font-mono text-[10px] sm:text-[10px] font-bold text-[#B94717] uppercase tracking-wider mb-1">{item.category} // {item.year}</div>
                 <h3 className="display text-base sm:text-xl text-[#11100C] mb-2 leading-tight">{item.title}</h3>
                 <p className="font-mono text-[10px] sm:text-xs text-[#B94717] font-bold uppercase mb-1">{item.headline}</p>
-                <p className="font-mono text-[9px] sm:text-[10px] text-[#11100C]/75 leading-relaxed">{item.details}</p>
+                <p className="font-mono text-[10px] sm:text-[10px] text-[#11100C]/75 leading-relaxed">{item.details}</p>
               </div>
             </div>
           ))}

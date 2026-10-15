@@ -60,7 +60,7 @@ export const PostcardContactModal = ({ isOpen, onClose }) => {
             
             {/* LEFT SIDE: MESSAGE BODY */}
             <div className="flex flex-col gap-3">
-              <span className="font-mono text-[9px] font-bold text-[#c2272a] uppercase tracking-widest">POSTCARD MESSAGE</span>
+              <span className="font-mono text-[10px] font-bold text-[#c2272a] uppercase tracking-widest">POSTCARD MESSAGE</span>
               <textarea
                 required
                 rows={7}
@@ -76,16 +76,16 @@ export const PostcardContactModal = ({ isOpen, onClose }) => {
               
               {/* POSTAGE STAMP */}
               <div className="flex justify-between items-start">
-                <div className="font-mono text-[9px] text-[#241a12]/70 leading-tight">
+                <div className="font-mono text-[10px] text-[#241a12]/70 leading-tight">
                   <div>TO: TANGY SESSIONS</div>
                   <div>BANSILALPET STEPWELL</div>
                   <div>HYDERABAD, INDIA</div>
                 </div>
 
                 <div className="w-14 h-16 bg-[#ecdcaf] border-2 border-dashed border-[#c2272a] flex flex-col items-center justify-center text-center rotate-3 p-1">
-                  <span className="font-mono text-[7px] font-bold text-[#c2272a]">POSTAGE</span>
+                  <span className="font-mono text-[10px] font-bold text-[#c2272a]">POSTAGE</span>
                   <span className="font-poster text-xs text-[#191410]">₹50</span>
-                  <span className="font-mono text-[6px]">HYD</span>
+                  <span className="font-mono text-[10px]">HYD</span>
                 </div>
               </div>
 

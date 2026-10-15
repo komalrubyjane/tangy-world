@@ -211,15 +211,15 @@ export const History = () => {
       </div>
 
       {/* CROP MARKS & ARCHIVE METADATA */}
-      <div className="absolute top-4 left-4 font-mono text-[9px] text-[#C99A2E] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
+      <div className="absolute top-4 left-4 font-mono text-[10px] text-[#C99A2E] font-bold tracking-[0.25em] uppercase z-20 pointer-events-none">
         [ ✚ ] CROP MARK // EXHIBITION PANEL
       </div>
-      <div className="absolute top-4 right-4 font-mono text-[9px] text-[#E7D5A4]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
+      <div className="absolute top-4 right-4 font-mono text-[10px] text-[#E7D5A4]/60 tracking-[0.25em] uppercase z-20 pointer-events-none hidden md:block">
         33⅓ RPM STEREO // 10 YEARS ARCHIVE
       </div>
 
       {/* SECTION HEADER */}
-      <div className="relative w-full py-28 md:py-36 px-6 text-center bg-[#EFE2C0] paperTexture text-[#11100C] border-b-8 border-[#11100C] flex flex-col items-center justify-center">
+      <div className="relative w-full py-16 md:py-36 px-6 text-center bg-[#EFE2C0] paperTexture text-[#11100C] border-b-8 border-[#11100C] flex flex-col items-center justify-center">
         
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-10">
           <span className="display text-[16vw] md:text-[22vw] leading-none text-[#11100C]">2016—2026</span>
@@ -281,7 +281,7 @@ export const History = () => {
             <div className="relative z-20 w-full max-w-[1100px] flex flex-col items-center">
               
               <div 
-                className="w-8 h-8 rounded-full border-2 border-[#11100C] mb-8 flex items-center justify-center shadow-xl font-mono text-[9px] font-bold z-30"
+                className="w-8 h-8 rounded-full border-2 border-[#11100C] mb-8 flex items-center justify-center shadow-xl font-mono text-[10px] font-bold z-30"
                 style={{ backgroundColor: era.accent, color: '#EFE2C0' }}
               >
                 ✦
@@ -296,7 +296,7 @@ export const History = () => {
                   <div className="my-6 relative inline-block bg-[#181614] p-2 border-2 border-[#11100C] shadow-lg rotate-[-3deg]">
                     <PaperTape rotation="-2deg" width="w-16" className="absolute -top-3 left-1/3 z-20" />
                     <img src={era.image} alt={era.title} className="w-full max-w-[320px] aspect-[4/3] object-cover filter grayscale sepia-[0.4]" />
-                    <span className="absolute bottom-2 left-3 font-mono text-[8px] text-[#E7D5A4]">✎ the beginning.</span>
+                    <span className="absolute bottom-2 left-3 font-mono text-[10px] text-[#E7D5A4]">✎ the beginning.</span>
                   </div>
                   <p className="font-body text-base md:text-lg text-[#11100C]/90 leading-relaxed max-w-lg mx-auto italic border-t border-[#11100C]/20 pt-4">
                     "{era.description}"
@@ -324,13 +324,13 @@ export const History = () => {
               {/* FORMAT 3: 2019 — CONCERT POSTER */}
               {era.format === 'POSTER' && (
                 <div className="era-card w-full max-w-[340px] sm:max-w-xl paper-surface p-5 md:p-8 border-2 border-[#11100C] shadow-[4px_4px_0px_#11100C] sm:shadow-[4px_4px_0px_#11100C] text-[#11100C] relative">
-                  <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#11100C] border-b-2 border-[#11100C] pb-2 mb-4">
+                  <div className="flex justify-between items-center font-mono text-[10px] font-bold text-[#11100C] border-b-2 border-[#11100C] pb-2 mb-4">
                     <span>TANGY CONCERT SERIES</span>
                     <span>YEAR {era.year}</span>
                   </div>
                   <div className="w-full aspect-[16/9] bg-black overflow-hidden border-2 border-[#11100C] mb-4 relative">
                     <img src={era.image} alt={era.title} className="w-full h-full object-cover filter grayscale contrast-125" />
-                    <span className="absolute top-2 right-2 bg-[#4A171D] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5">BANSILALPET STEPWELL</span>
+                    <span className="absolute top-2 right-2 bg-[#4A171D] text-[#E7D5A4] font-mono text-[10px] px-2 py-0.5">BANSILALPET STEPWELL</span>
                   </div>
                   <h3 className="display text-4xl md:text-5xl text-[#11100C] mb-2 ink-bleed">{era.title}</h3>
                   <p className="font-mono text-xs text-[#B94717] font-bold tracking-widest uppercase mb-4">{era.venue}</p>
@@ -372,7 +372,7 @@ export const History = () => {
               {/* FORMAT 6: 2023 — 35MM FILM STRIP */}
               {era.format === 'FILMSTRIP' && (
                 <div className="era-card w-full max-w-[340px] sm:max-w-4xl paper-surface-dark p-5 md:p-10 border-2 border-[#B94717] shadow-2xl text-[#E7D5A4] relative">
-                  <div className="flex justify-between font-mono text-[9px] text-[#C99A2E] tracking-[0.3em] uppercase mb-4 border-b border-[#B94717]/40 pb-2">
+                  <div className="flex justify-between font-mono text-[10px] text-[#C99A2E] tracking-[0.3em] uppercase mb-4 border-b border-[#B94717]/40 pb-2">
                     <span>KODAK SAFETY FILM 5063</span>
                     <span>YEAR {era.year}</span>
                     <span>35MM CONTACT STRIP</span>
@@ -381,17 +381,17 @@ export const History = () => {
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
                       <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy8.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
-                      <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 031</span>
+                      <span className="font-mono text-[10px] text-[#C99A2E] mt-1 block">FRAME 031</span>
                     </div>
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black">
                       <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy1.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
-                      <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 032</span>
+                      <span className="font-mono text-[10px] text-[#C99A2E] mt-1 block">FRAME 032</span>
                     </div>
                     <div className="relative border border-[#E7D5A4]/30 p-2 bg-black hidden md:block">
                       <VintageFilmFrame color="#181614" holeColor="#181614" className="opacity-60" />
                       <img src="/media/gallery/tangy3.jpg" className="w-full aspect-[4/3] object-cover filter grayscale" />
-                      <span className="font-mono text-[8px] text-[#C99A2E] mt-1 block">FRAME 033</span>
+                      <span className="font-mono text-[10px] text-[#C99A2E] mt-1 block">FRAME 033</span>
                     </div>
                   </div>
                   <h3 className="display text-4xl md:text-5xl text-[#E7D5A4] mb-2 ink-bleed">{era.title}</h3>

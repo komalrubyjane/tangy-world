@@ -92,17 +92,20 @@
   :root { --grid-cols: 12; --gutter: 76px; --grid-gap: 24px; --section-pad: var(--space-2xl); --dock-space: 76px; }
 }
 
-/* Small accent labels on the homepage: the same hues, shaded just enough to
-   reach WCAG AA (4.5:1) at label sizes. */
-.tangy-world .theme-about .sec-accent { color: #93401c; }
-.tangy-world .theme-archive .sec-accent { color: #8a3a19; }
-.tangy-world .theme-crew .sec-accent { color: #ddb553; }
+/* Small accent labels: the same hues, shaded just enough to reach WCAG AA
+   (4.5:1) at label sizes. */
+.theme-about .sec-accent { color: #93401c; }
+.theme-archive .sec-accent { color: #8a3a19; }
+.theme-crew .sec-accent { color: #ddb553; }
 
-/* ── HOMEPAGE SIZE TOKENS ─────────────────────────────────────────────
-   The homepage (.tangy-world) runs a lighter scale on phones and tablets so
-   the same content takes less room; desktop (>=1024px) keeps the defaults
-   (the fallbacks in each class below). Inner pages are unaffected.       */
-.tangy-world {
+/* ── PUBLIC-SITE SIZE TOKENS ──────────────────────────────────────────
+   Phones and tablets run a lighter scale so the same content takes less
+   room; desktop (>=1024px) keeps the defaults (the fallbacks in each class
+   below). The admin console, check-in and the artist workspace (no dock:
+   body[data-dock="off"]) keep their own sizes.
+   Tailwind's text-2xl…text-7xl steps are part of the scale on phones, so
+   page titles written with them shrink in one place.                    */
+:root {
   --fs-section: clamp(2rem, 9.6vw, 2.75rem);   /* section headings, 36px @375 */
   --fs-h2: clamp(1.75rem, 8vw, 2.25rem);       /* secondary headings, 30px @375 */
   --fs-h3: 1.25rem;                            /* card titles, 20px */
@@ -121,8 +124,18 @@
   --tape-h: 14px;
   --photo-max-h: 220px;                        /* Fig. photographs */
 }
+@media (max-width: 767px) {
+  :root {
+    --text-2xl: 1.375rem;   /* 24 → 22px */
+    --text-3xl: 1.625rem;   /* 30 → 26px */
+    --text-4xl: 2rem;       /* 36 → 32px */
+    --text-5xl: 2.25rem;    /* 48 → 36px */
+    --text-6xl: 2.5rem;     /* 60 → 40px */
+    --text-7xl: 2.75rem;    /* 72 → 44px */
+  }
+}
 @media (min-width: 768px) {
-  .tangy-world {
+  :root {
     --fs-section: clamp(3rem, 8.5vw, 6rem);
     --fs-h2: clamp(2.25rem, 5.6vw, 3.5rem);
     --fs-h3: clamp(1.3rem, 2.2vw, 1.85rem);
@@ -133,28 +146,64 @@
   }
 }
 @media (min-width: 1024px) {
-  .tangy-world {
+  :root {
     --fs-section: initial; --fs-h2: initial; --fs-h3: initial; --fs-card-display: clamp(2.4rem, 3.6vw, 3.4rem);
     --fs-quote: initial; --fs-small: initial; --fs-label: initial; --ls-label: initial;
     --fs-meta: initial; --ls-meta: initial; --fs-btn: initial; --ls-btn: initial; --btn-pad: initial;
     --section-pad: var(--space-2xl); --tape-w: initial; --tape-h: initial;
   }
 }
+/* The diary (homepage section and /diary/journal) keeps its original sizes. */
+.theme-diary {
+  --fs-quote: initial; --fs-label: initial; --ls-label: initial; --fs-meta: initial; --ls-meta: initial;
+  --fs-btn: initial; --ls-btn: initial; --btn-pad: initial; --fs-small: initial; --fs-h3: initial;
+}
+
+/* Console, check-in and artist workspace: previous sizes at every width. */
+body[data-dock="off"] {
+  --fs-section: initial; --fs-h2: initial; --fs-h3: initial; --fs-card-display: clamp(2.4rem, 3.6vw, 3.4rem);
+  --fs-quote: initial; --fs-small: initial; --fs-label: initial; --ls-label: initial;
+  --fs-meta: initial; --ls-meta: initial; --fs-btn: initial; --ls-btn: initial; --btn-pad: initial;
+  --section-pad: var(--space-xl); --tape-w: initial; --tape-h: initial; --photo-max-h: none;
+  --text-2xl: 1.5rem; --text-3xl: 1.875rem; --text-4xl: 2.25rem; --text-5xl: 3rem; --text-6xl: 3.75rem; --text-7xl: 4.5rem;
+}
+@media (min-width: 768px) { body[data-dock="off"] { --section-pad: 5.5rem; } }
+@media (min-width: 1024px) { body[data-dock="off"] { --section-pad: var(--space-2xl); } }
+/* Phone spacing scale for the public site: the large unprefixed spacing
+   utilities (which are, by definition, the phone values — sm:/md:/lg:
+   variants are separate classes and untouched) step down ~30%, so every
+   page gets the same lighter vertical rhythm. pt-20 (nav clearance) and
+   anything 40px or under are left alone; the diary keeps its own spacing. */
+@media (max-width: 767px) {
+  body:not([data-dock="off"]) {
+    & .py-16:not(.theme-diary *) { padding-block: 2.75rem; }   & .py-20:not(.theme-diary *) { padding-block: 3.5rem; }
+    & .pt-16:not(.theme-diary *) { padding-top: 2.75rem; }     & .pb-16:not(.theme-diary *) { padding-bottom: 2.75rem; }   & .pb-20:not(.theme-diary *) { padding-bottom: 3.5rem; }
+    & .mt-12:not(.theme-diary *) { margin-top: 2.25rem; }      & .mt-14:not(.theme-diary *) { margin-top: 2.5rem; }
+    & .mt-16:not(.theme-diary *) { margin-top: 2.75rem; }      & .mt-20:not(.theme-diary *) { margin-top: 3.5rem; }
+    & .mb-12:not(.theme-diary *) { margin-bottom: 2.25rem; }   & .mb-14:not(.theme-diary *) { margin-bottom: 2.5rem; }
+    & .mb-16:not(.theme-diary *) { margin-bottom: 2.75rem; }   & .mb-20:not(.theme-diary *) { margin-bottom: 3.5rem; }
+    & .gap-12:not(.theme-diary *) { gap: 2.25rem; }            & .gap-16:not(.theme-diary *) { gap: 2.75rem; }
+    & .gap-y-12:not(.theme-diary *) { row-gap: 2.25rem; }      & .gap-y-16:not(.theme-diary *) { row-gap: 2.75rem; }
+    & .space-y-12:not(.theme-diary *) > :not(:last-child) { margin-bottom: 2.25rem; }
+    & .space-y-16:not(.theme-diary *) > :not(:last-child) { margin-bottom: 2.75rem; }
+    /* Card padding: 16–20px on phones. */
+    & .p-8:not(.theme-diary *) { padding: 1.25rem; }           & .p-10:not(.theme-diary *) { padding: 1.5rem; }   & .p-12:not(.theme-diary *) { padding: 1.75rem; }
+  }
+}
+
 @media (max-width: 1023px) {
-  .tangy-world .theme-hero,
-  .tangy-world .theme-about, .tangy-world .theme-archive,
-  .tangy-world .theme-sessions, .tangy-world .theme-crew, .tangy-world .theme-diary,
-  .tangy-world .theme-collab, .tangy-world .theme-private, .tangy-world .theme-contact {
+  body:not([data-dock="off"]) :is(.theme-hero, .theme-inner, .theme-about, .theme-archive, .theme-sessions, .theme-crew, .theme-collab, .theme-private, .theme-contact) {
     /* Texture veil: a wash of the section's own colour over its baked
-       texture (~25%), so the material reads lighter without new assets. */
+       texture (~25%), so the material reads lighter without new assets.
+       (The diary's journal blue is left as it was.) */
     --tex-veil: color-mix(in srgb, var(--sec-bg) 26%, transparent);
     background-image: linear-gradient(var(--tex-veil), var(--tex-veil)), var(--tex-layers);
   }
-  .tangy-world .theme-hero { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 100%, 160px, 420px; }
-  .tangy-world .theme-about, .tangy-world .theme-archive { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp'); background-size: 100%, 160px, 720px; }
-  .tangy-world .theme-sessions, .tangy-world .theme-crew, .tangy-world .theme-diary { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 100%, 160px, 720px; }
-  .tangy-world .theme-collab { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 100%, 160px, 560px; }
-  .tangy-world .theme-private, .tangy-world .theme-contact { --tex-layers: url('/textures/grain-soft.webp'); background-size: 100%, 160px; }
+  body:not([data-dock="off"]) :is(.theme-hero, .theme-inner) { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 100%, 160px, 420px; }
+  body:not([data-dock="off"]) :is(.theme-about, .theme-archive) { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp'); background-size: 100%, 160px, 720px; }
+  body:not([data-dock="off"]) :is(.theme-sessions, .theme-crew) { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 100%, 160px, 720px; }
+  body:not([data-dock="off"]) .theme-collab { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 100%, 160px, 560px; }
+  body:not([data-dock="off"]) :is(.theme-private, .theme-contact) { --tex-layers: url('/textures/grain-soft.webp'); background-size: 100%, 160px; }
 }
 
 @layer base {

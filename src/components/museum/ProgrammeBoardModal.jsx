@@ -42,7 +42,7 @@ export const ProgrammeBoardModal = ({ isOpen, onClose }) => {
                   <span className="block font-mono text-xs opacity-80">{[evt.time, evt.venue].filter(Boolean).join(' · ')}</span>
                 </span>
               </span>
-              <span className="font-mono text-[9px] font-bold tracking-widest px-2.5 py-1 uppercase border w-fit bg-[#191410] text-[#ecdcaf]/80 border-[#ecdcaf]/20">
+              <span className="font-mono text-[10px] font-bold tracking-widest px-2.5 py-1 uppercase border w-fit bg-[#191410] text-[#ecdcaf]/80 border-[#ecdcaf]/20">
                 {evt.status === 'SOLD OUT' ? 'SOLD OUT · WAITLIST' : 'BOOK →'}
               </span>
             </button>

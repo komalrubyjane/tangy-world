@@ -17,7 +17,7 @@ export const CrewProfiles = ({ team, title }) => (
             <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#d1a437] m-0">{c.role}</p>
             <p className="font-mono text-xs text-[#ecdcaf]/80 mt-2 mb-2">{c.bio}</p>
             <ul className="flex flex-wrap gap-1.5 list-none m-0 p-0" aria-label={`${c.name}'s responsibilities`}>
-              {c.responsibilities.map((r) => <li key={r} className="font-mono text-[9px] uppercase border border-[#ecdcaf]/30 px-2 py-0.5">{r}</li>)}
+              {c.responsibilities.map((r) => <li key={r} className="font-mono text-[10px] uppercase border border-[#ecdcaf]/30 px-2 py-0.5">{r}</li>)}
             </ul>
           </div>
         </li>

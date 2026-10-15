@@ -26,15 +26,15 @@ function getOrCreateSessionId() {
 }
 
 const chipClass =
-  'min-h-[32px] px-2.5 py-1 font-mono text-[9.5px] font-bold uppercase tracking-wide border-2 border-[#C99A2E]/70 text-[#E7D5A4] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors text-left';
+  'min-h-[32px] px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide border-2 border-[#C99A2E]/70 text-[#E7D5A4] hover:bg-[#C99A2E] hover:text-[#11100C] transition-colors text-left';
 
 const smallChipClass =
-  'px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-wide border-2 border-[#11100C]/50 text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] transition-colors text-left';
+  'px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide border-2 border-[#11100C]/50 text-[#11100C] hover:bg-[#11100C] hover:text-[#E7D5A4] transition-colors text-left';
 
 const TypingIndicator = ({ reducedMotion }) => (
   <div className="flex justify-start mb-3">
     <div className="max-w-[70%] border-2 border-[#11100C] bg-[#F5E9C9] px-3 py-2.5 shadow-[3px_3px_0px_#11100C] flex items-center gap-2">
-      <span className="font-mono text-[9px] font-bold tracking-[0.2em] uppercase text-[#B94717]">◆ TANGY AI</span>
+      <span className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-[#B94717]">◆ TANGY AI</span>
       <div className="flex items-end gap-[3px] h-3.5" aria-label="Tangy AI is typing" role="status">
         {[0, 1, 2, 3, 4].map((i) => (
           <motion.span
@@ -216,7 +216,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
         >
           {!isUser && (
             <div
-              className={`font-mono text-[9px] font-bold tracking-[0.2em] uppercase mb-1 flex flex-wrap items-baseline gap-x-1.5 ${
+              className={`font-mono text-[10px] font-bold tracking-[0.2em] uppercase mb-1 flex flex-wrap items-baseline gap-x-1.5 ${
                 isTeam ? 'text-[#E7D5A4]' : 'text-[#B94717]'
               }`}
             >
@@ -269,7 +269,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-4 py-1.5 min-h-[60px] border-b-4 border-[#C99A2E] bg-[#1A140F]">
         <div className="min-w-0">
-          <div className="font-mono text-[9px] font-bold tracking-[0.25em] uppercase text-[#C99A2E] truncate">✦ TANGY ASSISTANT</div>
+          <div className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-[#C99A2E] truncate">✦ TANGY ASSISTANT</div>
           <div className="font-condensed text-sm text-[#E7D5A4] uppercase tracking-wide truncate">
             {conversationId ? 'Connected with Tangy Team' : 'Mock Knowledge-Base Guide'}
           </div>
@@ -278,7 +278,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
           <button
             type="button"
             onClick={() => openAgentForm()}
-            className="min-h-[44px] px-1 whitespace-nowrap font-mono text-[9px] font-bold uppercase tracking-widest text-[#E7D5A4]/70 hover:text-[#C99A2E] underline"
+            className="min-h-[44px] px-1 whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-widest text-[#E7D5A4]/70 hover:text-[#C99A2E] underline"
           >
             Talk to a human
           </button>
@@ -305,7 +305,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
         {conversationId && (
           <div className="mt-2 pt-2 border-t border-[#C99A2E]/20">
             {teamMessagesLoading && teamMessages.length === 0 ? (
-              <div className="text-center font-mono text-[9px] text-[#E7D5A4]/60 py-2">LOADING TEAM CHAT...</div>
+              <div className="text-center font-mono text-[10px] text-[#E7D5A4]/60 py-2">LOADING TEAM CHAT...</div>
             ) : (
               teamMessages.map((m) => (
                 <MessageBubble
@@ -324,7 +324,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
 
       {/* Escalation banner */}
       {escalation && (
-        <div className="px-3 py-1.5 bg-[#C99A2E] text-[#11100C] font-mono text-[9px] font-bold uppercase tracking-widest text-center border-t-2 border-[#11100C]">
+        <div className="px-3 py-1.5 bg-[#C99A2E] text-[#11100C] font-mono text-[10px] font-bold uppercase tracking-widest text-center border-t-2 border-[#11100C]">
           ✓ REQUEST SENT — REFERENCE #{escalation.conversationId.slice(0, 8).toUpperCase()}
         </div>
       )}
@@ -349,7 +349,7 @@ export const TangyAssistant = ({ variant = 'page', onClose }) => {
               type="button"
               onClick={() => setPickerOpen((o) => !o)}
               aria-expanded={pickerOpen}
-              className="min-h-[32px] font-mono text-[9px] font-bold uppercase tracking-widest text-[#C99A2E]"
+              className="min-h-[32px] font-mono text-[10px] font-bold uppercase tracking-widest text-[#C99A2E]"
             >
               {pickerOpen ? 'HIDE TOPICS ▲' : 'BROWSE TOPICS ▼'}
             </button>

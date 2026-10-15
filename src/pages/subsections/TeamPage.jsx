@@ -10,7 +10,7 @@ export const TeamPage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#211915] selection:text-[#E7D5A4] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
           <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">TEAM</span>
         </div>
@@ -49,7 +49,7 @@ export const TeamPage = () => {
               key={member.file}
               className="relative bg-[#EFE2C0] paperTexture text-[#15120D] border-2 border-[#15120D] shadow-[4px_4px_0px_#15120D] p-6 pt-8 flex flex-col items-center text-center"
             >
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#181614] text-[#EAD9A6] px-3 py-1 font-mono text-[8px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24] whitespace-nowrap">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#181614] text-[#EAD9A6] px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest border-t-2 border-x-2 border-[#D19A24] whitespace-nowrap">
                 FILE {member.file}
               </div>
               <span className="font-serif italic text-3xl text-[#B9471B] leading-none mb-1">"</span>

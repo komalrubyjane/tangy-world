@@ -29,16 +29,16 @@ export const JoinLoginPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono overflow-x-hidden">
       <Navbar />
-      <section className="pt-28 pb-20 px-4 sm:px-6 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-8 items-start">
+      <section className="pt-20 md:pt-28 pb-20 px-4 sm:px-6 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-8 items-start">
         <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-6 sm:p-10 shadow-[4px_4px_0px_#11100C]">
-          <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest">TANGY PROFILE // SIGN IN</span>
+          <span className="font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-widest">TANGY PROFILE // SIGN IN</span>
           <h1 className="font-condensed text-2xl font-bold uppercase mb-6 mt-1">WELCOME BACK</h1>
 
           <EmailOtpAuth onVerified={() => navigate(next, { replace: true })} />
         </div>
 
         <div className="bg-[#181614] border-2 border-[#C99A2E] p-5 sm:p-6 shadow-[4px_4px_0px_#11100C]">
-          <span className="font-mono text-[9px] font-bold text-[#B94717] uppercase tracking-widest block">OTHER TANGY LOGINS</span>
+          <span className="font-mono text-[10px] font-bold text-[#B94717] uppercase tracking-widest block">OTHER TANGY LOGINS</span>
           <h2 className="font-condensed text-lg font-bold uppercase mt-1 mb-1">NOT A PATRON ACCOUNT?</h2>
           <p className="font-mono text-[10px] text-[#E7D5A4]/60 mb-4 leading-relaxed">
             Artists and Tangy staff sign in through their own dedicated portals.
@@ -53,7 +53,7 @@ export const JoinLoginPage = () => {
                 <div className="font-mono text-[10px] font-bold uppercase text-[#C99A2E]">Artist Portal</div>
                 <div className="font-mono text-[10px] text-[#E7D5A4]/70">Approved artists sign in here.</div>
               </div>
-              <span className="shrink-0 px-2 py-1 border border-[#C99A2E]/60 text-[9px] font-bold uppercase tracking-wider text-[#E7D5A4]">→</span>
+              <span className="shrink-0 px-2 py-1 border border-[#C99A2E]/60 text-[10px] font-bold uppercase tracking-wider text-[#E7D5A4]">→</span>
             </button>
             <button
               type="button"
@@ -64,7 +64,7 @@ export const JoinLoginPage = () => {
                 <div className="font-mono text-[10px] font-bold uppercase text-[#C99A2E]">Staff / Admin</div>
                 <div className="font-mono text-[10px] text-[#E7D5A4]/70">Tangy team console.</div>
               </div>
-              <span className="shrink-0 px-2 py-1 border border-[#C99A2E]/60 text-[9px] font-bold uppercase tracking-wider text-[#E7D5A4]">→</span>
+              <span className="shrink-0 px-2 py-1 border border-[#C99A2E]/60 text-[10px] font-bold uppercase tracking-wider text-[#E7D5A4]">→</span>
             </button>
 
             {/* DEMO-ONLY CODE — see src/config/demoAdmin.js for the deletion note. */}
@@ -78,7 +78,7 @@ export const JoinLoginPage = () => {
                   <div className="font-mono text-[10px] font-bold uppercase text-[#E7D5A4]/70">Team Demo</div>
                   <div className="font-mono text-[10px] text-[#E7D5A4]/60">Internal preview — not a real account.</div>
                 </div>
-                <span className="shrink-0 px-2 py-1 border border-[#E7D5A4]/40 text-[9px] font-bold uppercase tracking-wider text-[#E7D5A4]/70">→</span>
+                <span className="shrink-0 px-2 py-1 border border-[#E7D5A4]/40 text-[10px] font-bold uppercase tracking-wider text-[#E7D5A4]/70">→</span>
               </button>
             )}
           </div>

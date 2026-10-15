@@ -36,7 +36,7 @@ export const PastSessionPage = () => {
     <div className="theme-sessions relative isolate min-h-screen text-[#E7D5A4] font-mono overflow-x-hidden printNoise" data-page-background={s?.page_background || 'default'}>
       <div aria-hidden="true" className="fixed inset-0 -z-10 pointer-events-none" style={pageBackground} data-session-backdrop />
       <Navbar />
-      <main className="pt-24 sm:pt-32 pb-16 px-4 sm:px-6 max-w-5xl mx-auto">
+      <main className="pt-20 sm:pt-32 pb-10 md:pb-16 px-4 sm:px-6 max-w-5xl mx-auto">
         <PageCrumbs parent={{ label: 'Previous Sessions', to: '/sessions/archive' }} label={s?.name} className="[&_ol]:justify-start" />
         {loading && <ContentLoading label="Opening the record…" />}
         {!loading && error && <ContentError onRetry={retry}>We couldn’t load this session right now.</ContentError>}

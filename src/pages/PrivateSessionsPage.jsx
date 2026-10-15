@@ -70,7 +70,7 @@ export const PrivateSessionsPage = () => {
                 className="bg-[#181614] border-2 border-[#ecdcaf]/40 p-5 shadow-[4px_4px_0px_#191410] text-left flex flex-col justify-between hover:border-[#d1a437] focus-visible:border-[#d1a437] transition-all"
               >
                 <div>
-                  <span className="font-mono text-[9px] font-bold text-[#d1a437]">CATEGORY #{item.number}</span>
+                  <span className="font-mono text-[10px] font-bold text-[#d1a437]">CATEGORY #{item.number}</span>
                   <h3 className="font-poster text-xl text-[#ecdcaf] my-1">{item.title}</h3>
                   <p className="font-mono text-xs text-[#ecdcaf]/80 leading-relaxed">{item.summary}</p>
                 </div>
@@ -89,7 +89,7 @@ export const PrivateSessionsPage = () => {
             {packages.map((pkg, idx) => (
               <div key={idx} className="bg-[#EFE2C0] paperTexture text-[#191410] p-6 border-2 border-[#191410] shadow-[4px_4px_0px_#191410] flex flex-col justify-between">
                 <div>
-                  <span className="font-mono text-[9px] font-bold text-[#315D73]">TIER #0{idx+1}</span>
+                  <span className="font-mono text-[10px] font-bold text-[#315D73]">TIER #0{idx+1}</span>
                   <h3 className="font-poster text-2xl text-[#191410] my-1">{pkg.name}</h3>
                   <div className="font-mono text-xl font-bold text-[#c2272a] mb-3">{pkg.price}</div>
                   <p className="font-mono text-xs text-[#191410]/80 leading-relaxed">{pkg.desc}</p>

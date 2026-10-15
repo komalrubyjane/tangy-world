@@ -54,10 +54,10 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
         <div className="bg-[#191410] p-4 border-2 border-[#d1a437] shadow-md flex items-center gap-4 text-left">
           <div className="w-16 h-16 bg-[#ecdcaf] text-[#191410] rounded-full border-2 border-[#c2272a] flex flex-col items-center justify-center text-center">
             <span className="font-poster text-lg font-bold">TS</span>
-            <span className="font-mono text-[7px] font-bold">HYD</span>
+            <span className="font-mono text-[10px] font-bold">HYD</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-mono text-[9px] text-[#d1a437] font-bold tracking-widest uppercase">PASSPORT NO: {user.passport_id || '—'}</span>
+            <span className="font-mono text-[10px] text-[#d1a437] font-bold tracking-widest uppercase">PASSPORT NO: {user.passport_id || '—'}</span>
             <h3 className="font-poster text-xl text-[#ecdcaf]">{user.full_name || user.email}</h3>
             <span className="font-mono text-xs text-[#ecdcaf]/80">Member since {user.member_since ? new Date(user.member_since).getFullYear() : '—'}</span>
           </div>
@@ -83,10 +83,10 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
                 onClick={() => playSFX('ticketClick')}
                 className="p-3 border-2 flex flex-col items-center text-center gap-1 bg-[#e9decb] text-[#241a12] border-[#191410] rotate-[-1deg] shadow-md"
               >
-                <span className="font-mono text-[8px] font-bold text-[#c2272a] uppercase">{b.registration_code}</span>
+                <span className="font-mono text-[10px] font-bold text-[#c2272a] uppercase">{b.registration_code}</span>
                 <h4 className="font-poster text-sm leading-tight uppercase my-0.5">{b.events?.name || 'Session'}</h4>
-                <span className="font-mono text-[9px] opacity-80">{b.events?.event_date} · {b.events?.venue}</span>
-                <span className={`font-mono text-[8px] font-black border px-2 py-0.5 mt-1 uppercase ${
+                <span className="font-mono text-[10px] opacity-80">{b.events?.event_date} · {b.events?.venue}</span>
+                <span className={`font-mono text-[10px] font-black border px-2 py-0.5 mt-1 uppercase ${
                   b.status === 'confirmed' ? 'text-emerald-800 border-emerald-800' : 'text-[#8a5a1a] border-[#8a5a1a]'
                 }`}>
                   {b.status === 'confirmed' ? '✓ CONFIRMED' : b.status.toUpperCase()}
@@ -96,7 +96,7 @@ export const DigitalPassportModal = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        <div className="font-mono text-[9.5px] text-[#ecdcaf]/60 text-center pt-2 border-t border-[#ecdcaf]/20">
+        <div className="font-mono text-[10px] text-[#ecdcaf]/60 text-center pt-2 border-t border-[#ecdcaf]/20">
           ✦ SHOW YOUR TICKET QR CODE AT CHECK-IN
         </div>
 

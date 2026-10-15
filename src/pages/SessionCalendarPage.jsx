@@ -111,7 +111,7 @@ export const SessionCalendarPage = () => {
       <Navbar />
 
       {/* HERO */}
-      <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -221,7 +221,7 @@ export const SessionCalendarPage = () => {
                           : 'border-[#11100C]/15 text-[#11100C]'
                       } ${hasEvents ? 'bg-[#E7D5A4] font-bold' : ''} ${selected ? 'ring-2 ring-[#11100C] bg-[#C99A2E]' : ''}`}
                     >
-                      <span className="text-[8px] opacity-60">{WEEKDAY_LABELS[dIdx]}</span>
+                      <span className="text-[10px] opacity-60">{WEEKDAY_LABELS[dIdx]}</span>
                       <span>{day}</span>
                       {hasEvents && <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[#B94717]" />}
                     </button>
@@ -233,7 +233,7 @@ export const SessionCalendarPage = () => {
         </div>
 
         {/* EVENT LEGEND */}
-        <div className="flex items-center gap-4 mt-4 font-mono text-[9px] sm:text-[10px] text-[#E7D5A4]/60 uppercase tracking-wider">
+        <div className="flex items-center gap-4 mt-4 font-mono text-[10px] sm:text-[10px] text-[#E7D5A4]/60 uppercase tracking-wider">
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#B94717] inline-block" /> HAS SESSION</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 border-2 border-[#B94717] inline-block" /> TODAY</span>
         </div>
@@ -265,7 +265,7 @@ export const SessionCalendarPage = () => {
                       <LotusStamp index={evtIdx} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center font-mono text-[9px] sm:text-[10px] font-bold text-[#B94717] uppercase mb-2 flex-wrap gap-1">
+                      <div className="flex justify-between items-center font-mono text-[10px] sm:text-[10px] font-bold text-[#B94717] uppercase mb-2 flex-wrap gap-1">
                         <span>{evt.time}</span>
                         <span className={isSoldOut ? 'text-[#5A120D]' : 'text-[#2D5A1B]'}>
                           {isPast ? 'PAST SESSION' : isSoldOut ? 'SOLD OUT · WAITLIST OPEN' : 'ON SALE'}
@@ -274,7 +274,7 @@ export const SessionCalendarPage = () => {
                       <h3 className="display text-2xl sm:text-3xl text-[#11100C] leading-tight mb-2">{evt.name}</h3>
                       <p className="font-mono text-[10px] sm:text-xs text-[#B94717] font-bold uppercase mb-2">{evt.venue} · {evt.city}</p>
                       <p className="font-mono text-[10px] sm:text-xs text-[#11100C]/75 leading-relaxed mb-3">{evt.description}</p>
-                      <p className="font-mono text-[9px] text-[#11100C]/60 uppercase mb-4">
+                      <p className="font-mono text-[10px] text-[#11100C]/60 uppercase mb-4">
                         FROM {evt.price}
                       </p>
                       <button

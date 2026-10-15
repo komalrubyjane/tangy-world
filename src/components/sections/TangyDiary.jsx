@@ -64,10 +64,6 @@ export const TangyDiary = () => {
   const leaf = isMobile ? currentMobileLeaf : desktopLeaf;
   const shR = isMobile ? SH_R_MOBILE : SH_R;
   const shL = isMobile ? SH_L_MOBILE : SH_L;
-  // Page padding: on phones the 28px spine covers 14px of each page, so the
-  // spine-side edge gets more room.
-  const padFront = isMobile ? '14px 12px 12px 22px' : 16;
-  const padBack = isMobile ? '14px 22px 12px 12px' : 16;
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -262,16 +258,17 @@ export const TangyDiary = () => {
         >
           {/* Desk shadow */}
           <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 pointer-events-none"
-            style={{ width: isMobile ? 'min(88vw, 600px)' : '72%', height: '54px', background: 'radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.28), transparent)' }}/>
+            style={{ width: isMobile ? 'min(76vw, 480px)' : '72%', height: '54px', background: 'radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.28), transparent)' }}/>
 
           {/* Book Container */}
           <div
             id="diary-book"
             style={{
               position: 'relative',
-              width: isMobile ? 'min(calc(100vw - 32px), 620px)' : 'min(880px, 94vw, calc((100svh - 132px - var(--dock-space) - 170px) * 1.42))',
-              height: isMobile ? 'clamp(460px, calc(840px - 100vw), 530px)' : 'min(580px, calc(100svh - 132px - var(--dock-space) - 170px))',
+              width: isMobile ? 'clamp(230px, 76vw, 480px)' : 'min(880px, 94vw, calc((100svh - 132px - var(--dock-space) - 170px) * 1.42))',
+              height: isMobile ? 'auto' : 'min(580px, calc(100svh - 132px - var(--dock-space) - 170px))',
               minHeight: isMobile ? undefined : '380px',
+              aspectRatio: isMobile ? '880 / 620' : undefined,
               transformStyle: 'preserve-3d',
             }}
           >
@@ -317,7 +314,7 @@ export const TangyDiary = () => {
             }}>
               <div style={{ position:'absolute', inset:0, opacity:0.5,
                 background:'repeating-linear-gradient(0deg,rgba(166,136,83,0.6) 0 2px,transparent 2px 8px)' }}/>
-              <div className="font-mono text-[10px] tracking-[0.08em] text-[#d4b47a] opacity-90 whitespace-nowrap select-none"
+              <div className="font-mono text-[8.5px] md:text-[9.5px] tracking-[0.18em] text-[#A68853] opacity-90 whitespace-nowrap select-none"
                 style={{ position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%) rotate(90deg)' }}>
                 TANGY DIARY · VOL. I · 2016–2026
               </div>
@@ -358,7 +355,7 @@ export const TangyDiary = () => {
                 ))}
                 <div style={{ position:'absolute', inset:0, padding:18, display:'flex', flexDirection:'column' }}
                   className="text-[#EADFC5]">
-                  <div className="font-mono text-[10px] tracking-[0.08em] uppercase text-[#EADFC5]/55 text-center mt-2">
+                  <div className="font-mono text-[7px] tracking-[0.22em] uppercase text-[#EADFC5]/55 text-center mt-2">
                     Archive No. 001
                   </div>
                   <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -366,17 +363,17 @@ export const TangyDiary = () => {
                       style={{ fontSize:'min(46px,4.5vw)' }}>
                       TANGY<br/>DIARY
                     </div>
-                    <div className="font-mono text-[10px] tracking-[0.2em] text-[#EADFC5]/72 mt-2 uppercase">Field Notes</div>
+                    <div className="font-mono text-[9px] tracking-[0.38em] text-[#EADFC5]/72 mt-2 uppercase">Field Notes</div>
                     <div className="font-serif italic text-[11px] text-[#EADFC5]/50 mt-1">Hyderabad · Since 2016</div>
                     <svg className="w-5 h-5 mx-auto mt-2 opacity-45 text-[#A68853]"><use href="#sym-compass"/></svg>
                   </div>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }}
+                <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="flex flex-col items-center justify-center text-center text-[#2E221B]">
                   <div className="font-serif italic text-lg">Field Journal</div>
-                  <div className="font-mono text-[10px] tracking-[0.1em] uppercase text-[#5A4032] mt-1.5"
+                  <div className="font-mono text-[8px] tracking-[0.1em] uppercase text-[#5A4032] mt-1.5"
                     style={{ border:'1px dashed rgba(166,136,83,0.55)', padding:'3px 8px' }}>
                     Vol. I · 2016 — 2026
                   </div>
@@ -396,30 +393,30 @@ export const TangyDiary = () => {
               onClick={() => handleLeafClick(1)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:padFront }} className="text-[#2E221B]">
-                  <div className="flex justify-between font-mono text-[10px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] tracking-[0.09em] uppercase text-[#5A4032] mb-1">
                     <span>Spread #01</span>
                     <span className="text-[#A44A34] font-bold">14 Oct, 2024</span>
                   </div>
                   <div className="font-serif italic text-lg leading-tight">The Beginning &amp;<br/>Bansilalpet Stepwell</div>
-                  <div className="font-mono text-[10px] text-[#A44A34] uppercase tracking-wider mt-0.5">LOCATION: BANSILALPET STEPWELL</div>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                  <div className="font-mono text-[7.5px] text-[#A44A34] uppercase tracking-wider mt-0.5">LOCATION: BANSILALPET STEPWELL</div>
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
                     The stepwell echoes before the crowd arrives. Water dripping against
                     350-year-old stone, acoustic instruments humming without amplification.
                   </p>
-                  <figure className="relative ml-auto mt-2 lg:mt-0 lg:absolute lg:top-[90px] lg:right-2 w-[64px] lg:w-[72px] bg-[#FBF7EE] shadow-md rotate-2" style={{ padding:'4px 4px 12px' }}>
+                  <figure className="absolute top-[90px] right-2 w-[72px] bg-[#FBF7EE] shadow-md rotate-2" style={{ padding:'4px 4px 12px' }}>
                     <div className="absolute -top-1 left-3 bg-[#A68853]/50 -rotate-2" style={{ width:24, height:9 }}/>
                     <svg viewBox="0 0 100 110" className="w-full">
                       <rect width="100" height="110" fill="#3D2B1F"/>
                       <circle cx="50" cy="55" r="13" fill="#1F1713"/>
                     </svg>
-                    <figcaption className="text-center font-serif text-[10px] text-[#2E221B] mt-0.5">Stepwell Echoes</figcaption>
+                    <figcaption className="text-center font-serif text-[8.5px] text-[#2E221B] mt-0.5">Stepwell Echoes</figcaption>
                   </figure>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }} className="text-[#2E221B]">
-                  <div className="font-mono text-[10px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #02 — Left
                   </div>
                   <div className="font-serif italic text-base">Bansilalpet Stepwell Log</div>
@@ -437,21 +434,21 @@ export const TangyDiary = () => {
               onClick={() => handleLeafClick(2)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:padFront }} className="text-[#2E221B]">
-                  <div className="flex justify-between font-mono text-[10px] uppercase text-[#5A4032] mb-1">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
                     <span>Spread #02</span>
                     <span className="text-[#A44A34] font-bold">21 Dec, 2024</span>
                   </div>
                   <div className="font-serif italic text-lg leading-tight">Monsoon Acoustics &amp;<br/>Old City Haveli</div>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
                     When the lights dropped at midnight, 300 people stood completely still
                     under rain-soaked arches. No phones in the air.
                   </p>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }} className="text-[#2E221B]">
-                  <div className="font-mono text-[10px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #03 — Left
                   </div>
                 </div>
@@ -465,24 +462,24 @@ export const TangyDiary = () => {
               onClick={() => handleLeafClick(3)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:padFront }} className="text-[#2E221B]">
-                  <div className="flex justify-between font-mono text-[10px] uppercase text-[#5A4032] mb-1">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="flex justify-between font-mono text-[8.5px] uppercase text-[#5A4032] mb-1">
                     <span>Spread #03</span>
                     <span className="text-[#A44A34] font-bold">05 Jan, 2025</span>
                   </div>
                   <div className="font-serif italic text-lg leading-tight">Artists &amp;<br/>Performers</div>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 leading-relaxed opacity-90 text-[#2E221B]">
                     The artists gathered around ribbon microphones for an unscripted acoustic jam.
                   </p>
-                  <div className="inline-block mt-3 lg:mt-0 lg:absolute lg:bottom-3 lg:left-3 text-[#EADFC5] font-mono text-[10px] rotate-1 shadow-sm"
+                  <div className="absolute bottom-3 left-3 text-[#EADFC5] font-mono text-[7.5px] rotate-1 shadow-sm"
                     style={{ background:'#A44A34', padding:'5px 8px', maxWidth:115 }}>
                     PERFORMER PASS // BACKSTAGE
                   </div>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }} className="text-[#2E221B]">
-                  <div className="font-mono text-[10px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #04 — Left
                   </div>
                 </div>
@@ -496,17 +493,17 @@ export const TangyDiary = () => {
               onClick={() => handleLeafClick(4)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:padFront }} className="text-[#2E221B]">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
                   <div className="font-serif italic text-lg leading-tight">Backstage Notes &amp;<br/>Hidden Spaces</div>
-                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px' }} className="mt-1.5 opacity-88">
+                  <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px' }} className="mt-1.5 opacity-88">
                     A 300-year-old sanctuary tucked behind stone arches. We mapped the acoustics
                     by hand, with no digital tools.
                   </p>
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }} className="text-[#2E221B]">
-                  <div className="font-mono text-[10px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
+                <div style={{ position:'absolute', inset:0, padding:16 }} className="text-[#2E221B]">
+                  <div className="font-mono text-[8px] uppercase mb-1 border-b border-[#5A4032]/40 pb-0.5 inline-block">
                     Spread #05 — Left
                   </div>
                 </div>
@@ -520,7 +517,7 @@ export const TangyDiary = () => {
               onClick={() => handleLeafClick(5)}
             >
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:isMobile ? padFront : 12 }} className="text-[#2E221B]">
+                <div style={{ position:'absolute', inset:0, padding:12 }} className="text-[#2E221B]">
                   <div className="relative mx-auto" style={{
                     background: 'linear-gradient(170deg, #FDFAF4 0%, #F8F3E8 60%, #F2EBD8 100%)',
                     border: '1px solid rgba(90,64,50,0.15)',
@@ -528,7 +525,7 @@ export const TangyDiary = () => {
                     padding: '10px 12px',
                     transform: 'rotate(-1.2deg)',
                   }}>
-                    <p style={{ fontFamily:'Caveat, cursive', fontSize:'15px', lineHeight:'1.45', color:'#2E221B' }}>
+                    <p style={{ fontFamily:'Caveat, cursive', fontSize:'14px', lineHeight:'1.45', color:'#2E221B' }}>
                       Dear You,<br/><br/>
                       Every gathering leaves something behind.<br/><br/>
                       A song. A conversation. A place. A memory.<br/><br/>
@@ -539,7 +536,7 @@ export const TangyDiary = () => {
                 </div>
               </div>
               <div style={backFace({ background:PAPER_BG, boxShadow:shL })}>
-                <div style={{ position:'absolute', inset:0, padding:padBack }}
+                <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                   <div className="font-serif italic text-base">The story continues.</div>
                 </div>
@@ -549,7 +546,7 @@ export const TangyDiary = () => {
             {/* ── LEAF 6: Static final right page ──────────── */}
             <div className="diary-leaf" style={leafStyle(6, isMobile, false, reducedMotion)}>
               <div style={frontFace({ background:PAPER_BG, boxShadow:shR })}>
-                <div style={{ position:'absolute', inset:0, padding:padFront }}
+                <div style={{ position:'absolute', inset:0, padding:16 }}
                   className="text-[#2E221B] flex flex-col items-center justify-center text-center">
                   <div className="font-serif italic text-xl">More stories<br/>are waiting.</div>
                   <div style={{ fontFamily:'Caveat, cursive', fontSize:'16px', fontWeight:700 }} className="mt-3 opacity-60">To be continued…</div>
@@ -594,7 +591,7 @@ export const TangyDiary = () => {
           </div>
           {isMobile ? (
             !hasInteracted && (
-              <div className="font-mono text-[10px] tracking-[0.15em] text-[#EFE2C0]/90 text-center uppercase">
+              <div className="font-mono text-[10px] tracking-[0.15em] text-[#EFE2C0]/70 text-center uppercase">
                 ‹ swipe or tap a page to turn ›
               </div>
             )

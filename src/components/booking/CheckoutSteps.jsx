@@ -42,7 +42,7 @@ function Field({ id, label, required, hint, error, children }) {
   return (
     <div className="flex flex-col gap-1">
       <label htmlFor={id} className={labelCls}>{label}{required && <span aria-hidden="true"> *</span>}{!required && <span className="font-normal normal-case tracking-normal text-[#191410]/60"> (optional)</span>}</label>
-      {hint && <p id={`${id}-hint`} className="font-mono text-[9.5px] text-[#191410]/65 m-0">{hint}</p>}
+      {hint && <p id={`${id}-hint`} className="font-mono text-[10px] text-[#191410]/65 m-0">{hint}</p>}
       {children}
       <Err id={`${id}-error`}>{error}</Err>
     </div>
@@ -59,7 +59,7 @@ function QuestionInput({ q, value, onChange, error, quantity }) {
     return (
       <fieldset className="flex flex-col gap-1.5 m-0 p-0 border-0" aria-describedby={described} data-question={q.id}>
         <legend className={labelCls}>{q.label}{q.required ? <span aria-hidden="true"> *</span> : <span className="font-normal normal-case tracking-normal text-[#191410]/60"> (optional)</span>}</legend>
-        {q.help && <p id={`${id}-hint`} className="font-mono text-[9.5px] text-[#191410]/65 m-0">{q.help}</p>}
+        {q.help && <p id={`${id}-hint`} className="font-mono text-[10px] text-[#191410]/65 m-0">{q.help}</p>}
         <div className="flex flex-wrap gap-2">
           {opts.map(([v, label]) => {
             const on = multi ? (value || []).includes(v) : value === v;
@@ -106,7 +106,7 @@ export function CheckoutProgress({ step }) {
             <span className={`w-7 h-7 rounded-full inline-flex items-center justify-center font-mono text-[11px] font-bold border-2 ${state === 'current' ? 'bg-[#c2272a] text-[#ecdcaf] border-[#c2272a]' : state === 'done' ? 'bg-[#191410] text-[#ecdcaf] border-[#191410]' : 'border-[#191410]/40 text-[#191410]/60'}`}>
               {state === 'done' ? <span aria-hidden="true">✓</span> : n}
             </span>
-            <span className={`font-mono text-[8.5px] uppercase leading-tight ${state === 'current' ? 'font-bold text-[#191410]' : 'text-[#191410]/60'}`}>{label}<span className="sr-only">{state === 'done' ? ' (done)' : ''}</span></span>
+            <span className={`font-mono text-[10px] uppercase leading-tight ${state === 'current' ? 'font-bold text-[#191410]' : 'text-[#191410]/60'}`}>{label}<span className="sr-only">{state === 'done' ? ' (done)' : ''}</span></span>
           </li>
         );
       })}
@@ -230,7 +230,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
           </p>
           <fieldset className="flex flex-col gap-3 m-0 p-0 border-0" data-attendee-names>
             <legend className={labelCls}>Attendee details</legend>
-            <p className="font-mono text-[9.5px] text-[#191410]/70 m-0">
+            <p className="font-mono text-[10px] text-[#191410]/70 m-0">
               {form.quantity === 1 ? 'Who is attending?' : 'Enter the name of everyone attending this booking.'} Staff check each person in by name at the entrance, and one QR covers the whole booking.
             </p>
             {form.names.map((n, i) => (
@@ -282,7 +282,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
                 <textarea id="c-collab-note" rows={2} maxLength={1000} value={form.collabNote} onChange={(e) => set({ collabNote: e.target.value })} className={inputCls(errors['c-collab-note'])} />
               </Field>
             </div>
-            <p className="font-mono text-[9px] text-[#191410]/60 mt-2 mb-0">The Tangy team will reach out — this doesn't sign you up for anything.</p>
+            <p className="font-mono text-[10px] text-[#191410]/60 mt-2 mb-0">The Tangy team will reach out — this doesn't sign you up for anything.</p>
           </details>
           <Field id="c-note" label="Anything else you'd like to share?" error={errors['c-note']}>
             <textarea id="c-note" rows={2} maxLength={1000} value={form.note} onChange={(e) => set({ note: e.target.value })} className={inputCls(errors['c-note'])} />
@@ -323,7 +323,7 @@ export function CheckoutSteps({ event, tiers, form, setForm, step, setStep, pay,
             </div>
           )}
           {pay.status === 'dismissed' && <p role="status" className="font-mono text-[10.5px] text-[#191410] m-0">Payment window closed — nothing was charged. You can try again when you're ready.</p>}
-          <div className="p-2 bg-[#C89D35]/20 text-[#191410] font-mono text-[9px] border border-[#d1a437]/50">
+          <div className="p-2 bg-[#C89D35]/20 text-[#191410] font-mono text-[10px] border border-[#d1a437]/50">
             🔒 Secure payment via Razorpay — your card/UPI details never touch Tangy's servers, and payment is verified before your booking is confirmed.
             {' '}By paying you accept the <a href="/terms" target="_blank" rel="noopener" className="underline">terms</a> and <a href="/refund-policy" target="_blank" rel="noopener" className="underline">refund policy</a>; see how we use your details in the <a href="/privacy" target="_blank" rel="noopener" className="underline">privacy notice</a>.
           </div>

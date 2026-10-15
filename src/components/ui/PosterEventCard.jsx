@@ -31,7 +31,7 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
         {/* Spot-colour side strip carrying the event's tags */}
         <div className="relative w-6 shrink-0 bg-[#B5532A]">
           <span
-            className="absolute inset-0 flex items-center justify-center font-mono text-[9px] font-medium text-[#EFE2C0] uppercase tracking-[0.22em] whitespace-nowrap"
+            className="absolute inset-0 flex items-center justify-center font-mono text-[10px] font-medium text-[#EFE2C0] uppercase tracking-[0.22em] whitespace-nowrap"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
             {(evt.tags?.slice(0, 3).join(' · ') || 'LIVE · MUSIC · CULTURE')}
@@ -94,7 +94,7 @@ export const PosterEventCard = ({ event: evt, idx, onBook }) => {
                 </button>
                 <div className="shrink-0 w-16 flex flex-col items-center justify-center bg-[#B5532A] text-[#EFE2C0] border-l-2 border-dashed border-[#F5E9C9]">
                   <span className="font-mono text-[12px] font-medium leading-none">{evt.price}</span>
-                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] opacity-80 mt-1">Entry 1</span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] opacity-80 mt-1">Entry 1</span>
                 </div>
               </div>
             </div>

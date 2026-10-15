@@ -20,7 +20,7 @@ export const DiaryPostPage = () => {
   return (
     <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono t-quiet">
       <Navbar />
-      <main className="pt-28 pb-16 px-4 sm:px-6 max-w-3xl mx-auto">
+      <main className="pt-20 md:pt-28 pb-10 md:pb-16 px-4 sm:px-6 max-w-3xl mx-auto">
         <Link to="/diary" className="font-mono text-[10px] text-[#D19A24] tracking-widest uppercase hover:underline">← The diary</Link>
         {loading && <ContentLoading label="Loading entry…" />}
         {!loading && error && <ContentError onRetry={retry} />}

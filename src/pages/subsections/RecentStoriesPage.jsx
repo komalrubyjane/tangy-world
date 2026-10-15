@@ -18,7 +18,7 @@ export const RecentStoriesPage = () => {
     <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
+      <section className="relative pt-20 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">
@@ -47,7 +47,7 @@ export const RecentStoriesPage = () => {
                   <LotusStamp index={idx} bg="transparent" border="#D19A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
                 </div>
                 <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase mb-2">{formatDate(story.published_at)}{story.location ? ` · ${story.location}` : ''}</span>
+                  <span className="font-mono text-[10px] font-bold text-[#7C2D18] uppercase mb-2">{formatDate(story.published_at)}{story.location ? ` · ${story.location}` : ''}</span>
                   <h2 className="font-serif italic text-lg sm:text-xl text-[#11100C] font-bold mb-2 leading-tight">{story.title}</h2>
                   <p className="font-body text-xs sm:text-sm text-[#11100C]/80 leading-relaxed flex-1">{story.excerpt}</p>
                 </div>

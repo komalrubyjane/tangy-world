@@ -26,7 +26,7 @@ export const BlogsPage = () => {
       <Navbar />
 
       {/* PAGE HERO */}
-      <section id="journal" className="relative pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
+      <section id="journal" className="relative pt-20 md:pt-28 pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#D19A24]/40">
         <span className="font-mono text-xs text-[#D19A24] tracking-[0.35em] uppercase font-bold mb-3 block">
           TANGY EDITORIALS // SHOW STORIES & MUSIC LAUNCHES
         </span>
@@ -70,7 +70,7 @@ export const BlogsPage = () => {
             >
               <RetroGrain index={idx % 2} opacity={0.1} blend="overlay" />
               <LotusStamp index={idx} bg="transparent" border="#7C2D18" className="hidden sm:block absolute -top-3 -right-3 w-9 h-9 z-20 opacity-95 rotate-[-8deg]" />
-              <div className="relative flex justify-between items-center font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
+              <div className="relative flex justify-between items-center font-mono text-[10px] sm:text-xs font-bold text-[#7C2D18] border-b border-[#11100C]/30 px-4 sm:px-6 py-2 sm:py-3 uppercase">
                 <span>{formatDate(entry.published_at)}</span>
                 <span className="hidden sm:block">{entry.location || 'HYDERABAD ARCHIVE'}</span>
               </div>
@@ -89,7 +89,7 @@ export const BlogsPage = () => {
 
                 <div className="sm:col-span-2 p-4 sm:p-8 flex flex-col justify-between">
                   <div>
-                    <span className="font-mono text-[9px] font-bold text-[#7C2D18] uppercase block mb-2 sm:hidden">
+                    <span className="font-mono text-[10px] font-bold text-[#7C2D18] uppercase block mb-2 sm:hidden">
                       {entry.location || 'HYDERABAD ARCHIVE'}
                     </span>
 
@@ -103,7 +103,7 @@ export const BlogsPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-t border-[#11100C]/20 pt-3 sm:pt-4">
-                    <div className="font-mono text-[9px] sm:text-xs font-bold text-[#7C2D18] uppercase">
+                    <div className="font-mono text-[10px] sm:text-xs font-bold text-[#7C2D18] uppercase">
                       {(entry.tags || []).length ? `TAGS: ${entry.tags.join(' · ')}` : entry.author_name ? `BY ${entry.author_name}` : ''}
                     </div>
                     <Link

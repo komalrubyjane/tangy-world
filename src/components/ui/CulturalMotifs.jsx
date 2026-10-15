@@ -119,7 +119,7 @@ export const RegistrationMark = ({ color = '#ECDCAF', className = '' }) => (
 export const PaperLabel = ({ text, rotation = '-2deg', color = '#E9DECB', textColor = '#241A12', className = '' }) => (
   <div
     style={{ transform: `rotate(${rotation})`, backgroundColor: color, color: textColor }}
-    className={`relative inline-block font-mono text-[9px] font-bold px-2.5 py-1 uppercase tracking-widest shadow-md pointer-events-none select-none border border-black/20 ${className}`}
+    className={`relative inline-block font-mono text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest shadow-md pointer-events-none select-none border border-black/20 ${className}`}
   >
     <span className="absolute -top-[3px] left-[18%] w-[30%] h-[7px] bg-black/10 -rotate-2" aria-hidden="true" />
     {text}

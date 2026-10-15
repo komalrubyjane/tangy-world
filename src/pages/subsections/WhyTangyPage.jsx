@@ -11,7 +11,7 @@ export const WhyTangyPage = () => {
       <Navbar />
 
       {/* HERO */}
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/30">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
           <span className="font-condensed text-[18vw] leading-none text-[#E7D5A4] font-bold uppercase">WHY</span>
         </div>

@@ -52,7 +52,7 @@ export const CollaboratePage = () => {
       <Navbar />
 
       {/* PAGE HERO */}
-      <section className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
 
         <div className="relative z-10">
           <span className="font-mono text-[10px] sm:text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold mb-3 block">
@@ -78,7 +78,7 @@ export const CollaboratePage = () => {
           ].map((stat, i) => (
             <div key={i} className="text-center px-5 sm:border-r last:border-0 border-[#11100C]/20">
               <div className="display text-3xl sm:text-5xl text-[#11100C] leading-none">{stat.num}</div>
-              <div className="font-mono text-[9px] sm:text-[10px] text-[#11100C]/60 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
+              <div className="font-mono text-[10px] sm:text-[10px] text-[#11100C]/60 tracking-[0.25em] uppercase mt-1">{stat.label}</div>
             </div>
           ))}
         </div>

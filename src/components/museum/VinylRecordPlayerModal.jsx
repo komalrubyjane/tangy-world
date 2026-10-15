@@ -53,9 +53,9 @@ export const VinylRecordPlayerModal = ({ isOpen, onClose }) => {
 
               {/* CENTER RECORD LABEL */}
               <div className="w-24 h-24 rounded-full bg-[#c2272a] text-[#ecdcaf] border-2 border-[#191410] flex flex-col items-center justify-center text-center p-1 shadow-md">
-                <span className="font-poster text-[9px] leading-tight uppercase">TANGY SESSIONS</span>
-                <span className="font-mono text-[7px] text-[#d1a437] font-bold">33⅓ RPM</span>
-                <span className="font-mono text-[6px] tracking-widest">{selectedVinyl.catalogNo}</span>
+                <span className="font-poster text-[10px] leading-tight uppercase">TANGY SESSIONS</span>
+                <span className="font-mono text-[10px] text-[#d1a437] font-bold">33⅓ RPM</span>
+                <span className="font-mono text-[10px] tracking-widest">{selectedVinyl.catalogNo}</span>
               </div>
             </div>
 
@@ -70,18 +70,18 @@ export const VinylRecordPlayerModal = ({ isOpen, onClose }) => {
           {/* VINYL DETAILS & STORY */}
           <div className="flex flex-col gap-4 text-left">
             <div>
-              <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase">{selectedVinyl.catalogNo} · {selectedVinyl.speed}</span>
+              <span className="font-mono text-[10px] font-bold text-[#d1a437] uppercase">{selectedVinyl.catalogNo} · {selectedVinyl.speed}</span>
               <h3 className="font-poster text-2xl text-[#ecdcaf]">{selectedVinyl.title}</h3>
               <p className="font-mono text-xs text-[#c2272a] font-bold">{selectedVinyl.artist} ({selectedVinyl.year})</p>
             </div>
 
             <div className="bg-[#0d0a07] p-3 border border-[#ecdcaf]/20">
-              <span className="font-mono text-[9px] font-bold text-[#d1a437] uppercase">PREVIEW TRACK</span>
+              <span className="font-mono text-[10px] font-bold text-[#d1a437] uppercase">PREVIEW TRACK</span>
               <p className="font-sans text-xs italic text-[#ecdcaf]/90 my-1">{selectedVinyl.previewTrack}</p>
             </div>
 
             <div className="border-l-2 border-[#d1a437] pl-3 py-1">
-              <span className="font-mono text-[9px] font-bold text-[#ecdcaf]/70 uppercase">LINER NOTES</span>
+              <span className="font-mono text-[10px] font-bold text-[#ecdcaf]/70 uppercase">LINER NOTES</span>
               <p className="font-mono text-xs text-[#ecdcaf]/80 mt-1">{selectedVinyl.story}</p>
             </div>
 

@@ -16,7 +16,7 @@ const STATUS_COLORS = {
 };
 
 const Badge = ({ status }) => (
-  <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#EFE2C0]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
+  <span className={`px-2 py-0.5 text-[10px] font-bold uppercase border ${STATUS_COLORS[status] || 'bg-[#EFE2C0]/10 text-[#E7D5A4] border-[#E7D5A4]/30'}`}>
     {status || 'n/a'}
   </span>
 );
@@ -69,7 +69,7 @@ const BookingCard = ({ b }) => (
         <Badge status={b.status} />
       </div>
       <p className="font-mono text-[10px] mt-1 opacity-80">{fmtDate(b.events?.event_date)} · {b.events?.venue || '—'}</p>
-      <p className="font-mono text-[9px] mt-2 text-[#B94717] font-bold">{b.registration_code} · QTY {b.quantity}</p>
+      <p className="font-mono text-[10px] mt-2 text-[#B94717] font-bold">{b.registration_code} · QTY {b.quantity}</p>
     </div>
   </div>
 );
@@ -161,7 +161,7 @@ export const ProfilePage = () => {
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] overflow-x-hidden">
       <Navbar />
 
-      <main className="pt-24 sm:pt-28 pb-20 px-4 sm:px-6 max-w-5xl mx-auto">
+      <main className="pt-20 sm:pt-28 pb-20 px-4 sm:px-6 max-w-5xl mx-auto">
         {/* HEADER */}
         <Section delay={0}>
           <div className="bg-[#4A171D] border-2 border-[#C99A2E] p-5 sm:p-7 shadow-[4px_4px_0px_#11100C] relative overflow-hidden">
@@ -170,12 +170,12 @@ export const ProfilePage = () => {
                 <span className="font-condensed text-xl sm:text-2xl font-bold">{initials(displayName)}</span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="font-mono text-[9px] font-bold text-[#C99A2E] uppercase tracking-[0.25em] block mb-1">
+                <span className="font-mono text-[10px] font-bold text-[#C99A2E] uppercase tracking-[0.25em] block mb-1">
                   ✦ TANGY DIGITAL PASSPORT
                 </span>
                 <h1 className="font-condensed text-2xl sm:text-3xl font-bold uppercase leading-tight truncate">{displayName}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span className="px-2 py-0.5 text-[9px] font-bold uppercase border border-[#C99A2E] text-[#C99A2E] bg-[#181614]">
+                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase border border-[#C99A2E] text-[#C99A2E] bg-[#181614]">
                     {user.role === 'user' ? 'Patron' : user.role}
                   </span>
                   <span className="font-mono text-[10px] text-[#E7D5A4]/70">Member since {fmtDate(user.member_since?.slice ? user.member_since.slice(0, 10) : user.member_since)}</span>
@@ -202,15 +202,15 @@ export const ProfilePage = () => {
         <Section title="Details" delay={0.05}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
-              <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Email</span>
+              <span className="font-mono text-[10px] font-bold uppercase text-[#C99A2E]">Email</span>
               <div className="font-mono text-xs mt-1 break-all">{user.email}</div>
             </div>
             <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
-              <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Phone</span>
+              <span className="font-mono text-[10px] font-bold uppercase text-[#C99A2E]">Phone</span>
               <div className="font-mono text-xs mt-1">{user.phone || '—'}</div>
             </div>
             <div className="bg-[#181614] border border-[#C99A2E]/40 p-4">
-              <span className="font-mono text-[9px] font-bold uppercase text-[#C99A2E]">Passport ID</span>
+              <span className="font-mono text-[10px] font-bold uppercase text-[#C99A2E]">Passport ID</span>
               <div className="font-mono text-xs mt-1">{user.passport_id || '—'}</div>
             </div>
           </div>
@@ -221,15 +221,15 @@ export const ProfilePage = () => {
           <Section title="Activity" delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
-                <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
+                <span className="font-mono text-[10px] font-bold uppercase text-[#B94717]">Passport Stamps</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : bookings.length}</div>
               </div>
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
-                <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Upcoming</span>
+                <span className="font-mono text-[10px] font-bold uppercase text-[#B94717]">Upcoming</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : upcomingBookings.length}</div>
               </div>
               <div className="bg-[#EFE2C0] paperTexture text-[#11100C] border-2 border-[#11100C] p-4 shadow-[4px_4px_0px_#11100C]">
-                <span className="font-mono text-[9px] font-bold uppercase text-[#B94717]">Past Sessions</span>
+                <span className="font-mono text-[10px] font-bold uppercase text-[#B94717]">Past Sessions</span>
                 <div className="font-condensed text-3xl font-bold mt-1">{bookingsError ? '—' : pastBookings.length}</div>
               </div>
             </div>

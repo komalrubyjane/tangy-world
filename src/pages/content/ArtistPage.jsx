@@ -29,7 +29,7 @@ export const ArtistPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
       <Navbar />
-      <main className="pt-28 pb-16 px-4 sm:px-6 max-w-4xl mx-auto">
+      <main className="pt-20 md:pt-28 pb-10 md:pb-16 px-4 sm:px-6 max-w-4xl mx-auto">
         <Link to="/artist" className="text-[10px] text-[#C99A2E] tracking-widest uppercase hover:underline">← All artists</Link>
         {loading && <ContentLoading label="Loading artist…" />}
         {!loading && error && <ContentError onRetry={retry} />}

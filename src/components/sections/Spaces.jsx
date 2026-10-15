@@ -152,16 +152,16 @@ export const Spaces = () => {
                   alt={venue.name}
                   className="w-full h-full object-cover filter grayscale sepia-[0.3] contrast-125"
                 />
-                <div className="absolute top-2 left-2 bg-[#B5532A] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold uppercase">
+                <div className="absolute top-2 left-2 bg-[#B5532A] text-[#E7D5A4] font-mono text-[10px] px-2 py-0.5 font-bold uppercase">
                   {venue.type}
                 </div>
-                <div className="absolute bottom-2 right-2 bg-[#181614] text-[#E7D5A4] font-mono text-[8px] px-2 py-0.5 font-bold">
+                <div className="absolute bottom-2 right-2 bg-[#181614] text-[#E7D5A4] font-mono text-[10px] px-2 py-0.5 font-bold">
                   {venue.sessions}
                 </div>
               </div>
 
               <div className="p-4">
-                <div className="flex justify-between items-center font-mono text-[9px] font-bold text-[#B94717] border-b border-[#11100C]/20 pb-2 mb-3 uppercase">
+                <div className="flex justify-between items-center font-mono text-[10px] font-bold text-[#B94717] border-b border-[#11100C]/20 pb-2 mb-3 uppercase">
                   <span>{venue.year}</span>
                   <span>{venue.location}</span>
                 </div>

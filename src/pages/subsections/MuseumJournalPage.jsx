@@ -10,7 +10,7 @@ export const MuseumJournalPage = () => {
     <div className="min-h-screen bg-[#211915] text-[#EADFC5] font-mono selection:bg-[#A68853] selection:text-[#241A14] overflow-x-hidden printNoise">
       <Navbar />
 
-      <section className="relative pt-24 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#A68853]/30">
+      <section className="relative pt-20 sm:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#A68853]/30">
         <div className="relative z-10">
           <PageCrumbs />
           <span className="font-mono text-[10px] sm:text-xs text-[#A68853] tracking-[0.35em] uppercase font-bold mb-3 mt-3 block">

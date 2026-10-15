@@ -125,7 +125,7 @@ export const Navbar = () => {
                 className={`relative py-1 flex items-center gap-1 font-mono text-[11px] uppercase tracking-widest transition-colors hover:text-[#C99A2E] after:absolute after:left-0 after:right-3 after:-bottom-0.5 after:h-px after:bg-current after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 ${isOpen || activeSection === cat.title ? 'text-[#C99A2E] after:scale-x-100' : 'text-[#E7D5A4]/90'}`}
               >
                 <span>{cat.title}</span>
-                <span className="text-[8px] opacity-60 transition-transform duration-200 group-hover:rotate-180" aria-hidden="true">▾</span>
+                <span className="text-[10px] opacity-60 transition-transform duration-200 group-hover:rotate-180" aria-hidden="true">▾</span>
               </Link>
 
               {/* Cream Paper Dropdown Menu */}

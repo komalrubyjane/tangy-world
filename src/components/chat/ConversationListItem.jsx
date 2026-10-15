@@ -26,10 +26,10 @@ export const ConversationListItem = ({ conversation, active, onClick }) => {
           <span className={`truncate text-sm ${conversation.unread ? 'font-bold text-[#E7D5A4]' : 'font-semibold text-[#E7D5A4]/85'}`}>
             {other?.name || 'Guest Visitor'}
           </span>
-          <span className="shrink-0 text-[9px] font-mono opacity-50">{timeAgo(conversation.lastMessageAt || conversation.createdAt)}</span>
+          <span className="shrink-0 text-[10px] font-mono opacity-50">{timeAgo(conversation.lastMessageAt || conversation.createdAt)}</span>
         </div>
         <div className="flex items-center gap-1.5 mt-0.5">
-          {other?.role && <span className="text-[9px] font-mono uppercase opacity-50">{ROLE_LABEL[roleBucket(other.role)]}</span>}
+          {other?.role && <span className="text-[10px] font-mono uppercase opacity-50">{ROLE_LABEL[roleBucket(other.role)]}</span>}
         </div>
         <p className={`text-xs mt-1 truncate ${conversation.unread ? 'text-[#E7D5A4]/90 font-medium' : 'text-[#E7D5A4]/60'}`}>
           {conversation.lastMessagePreview || 'No messages yet'}
@@ -37,7 +37,7 @@ export const ConversationListItem = ({ conversation, active, onClick }) => {
         <div className="flex items-center gap-1.5 mt-1.5">
           <StatusBadge status={conversation.status} />
           {conversation.assignedAdmin && (
-            <span className="text-[8.5px] font-mono uppercase opacity-50 truncate">→ {conversation.assignedAdmin.name}</span>
+            <span className="text-[10px] font-mono uppercase opacity-50 truncate">→ {conversation.assignedAdmin.name}</span>
           )}
         </div>
       </div>

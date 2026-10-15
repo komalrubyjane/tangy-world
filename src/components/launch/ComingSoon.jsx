@@ -15,7 +15,7 @@ export const ComingSoonPage = ({ title = 'Coming soon', text, back = { to: '/', 
   return (
     <div className={`${bare ? 'min-h-[70vh]' : 'min-h-screen'} bg-[#181614] text-[#E7D5A4] font-body flex flex-col t-quiet`}>
       {!bare && <Navbar />}
-      <main className="flex-1 flex flex-col items-center justify-center text-center gap-5 px-4 pt-28 pb-16" data-coming-soon>
+      <main className="flex-1 flex flex-col items-center justify-center text-center gap-5 px-4 pt-20 md:pt-28 pb-10 md:pb-16" data-coming-soon>
         <span className="font-mono text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold">Coming soon</span>
         <h1 className="display text-4xl sm:text-6xl uppercase m-0">{title}</h1>
         <p className="max-w-md text-xs sm:text-sm text-[#E7D5A4]/75 m-0">

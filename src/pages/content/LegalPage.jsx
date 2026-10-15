@@ -14,7 +14,7 @@ export const LegalPage = ({ doc }) => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-body t-quiet">
       <Navbar />
-      <main className="pt-28 pb-16 px-4 sm:px-6 max-w-3xl mx-auto" data-legal={doc}>
+      <main className="pt-20 md:pt-28 pb-10 md:pb-16 px-4 sm:px-6 max-w-3xl mx-auto" data-legal={doc}>
         <h1 className="display text-4xl sm:text-6xl uppercase m-0">{d.title}</h1>
         <p className="text-[11px] text-[#E7D5A4]/60 mt-3 mb-0">Version {d.version} · last updated {d.updated}</p>
         {draft && (

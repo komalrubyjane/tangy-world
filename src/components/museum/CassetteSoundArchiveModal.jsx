@@ -127,7 +127,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
             {/* CASSETTE TAPE BRAND LABEL */}
             <div className="flex flex-col items-center text-center px-4">
               <span className="font-poster text-lg text-[#d1a437] tracking-widest">TANGY C-90</span>
-              <span className="font-mono text-[9px] text-[#ecdcaf]/70 uppercase">{selectedTrack.freq} · HIGH BIAS</span>
+              <span className="font-mono text-[10px] text-[#ecdcaf]/70 uppercase">{selectedTrack.freq} · HIGH BIAS</span>
               <span className="font-mono text-[10px] text-[#c2272a] font-bold mt-1 truncate max-w-[200px]">{selectedTrack.title}</span>
             </div>
 
@@ -138,7 +138,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* VU METERS */}
-          <div className="w-full flex justify-between items-center bg-[#191410] px-4 py-2 border border-[#ecdcaf]/20 font-mono text-[9px]">
+          <div className="w-full flex justify-between items-center bg-[#191410] px-4 py-2 border border-[#ecdcaf]/20 font-mono text-[10px]">
             <span className="text-[#d1a437]">VU LEVEL:</span>
             <div className="flex-1 mx-3 h-3 bg-[#0d0a07] border border-[#ecdcaf]/30 relative overflow-hidden">
               <div 
@@ -162,7 +162,7 @@ export const CassetteSoundArchiveModal = ({ isOpen, onClose }) => {
                 <span className="font-mono font-bold text-xs">{selectedTrack.id === track.id && isPlaying ? '▶' : '⏵'}</span>
                 <div>
                   <h4 className="font-poster text-sm tracking-wide">{track.title}</h4>
-                  <p className="font-mono text-[9px] opacity-80">{track.note}</p>
+                  <p className="font-mono text-[10px] opacity-80">{track.note}</p>
                 </div>
               </div>
               <span className="font-mono text-xs font-bold">{track.duration}</span>

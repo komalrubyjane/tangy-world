@@ -46,7 +46,7 @@ export const ArchivePage = () => {
       )}
 
       {/* PAGE HERO */}
-      <section id="session-archive" className="relative pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <section id="session-archive" className="relative pt-20 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none opacity-[0.04]">
           <span className="font-condensed text-[16vw] leading-none text-[#E7D5A4] font-bold uppercase">ARCHIVE</span>
@@ -103,7 +103,7 @@ export const ArchivePage = () => {
               onClick={() => setLightboxSrc(item.src)}
             >
               <RetroGrain index={idx % 2} opacity={0.12} blend="overlay" />
-              <div className="relative flex justify-between font-mono text-[7px] sm:text-[8px] font-bold text-[#C99A2E] mb-1 uppercase">
+              <div className="relative flex justify-between font-mono text-[10px] sm:text-[10px] font-bold text-[#C99A2E] mb-1 uppercase">
                 <span>FRAME {String(idx + 1).padStart(3, '0')}</span>
                 <span>HYD 2025</span>
               </div>
@@ -114,7 +114,7 @@ export const ArchivePage = () => {
                   className="w-full h-full object-cover filter grayscale sepia-[0.25] contrast-125 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                 />
               </div>
-              <p className="font-mono text-[8px] sm:text-[9px] font-bold uppercase text-[#E7D5A4]/70 leading-tight">{item.label}</p>
+              <p className="font-mono text-[10px] sm:text-[10px] font-bold uppercase text-[#E7D5A4]/70 leading-tight">{item.label}</p>
             </div>
           ))}
         </div>
@@ -157,12 +157,12 @@ export const ArchivePage = () => {
                 <LotusStamp index={i} bg="transparent" border="#C99A24" className="absolute -bottom-2 -right-2 w-7 h-7 shadow-md -rotate-6" />
               </div>
               <div className="relative flex-1 min-w-0">
-                <div className="font-mono text-[8px] sm:text-[9px] font-bold text-[#B94717] uppercase tracking-wider mb-1">
+                <div className="font-mono text-[10px] sm:text-[10px] font-bold text-[#B94717] uppercase tracking-wider mb-1">
                   {item.category} // {item.year}
                 </div>
                 <h3 className="display text-base sm:text-xl text-[#11100C] mb-2 leading-tight">{item.title}</h3>
                 <p className="font-mono text-[10px] sm:text-xs text-[#B94717] font-bold uppercase mb-1">{item.headline}</p>
-                <p className="font-mono text-[9px] sm:text-[10px] text-[#11100C]/75 leading-relaxed">{item.details}</p>
+                <p className="font-mono text-[10px] sm:text-[10px] text-[#11100C]/75 leading-relaxed">{item.details}</p>
               </div>
             </div>
           ))}

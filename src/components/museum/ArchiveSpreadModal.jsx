@@ -20,7 +20,7 @@ export const ArchiveSpreadModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center border-b-2 border-[#191410] pb-3">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-bold text-[#c2272a] tracking-[0.3em]">📚 TANGY ARCHIVE // MAGAZINE SPREAD</span>
-            <span className="font-mono text-[9px] text-[#241a12]/70">LIBRARY FILE NO. {selectedItem.year}</span>
+            <span className="font-mono text-[10px] text-[#241a12]/70">LIBRARY FILE NO. {selectedItem.year}</span>
           </div>
           <button 
             onClick={onClose}
@@ -40,7 +40,7 @@ export const ArchiveSpreadModal = ({ isOpen, onClose }) => {
               alt={selectedItem.title} 
               className="w-full aspect-[4/3] object-cover filter contrast-110" 
             />
-            <div className="mt-2 font-mono text-[9px] text-[#ecdcaf] flex justify-between uppercase">
+            <div className="mt-2 font-mono text-[10px] text-[#ecdcaf] flex justify-between uppercase">
               <span>{selectedItem.category}</span>
               <span>YEAR {selectedItem.year}</span>
             </div>
@@ -49,7 +49,7 @@ export const ArchiveSpreadModal = ({ isOpen, onClose }) => {
           {/* RIGHT PAGE: EDITORIAL STORY & SPECS */}
           <div className="flex flex-col gap-4 text-left">
             <div>
-              <span className="font-mono text-[9px] font-bold text-[#c2272a] uppercase tracking-widest">{selectedItem.category} ARCHIVE</span>
+              <span className="font-mono text-[10px] font-bold text-[#c2272a] uppercase tracking-widest">{selectedItem.category} ARCHIVE</span>
               <h3 className="font-poster text-2xl text-[#191410] leading-tight my-1">{selectedItem.title}</h3>
               <p className="font-mono text-xs text-[#241a12]/80 font-semibold border-b border-[#191410]/20 pb-2">{selectedItem.headline}</p>
             </div>
@@ -68,7 +68,7 @@ export const ArchiveSpreadModal = ({ isOpen, onClose }) => {
                 <button
                   key={item.id}
                   onClick={() => { playSFX('ticketClick'); setSelectedItem(item); }}
-                  className={`px-2.5 py-1.5 font-mono text-[9px] font-bold tracking-wider uppercase border text-nowrap transition-all ${selectedItem.id === item.id ? 'bg-[#191410] text-[#ecdcaf] border-[#191410]' : 'bg-[#e9decb] text-[#191410] border-[#191410]/30 hover:border-[#191410]'}`}
+                  className={`px-2.5 py-1.5 font-mono text-[10px] font-bold tracking-wider uppercase border text-nowrap transition-all ${selectedItem.id === item.id ? 'bg-[#191410] text-[#ecdcaf] border-[#191410]' : 'bg-[#e9decb] text-[#191410] border-[#191410]/30 hover:border-[#191410]'}`}
                 >
                   {item.category} ({item.year})
                 </button>

@@ -62,7 +62,7 @@ export const VenueHostApplyPage = () => {
     <div className="min-h-screen bg-[#211915] text-[#E7D5A4] font-mono selection:bg-[#C89D35] selection:text-[#11100C] printNoise">
       <Navbar />
 
-      <section className="relative pt-32 pb-16 px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C69A32]/40">
+      <section className="relative pt-20 md:pt-32 pb-10 md:pb-16 px-6 max-w-5xl mx-auto text-center border-b-2 border-[#C69A32]/40">
         {/* Temporary launch: /join is "Coming soon". */}
         {!LAUNCH_MODE && <button
           type="button"

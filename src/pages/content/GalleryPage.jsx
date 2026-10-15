@@ -21,7 +21,7 @@ export const GalleryPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
       <Navbar />
-      <header className="pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
+      <header className="pt-20 md:pt-28 pb-10 px-4 sm:px-6 max-w-6xl mx-auto text-center border-b-2 border-[#C99A2E]/40">
         <span className="text-xs text-[#C99A2E] tracking-[0.35em] uppercase font-bold block mb-3">CONTACT SHEETS</span>
         <h1 className="display text-5xl sm:text-7xl uppercase m-0">GALLERY</h1>
         <SectionNav className="mt-6" />
@@ -81,7 +81,7 @@ export const GalleryAlbumPage = () => {
   return (
     <div className="min-h-screen bg-[#181614] text-[#E7D5A4] font-mono printNoise">
       <Navbar />
-      <main className="pt-28 pb-16 px-4 sm:px-6 max-w-6xl mx-auto">
+      <main className="pt-20 md:pt-28 pb-10 md:pb-16 px-4 sm:px-6 max-w-6xl mx-auto">
         <Link to="/gallery" className="text-[10px] text-[#C99A2E] tracking-widest uppercase hover:underline">← Gallery</Link>
         {loading && <ContentLoading label="Developing…" />}
         {!loading && error && <ContentError onRetry={retry} />}
