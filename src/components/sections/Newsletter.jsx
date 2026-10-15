@@ -27,13 +27,13 @@ export const Newsletter = () => {
       <div className="t-container relative max-w-[760px] text-center">
         <p className="reveal t-label sec-accent m-0">09 — Private mailing list</p>
         <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">Inner Circle</span></h2>
-        <p className="reveal d2 t-quote text-[#EFE2C0]/90 mt-5 mb-0">
+        <p className="reveal d2 t-quote text-[#EFE2C0]/90 mt-4 md:mt-5 mb-0">
           &ldquo;The best stories are shared with those who stay close.&rdquo;
         </p>
 
         {/* Temporary launch: this form saves nothing yet, so it isn't offered. */}
         {LAUNCH_MODE ? (
-          <p className="reveal d3 t-label text-[#EFE2C0]/80 mt-10 mb-0">The Inner Circle mailing list opens soon.</p>
+          <p className="reveal d3 t-label text-[#EFE2C0]/80 mt-7 md:mt-10 mb-0">The Inner Circle mailing list opens soon.</p>
         ) : status === 'SUCCESS' ? (
           <div className="mt-10 inline-block text-left border-[3px] border-double border-[#EFE2C0]/40 p-6">
             <h3 className="t-h3 text-[#EFE2C0] m-0">You&rsquo;re in the circle ✦</h3>
@@ -62,7 +62,7 @@ export const Newsletter = () => {
             </a>
           </>
         )}
-        <p className="folio mt-14 mb-0" aria-hidden="true">— 09 —</p>
+        <p className="folio mt-8 md:mt-14 mb-0" aria-hidden="true">— 09 —</p>
       </div>
     </section>
   );

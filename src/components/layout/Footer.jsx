@@ -8,15 +8,15 @@ const POLICIES = [['Terms', '/terms'], ['Privacy', '/privacy'], ['Refund policy'
 // colophon. Bottom padding clears the fixed dock (--dock-space).
 export const Footer = () => {
   return (
-    <footer className="relative w-full theme-footer border-t-[3px] border-double border-[#EFE2C0]/20 pt-16 md:pt-24 pb-[calc(var(--dock-space)+2rem)]">
+    <footer className="relative w-full theme-footer border-t-[3px] border-double border-[#EFE2C0]/20 pt-12 md:pt-24 pb-[calc(var(--dock-space)+2rem)]">
       <div className="t-container">
         <p className="t-label text-[#C89D35] m-0">Hyderabad / India // Est. 2016</p>
-        <h2 className="font-display uppercase text-[#EFE2C0] leading-[0.85] mt-4 mb-0" style={{ fontSize: 'clamp(3rem, 12vw, 10rem)' }}>
+        <h2 className="font-display uppercase text-[#EFE2C0] leading-[0.85] mt-4 mb-0" style={{ fontSize: 'clamp(2.25rem, 10vw, 10rem)' }}>
           Tangy Sessions
         </h2>
-        <p className="t-label text-[#EFE2C0]/70 mt-5 mb-0">People • Music • Places • Stories</p>
+        <p className="t-label text-[#EFE2C0]/70 mt-4 md:mt-5 mb-0">People • Music • Places • Stories</p>
 
-        <div className="t-grid mt-14 pt-10 border-t border-[#EFE2C0]/15 gap-y-10">
+        <div className="t-grid mt-8 md:mt-14 pt-8 md:pt-10 border-t border-[#EFE2C0]/15 gap-y-8 md:gap-y-10">
           <nav aria-label="Archive index" className="col-span-4 md:col-span-4 lg:col-span-6">
             <p className="t-meta text-[#C89D35] m-0 mb-4">Archive index</p>
             <ol className="list-none m-0 p-0 grid grid-cols-2 gap-x-6 gap-y-2">
@@ -49,7 +49,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-14 pt-6 border-t border-[#EFE2C0]/15 flex flex-col md:flex-row justify-between gap-2 t-meta text-[#EFE2C0]/55">
+        <div className="mt-8 md:mt-14 pt-5 md:pt-6 border-t border-[#EFE2C0]/15 flex flex-col md:flex-row justify-between gap-2 t-meta text-[#EFE2C0]/55">
           <span>© 2016–2026 Tangy Sessions. All rights reserved.</span>
           <nav aria-label="Policies" className="flex flex-wrap gap-4">
             {POLICIES.map(([label, to]) => <Link key={to} to={to} className="hover:text-[#C89D35] underline underline-offset-2">{label}</Link>)}

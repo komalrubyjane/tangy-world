@@ -25,7 +25,7 @@ export const Archive = () => {
           <div className="col-span-4 md:col-span-5 lg:col-span-7">
             <p className="reveal t-label sec-accent m-0">04 — Analogue contact sheet // File 35mm</p>
             <h2 className="reveal-type t-h1 registrationOffset text-[#181614] mt-4 mb-0" style={{ '--reg-ink': 'rgba(181,83,42,0.35)' }}><span className="rt">The Archive</span></h2>
-            <span className="reveal-stamp archiveStamp text-[#8a2320] mt-6" style={{ '--rest-rot': '-6deg' }}>Classified // Archival record ✦</span>
+            <span className="reveal-stamp archiveStamp text-[#8a2320] mt-4 md:mt-6" style={{ '--rest-rot': '-6deg' }}>Classified // Archival record ✦</span>
           </div>
           <div className="reveal d2 col-span-4 md:col-span-3 lg:col-span-4 lg:col-start-9 flex flex-col items-start md:items-end gap-5">
             <p className="t-quote text-[#181614]/85 m-0 md:text-right">&ldquo;Every gathering leaves behind more than photographs.&rdquo;</p>
@@ -34,7 +34,7 @@ export const Archive = () => {
         </header>
 
         {/* THE SHEET */}
-        <div className="reveal-paper contactSheet paperShadow mt-12 md:mt-16" style={{ '--rest-rot': '0.4deg' }}>
+        <div className="reveal-paper contactSheet paperShadow mt-8 md:mt-16" style={{ '--rest-rot': '0.4deg' }}>
           {/* Taped to the catalogue page at two corners */}
           <span className="tapeStrip -top-2 left-6 rotate-[-8deg]" aria-hidden="true" />
           <span className="tapeStrip -top-2 right-6 rotate-[6deg]" aria-hidden="true" />
@@ -68,7 +68,7 @@ export const Archive = () => {
           </ol>
         </div>
 
-        <p className="folio text-right mt-10 mb-0" aria-hidden="true">— 04 —</p>
+        <p className="folio text-right mt-8 md:mt-10 mb-0" aria-hidden="true">— 04 —</p>
       </div>
     </section>
   );

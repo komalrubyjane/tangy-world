@@ -181,7 +181,7 @@ export const Hero = () => {
             {/* MASTHEAD — the one typographic statement, with a single
                 static vermilion misregistration layer. */}
             <h1
-              className="hero-in order-1 lg:order-none m-0 mt-3 lg:mt-0 text-center lg:text-left font-display font-normal uppercase text-[#EFE2C0] leading-[0.82] select-none text-[clamp(3.25rem,20vw,8rem)] max-lg:[@media(max-height:720px)]:text-[min(19vw,10.5svh)] lg:text-[clamp(5rem,11.6vw,11.5rem)]"
+              className="hero-in order-1 lg:order-none m-0 mt-3 lg:mt-0 text-center lg:text-left font-display font-normal uppercase text-[#EFE2C0] leading-[0.82] select-none text-[clamp(2.75rem,13vw,6rem)] max-lg:[@media(max-height:720px)]:text-[min(13vw,9svh)] lg:text-[clamp(5rem,11.6vw,11.5rem)]"
             >
               <span className="relative block">
                 <span className="absolute inset-0 text-[#C0392B]/50 translate-x-[0.02em] -translate-y-[0.016em] -z-10" aria-hidden="true">Tangy</span>
@@ -204,7 +204,7 @@ export const Hero = () => {
               <a href="#sessions" onClick={scrollToSessions} className="t-btn t-btn-light">
                 Upcoming sessions <span aria-hidden="true">↓</span>
               </a>
-              <a href="/about" className="t-link py-2 text-[#EFE2C0]/85 hover:text-[#C89D35]">Our story</a>
+              <a href="/about" className="t-link inline-flex items-center min-h-[44px] text-[#EFE2C0]/85 hover:text-[#C89D35]">Our story</a>
             </div>
           </div>
         </div>

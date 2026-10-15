@@ -15,7 +15,7 @@ export const Closing = () => {
     <section ref={sectionRef} id="contact" className="t-section theme-contact overflow-hidden">
 
       <div className="t-container relative">
-        <div className="t-grid items-center gap-y-12">
+        <div className="t-grid items-center gap-y-8 md:gap-y-12">
           <figure className="reveal-paper col-span-4 md:col-span-4 lg:col-span-5 m-0 max-w-[380px] md:max-w-none w-full mx-auto md:mx-0" style={{ '--rest-rot': '-1deg' }}>
             <div className="photoFrame paperShadow">
             <span className="tapeStrip -top-2.5 left-8 rotate-[-6deg]" aria-hidden="true" />
@@ -27,12 +27,12 @@ export const Closing = () => {
                 alt="After hours"
                 loading="lazy"
                 decoding="async"
-                className="photo-bw drift-img block w-full aspect-[4/5] object-cover"
+                className="photo-bw drift-img block w-full aspect-[4/5] max-h-(--photo-max-h) object-cover"
               />
             </picture>
             </div>
             </div>
-            <figcaption className="filmCaption text-[#EFE2C0]/55 mt-4">Fig. 10 — After hours</figcaption>
+            <figcaption className="filmCaption text-[#EFE2C0]/55 mt-3 md:mt-4">Fig. 10 — After hours</figcaption>
           </figure>
 
           <div className="col-span-4 md:col-span-4 lg:col-span-6 lg:col-start-7">
@@ -40,24 +40,24 @@ export const Closing = () => {
             <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">
               Come<br /><span className="text-[#C89D35]">find us.</span>
             </span></h2>
-            <p className="reveal d2 t-quote text-[#EFE2C0]/85 mt-5 mb-0">&ldquo;Every journey begins somewhere.&rdquo;</p>
+            <p className="reveal d2 t-quote text-[#EFE2C0]/85 mt-4 md:mt-5 mb-0">&ldquo;Every journey begins somewhere.&rdquo;</p>
 
-            <dl className="reveal d2 mt-10 m-0 border-t-[3px] border-double border-[#EFE2C0]/25">
+            <dl className="reveal d2 mt-7 md:mt-10 m-0 border-t-[3px] border-double border-[#EFE2C0]/25">
               {DETAILS.map((d) => (
-                <div key={d.label} className="grid grid-cols-[7rem_1fr] gap-4 py-4 border-b border-[#EFE2C0]/20">
+                <div key={d.label} className="grid grid-cols-[6rem_1fr] md:grid-cols-[7rem_1fr] gap-3 md:gap-4 py-3 md:py-4 border-b border-[#EFE2C0]/20">
                   <dt className="archiveMetadata text-[#C89D35]">{d.label}</dt>
                   <dd className="m-0 font-mono text-sm text-[#EFE2C0]/90 break-words">
-                    {d.href ? <a href={d.href} className="hover:text-[#C89D35]">{d.value}</a> : d.value}
+                    {d.href ? <a href={d.href} className="inline-block py-3 -my-3 hover:text-[#C89D35]">{d.value}</a> : d.value}
                   </dd>
                 </div>
               ))}
             </dl>
 
-            <a href="/contact" className="reveal d2 t-btn t-btn-light mt-10">Contact → Visit Tangy</a>
+            <a href="/contact" className="reveal d2 t-btn t-btn-light mt-7 md:mt-10">Contact → Visit Tangy</a>
           </div>
         </div>
 
-        <div className="flex justify-between gap-4 mt-16 pt-4 border-t border-[#EFE2C0]/15 archiveMetadata text-[#EFE2C0]/60">
+        <div className="flex justify-between gap-4 mt-10 md:mt-16 pt-4 border-t border-[#EFE2C0]/15 archiveMetadata text-[#EFE2C0]/60">
           <span>Tangy Sessions · Hyderabad · Est. 2016</span>
           <span className="folio !opacity-100">— 10 —</span>
         </div>

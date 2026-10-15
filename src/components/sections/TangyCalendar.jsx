@@ -15,7 +15,7 @@ export const TangyCalendar = () => {
   return (
     <section id="calendar" className="t-section theme-sessions" aria-labelledby="home-calendar-title">
       <div className="t-container">
-        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-8 border-b-[3px] border-double border-[#EFE2C0]/25">
+        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6 pb-6 md:pb-8 border-b-[3px] border-double border-[#EFE2C0]/25">
           <div>
             <p className="t-label sec-accent m-0">Upcoming dates // Sessions, workshops &amp; events</p>
             <h2 id="home-calendar-title" className="t-h1 text-[#EFE2C0] mt-4 mb-0">Tangy Calendar</h2>

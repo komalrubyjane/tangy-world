@@ -92,6 +92,71 @@
   :root { --grid-cols: 12; --gutter: 76px; --grid-gap: 24px; --section-pad: var(--space-2xl); --dock-space: 76px; }
 }
 
+/* Small accent labels on the homepage: the same hues, shaded just enough to
+   reach WCAG AA (4.5:1) at label sizes. */
+.tangy-world .theme-about .sec-accent { color: #93401c; }
+.tangy-world .theme-archive .sec-accent { color: #8a3a19; }
+.tangy-world .theme-crew .sec-accent { color: #ddb553; }
+
+/* ── HOMEPAGE SIZE TOKENS ─────────────────────────────────────────────
+   The homepage (.tangy-world) runs a lighter scale on phones and tablets so
+   the same content takes less room; desktop (>=1024px) keeps the defaults
+   (the fallbacks in each class below). Inner pages are unaffected.       */
+.tangy-world {
+  --fs-section: clamp(2rem, 9.6vw, 2.75rem);   /* section headings, 36px @375 */
+  --fs-h2: clamp(1.75rem, 8vw, 2.25rem);       /* secondary headings, 30px @375 */
+  --fs-h3: 1.25rem;                            /* card titles, 20px */
+  --fs-card-display: clamp(1.75rem, 7.5vw, 2.25rem); /* invitation title, 28px @375 */
+  --fs-quote: clamp(1rem, 4.5vw, 1.125rem);    /* pull-quotes, 17px @375 */
+  --fs-small: 0.9375rem;                       /* card body, 15px */
+  --fs-label: 0.6875rem;                       /* kickers, 11px */
+  --ls-label: 0.08em;
+  --fs-meta: 0.65625rem;                       /* file nos., stamps, tags, 10.5px */
+  --ls-meta: 0.08em;
+  --fs-btn: 0.8125rem;                         /* 13px */
+  --ls-btn: 0.1em;
+  --btn-pad: 0.625rem 1rem;                    /* 10px 16px, min-height stays 44px */
+  --section-pad: 3.5rem;                       /* 56px */
+  --tape-w: 54px;
+  --tape-h: 14px;
+  --photo-max-h: 220px;                        /* Fig. photographs */
+}
+@media (min-width: 768px) {
+  .tangy-world {
+    --fs-section: clamp(3rem, 8.5vw, 6rem);
+    --fs-h2: clamp(2.25rem, 5.6vw, 3.5rem);
+    --fs-h3: clamp(1.3rem, 2.2vw, 1.85rem);
+    --fs-quote: clamp(1.15rem, 2vw, 1.6rem);
+    --fs-small: 0.9375rem;
+    --section-pad: 4.5rem;
+    --photo-max-h: none;
+  }
+}
+@media (min-width: 1024px) {
+  .tangy-world {
+    --fs-section: initial; --fs-h2: initial; --fs-h3: initial; --fs-card-display: clamp(2.4rem, 3.6vw, 3.4rem);
+    --fs-quote: initial; --fs-small: initial; --fs-label: initial; --ls-label: initial;
+    --fs-meta: initial; --ls-meta: initial; --fs-btn: initial; --ls-btn: initial; --btn-pad: initial;
+    --section-pad: var(--space-2xl); --tape-w: initial; --tape-h: initial;
+  }
+}
+@media (max-width: 1023px) {
+  .tangy-world .theme-hero,
+  .tangy-world .theme-about, .tangy-world .theme-archive,
+  .tangy-world .theme-sessions, .tangy-world .theme-crew, .tangy-world .theme-diary,
+  .tangy-world .theme-collab, .tangy-world .theme-private, .tangy-world .theme-contact {
+    /* Texture veil: a wash of the section's own colour over its baked
+       texture (~25%), so the material reads lighter without new assets. */
+    --tex-veil: color-mix(in srgb, var(--sec-bg) 26%, transparent);
+    background-image: linear-gradient(var(--tex-veil), var(--tex-veil)), var(--tex-layers);
+  }
+  .tangy-world .theme-hero { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/bandhani-print.webp'); background-size: 100%, 160px, 420px; }
+  .tangy-world .theme-about, .tangy-world .theme-archive { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-ink.webp'); background-size: 100%, 160px, 720px; }
+  .tangy-world .theme-sessions, .tangy-world .theme-crew, .tangy-world .theme-diary { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/fibers-light.webp'); background-size: 100%, 160px, 720px; }
+  .tangy-world .theme-collab { --tex-layers: url('/textures/grain-soft.webp'), url('/textures/botanical-print.webp'); background-size: 100%, 160px, 560px; }
+  .tangy-world .theme-private, .tangy-world .theme-contact { --tex-layers: url('/textures/grain-soft.webp'); background-size: 100%, 160px; }
+}
+
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -121,6 +186,11 @@
   @supports (overflow-x: clip) { body, #root { overflow-x: clip; } }
   #root { width: 100%; min-height: 100%; }
 
+  /* Cormorant Garamond substitutes a "Th" ligature glyph; where that glyph is
+     missing from the served subset it renders as "!" / '"' ("!e", '"ey're').
+     Common ligatures off: same letters, drawn separately. */
+  html { font-variant-ligatures: no-common-ligatures; }
+
   h1, h2 { font-family: var(--font-display); font-weight: 400; }
   h3, h4 { font-family: var(--font-condensed); font-weight: 600; }
 
@@ -140,40 +210,40 @@
     line-height: 0.9;
     letter-spacing: 0.005em;
   }
-  .t-h1 { font-size: clamp(3.25rem, 11vw, 10rem); line-height: 0.84; }
-  .t-h2 { font-size: clamp(2.5rem, 6.4vw, 5.75rem); }
+  .t-h1 { font-size: var(--fs-section, clamp(3.25rem, 11vw, 10rem)); line-height: 0.84; }
+  .t-h2 { font-size: var(--fs-h2, clamp(2.5rem, 6.4vw, 5.75rem)); }
   .t-h3 {
     font-family: var(--font-condensed);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    font-size: var(--fs-h3, clamp(1.35rem, 2.2vw, 1.85rem));
     line-height: 1.05;
     letter-spacing: 0.01em;
   }
   .t-body { font-family: var(--font-body); font-size: 1rem; line-height: 1.65; }
   .t-lead { font-family: var(--font-body); font-size: clamp(1.05rem, 1.4vw, 1.25rem); line-height: 1.6; }
-  .t-small { font-family: var(--font-body); font-size: 0.875rem; line-height: 1.55; }
+  .t-small { font-family: var(--font-body); font-size: var(--fs-small, 0.875rem); line-height: 1.55; }
   .t-quote {
     font-family: var(--font-accent);
     font-style: italic;
     font-weight: 500;
-    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-size: var(--fs-quote, clamp(1.25rem, 2vw, 1.6rem));
     line-height: 1.3;
   }
   .t-label {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-label, 0.75rem);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: var(--ls-label, 0.18em);
     line-height: 1.4;
   }
   .t-meta,
   .t-caption {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: var(--fs-meta, 0.6875rem);
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--ls-meta, 0.14em);
     line-height: 1.45;
   }
 
@@ -377,12 +447,12 @@
     justify-content: center;
     gap: 0.6em;
     min-height: 44px;
-    padding: 0.8rem 1.4rem;
+    padding: var(--btn-pad, 0.8rem 1.4rem);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-btn, 0.75rem);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: var(--ls-btn, 0.16em);
     line-height: 1.2;
     text-decoration: none;
     background: var(--color-tangy-ink);
@@ -417,10 +487,10 @@
     padding: 0.3rem 0.6rem;
     border: 1.5px solid currentColor;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: var(--fs-meta, 0.6875rem);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: var(--ls-meta, 0.18em);
   }
   .t-tape {
     position: absolute;
@@ -434,10 +504,10 @@
   /* ── ARCHIVAL PRIMITIVES ─────────────────────────────────────────── */
   .archivalRule { border: 0; border-top: 1px solid currentColor; opacity: 0.35; margin: 0; }
   .archivalRule--double { border-top: 3px double currentColor; opacity: 0.5; }
-  .archiveMetadata { font-family: var(--font-mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.45; }
-  .filmCaption { font-family: var(--font-mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; }
+  .archiveMetadata { font-family: var(--font-mono); font-size: var(--fs-meta, 0.6875rem); text-transform: uppercase; letter-spacing: var(--ls-meta, 0.14em); line-height: 1.45; }
+  .filmCaption { font-family: var(--font-mono); font-size: var(--fs-meta, 0.6875rem); text-transform: uppercase; letter-spacing: var(--ls-meta, 0.14em); }
   .filmCaption::before { content: '▸ '; opacity: 0.6; }
-  .folio { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.3em; opacity: 0.55; }
+  .folio { font-family: var(--font-mono); font-size: var(--fs-meta, 0.6875rem); letter-spacing: 0.3em; opacity: 0.55; }
 
   /* Print misregistration: an offset second ink, as text-shadow (no extra DOM). */
   .registrationOffset { text-shadow: 0.014em 0.008em 0 var(--reg-ink, rgba(192, 57, 43, 0.45)); }
@@ -468,8 +538,8 @@
   /* Masking tape: translucent, torn ends. */
   .tapeStrip {
     position: absolute;
-    width: 76px;
-    height: 20px;
+    width: var(--tape-w, 76px);
+    height: var(--tape-h, 20px);
     background: rgba(236, 222, 184, 0.72);
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
     clip-path: polygon(3% 8%, 97% 0, 100% 30%, 96% 58%, 99% 100%, 2% 94%, 0 62%, 4% 34%);
@@ -483,10 +553,10 @@
     padding: 0.3rem 0.6rem;
     border: 1.5px solid currentColor;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: var(--fs-meta, 0.6875rem);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: var(--ls-meta, 0.18em);
     opacity: 0.88;
     transform: rotate(var(--rest-rot, -4deg));
   }
@@ -521,9 +591,9 @@
     display: flex;
     align-items: center;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: var(--fs-meta, 0.6875rem);
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--ls-meta, 0.14em);
     border: 1px solid rgba(24, 22, 20, 0.7);
     border-bottom: 0;
     border-radius: 3px 3px 0 0;

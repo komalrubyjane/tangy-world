@@ -26,7 +26,7 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
   return (
     <section ref={sectionRef} id="sessions" className="t-section theme-sessions overflow-hidden">
       <div className="t-container">
-        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-8 md:pb-12 border-b-[3px] border-double border-[#EFE2C0]/25">
+        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 md:gap-6 pb-6 md:pb-12 border-b-[3px] border-double border-[#EFE2C0]/25">
           <div>
             <p className="reveal t-label sec-accent m-0">03 — Collectible concert tickets // 1974 series</p>
             <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">Sessions</span></h2>
@@ -34,7 +34,7 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
           <a href="/sessions" className="reveal d2 t-btn t-btn-light self-start md:self-auto">Sessions → View more</a>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 sm:gap-8 lg:gap-10 mt-12 md:mt-16 max-w-[420px] sm:max-w-none mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mt-8 md:mt-16 max-w-[420px] sm:max-w-none mx-auto">
           {events.map((event, idx) => (
             <div
               key={event.id}
@@ -46,7 +46,7 @@ export const UpcomingEvents = ({ onSelectBooking }) => {
           ))}
         </div>
         {!loading && events.length === 0 && (
-          <p className="t-label text-[#EFE2C0]/70 mt-12 text-center">
+          <p className="t-label text-[#EFE2C0]/70 mt-8 md:mt-12 text-center">
             {LAUNCH_MODE
               ? <>New sessions coming soon — <a className="underline" href="/sessions">register for our next session</a>.</>
               : 'New sessions are being scheduled — join the waitlist on the sessions page.'}

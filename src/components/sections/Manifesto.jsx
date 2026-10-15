@@ -17,7 +17,7 @@ export const Manifesto = () => {
           <span className="hidden sm:inline">Hyderabad · Est. 2016</span>
         </div>
 
-        <div className="t-grid gap-y-0 mt-10 md:mt-14 items-start">
+        <div className="t-grid gap-y-0 mt-8 md:mt-14 items-start">
           {/* TEXT COLUMN — `contents` below lg so the photograph can slot in
               right after the headline on phones/tablets (heading → photo →
               copy → quote/CTA); a normal column beside the photo on desktop. */}
@@ -26,11 +26,11 @@ export const Manifesto = () => {
             <h2 className="reveal-type t-h1 registrationOffset text-[#181614] mt-4 mb-0 col-span-4 md:col-span-8 order-2 lg:order-none" style={{ '--reg-ink': 'rgba(181,83,42,0.35)' }}><span className="rt">
               Why<br />Tangy?
             </span></h2>
-            <p className="reveal d2 t-h3 text-[#181614] mt-6 mb-0 max-w-[28ch] col-span-4 md:col-span-8 order-3 lg:order-none">
+            <p className="reveal d2 t-h3 text-[#181614] mt-4 md:mt-6 mb-0 max-w-[28ch] col-span-4 md:col-span-8 order-3 lg:order-none">
               We don&rsquo;t just host shows. We create memories.
             </p>
 
-            <div className="reveal d2 grid md:grid-cols-2 gap-6 md:gap-8 mt-8 t-body text-[#181614]/85 col-span-4 md:col-span-8 order-5 lg:order-none">
+            <div className="reveal d2 grid md:grid-cols-2 gap-4 md:gap-8 mt-6 md:mt-8 t-body text-[#181614]/85 col-span-4 md:col-span-8 order-5 lg:order-none">
               <p className="m-0">
                 A room became a stage. A stage became a gathering. A gathering became a memory — and the memory kept playing. Tangy Sessions was born out of a refusal to let music stay quiet or generic.
               </p>
@@ -39,7 +39,7 @@ export const Manifesto = () => {
               </p>
             </div>
 
-            <div className="reveal d2 mt-10 pt-6 border-t border-[#181614]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5 col-span-4 md:col-span-8 order-6 lg:order-none">
+            <div className="reveal d2 mt-8 md:mt-10 pt-5 md:pt-6 border-t border-[#181614]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5 col-span-4 md:col-span-8 order-6 lg:order-none">
               <p className="t-quote text-[#181614]/90 m-0 max-w-[32ch]">
                 &ldquo;We started with one forgotten stepwell. Today, every performance carries another story.&rdquo;
               </p>
@@ -49,7 +49,7 @@ export const Manifesto = () => {
 
           {/* ARCHIVAL PHOTOGRAPH */}
           <figure
-            className="reveal-paper col-span-4 md:col-span-6 md:col-start-2 lg:col-span-4 lg:col-start-9 m-0 mt-10 lg:mt-24 order-4 lg:order-none max-w-[380px] md:max-w-none mx-auto md:mx-0 w-full"
+            className="reveal-paper col-span-4 md:col-span-6 md:col-start-2 lg:col-span-4 lg:col-start-9 m-0 mt-8 lg:mt-24 order-4 lg:order-none max-w-[380px] md:max-w-none mx-auto md:mx-0 w-full"
             style={{ '--rest-rot': '-1.5deg' }}
           >
             <div className="photoFrame paperShadow">
@@ -62,15 +62,15 @@ export const Manifesto = () => {
                   alt="Tangy crowd"
                   loading="lazy"
                   decoding="async"
-                  className="photo-bw drift-img block w-full aspect-[4/5] object-cover"
+                  className="photo-bw drift-img block w-full aspect-[4/5] max-h-(--photo-max-h) object-cover"
                 />
               </div>
             </div>
-            <figcaption className="filmCaption text-[#181614]/70 mt-4">Fig. 02.1 — Tangy crowd</figcaption>
+            <figcaption className="filmCaption text-[#181614]/70 mt-3 md:mt-4">Fig. 02.1 — Tangy crowd</figcaption>
           </figure>
         </div>
 
-        <p className="folio text-right mt-14 mb-0" aria-hidden="true">— 02 —</p>
+        <p className="folio text-right mt-8 md:mt-14 mb-0" aria-hidden="true">— 02 —</p>
       </div>
     </section>
   );

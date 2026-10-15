@@ -23,9 +23,9 @@ const DOSSIERS = [
   {
     key: 'art',
     tab: 'Dossier No. 08-A // On the stage',
-    tabTone: 'bg-[#B5532A] text-[#EFE2C0]',
+    tabTone: 'bg-[#963f1c] text-[#EFE2C0]',
     stamp: 'Audition // 33⅓ RPM',
-    stampTone: 'text-[#B5532A]',
+    stampTone: 'text-[#93401c]',
     rot: '0.8deg',
     path: 'Path 02 // Artist portfolio',
     title: 'Artist',
@@ -40,8 +40,8 @@ const DOSSIERS = [
 
 const PARTNERS = [
   { no: '01', band: '#C89D35', bandInk: '#181614', rot: '-0.6deg', kind: 'Partner', title: 'Vendors', body: 'Chai stalls, artisanal food popups, vintage print presses, and craft makers bringing local flavor to every session.', href: '/apply/vendors' },
-  { no: '02', band: '#B5532A', bandInk: '#EFE2C0', rot: '0.5deg', kind: 'Sponsor', title: 'Sponsors', body: 'Cultural foundations, audio gear brands, and independent supporters powering heritage music preservation.', href: '/apply/sponsors' },
-  { no: '03', band: '#5A6E80', bandInk: '#EFE2C0', rot: '-0.3deg', kind: 'Heritage', title: 'Venue / Host', body: 'Have a 300-year-old stepwell, private Nizam-era courtyard, or historic acoustic sanctuary? Host a session.', href: '/apply/venue-host' },
+  { no: '02', band: '#9c451f', bandInk: '#EFE2C0', rot: '0.5deg', kind: 'Sponsor', title: 'Sponsors', body: 'Cultural foundations, audio gear brands, and independent supporters powering heritage music preservation.', href: '/apply/sponsors' },
+  { no: '03', band: '#4d6072', bandInk: '#EFE2C0', rot: '-0.3deg', kind: 'Heritage', title: 'Venue / Host', body: 'Have a 300-year-old stepwell, private Nizam-era courtyard, or historic acoustic sanctuary? Host a session.', href: '/apply/venue-host' },
 ];
 
 // A wire paper clip holding each dossier's photograph.
@@ -66,16 +66,16 @@ export const Volunteer = () => {
         <header className="max-w-3xl">
           <p className="reveal t-label sec-accent m-0">05 — Tangy Sessions // Recruitment archive</p>
           <h2 className="reveal-type t-h1 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">Join the crew</span></h2>
-          <p className="reveal d2 t-quote text-[#EFE2C0]/90 mt-5 mb-0">&ldquo;Great experiences are built by passionate people behind the scenes.&rdquo;</p>
+          <p className="reveal d2 t-quote text-[#EFE2C0]/90 mt-4 md:mt-5 mb-0">&ldquo;Great experiences are built by passionate people behind the scenes.&rdquo;</p>
           <p className="reveal d2 t-label text-[#EFE2C0]/70 mt-4 mb-0">Behind the sound · On the stage</p>
         </header>
 
         {/* DOSSIERS — physical files on the desk */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8 lg:gap-12 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 lg:gap-12 mt-12 md:mt-20">
           {DOSSIERS.map((d, i) => (
             <article
               key={d.key}
-              className="reveal-paper paperLift relative bg-[#f2e7cb] paperTexture paperShadow text-[#181614] p-6 md:p-8 lg:p-10 flex flex-col"
+              className="reveal-paper paperLift relative bg-[#f2e7cb] paperTexture paperShadow text-[#181614] p-[18px] md:p-8 lg:p-10 flex flex-col"
               style={{ '--rest-rot': d.rot, transitionDelay: `${330 + i * 140}ms` }}
             >
               <div className={`documentTab ${d.tabTone}`}>{d.tab}</div>
@@ -84,11 +84,11 @@ export const Volunteer = () => {
                 <p className="archiveMetadata text-[#181614]/70 m-0 pt-1">{d.path}</p>
                 <span className={`reveal-stamp archiveStamp shrink-0 ${d.stampTone}`} style={{ '--rest-rot': '-5deg' }}>{d.stamp}</span>
               </div>
-              <h3 className="t-h2 font-display font-normal mt-6 mb-0">{d.title}</h3>
-              <p className="t-body text-[#181614]/85 mt-4 mb-0 max-w-[40ch]">{d.note}</p>
+              <h3 className="t-h2 font-display font-normal mt-5 md:mt-6 mb-0">{d.title}</h3>
+              <p className="t-body text-[#181614]/85 mt-3 md:mt-4 mb-0 max-w-[40ch]">{d.note}</p>
 
-              <figure className="relative m-0 mt-7 w-[200px] md:w-[220px] photoFrame paperShadow -rotate-[2deg]">
-                <PaperClip className="absolute -top-4 left-5 w-4 h-11 z-[3]" />
+              <figure className="relative m-0 mt-6 md:mt-7 w-[150px] md:w-[220px] photoFrame paperShadow -rotate-[2deg]">
+                <PaperClip className="absolute -top-3 md:-top-4 left-4 md:left-5 w-3 h-8 md:w-4 md:h-11 z-[3]" />
                 <div className="photoFrame-img">
                   <picture>
                     <source srcSet={d.photo.webp} type="image/webp" />
@@ -98,9 +98,9 @@ export const Volunteer = () => {
                 <figcaption className="filmCaption mt-2 text-[#181614]/75">{d.photo.caption}</figcaption>
               </figure>
 
-              <ul className="list-none m-0 p-0 mt-6 flex flex-wrap gap-2">
+              <ul className="list-none m-0 p-0 mt-5 md:mt-6 flex flex-wrap gap-1.5 md:gap-2">
                 {d.tags.map((t) => (
-                  <li key={t} className="archiveMetadata border border-[#181614]/60 px-2 py-1">{t}</li>
+                  <li key={t} className="archiveMetadata border border-[#181614]/60 px-2.5 py-1">{t}</li>
                 ))}
               </ul>
 
@@ -108,7 +108,7 @@ export const Volunteer = () => {
                 type="button"
                 onClick={() => setOpenDetails(openDetails === d.key ? null : d.key)}
                 aria-expanded={openDetails === d.key}
-                className="t-link self-start mt-6 text-[#181614]/80 hover:text-[#B5532A] min-h-[44px]"
+                className="t-link self-start mt-3 md:mt-6 text-[#181614]/80 hover:text-[#B5532A] min-h-[44px]"
               >
                 {openDetails === d.key ? 'Hide details −' : 'Details +'}
               </button>
@@ -119,7 +119,7 @@ export const Volunteer = () => {
                 </div>
               )}
 
-              <div className="mt-auto pt-6">
+              <div className="mt-auto pt-4 md:pt-6">
                 <a href={d.cta.href} onClick={() => playSFX('ticketClick')} className="t-btn w-full">
                   {d.cta.label}
                 </a>
@@ -128,14 +128,14 @@ export const Volunteer = () => {
           ))}
         </div>
 
-        <p className="folio text-right mt-14 mb-0" aria-hidden="true">— 05 —</p>
+        <p className="folio text-right mt-8 md:mt-14 mb-0" aria-hidden="true">— 05 —</p>
       </div>
     </section>
 
     {/* 06 — BUILD THIS WORLD TOGETHER: partner files in a botanical-print archive */}
     <section ref={collabRef} id="build-together" className="t-section theme-collab overflow-hidden">
       <div className="t-container relative">
-        <header className="t-grid items-end gap-y-4 pb-8 border-b-[3px] border-double border-[#EFE2C0]/25">
+        <header className="t-grid items-end gap-y-4 pb-6 md:pb-8 border-b-[3px] border-double border-[#EFE2C0]/25">
           <div className="col-span-4 md:col-span-5 lg:col-span-8">
             <p className="reveal t-label sec-accent m-0">06 — Collaboration archive // Tangy Sessions</p>
             <h2 className="reveal-type t-h2 registrationOffset text-[#EFE2C0] mt-4 mb-0"><span className="rt">Build this world together</span></h2>
@@ -145,7 +145,7 @@ export const Volunteer = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 lg:gap-10 mt-8 md:mt-12">
           {PARTNERS.map((p, i) => (
             <article
               key={p.no}
@@ -153,20 +153,20 @@ export const Volunteer = () => {
               style={{ '--rest-rot': p.rot, transitionDelay: `${330 + i * 110}ms` }}
             >
               {/* File label band */}
-              <div className="flex justify-between items-center px-6 lg:px-8 py-2.5 archiveMetadata" style={{ background: p.band, color: p.bandInk }}>
+              <div className="flex justify-between items-center px-[18px] md:px-6 lg:px-8 py-2 md:py-2.5 archiveMetadata" style={{ background: p.band, color: p.bandInk }}>
                 <span>File No. {p.no}</span>
                 <span>{p.kind}</span>
               </div>
-              <div className="flex-1 flex flex-col p-6 lg:p-8">
+              <div className="flex-1 flex flex-col p-[18px] md:p-6 lg:p-8">
                 <h3 className="t-h3 m-0">{p.title}</h3>
-                <p className="t-small text-[#181614]/85 mt-3 mb-6">{p.body}</p>
+                <p className="t-small text-[#181614]/85 mt-2 md:mt-3 mb-5 md:mb-6">{p.body}</p>
                 <a href={p.href} className="t-btn mt-auto">Collaborate → Explore opportunities</a>
               </div>
             </article>
           ))}
         </div>
 
-        <p className="folio text-right mt-14 mb-0" aria-hidden="true">— 06 —</p>
+        <p className="folio text-right mt-8 md:mt-14 mb-0" aria-hidden="true">— 06 —</p>
       </div>
     </section>
     </>
