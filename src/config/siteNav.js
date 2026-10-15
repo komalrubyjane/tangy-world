@@ -55,10 +55,10 @@ const ALL_SECTIONS = [
     match: ['/artist', '/artists'],
     items: [
       { label: 'Artists Directory', path: '/artist', heading: 'ARTIST' },
-      { label: 'Apply as an Artist', path: '/artist/apply', heading: 'APPLY', launchHidden: true },
-      { label: 'Artist Login', path: '/artist/login', heading: 'STAGE', launchHidden: true },
+      { label: 'Apply as an Artist', path: '/artist/apply', heading: 'APPLY' },
+      { label: 'Artist Login', path: '/artist/login', heading: 'STAGE' },
       // Signed-in area: signed-out visitors are sent to /artist/login.
-      { label: 'Artist Portal', path: '/artist/dashboard', heading: 'ARTIST', protected: true, launchHidden: true },
+      { label: 'Artist Portal', path: '/artist/dashboard', heading: 'ARTIST', protected: true },
     ],
   },
   {

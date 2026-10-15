@@ -134,8 +134,8 @@ export const Navbar = () => {
                   isOpen ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' : 'opacity-0 translate-y-2 pointer-events-none scale-95'
                 }`}
               >
-                {/* Dropdown Items List */}
-                <div className="relative z-10 flex flex-col gap-1">
+                {/* Dropdown Items List — scrolls when the screen is too short */}
+                <div className="relative z-10 flex flex-col gap-1 max-h-[calc(100dvh-90px)] overflow-y-auto overscroll-contain" data-lenis-prevent>
                   {cat.items.map((item) => (
                     <Link
                       key={item.label}
@@ -213,6 +213,7 @@ export const Navbar = () => {
         aria-modal="true"
         aria-label="Archive index"
         inert={!isMobileMenuOpen}
+        data-lenis-prevent
         className={`index-panel ${isMobileMenuOpen ? 'is-open' : ''} fixed inset-x-0 top-[61px] h-[calc(100dvh-61px)] theme-hero z-[10000] overflow-y-auto overscroll-contain xl:hidden`}
       >
         <div className="t-container md:max-w-[44rem] py-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
